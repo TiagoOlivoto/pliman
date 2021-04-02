@@ -7,10 +7,10 @@
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version-ago/metan)](https://CRAN.R-project.org/package=metan) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable) ![Downloads](http://cranlogs.r-pkg.org/badges/metan) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/metan) [<img src="https://zenodo.org/badge/130062661.svg" alt="DOI" width="186"/>](https://zenodo.org/badge/latestdoi/130062661) -->
 <!-- badges: end -->
 
-`pliman` (**pl**nt **im**age **an**anlysis) is designed to analyze plant
-images, especially related to leaf analysis. You provide color palettes,
-tell `pliman` what each one represents, and it takes care of the
-details. The package will help you to:
+`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze
+plant images, especially related to leaf analysis. You provide color
+palettes, tell `pliman` what each one represents, and it takes care of
+the details. The package will help you to:
 
 -   Measure leaf area
 -   Measure disease severity
@@ -60,7 +60,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 88.63503    11.36497
+    # 1 88.64378    11.35622
 
 # Getting help
 
