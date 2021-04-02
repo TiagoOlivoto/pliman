@@ -32,9 +32,6 @@ devtools::install_github("TiagoOlivoto/metan", build_vignettes = TRUE)
 install the latest version of
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-For the latest release notes on this development version, see the [NEWS
-file](https://tiagoolivoto.github.io/metan/news/index.html).
-
 # Usage
 
 ``` r
@@ -63,7 +60,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 88.62117    11.37883
+    # 1 88.63503    11.36497
 
 # Getting help
 
