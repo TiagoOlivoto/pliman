@@ -19,13 +19,13 @@ the details. The package will help you to:
 # Installation
 
 The development version of `pliman` can be installed from
-[GitHub](https://github.com/TiagoOlivoto/metan) with:
+[GitHub](https://github.com/TiagoOlivoto/pliman) with:
 
 ``` r
-devtools::install_github("TiagoOlivoto/metan")
+devtools::install_github("TiagoOlivoto/pliman")
 
 # To build the HTML vignette use
-devtools::install_github("TiagoOlivoto/metan", build_vignettes = TRUE)
+devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 ```
 
 *Note*: If you are a Windows user, you should also first download and
@@ -59,8 +59,8 @@ symptomatic_area(img = img,
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
-    #    healthy symptomatic
-    # 1 88.67383    11.32617
+    #   healthy symptomatic
+    # 1 88.8048     11.1952
 
 # Getting help
 
