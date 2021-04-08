@@ -51,7 +51,7 @@
 #' @export
 #' @md
 #' @importFrom EBImage bwlabel computeFeatures.shape computeFeatures.moment
-#' @importFrom graphics text par
+#' @importFrom graphics text par points
 #' @examples
 #' \donttest{
 #' library(pliman)
