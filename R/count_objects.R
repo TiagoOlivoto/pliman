@@ -30,7 +30,7 @@
 #'   another object (checked for every contact pixel). If the height is smaller
 #'   than the tolerance, the object will be combined with one of its neighbors,
 #'   which is the highest. Tolerance should be chosen according to the range of
-#'   x. Defaults to 2.
+#'   x. Defaults to `3`.
 #' @param extension Radius of the neighborhood in pixels for the detection of
 #'   neighboring objects. Defaults to 20. Higher value smoothes out small
 #'   objects.
@@ -81,8 +81,8 @@ count_objects <- function(img,
                           background = NULL,
                           img_pattern = NULL,
                           channel = "blue",
-                          tolerance = 2,
-                          extension = 20,
+                          tolerance = 3,
+                          extension = 10,
                           lower_size = NULL,
                           upper_size = NULL,
                           randomize = TRUE,
