@@ -23,6 +23,9 @@
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `img_pattern = "1"`) will select
 #'   images that are nammed as 1.-, 2.-, and so on.
+#' @param parallel Processes the images asynchronously (in parallel) in separate
+#'   R sessions running in the background on the same machine. It may speed up
+#'   the processing time, speccialy when `img_pattern` is used is informed.
 #' @param channel A character value specifying the target mode for conversion to
 #'   binary image. One of `gray`, `grey`, `red`, `green`, or `blue`.
 #' @param tolerance The minimum height of the object in the units of image
@@ -70,6 +73,8 @@
 #' @return A data frame with the results for each image.
 #' @export
 #' @importFrom EBImage channel combine watershed distmap otsu getFrames colorLabels resize
+#' @importFrom future.apply future_lapply
+#' @importFrom future plan multisession
 #' @md
 #' @examples
 #' \donttest{
@@ -80,6 +85,7 @@ count_objects <- function(img,
                           foreground = NULL,
                           background = NULL,
                           img_pattern = NULL,
+                          parallel = FALSE,
                           channel = "blue",
                           tolerance = NULL,
                           extension = NULL,
@@ -117,7 +123,7 @@ count_objects <- function(img,
   help_count <-
     function(img, foreground, background, tolerance, extension, randomize,
              nrows, show_image, show_original, show_background, marker, marker_col, marker_size, save_image, prefix,
-             dir_original, dir_processed){
+             dir_original, dir_processed, verbose){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -279,15 +285,13 @@ count_objects <- function(img,
       results <- list(results = shape,
                       statistics = stats)
       if(verbose == TRUE){
-        cat("--------------------------------------------\n")
+        cat("\n--------------------------------------------\n")
         cat("Number of objects:", stats[1,2],"\n")
-        cat("--------------------------------------------\n")
+        cat("--------------------------------------------\n\n")
         print(stats[-1,], row.names = FALSE)
-        cat("--------------------------------------------\n")
       }
       invisible(results)
     }
-
   if(missing(img_pattern)){
     help_count(img, foreground, background, tolerance, extension, randomize,
                nrows, show_image, show_original, show_background, marker,
@@ -308,6 +312,22 @@ count_objects <- function(img,
     if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
+    if(parallel == TRUE){
+    plan(multisession)
+    if(verbose == TRUE){
+      message("Image processing using parallel computation, please wait.")
+    }
+    results <-
+      future_lapply(names_plant, # apply sel_gain nboot times
+                    function(x){
+                      help_count(x,
+                                 foreground, background, tolerance, extension, randomize,
+                                 nrows, show_image, show_original, show_background, marker,
+                                 marker_col, marker_size, save_image, prefix,
+                                 dir_original, dir_processed, verbose =  FALSE)
+                    })
+
+    } else{
     results <- list()
     pb <- progress(max = length(plants), style = 4)
     for (i in 1:length(plants)) {
@@ -318,7 +338,8 @@ count_objects <- function(img,
                    foreground, background, tolerance, extension, randomize,
                    nrows, show_image, show_original, show_background, marker,
                    marker_col, marker_size, save_image, prefix,
-                   dir_original, dir_processed)
+                   dir_original, dir_processed, verbose)
+    }
     }
     names(results) <- names_plant
     stats <-
@@ -337,6 +358,15 @@ count_objects <- function(img,
                   .[, c(10, 1:9)]
               })
       )
+    if(verbose == TRUE){
+      summ <- stats[stats$statistics == "n",c(1,3)]
+      names(summ) <- c("Image", "Objects")
+      cat("--------------------------------------------\n")
+      print(summ)
+      cat("--------------------------------------------\n")
+      message("Done!")
+
+    }
     invisible(list(statistics = stats,
                    results = results))
   }

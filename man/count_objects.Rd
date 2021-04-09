@@ -9,6 +9,7 @@ count_objects(
   foreground = NULL,
   background = NULL,
   img_pattern = NULL,
+  parallel = FALSE,
   channel = "blue",
   tolerance = NULL,
   extension = NULL,
@@ -44,6 +45,10 @@ processed. For example, if \code{img_pattern = "im"} all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
 images that are nammed as 1.-, 2.-, and so on.}
+
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time, speccialy when \code{img_pattern} is used is informed.}
 
 \item{channel}{A character value specifying the target mode for conversion to
 binary image. One of \code{gray}, \code{grey}, \code{red}, \code{green}, or \code{blue}.}

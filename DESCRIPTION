@@ -17,6 +17,8 @@ biocViews:
 Depends: 
     R (>= 4.0.0)
 Imports: 
+    future,
     EBImage,
     ggplot2,
-    magrittr
+    magrittr,
+    future.apply
