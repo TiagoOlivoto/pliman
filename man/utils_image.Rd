@@ -8,6 +8,7 @@
 \alias{save_image}
 \alias{image_to_mat}
 \alias{image_rgb}
+\alias{image_resize}
 \alias{image_pallete}
 \title{Import, export and display images}
 \usage{
@@ -21,7 +22,9 @@ save_image(image, name, ...)
 
 image_to_mat(image, randomize = TRUE, nrows = 5000)
 
-image_rgb(image, facet = FALSE)
+image_rgb(image, facet = TRUE)
+
+image_resize(image, width, height)
 
 image_pallete(image, npal, nstart = 25)
 }
@@ -52,6 +55,9 @@ frame? Padrao \code{TRUE}.}
 \item{nrows}{Number of lines to be selected, no data frame created.}
 
 \item{facet}{Shows RGB values as a facet plot? Defaults to \code{FALSE}.}
+
+\item{width, height}{Width and height of the resized image. One of these
+arguments can be missing to enable proportional resizing.}
 
 \item{npal}{The number of color palletes.}
 

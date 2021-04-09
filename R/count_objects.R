@@ -69,7 +69,7 @@
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return A data frame with the results for each image.
 #' @export
-#' @importFrom EBImage channel combine watershed distmap otsu getFrames colorLabels
+#' @importFrom EBImage channel combine watershed distmap otsu getFrames colorLabels resize
 #' @md
 #' @examples
 #' \donttest{
@@ -81,8 +81,8 @@ count_objects <- function(img,
                           background = NULL,
                           img_pattern = NULL,
                           channel = "blue",
-                          tolerance = 3,
-                          extension = 10,
+                          tolerance = NULL,
+                          extension = NULL,
                           lower_size = NULL,
                           upper_size = NULL,
                           randomize = TRUE,
@@ -130,47 +130,51 @@ count_objects <- function(img,
         extens_ori <- "png"
       }
       if(!is.null(foreground) && !is.null(background)){
-      if(is.character(foreground)){
-        all_files <- sapply(list.files(diretorio_original), file_name)
-        imag <- list.files(diretorio_original, pattern = foreground)
-        check_names_dir(foreground, all_files, diretorio_original)
-        name <- file_name(imag)
-        extens <- file_extension(imag)
-        foreground <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
-      }
-      if(is.character(background)){
-        all_files <- sapply(list.files(diretorio_original), file_name)
-        imag <- list.files(diretorio_original, pattern = background)
-        check_names_dir(background, all_files, diretorio_original)
-        name <- file_name(imag)
-        extens <- file_extension(imag)
-        background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
-      }
-      original <- image_to_mat(img, randomize = randomize, nrows = nrows)
-      foreground <- image_to_mat(foreground, randomize = randomize, nrows = nrows)
-      background <- image_to_mat(background, randomize = randomize, nrows = nrows)
-      back_fore <-
-        rbind(foreground$df_man,
-              background$df_man) %>%
-        transform(Y = ifelse(CODE == "background", 0, 1))
-      modelo1 <-
-        glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore) %>%
-        suppressWarnings()
-      pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
-      foreground_background <- matrix(pred1, ncol = ncol(original$R))
-      foreground_background <- correct_image(foreground_background, perc = 0.01)
-      ID <- c(foreground_background == 1)
-      ID2 <- c(foreground_background == 0)
-      nmask <- watershed(distmap(foreground_background),
-                         tolerance = tolerance,
-                         ext = extension)
+        if(is.character(foreground)){
+          all_files <- sapply(list.files(diretorio_original), file_name)
+          imag <- list.files(diretorio_original, pattern = foreground)
+          check_names_dir(foreground, all_files, diretorio_original)
+          name <- file_name(imag)
+          extens <- file_extension(imag)
+          foreground <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        }
+        if(is.character(background)){
+          all_files <- sapply(list.files(diretorio_original), file_name)
+          imag <- list.files(diretorio_original, pattern = background)
+          check_names_dir(background, all_files, diretorio_original)
+          name <- file_name(imag)
+          extens <- file_extension(imag)
+          background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        }
+        original <- image_to_mat(img, randomize = randomize, nrows = nrows)
+        foreground <- image_to_mat(foreground, randomize = randomize, nrows = nrows)
+        background <- image_to_mat(background, randomize = randomize, nrows = nrows)
+        back_fore <-
+          rbind(foreground$df_man,
+                background$df_man) %>%
+          transform(Y = ifelse(CODE == "background", 0, 1))
+        modelo1 <-
+          glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore) %>%
+          suppressWarnings()
+        pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+        foreground_background <- matrix(pred1, ncol = ncol(original$R))
+        foreground_background <- correct_image(foreground_background, perc = 0.01)
+        ID <- c(foreground_background == 1)
+        ID2 <- c(foreground_background == 0)
+        tol <- ifelse(is.null(tolerance), round(nrow(foreground_background) / 300, 0), tolerance)
+        ext <- ifelse(is.null(extension), round(nrow(foreground_background) / 300, 0), extension)
+        nmask <- watershed(distmap(foreground_background),
+                           tolerance = tol,
+                           ext = ext)
       } else{
         img2 <- channel(img, channel)
         threshold <- otsu(img2)
         img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
+        tol <- ifelse(is.null(tolerance), round(nrow(img2) / 300, 0), tolerance)
+        ext <- ifelse(is.null(extension), round(nrow(img2) / 300, 0), extension)
         nmask <- watershed(distmap(img2),
-                           tolerance = tolerance,
-                           ext = extension)
+                           tolerance = tol,
+                           ext = ext)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
         feat <- computeFeatures.moment(nmask)
@@ -186,13 +190,13 @@ count_objects <- function(img,
           im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
           im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
         } else{
-        im2 <- img
-        im2@.Data[,,1][ID] <- col_foreground[1]
-        im2@.Data[,,2][ID] <- col_foreground[2]
-        im2@.Data[,,3][ID] <- col_foreground[3]
-        im2@.Data[,,1][ID2] <- col_background[1]
-        im2@.Data[,,2][ID2] <- col_background[2]
-        im2@.Data[,,3][ID2] <- col_background[3]
+          im2 <- img
+          im2@.Data[,,1][ID] <- col_foreground[1]
+          im2@.Data[,,2][ID] <- col_foreground[2]
+          im2@.Data[,,3][ID] <- col_foreground[3]
+          im2@.Data[,,1][ID2] <- col_background[1]
+          im2@.Data[,,2][ID2] <- col_background[2]
+          im2@.Data[,,3][ID2] <- col_background[3]
         }
       }
       shape <-
@@ -210,7 +214,7 @@ count_objects <- function(img,
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
       if(show_image == TRUE){
         if(marker == "text"){
-          marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
+          marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
           show_image(im2)
           text(shape[,2],
                shape[,3],
@@ -218,7 +222,7 @@ count_objects <- function(img,
                col = marker_col,
                cex = marker_size)
         } else{
-          marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
+          marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
           show_image(im2)
           points(shape[,2],
                  shape[,3],
@@ -286,7 +290,8 @@ count_objects <- function(img,
 
   if(missing(img_pattern)){
     help_count(img, foreground, background, tolerance, extension, randomize,
-               nrows, show_image, show_original, show_background, marker, marker_col, marker_size, save_image, prefix,
+               nrows, show_image, show_original, show_background, marker,
+               marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed)
   } else{
     if(img_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
@@ -311,8 +316,9 @@ count_objects <- function(img,
       results[[i]] <-
         help_count(img  = names_plant[i],
                    foreground, background, tolerance, extension, randomize,
-                   nrows, show_image, show_original, show_background, col_background,
-                   save_image, dir_original, dir_processed)
+                   nrows, show_image, show_original, show_background, marker,
+                   marker_col, marker_size, save_image, prefix,
+                   dir_original, dir_processed)
     }
     names(results) <- names_plant
     stats <-
@@ -331,8 +337,8 @@ count_objects <- function(img,
                   .[, c(10, 1:9)]
               })
       )
-    return(list(statistics = stats,
-                results = results))
+    invisible(list(statistics = stats,
+                   results = results))
   }
 }
 

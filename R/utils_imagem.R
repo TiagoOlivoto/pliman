@@ -25,6 +25,8 @@
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param nstart How many random sets from `npal` should be chosen?
+#' @param width,height Width and height of the resized image. One of these
+#'   arguments can be missing to enable proportional resizing.
 #' @param ... Depends on the function:
 #'    * For `import_image()` and `save_image()`, alternative arguments passed to
 #' the corresponding functions from the `jpeg`, `png`, and `tiff` packages.
@@ -107,7 +109,7 @@ image_to_mat <- function(image, randomize =  TRUE, nrows = 5000){
 }
 #' @export
 #' @name utils_image
-image_rgb <- function(image, facet = FALSE){
+image_rgb <- function(image, facet = TRUE){
   mat <- image_to_mat(image)$df_in
   mat$CODE <- NULL
   mat$id <- rownames(mat)
@@ -129,6 +131,11 @@ image_rgb <- function(image, facet = FALSE){
           legend.title = element_blank(),
           axis.ticks.length = unit(0.2, "cm"),
           panel.grid.minor = element_blank())
+}
+#' @export
+#' @name utils_image
+image_resize <- function(image, width, height){
+  resize(image, width, height)
 }
 #' @export
 #' @name utils_image
