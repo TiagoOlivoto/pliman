@@ -64,3 +64,29 @@ check_names_dir <- function(name, names_dir, dir){
          call. = FALSE)
   }
 }
+
+image_correct <- function(image, perc){
+  t <- image
+  n=round(perc*min(c(ncol(t),nrow(t))),0)
+  p1=function(t){
+    t2=t
+    for( i in 2:(nrow(t)-n-1)){
+      for(j in 1:ncol(t)){
+        if(t[i,j]==1){
+          if(t[i-1,j]==0){
+            a=0
+            while(a<n){
+              a=a+1
+
+              if(sum(t[i:(i+a),j]==1)<a){t2[i:(i+a),j]=0;a=n}
+            }
+          }
+        }
+      }
+    }
+    return(t2)
+  }
+  Pp=p1(t)
+  Pp=p1(t(Pp))
+  return(t(Pp))
+}

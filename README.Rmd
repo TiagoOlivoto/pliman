@@ -44,15 +44,15 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 
 # Usage
-
+# Disease severity
 
 ```{r fig.width=12, fig.height=3}
 library(pliman)
-img <- import_image(system.file("tmp_images/sev2.png", package = "pliman"))
-healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-symptoms <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-background <- import_image(system.file("tmp_images/sev_back.png", package = "pliman"))
-combine_images(img, healthy, symptoms, background, ncol = 4)
+img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
+healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+image_combine(img, healthy, symptoms, background, ncol = 4)
 
 ```
 
@@ -62,6 +62,28 @@ symptomatic_area(img = img,
                  img_symptoms = symptoms,
                  img_background = background,
                  show_image = TRUE)
+```
+
+# Count crop grains
+The function `count_objects()` can be used to count the grains of an image. In the following example, we will count the number of soybean grains of an image with 150 grains.
+
+```{r}
+img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+image_show(img)
+count_objects(img)
+
+```
+
+In the following example, we will enumerate the grains with an area greater than the mean of all grains in the image and add a white background to the processed image.
+
+```{r}
+count_objects(img,
+              show_segmentation = FALSE,
+              col_background = "white",
+              marker = "text",
+              lower_size = 611.92,
+              marker_size = 0.5,
+              marker_col = "black")
 ```
 
 

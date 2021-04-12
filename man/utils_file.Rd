@@ -17,11 +17,14 @@ file_dir(file)
 manipulate_files(
   pattern,
   dir = NULL,
-  prefix = "",
-  suffix = "",
+  prefix = NULL,
+  name = NULL,
+  suffix = NULL,
   sep = "",
   save_to = NULL,
-  overwrite = FALSE
+  overwrite = FALSE,
+  remove_original = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -33,7 +36,13 @@ manipulate_files(
 Defaults to the current working directory.}
 
 \item{prefix, suffix}{A prefix or suffix to be added in the new file names.
-Defaults to \code{""}.}
+Defaults to \code{NULL} (no prefix or suffix).}
+
+\item{name}{The name of the new files. Defaults to \code{NULL} (original names).
+\code{name} can be either a single value or a character vector of the same
+length as the number of files manipulated. If one value is informed, a
+sequential vector of names will be created as "\code{name}_1", "\code{name}_2", and
+so on.}
 
 \item{sep}{An optional separator. Defaults to \code{""}.}
 
@@ -45,6 +54,11 @@ exist, it will be created. By default, the files will not be overwritten.
 Set \code{overwrite = TRUE} to overwrite the files.}
 
 \item{overwrite}{Overwrite the files? Defaults to \code{FALSE}.}
+
+\item{remove_original}{Remove original files after manipulation? defaults to
+\code{FALSE}. If \code{TRUE} the files in \code{pattern} will be removed.}
+
+\item{verbose}{If \code{FALSE}, the code is run silently.}
 }
 \description{
 \itemize{

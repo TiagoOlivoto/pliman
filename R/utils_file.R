@@ -12,7 +12,12 @@
 #' @param dir The working directory containig the files to be manipulated.
 #'   Defaults to the current working directory.
 #' @param prefix,suffix A prefix or suffix to be added in the new file names.
-#'   Defaults to `""`.
+#'   Defaults to `NULL` (no prefix or suffix).
+#' @param name The name of the new files. Defaults to `NULL` (original names).
+#'   `name` can be either a single value or a character vector of the same
+#'   length as the number of files manipulated. If one value is informed, a
+#'   sequential vector of names will be created as "`name`_1", "`name`_2", and
+#'   so on.
 #' @param sep An optional separator. Defaults to `""`.
 #' @param save_to The directory to save the new files. Defaults to the current
 #'   working directory. If the file name of a file is not changed, nothing will
@@ -21,6 +26,9 @@
 #'   exist, it will be created. By default, the files will not be overwritten.
 #'   Set `overwrite = TRUE` to overwrite the files.
 #' @param overwrite Overwrite the files? Defaults to `FALSE`.
+#' @param remove_original Remove original files after manipulation? defaults to
+#'   `FALSE`. If `TRUE` the files in `pattern` will be removed.
+#' @param verbose If `FALSE`, the code is run silently.
 #' @export
 #' @examples
 #' \donttest{
@@ -63,12 +71,16 @@ file_dir <- function(file){
 #' @name utils_file
 manipulate_files <- function(pattern,
                              dir = NULL,
-                             prefix = "",
-                             suffix = "",
+                             prefix = NULL,
+                             name = NULL,
+                             suffix = NULL,
                              sep = "",
                              save_to = NULL,
-                             overwrite = FALSE){
-  if(is.null(dir)){
+                             overwrite = FALSE,
+                             remove_original = FALSE,
+                             verbose = TRUE){
+  check_dir <- is.null(dir)
+  if(check_dir){
     dir <- paste0("./")
   } else{
     dir <- ifelse(grepl(":", dir, fixed = TRUE),
@@ -76,7 +88,8 @@ manipulate_files <- function(pattern,
                   paste0("./", dir))
   }
   if(is.null(save_to)){
-    save_to <- paste0("./")
+    save_to <- paste0(ifelse(is.null(save_to), paste0(dir),  paste0(dir, "/")))
+    save_to <- ifelse(check_dir, save_to, paste0(save_to, "/"))
   } else{
     save_to <- ifelse(grepl(":", save_to, fixed = TRUE),
                       file_dir(save_to),
@@ -89,9 +102,43 @@ manipulate_files <- function(pattern,
     pattern <- "^[0-9].*$"
   }
   old_files <- list.files(dir, pattern = pattern)
-  old_files <- paste0(dir, old_files)
+  old_files <- paste0(ifelse(nchar(dir) !=2,
+                             paste0(dir, "/"),
+                             paste(dir)), old_files)
   names <- sapply(old_files, file_name)
   extens <- sapply(old_files, file_extension)
-  new_files <- paste0(save_to, prefix, sep, names, sep, suffix, ".", extens)
-  file.copy(from = old_files, to = new_files, overwrite = overwrite)
+  prefix <- ifelse(is.null(prefix), "", prefix)
+  if(is.null(name)){
+   name <- names
+  } else{
+    if(length(name) == 1){
+    name <- lapply(seq_along(names),
+                   function(i){
+                     paste0(name, i, collapse = "_")
+                   }) %>%
+      unlist()
+    } else{
+      name <- name
+      if(length(name) != length(names)){
+        stop("The length of name must be equal to the number of files (", length(names), ").")
+      }
+    }
+  }
+  suffix <- ifelse(is.null(suffix), "", suffix)
+  new_files <- paste0(save_to, prefix, sep, name, sep, suffix, ".", extens)
+  a <- file.copy(from = old_files, to = new_files, overwrite = overwrite)
+  if(remove_original == TRUE){
+    invisible(file.remove(old_files))
+  }
+  if(verbose == TRUE){
+    if(remove_original == TRUE){
+      message(length(old_files), " files successfully deleted from '", dir, "'")
+    }
+    if(all(a) == TRUE){
+      message(length(a), " files successfully copied to '", save_to, "'")
+    }
+    if(any(a) == FALSE){
+      warning("Failed to copy ", length(which(a == FALSE)), " files.", call. = FALSE)
+    }
+  }
 }

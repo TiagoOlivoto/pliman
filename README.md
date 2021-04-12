@@ -34,17 +34,19 @@ install the latest version of
 
 # Usage
 
+# Disease severity
+
 ``` r
 library(pliman)
 # |===========================================|
 # | Tools for Plant Image Analysis (pliman)   |
 # | Author: Tiago Olivoto                     |
 # |===========================================|
-img <- import_image(system.file("tmp_images/sev2.png", package = "pliman"))
-healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-symptoms <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-background <- import_image(system.file("tmp_images/sev_back.png", package = "pliman"))
-combine_images(img, healthy, symptoms, background, ncol = 4)
+img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
+healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
 ![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
@@ -59,8 +61,65 @@ symptomatic_area(img = img,
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
-    #   healthy symptomatic
-    # 1 88.8048     11.1952
+    #    healthy symptomatic
+    # 1 88.38373    11.61627
+
+# Count crop grains
+
+The function `count_objects()` can be used to count the grains of an
+image. In the following example, we will count the number of soybean
+grains of an image with 150 grains.
+
+``` r
+img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+image_show(img)
+```
+
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+count_objects(img)
+```
+
+![](man/figures/README-unnamed-chunk-5-2.png)<!-- -->
+
+    # 
+    # --------------------------------------------
+    # Number of objects: 150 
+    # --------------------------------------------
+    #  statistics        area   perimeter
+    #         min   431.00000    69.00000
+    #        mean   611.92000    80.60667
+    #         max   844.00000    98.00000
+    #          sd    86.50441     7.09182
+    #         sum 91788.00000 12091.00000
+
+In the following example, we will enumerate the grains with an area
+greater than the mean of all grains in the image and add a white
+background to the processed image.
+
+``` r
+count_objects(img,
+              show_segmentation = FALSE,
+              col_background = "white",
+              marker = "text",
+              lower_size = 611.92,
+              marker_size = 0.5,
+              marker_col = "black")
+```
+
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+
+    # 
+    # --------------------------------------------
+    # Number of objects: 77 
+    # --------------------------------------------
+    #  statistics        area perimeter
+    #         min   613.00000   78.0000
+    #        mean   682.18182   85.5974
+    #         max   844.00000   98.0000
+    #          sd    50.19009    5.3219
+    #         sum 52528.00000 6591.0000
 
 # Getting help
 

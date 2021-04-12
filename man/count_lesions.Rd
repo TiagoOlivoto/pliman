@@ -104,12 +104,12 @@ stored in the current working directory or in the subdirectory informed in
 \examples{
 \donttest{
 library(pliman)
-img <- import_image(system.file("tmp_images/sev3.png", package = "pliman"))
-healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-lesions <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-show_image(img)
-show_image(healthy)
-show_image(lesions)
+img <- image_import(system.file("tmp_images/sev3.png", package = "pliman"))
+healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+lesions <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+image_show(img)
+image_show(healthy)
+image_show(lesions)
 count_lesions(img = img,
               img_healthy = healthy,
               img_lesion = lesions,

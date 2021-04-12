@@ -53,12 +53,12 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- import_image(system.file("tmp_images/sev3.png", package = "pliman"))
-#' healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-#' lesions <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-#' show_image(img)
-#' show_image(healthy)
-#' show_image(lesions)
+#' img <- image_import(system.file("tmp_images/sev3.png", package = "pliman"))
+#' healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+#' lesions <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+#' image_show(img)
+#' image_show(healthy)
+#' image_show(lesions)
 #' count_lesions(img = img,
 #'               img_healthy = healthy,
 #'               img_lesion = lesions,
@@ -110,7 +110,7 @@ count_lesions <- function(img,
         imag <- list.files(diretorio_original, pattern = img)
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
-        img <- import_image(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+        img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
       } else{
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
@@ -121,7 +121,7 @@ count_lesions <- function(img,
         check_names_dir(img_healthy, all_files, diretorio_original)
         name <- file_name(imag)
         extens <- file_extension(imag)
-        img_healthy <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
       }
       if(is.character(img_lesion)){
         all_files <- sapply(list.files(diretorio_original), file_name)
@@ -129,16 +129,16 @@ count_lesions <- function(img,
         check_names_dir(img_lesion, all_files, diretorio_original)
         name <- file_name(imag)
         extens <- file_extension(imag)
-        img_lesion <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        img_lesion <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
       }
-      original <- image_to_mat(img, randomize = randomize, nrows = nrows)
-      sadio <- image_to_mat(img_healthy, randomize = randomize, nrows = nrows)
-      sintoma <- image_to_mat(img_lesion, randomize = randomize, nrows = nrows)
+      original <- image_to_mat(img)
+      sadio <- image_to_mat(img_healthy)
+      sintoma <- image_to_mat(img_lesion)
       ################## no background #############
       if(is.null(img_background)){
         sadio_sintoma <-
-          rbind(sadio$df_man,
-                sintoma$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_healthy", 1, 0))
         sadio_sintoma$CODE <- NULL
         usef_area <- nrow(original$df_in)
@@ -148,7 +148,7 @@ count_lesions <- function(img,
         # isolate plant
         pred1 <- predict(model, newdata = original$df_in, type="response") %>% round(0)
         plant_symp <- matrix(pred1, ncol = ncol(original$R))
-        plant_symp <- correct_image(plant_symp, perc = 0.01)
+        plant_symp <- image_correct(plant_symp, perc = 0.01)
         ID <- c(plant_symp == 0)
         mpred1 <- bwlabel(plant_symp == 0)
         shape_leaf <-
@@ -204,14 +204,14 @@ count_lesions <- function(img,
           check_names_dir(img_background, all_files, diretorio_original)
           name <- file_name(imag)
           extens <- file_extension(imag)
-          img_background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
-        fundo <- image_to_mat(img_background, randomize = randomize, nrows = nrows)
+        fundo <- image_to_mat(img_background)
         # separate image from background
         fundo_resto <-
-          rbind(sadio$df_man,
-                sintoma$df_man,
-                fundo$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
+                fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_background", 0, 1))
         # fundo_resto$CODE <- NULL
         modelo1 <-
@@ -219,12 +219,12 @@ count_lesions <- function(img,
           suppressWarnings()
         pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
         plant_background <- matrix(pred1, ncol = ncol(original$R))
-        plant_background <- correct_image(plant_background, perc = 0.009)
-        # show_image(plant_background)
+        plant_background <- image_correct(plant_background, perc = 0.009)
+        # image_show(plant_background)
         plant_background[plant_background == 1] <- 2
         sadio_sintoma <-
-          rbind(sadio$df_man,
-                sintoma$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_healthy", 1, 0))
         sadio_sintoma$CODE <- NULL
         modelo2 <-
@@ -237,7 +237,7 @@ count_lesions <- function(img,
         pred3 <- predict(modelo2, newdata = original$df_in, type="response") %>% round(0)
         pred3[!ID] <- 1
         leaf_sympts <- matrix(pred3, ncol = ncol(original$R))
-        leaf_sympts <- correct_image(leaf_sympts, perc = 0.009)
+        leaf_sympts <- image_correct(leaf_sympts, perc = 0.009)
         plant_background[leaf_sympts == 1] <- 3
         mpred1 <- bwlabel(leaf_sympts == 0)
         shape_leaf <-
@@ -261,7 +261,7 @@ count_lesions <- function(img,
           im2@.Data[,,1][ID][which(pred2 == 0)] <- col_lesions[1]
           im2@.Data[,,2][ID][which(pred2 == 0)] <- col_lesions[2]
           im2@.Data[,,3][ID][which(pred2 == 0)] <- col_lesions[3]
-          show_image(im2)
+          image_show(im2)
           if(!is.null(col_background)){
             col_background <- col2rgb(col_background)
             im2@.Data[,,1][!ID] <- col_background[1]
@@ -291,7 +291,7 @@ count_lesions <- function(img,
 
       }
       if(show_image == TRUE){
-        show_image(im2)
+        image_show(im2)
         text(shape_leaf[,2],
              shape_leaf[,3],
              shape_leaf$id,
@@ -308,7 +308,7 @@ count_lesions <- function(img,
                    extens_ori),
             width = dim(im2@.Data)[1],
             height = dim(im2@.Data)[2])
-        show_image(im2)
+        image_show(im2)
         text(shape_leaf[,2],
              shape_leaf[,3],
              shape_leaf$id,
@@ -354,7 +354,7 @@ count_lesions <- function(img,
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
-    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff"))){
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     results <- list()

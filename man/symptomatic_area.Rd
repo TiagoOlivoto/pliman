@@ -86,14 +86,14 @@ the subdirectory informed in \code{dir_original}.
 \examples{
 \donttest{
 library(pliman)
-img <- import_image(system.file("tmp_images/sev2.png", package = "pliman"))
-healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-symptoms <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-background <- import_image(system.file("tmp_images/sev_back.png", package = "pliman"))
-show_image(img)
-show_image(healthy)
-show_image(symptoms)
-show_image(background)
+img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
+healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+image_show(img)
+image_show(healthy)
+image_show(symptoms)
+image_show(background)
 symptomatic_area(img = img,
                  img_healthy = healthy,
                  img_symptoms = symptoms,

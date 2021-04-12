@@ -10,6 +10,8 @@ count_objects(
   background = NULL,
   img_pattern = NULL,
   parallel = FALSE,
+  resize = FALSE,
+  invert = FALSE,
   channel = "blue",
   tolerance = NULL,
   extension = NULL,
@@ -20,11 +22,11 @@ count_objects(
   show_image = TRUE,
   show_original = TRUE,
   show_background = TRUE,
-  show_segmentation = FALSE,
-  col_foreground = "black",
-  col_background = "white",
-  marker = "point",
-  marker_col = "red",
+  show_segmentation = TRUE,
+  col_foreground = NULL,
+  col_background = NULL,
+  marker = NULL,
+  marker_col = NULL,
   marker_size = NULL,
   save_image = FALSE,
   prefix = "proc_",
@@ -49,6 +51,13 @@ images that are nammed as 1.-, 2.-, and so on.}
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, speccialy when \code{img_pattern} is used is informed.}
+
+\item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).}
+
+\item{invert}{Inverts the binary image, if desired. This is useful to process
+images with black background. Defaults to \code{FALSE}.}
 
 \item{channel}{A character value specifying the target mode for conversion to
 binary image. One of \code{gray}, \code{grey}, \code{red}, \code{green}, or \code{blue}.}
@@ -86,13 +95,15 @@ or equal 120 and less than or equal 140 will be considered.}
 background is shown by default when \code{show_original = FALSE}.}
 
 \item{show_segmentation}{Shows the object segmentation colored with random
-permutations.}
+permutations. Defaults to \code{TRUE}.}
 
 \item{col_foreground, col_background}{Foreground and background color after
-image processing. Defaults to \code{"black"}, and \code{"white"}, respectively.}
+image processing. Defaults to \code{NULL}, in which \code{"black"}, and \code{"white"} are
+used, respectively.}
 
 \item{marker, marker_col, marker_size}{The type, color and size of the object
-marker. Defaults to a red point. Use \code{marker = "text"} to enumerate the
+marker. Defaults to \code{NULL}, which shows a red point when \code{show_segmentation = FALSE}. To force a marker to be used with segmented objects, set up to
+\code{marker = "point"} (to show a point) or \code{marker = "text"} to enumerate the
 objects.}
 
 \item{save_image}{Save the image after processing? The image is saved in the
@@ -129,11 +140,20 @@ If color palettes samples are provided, a general linear model (binomial
 family) fitted to the RGB values is used to segment fore- and background. By
 using \code{img_pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
-subdirectory informed in '\code{dir_original}.
+subdirectory informed in '\code{dir_original}. To speed up the computation time,
+one can set \code{parallel = TRUE}.
 }
 \examples{
 \donttest{
 library(pliman)
+img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+count_objects(img)
+
+# Enumerate the objects in the original image
+count_objects(img,
+              show_segmentation = FALSE,
+              marker = "text",
+              marker_col = "white")
 }
 
 }

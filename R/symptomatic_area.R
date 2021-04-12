@@ -46,14 +46,14 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- import_image(system.file("tmp_images/sev2.png", package = "pliman"))
-#' healthy <- import_image(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-#' symptoms <- import_image(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-#' background <- import_image(system.file("tmp_images/sev_back.png", package = "pliman"))
-#' show_image(img)
-#' show_image(healthy)
-#' show_image(symptoms)
-#' show_image(background)
+#' img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
+#' healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
+#' symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
+#' background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+#' image_show(img)
+#' image_show(healthy)
+#' image_show(symptoms)
+#' image_show(background)
 #' symptomatic_area(img = img,
 #'                  img_healthy = healthy,
 #'                  img_symptoms = symptoms,
@@ -105,7 +105,7 @@ symptomatic_area <- function(img,
         imag <- list.files(diretorio_original, pattern = img)
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
-        img <- import_image(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+        img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
       } else{
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
@@ -116,7 +116,7 @@ symptomatic_area <- function(img,
         check_names_dir(img_healthy, all_files, diretorio_original)
         name <- file_name(imag)
         extens <- file_extension(imag)
-        img_healthy <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
       }
       if(is.character(img_symptoms)){
         all_files <- sapply(list.files(diretorio_original), file_name)
@@ -124,16 +124,16 @@ symptomatic_area <- function(img,
         check_names_dir(img_symptoms, all_files, diretorio_original)
         name <- file_name(imag)
         extens <- file_extension(imag)
-        img_symptoms <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
       }
-      original <- image_to_mat(img, randomize = randomize, nrows = nrows)
-      sadio <- image_to_mat(img_healthy, randomize = randomize, nrows = nrows)
-      sintoma <- image_to_mat(img_symptoms, randomize = randomize, nrows = nrows)
+      original <- image_to_mat(img)
+      sadio <- image_to_mat(img_healthy)
+      sintoma <- image_to_mat(img_symptoms)
       ################## no background #############
       if(is.null(img_background)){
         sadio_sintoma <-
-          rbind(sadio$df_man,
-                sintoma$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_healthy", 1, 0))
         usef_area <- nrow(original$df_in)
         model <-
@@ -142,7 +142,7 @@ symptomatic_area <- function(img,
         # isolate plant
         pred1 <- predict(model, newdata = original$df_in, type="response") %>% round(0)
         plant_symp <- matrix(pred1, ncol = ncol(original$R))
-        plant_symp <- correct_image(plant_symp, perc = 0.01)
+        plant_symp <- image_correct(plant_symp, perc = 0.01)
         ID <- c(plant_symp == 0)
         pix_sympt <- length(which(ID == TRUE))
         # pred2 <- predict(model, newdata = original$df_in[ID,], type="response") %>% round(0)
@@ -184,25 +184,25 @@ symptomatic_area <- function(img,
           check_names_dir(img_background, all_files, diretorio_original)
           name <- file_name(imag)
           extens <- file_extension(imag)
-          img_background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
-        fundo <- image_to_mat(img_background, randomize = randomize, nrows = nrows)
+        fundo <- image_to_mat(img_background)
         # separate image from background
         fundo_resto <-
-          rbind(sadio$df_man,
-                sintoma$df_man,
-                fundo$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
+                fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_background", 0, 1))
         modelo1 <-
           glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto) %>%
           suppressWarnings()
         pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
         plant_background <- matrix(pred1, ncol = ncol(original$R))
-        plant_background <- correct_image(plant_background, perc = 0.009)
+        plant_background <- image_correct(plant_background, perc = 0.009)
         plant_background[plant_background == 1] <- 2
         sadio_sintoma <-
-          rbind(sadio$df_man,
-                sintoma$df_man) %>%
+          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "img_healthy", 1, 0))
         modelo2 <-
           glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma) %>%
@@ -251,7 +251,7 @@ symptomatic_area <- function(img,
         if(dir.exists(diretorio_processada) == FALSE){
           dir.create(diretorio_processada)
         }
-        save_image(im2,
+        image_export(im2,
                    name = paste0(diretorio_processada, "/",
                                  prefix,
                                  name_ori, ".",
@@ -279,7 +279,7 @@ symptomatic_area <- function(img,
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
-    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff"))){
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     results <- list()

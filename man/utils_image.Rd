@@ -2,83 +2,32 @@
 % Please edit documentation in R/utils_imagem.R
 \name{utils_image}
 \alias{utils_image}
-\alias{show_image}
-\alias{combine_images}
-\alias{import_image}
-\alias{save_image}
-\alias{image_to_mat}
-\alias{image_rgb}
-\alias{image_resize}
-\alias{image_pallete}
+\alias{image_import}
+\alias{image_export}
+\alias{image_show}
 \title{Import, export and display images}
 \usage{
-show_image(image)
+image_import(image, ...)
 
-combine_images(..., nrow = NULL, ncol = NULL)
+image_export(image, name, ...)
 
-import_image(image, ...)
-
-save_image(image, name, ...)
-
-image_to_mat(image, randomize = TRUE, nrows = 5000)
-
-image_rgb(image, facet = TRUE)
-
-image_resize(image, width, height)
-
-image_pallete(image, npal, nstart = 25)
+image_show(image)
 }
 \arguments{
-\item{image}{An image.
-\itemize{
-\item For \code{show_image()}, any R object that can be coerced to a raster object.
-\item For \code{import_image()}, a string specifying the path of an image.
-\item For \code{save_image()}, a two-dimensional or three-dimensional object (matrix,
-data.frame or array).
+\item{image}{\itemize{
+\item For \code{image_import()}, a character vector of file names or URLs.
+\item For \code{image_export()}, an Image object or an array.
 }}
 
-\item{...}{Depends on the function:
-\itemize{
-\item For \code{import_image()} and \code{save_image()}, alternative arguments passed to
-the corresponding functions from the \code{jpeg}, \code{png}, and \code{tiff} packages.
-\item For \code{combine_images()}, a comma-separated list of image objects.
-}}
+\item{...}{Alternative arguments passed to the corresponding functions from
+the \code{jpeg}, \code{png}, and \code{tiff} packages.}
 
-\item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
-\code{NULL}, i.e., a square grid is produced.}
-
-\item{name}{An string specifying the name of the image}
-
-\item{randomize}{Randomize as lines of array conversation for data
-frame? Padrao \code{TRUE}.}
-
-\item{nrows}{Number of lines to be selected, no data frame created.}
-
-\item{facet}{Shows RGB values as a facet plot? Defaults to \code{FALSE}.}
-
-\item{width, height}{Width and height of the resized image. One of these
-arguments can be missing to enable proportional resizing.}
-
-\item{npal}{The number of color palletes.}
-
-\item{nstart}{How many random sets from \code{npal} should be chosen?}
+\item{name}{An string specifying the name of the image.}
 }
 \description{
-Basic tools to work with images .png, .jpeg, .jpg, .tiff (ou .tif, .TIFF,
-.TIF)
-\itemize{
-\item \code{import_image()} Imports an image.
-\item \code{show_image()} Show an image.
-\item \code{save_image()} Saves an image.
-\item \code{image_to_mat()} Convert an image to a list, containing three matrices (RGB)
-and a data frame with three columns, one for each of the RGB Spectrum. (RGB).
-\item \code{image_rgb()} Produces a density plot with the RGB values of an image.
-\item \code{image_pallete()} Generate desired number of color palettes from an image
-using the k-means algorithm.
-}
+Import images from files and URLs, write images to files and show images.
 }
 \examples{
 library(pliman)
-img <- import_image(system.file("tmp_images", "sev3.png", package = "pliman"))
-image_rgb(img)
+img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
 }

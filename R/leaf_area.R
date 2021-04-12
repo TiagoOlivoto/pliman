@@ -55,14 +55,14 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- import_image(system.file("tmp_images/la.png", package = "pliman"))
-#' leaf <- import_image(system.file("tmp_images/la2.png", package = "pliman"))
-#' tmpl <- import_image(system.file("tmp_images/la3.png", package = "pliman"))
-#' background <- import_image(system.file("tmp_images/sev_back.png", package = "pliman"))
-#' show_image(img)
-#' show_image(leaf)
-#' show_image(tmpl)
-#' show_image(background)
+#' img <- image_import(system.file("tmp_images/la.png", package = "pliman"))
+#' leaf <- image_import(system.file("tmp_images/la2.png", package = "pliman"))
+#' tmpl <- image_import(system.file("tmp_images/la3.png", package = "pliman"))
+#' background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+#' image_show(img)
+#' image_show(leaf)
+#' image_show(tmpl)
+#' image_show(background)
 #' leaf_area(img = img,
 #'           img_leaf = leaf,
 #'           img_template = tmpl,
@@ -115,7 +115,7 @@ leaf_area <- function(img,
       imag <- list.files(diretorio_original, pattern = img)
       name_ori <- file_name(imag)
       extens_ori <- file_extension(imag)
-      img <- import_image(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+      img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
     } else{
       name_ori <- match.call()[[2]]
       extens_ori <- "png"
@@ -126,7 +126,7 @@ leaf_area <- function(img,
       imag <- list.files(diretorio_original, pattern = img_leaf)
       name <- file_name(imag)
       extens <- file_extension(imag)
-      img_leaf <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+      img_leaf <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
     }
     if(is.character(img_template)){
       all_files <- sapply(list.files(diretorio_original), file_name)
@@ -134,7 +134,7 @@ leaf_area <- function(img,
       imag <- list.files(diretorio_original, pattern = img_template)
       name <- file_name(imag)
       extens <- file_extension(imag)
-      img_template <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+      img_template <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
     }
     if(is.character(img_background)){
       all_files <- sapply(list.files(diretorio_original), file_name)
@@ -142,17 +142,17 @@ leaf_area <- function(img,
       imag <- list.files(diretorio_original, pattern = img_background)
       name <- file_name(imag)
       extens <- file_extension(imag)
-      img_background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+      img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
     }
-    original <- image_to_mat(img, randomize = randomize, nrows = nrows)
-    leaf <- image_to_mat(img_leaf, randomize = randomize, nrows = nrows)
-    template <- image_to_mat(img_template, randomize = randomize, nrows = nrows)
-    background <- image_to_mat(img_background, randomize = randomize, nrows = nrows)
+    original <- image_to_mat(img)
+    leaf <- image_to_mat(img_leaf)
+    template <- image_to_mat(img_template)
+    background <- image_to_mat(img_background)
     # separate image from background
     background_resto <-
-      rbind(leaf$df_man,
-            template$df_man,
-            background$df_man) %>%
+      rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
+            template$df_in[sample(1:nrow(template$df_in)),][1:nrows,],
+            background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]) %>%
       transform(Y = ifelse(CODE == "img_background", 1, 0))
     background_resto$CODE <- NULL
     modelo1 <-
@@ -160,13 +160,13 @@ leaf_area <- function(img,
       suppressWarnings()
     pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
     plant_background <- matrix(pred1, ncol = ncol(original$R))
-    plant_background <- correct_image(plant_background, perc = 0.009)
+    plant_background <- image_correct(plant_background, perc = 0.009)
     plant_background[plant_background == 1] <- 2
-    # show_image(plant_background!=2)
+    # image_show(plant_background!=2)
     # separate leaf from template
     leaf_template <-
-      rbind(leaf$df_man,
-            template$df_man) %>%
+      rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
+            template$df_in[sample(1:nrow(template$df_in)),][1:nrows,]) %>%
       transform(Y = ifelse(CODE == "img_leaf", 0, 1))
     background_resto$CODE <- NULL
     modelo2 <-
@@ -177,7 +177,7 @@ leaf_area <- function(img,
     pred2 <- predict(modelo2, newdata = original$df_in[ID,], type="response") %>% round(0)
     pred3 <- predict(modelo2, newdata = original$df_in, type="response") %>% round(0)
     leaf_template <- matrix(pred3, ncol = ncol(original$R))
-    leaf_template <- correct_image(leaf_template, perc = 0.009)
+    leaf_template <- image_correct(leaf_template, perc = 0.009)
     plant_background[leaf_template == 1] <- 3
     mpred1 <- bwlabel(leaf_template == 1)
     shape_template <-
@@ -231,7 +231,7 @@ leaf_area <- function(img,
       im2@.Data[,,3][!ID] <- col_background[3]
     }
     if(show_image == TRUE){
-      show_image(im2)
+      image_show(im2)
       text(shape[,2],
            shape[,3],
            shape$label,
@@ -248,7 +248,7 @@ leaf_area <- function(img,
                 collapse = "", sep = ""),
           width = dim(im2@.Data)[1],
           height = dim(im2@.Data)[2])
-      show_image(im2)
+      image_show(im2)
       text(shape[,2],
            shape[,3],
            shape$label,
@@ -275,7 +275,7 @@ leaf_area <- function(img,
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
-    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff"))){
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     results <- list()

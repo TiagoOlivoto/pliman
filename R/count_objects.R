@@ -14,7 +14,8 @@
 #'family) fitted to the RGB values is used to segment fore- and background. By
 #'using `img_pattern` it is possible to process several images with common
 #'pattern names that are stored in the current working directory or in the
-#'subdirectory informed in '`dir_original`.
+#'subdirectory informed in '`dir_original`. To speed up the computation time,
+#'one can set `parallel = TRUE`.
 #' @param img The image to be analyzed.
 #' @param foreground A color palette of the foreground (optional.
 #' @param background A color palette of the background (optional).
@@ -26,6 +27,11 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, speccialy when `img_pattern` is used is informed.
+#' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
+#'   numeric value of range 0-100 (proportion of the size of the original
+#'   image).
+#' @param invert Inverts the binary image, if desired. This is useful to process
+#'   images with black background. Defaults to `FALSE`.
 #' @param channel A character value specifying the target mode for conversion to
 #'   binary image. One of `gray`, `grey`, `red`, `green`, or `blue`.
 #' @param tolerance The minimum height of the object in the units of image
@@ -53,11 +59,14 @@
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
-#'   permutations.
+#'   permutations. Defaults to `TRUE`.
 #' @param col_foreground,col_background Foreground and background color after
-#'   image processing. Defaults to `"black"`, and `"white"`, respectively.
+#'   image processing. Defaults to `NULL`, in which `"black"`, and `"white"` are
+#'   used, respectively.
 #' @param marker,marker_col,marker_size The type, color and size of the object
-#'   marker. Defaults to a red point. Use `marker = "text"` to enumerate the
+#'   marker. Defaults to `NULL`, which shows a red point when `show_segmentation
+#'   = FALSE`. To force a marker to be used with segmented objects, set up to
+#'   `marker = "point"` (to show a point) or `marker = "text"` to enumerate the
 #'   objects.
 #' @param save_image Save the image after processing? The image is saved in the
 #'   current working directory named as `proc_*` where `*` is the image name
@@ -79,6 +88,14 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
+#' img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+#' count_objects(img)
+#'
+#' # Enumerate the objects in the original image
+#' count_objects(img,
+#'               show_segmentation = FALSE,
+#'               marker = "text",
+#'               marker_col = "white")
 #' }
 #'
 count_objects <- function(img,
@@ -86,6 +103,8 @@ count_objects <- function(img,
                           background = NULL,
                           img_pattern = NULL,
                           parallel = FALSE,
+                          resize = FALSE,
+                          invert = FALSE,
                           channel = "blue",
                           tolerance = NULL,
                           extension = NULL,
@@ -96,11 +115,11 @@ count_objects <- function(img,
                           show_image = TRUE,
                           show_original = TRUE,
                           show_background = TRUE,
-                          show_segmentation = FALSE,
-                          col_foreground = "black",
-                          col_background = "white",
-                          marker = "point",
-                          marker_col = "red",
+                          show_segmentation = TRUE,
+                          col_foreground = NULL,
+                          col_background = NULL,
+                          marker = NULL,
+                          marker_col = NULL,
                           marker_size = NULL,
                           save_image = FALSE,
                           prefix = "proc_",
@@ -130,7 +149,10 @@ count_objects <- function(img,
         imag <- list.files(diretorio_original, pattern = img)
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
-        img <- import_image(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+        img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+        if(resize != FALSE){
+          img <- image_resize(img, resize)
+        }
       } else{
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
@@ -142,7 +164,7 @@ count_objects <- function(img,
           check_names_dir(foreground, all_files, diretorio_original)
           name <- file_name(imag)
           extens <- file_extension(imag)
-          foreground <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
         if(is.character(background)){
           all_files <- sapply(list.files(diretorio_original), file_name)
@@ -150,34 +172,40 @@ count_objects <- function(img,
           check_names_dir(background, all_files, diretorio_original)
           name <- file_name(imag)
           extens <- file_extension(imag)
-          background <- import_image(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
-        original <- image_to_mat(img, randomize = randomize, nrows = nrows)
-        foreground <- image_to_mat(foreground, randomize = randomize, nrows = nrows)
-        background <- image_to_mat(background, randomize = randomize, nrows = nrows)
+        original <- image_to_mat(img)
+        foreground <- image_to_mat(foreground)
+        background <- image_to_mat(background)
         back_fore <-
-          rbind(foreground$df_man,
-                background$df_man) %>%
+          rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
+                background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]) %>%
           transform(Y = ifelse(CODE == "background", 0, 1))
         modelo1 <-
           glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore) %>%
           suppressWarnings()
         pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
         foreground_background <- matrix(pred1, ncol = ncol(original$R))
-        foreground_background <- correct_image(foreground_background, perc = 0.01)
+        # foreground_background <- image_correct(foreground_background, perc = correction)
         ID <- c(foreground_background == 1)
         ID2 <- c(foreground_background == 0)
-        tol <- ifelse(is.null(tolerance), round(nrow(foreground_background) / 300, 0), tolerance)
-        ext <- ifelse(is.null(extension), round(nrow(foreground_background) / 300, 0), extension)
+        tol <- ifelse(is.null(tolerance),
+                      ifelse(nrow(foreground_background) > 1000,
+                             round(nrow(foreground_background) / 750, 0), 1), tolerance)
+        ext <- ifelse(is.null(extension),
+                      ifelse(nrow(foreground_background) > 1000,
+                             round(nrow(foreground_background) / 300, 0), 1), extension)
         nmask <- watershed(distmap(foreground_background),
                            tolerance = tol,
                            ext = ext)
       } else{
-        img2 <- channel(img, channel)
-        threshold <- otsu(img2)
-        img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
-        tol <- ifelse(is.null(tolerance), round(nrow(img2) / 300, 0), tolerance)
-        ext <- ifelse(is.null(extension), round(nrow(img2) / 300, 0), extension)
+        img2 <- image_binary(img, invert = invert)
+        tol <- ifelse(is.null(tolerance),
+                      ifelse(nrow(img2) > 1000,
+                             round(nrow(img2) / 750, 0), 1), tolerance)
+        ext <- ifelse(is.null(extension),
+                      ifelse(nrow(img2) > 1000,
+                             round(nrow(img2) / 300, 0), 1), extension)
         nmask <- watershed(distmap(img2),
                            tolerance = tol,
                            ext = ext)
@@ -185,11 +213,31 @@ count_objects <- function(img,
         ID2 <- which(img2 == 0)
         feat <- computeFeatures.moment(nmask)
       }
+      backg <- !is.null(col_background)
+      col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
+      col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
       if(show_original == TRUE & show_segmentation == FALSE){
         im2 <- img
-      } else{
-        col_foreground <- col2rgb(col_foreground)
-        col_background <- col2rgb(col_background)
+        if(backg){
+          im3 <- colorLabels(nmask)
+          im2@.Data[,,1][which(im3@.Data[,,1]==0)] <- col_background[1]
+          im2@.Data[,,2][which(im3@.Data[,,2]==0)] <- col_background[2]
+          im2@.Data[,,3][which(im3@.Data[,,3]==0)] <- col_background[3]
+        }
+      }
+      if(show_original == TRUE & show_segmentation == TRUE){
+        im2 <- colorLabels(nmask)
+        if(backg){
+          im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
+          im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
+          im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
+        } else{
+          im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- img@.Data[,,1][which(im2@.Data[,,1]==0)]
+          im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- img@.Data[,,2][which(im2@.Data[,,2]==0)]
+          im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- img@.Data[,,3][which(im2@.Data[,,3]==0)]
+        }
+      }
+      if(show_original == FALSE){
         if(show_segmentation == TRUE){
           im2 <- colorLabels(nmask)
           im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
@@ -218,23 +266,29 @@ count_objects <- function(img,
       # return(shape)
       shape$id <- 1:nrow(shape)
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
+      show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
+      marker <- ifelse(is.null(marker), "point", marker)
+      marker_col <- ifelse(is.null(marker_col), "red", marker_col)
+      marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       if(show_image == TRUE){
         if(marker == "text"){
-          marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
-          show_image(im2)
-          text(shape[,2],
-               shape[,3],
-               shape[,1],
-               col = marker_col,
-               cex = marker_size)
-        } else{
-          marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
-          show_image(im2)
-          points(shape[,2],
+          image_show(im2)
+          if(show_mark){
+            text(shape[,2],
                  shape[,3],
+                 shape[,1],
                  col = marker_col,
-                 pch = 16,
                  cex = marker_size)
+          }
+        } else{
+          image_show(im2)
+          if(show_mark){
+            points(shape[,2],
+                   shape[,3],
+                   col = marker_col,
+                   pch = 16,
+                   cex = marker_size)
+          }
         }
       }
       if(save_image == TRUE){
@@ -249,7 +303,7 @@ count_objects <- function(img,
             height = dim(im2@.Data)[2])
         if(marker == "text"){
           marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-          show_image(im2)
+          image_show(im2)
           text(feat[,1],
                feat[,2],
                seq(1:nrow(feat)),
@@ -257,7 +311,7 @@ count_objects <- function(img,
                cex = marker_size)
         } else{
           marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-          show_image(im2)
+          image_show(im2)
           points(feat[,1],
                  feat[,2],
                  col = marker_col,
@@ -287,8 +341,9 @@ count_objects <- function(img,
       if(verbose == TRUE){
         cat("\n--------------------------------------------\n")
         cat("Number of objects:", stats[1,2],"\n")
-        cat("--------------------------------------------\n\n")
+        cat("--------------------------------------------\n")
         print(stats[-1,], row.names = FALSE)
+        cat("\n")
       }
       invisible(results)
     }
@@ -296,7 +351,7 @@ count_objects <- function(img,
     help_count(img, foreground, background, tolerance, extension, randomize,
                nrows, show_image, show_original, show_background, marker,
                marker_col, marker_size, save_image, prefix,
-               dir_original, dir_processed)
+               dir_original, dir_processed, verbose)
   } else{
     if(img_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       img_pattern <- "^[0-9].*$"
@@ -309,37 +364,37 @@ count_objects <- function(img,
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
-    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff"))){
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     if(parallel == TRUE){
-    plan(multisession)
-    if(verbose == TRUE){
-      message("Image processing using parallel computation, please wait.")
-    }
-    results <-
-      future_lapply(names_plant, # apply sel_gain nboot times
-                    function(x){
-                      help_count(x,
-                                 foreground, background, tolerance, extension, randomize,
-                                 nrows, show_image, show_original, show_background, marker,
-                                 marker_col, marker_size, save_image, prefix,
-                                 dir_original, dir_processed, verbose =  FALSE)
-                    })
+      plan(multisession)
+      if(verbose == TRUE){
+        message("Image processing using parallel computation, please wait.")
+      }
+      results <-
+        future_lapply(names_plant,
+                      function(x){
+                        help_count(x,
+                                   foreground, background, tolerance, extension, randomize,
+                                   nrows, show_image, show_original, show_background, marker,
+                                   marker_col, marker_size, save_image, prefix,
+                                   dir_original, dir_processed, verbose =  FALSE)
+                      })
 
     } else{
-    results <- list()
-    pb <- progress(max = length(plants), style = 4)
-    for (i in 1:length(plants)) {
-      run_progress(pb, actual = i,
-                   text = paste("Processing image", names_plant[i]))
-      results[[i]] <-
-        help_count(img  = names_plant[i],
-                   foreground, background, tolerance, extension, randomize,
-                   nrows, show_image, show_original, show_background, marker,
-                   marker_col, marker_size, save_image, prefix,
-                   dir_original, dir_processed, verbose)
-    }
+      results <- list()
+      pb <- progress(max = length(plants), style = 4)
+      for (i in 1:length(plants)) {
+        run_progress(pb, actual = i,
+                     text = paste("Processing image", names_plant[i]))
+        results[[i]] <-
+          help_count(img  = names_plant[i],
+                     foreground, background, tolerance, extension, randomize,
+                     nrows, show_image, show_original, show_background, marker,
+                     marker_col, marker_size, save_image, prefix,
+                     dir_original, dir_processed, verbose)
+      }
     }
     names(results) <- names_plant
     stats <-
@@ -368,6 +423,7 @@ count_objects <- function(img,
 
     }
     invisible(list(statistics = stats,
+                   count = summ,
                    results = results))
   }
 }
