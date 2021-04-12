@@ -106,7 +106,7 @@ count_objects(img,
               marker = "text",
               lower_size = 611.92,
               marker_size = 0.5,
-              marker_col = "black")
+              marker_col = "white")
 ```
 
 ![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
