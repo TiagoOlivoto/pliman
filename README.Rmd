@@ -27,6 +27,7 @@ knitr::opts_chunk$set(
 * Measure leaf area
 * Measure disease severity
 * Count the number of lesions
+* Count objects in an image
 
 # Installation
 

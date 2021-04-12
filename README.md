@@ -15,6 +15,7 @@ the details. The package will help you to:
 -   Measure leaf area
 -   Measure disease severity
 -   Count the number of lesions
+-   Count objects in an image
 
 # Installation
 
