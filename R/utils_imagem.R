@@ -850,7 +850,7 @@ image_segment <- function(image,
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
-        plot(imgs[[i]][[1]])
+        image_combine(imgs[[i]][[2]], imgs[[i]][[1]])
       }
     }
     invisible(imgs)

@@ -41,11 +41,12 @@
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
 #' @param index A character value specifying the target mode for conversion to
-#'   binary image. One of `gray`, `grey`, `red`, `green`, or `blue`.
+#'   binary image. Defaults to `"NB"` (normalized blue). See [image_index()] for
+#'   more details.
 #' @param object_size The size of the object. Used to automatically set up
-#'   `tolerance` and `extension` parameters. One of the following. `"small"
-#'   (e.g, wheat grains)`, `"medium" (e.g, soybean grains)`, `"large" (e.g,
-#'   peanut grains)`.  `"elarge" (e.g, soybean pods)`.
+#'   `tolerance` and `extension` parameters. One of the following. `"small"`
+#'   (e.g, wheat grains), `"medium"` (e.g, soybean grains), `"large"`(e.g,
+#'   peanut grains), and `"elarge"` (e.g, soybean pods)`.
 #' @param tolerance The minimum height of the object in the units of image
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
@@ -203,11 +204,11 @@ count_objects <- function(img,
           suppressWarnings()
         pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
         foreground_background <- matrix(pred1, ncol = ncol(original$R))
-        # foreground_background <- image_correct(foreground_background, perc = correction)
+        foreground_background <- image_correct(foreground_background, perc = 0.02)
         ID <- c(foreground_background == 1)
         ID2 <- c(foreground_background == 0)
         parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-        res <- length(img2)
+        res <- length(foreground_background)
         parms2 <- parms[parms$object_size == object_size,]
         rowid <-
           which(sapply(as.character(parms2$resolution), function(x) {

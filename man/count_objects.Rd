@@ -73,10 +73,13 @@ image.}
 images with black background. Defaults to \code{FALSE}.}
 
 \item{index}{A character value specifying the target mode for conversion to
-binary image. One of \code{gray}, \code{grey}, \code{red}, \code{green}, or \code{blue}.}
+binary image. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
+more details.}
 
 \item{object_size}{The size of the object. Used to automatically set up
-\code{tolerance} and \code{extension} parameters. One of the following. \verb{"small" (e.g, wheat grains)}, \verb{"medium" (e.g, soybean grains)}, \verb{"large" (e.g, peanut grains)}.  \verb{"elarge" (e.g, soybean pods)}.}
+\code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
+(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
+peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
 \item{tolerance}{The minimum height of the object in the units of image
 intensity between its highest point (seed) and the point where it contacts

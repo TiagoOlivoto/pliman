@@ -6,25 +6,33 @@
 \usage{
 count_lesions(
   img,
-  img_healthy,
-  img_lesion,
+  img_healthy = NULL,
+  img_lesion = NULL,
   img_background = NULL,
   img_pattern = NULL,
   parallel = FALSE,
   workers = NULL,
+  resize = FALSE,
+  invert = FALSE,
+  index = "NB",
   lower_size = NULL,
   upper_size = NULL,
   randomize = TRUE,
   nrows = 10000,
+  lesion_size = "medium",
+  segment = TRUE,
+  tolerance = NULL,
+  extension = NULL,
+  show_segmentation = TRUE,
   show_image = FALSE,
   show_original = TRUE,
   show_background = TRUE,
-  col_leaf = "green",
-  col_lesions = "red",
+  col_leaf = NULL,
+  col_lesions = NULL,
   col_background = NULL,
-  text_col = "black",
-  text_size = 1,
-  text_digits = 2,
+  marker = NULL,
+  marker_col = NULL,
+  marker_size = NULL,
   save_image = FALSE,
   prefix = "proc_",
   dir_original = NULL,
@@ -55,6 +63,17 @@ number of sections is set up to 90\% of available cores.}
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
+\item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).}
+
+\item{invert}{Inverts the binary image, if desired. This is useful to process
+images with black background. Defaults to \code{FALSE}.}
+
+\item{index}{A character value specifying the target mode for conversion to
+binary image when \code{img_healthy} and \code{img_lesion} are not declared. Defaults
+to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details.}
+
 \item{lower_size}{Lower limit for size for the image analysis. Leaf images
 often contain dirt and dust. To prevent dust from affecting the image
 analysis, the lower limit of analyzed size is set to 0.1, i.e., objects
@@ -67,6 +86,31 @@ known area or use \code{lower_limit = 0} to select all objects (not advised).}
 \item{randomize}{Randomize the lines before training the model?}
 
 \item{nrows}{The number of lines to be used in training step.}
+
+\item{lesion_size}{The size of the lesion. Used to automatically set up
+\code{tolerance} and \code{extension} parameters. One of the following. \code{"small"} (2-5
+mm in diameter, e.g, rust pustules), \code{"medium"} (0.5-1.0 cm in diameter,
+e.g, wheat leaf spot), \code{"large"} (1-2 cm in diameter, and  \code{"elarge"} (2-3
+cm in diameter, e.g, target spot of soybean).}
+
+\item{segment}{If \code{TRUE} (Default) implements the Watershed Algorithm to
+segment lesions connected by a fairly few pixels that could be considered
+as two distinct lesions. If \code{FALSE}, lesions that are connected by any
+pixel are considered unique lesions. For more details see
+\code{\link[EBImage:watershed]{EBImage::watershed()}}.}
+
+\item{tolerance}{The minimum height of the object in the units of image
+intensity between its highest point (seed) and the point where it contacts
+another object (checked for every contact pixel). If the height is smaller
+than the tolerance, the object will be combined with one of its neighbors,
+which is the highest. Defaults to \code{NULL}, i.e., starting values are set up according to the argument \code{lesion_size}.}
+
+\item{extension}{Radius of the neighborhood in pixels for the detection of
+neighboring objects. Defaults to 20. Higher value smoothes out small
+objects.}
+
+\item{show_segmentation}{Shows the object segmentation colored with random
+permutations. Defaults to \code{TRUE}.}
 
 \item{show_image}{Show image after processing?}
 
@@ -82,9 +126,10 @@ background is shown by default when \code{show_original = FALSE}.}
 \item{col_background}{Background color after image processing. Defaults to
 \code{"NULL"}.}
 
-\item{text_col, text_size, text_digits}{The color, size and significant digits
-used in the text. The shows the pattern \code{o|a}, where \code{o} and \code{a} are the
-object id and its area, respectively.}
+\item{marker, marker_col, marker_size}{The type, color and size of the object
+marker. Defaults to \code{NULL}, which shows a red point when \code{show_segmentation = FALSE}. To force a marker to be used with segmented objects, set up to
+\code{marker = "point"} (to show a point) or \code{marker = "text"} to enumerate the
+objects.}
 
 \item{save_image}{Save the image after processing? The image is saved in the
 current working directory named as \verb{proc_*} where \code{*} is the image name
