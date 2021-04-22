@@ -7,10 +7,14 @@
 image_combine(..., nrow = NULL, ncol = NULL)
 }
 \arguments{
-\item{...}{a comma-separated list of image objects.}
+\item{...}{a comma-separated name of image objects or a list containing image
+objects.}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
+}
+\value{
+A grid with the images in \code{...}
 }
 \description{
 Combines several images to a grid
@@ -20,4 +24,7 @@ library(pliman)
 img1 <- image_import(system.file("tmp_images", "sev1.png", package = "pliman"))
 img2 <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
 image_combine(img1, img2)
+}
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }

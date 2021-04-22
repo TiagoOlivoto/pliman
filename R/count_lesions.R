@@ -17,6 +17,12 @@
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `img_pattern = "1"`) will select
 #'   images that are nammed as 1.-, 2.-, and so on.
+#' @param parallel Processes the images asynchronously (in parallel) in separate
+#'   R sessions running in the background on the same machine. It may speed up
+#'   the processing time, speccialy when `img_pattern` is used is informed. The
+#'   number of sections is set up to 90% of available cores.
+#' @param workers A positive numeric scalar or a function specifying the maximum
+#'   number of parallel processes that can be active at the same time.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
 #'   often contain dirt and dust. To prevent dust from affecting the image
 #'   analysis, the lower limit of analyzed size is set to 0.1, i.e., objects
@@ -47,6 +53,7 @@
 #'   search for the image `img` in the current working directory. After
 #'   processing, when `save_image = TRUE`, the processed image will be also
 #'   saved in such a directory.
+#' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return A data frame with the results for each image.
 #' @export
 #' @md
@@ -70,6 +77,8 @@ count_lesions <- function(img,
                           img_lesion,
                           img_background = NULL,
                           img_pattern = NULL,
+                          parallel = FALSE,
+                          workers = NULL,
                           lower_size = NULL,
                           upper_size = NULL,
                           randomize = TRUE,
@@ -86,7 +95,8 @@ count_lesions <- function(img,
                           save_image = FALSE,
                           prefix = "proc_",
                           dir_original = NULL,
-                          dir_processed = NULL){
+                          dir_processed = NULL,
+                          verbose = TRUE){
   if(!missing(img) & !missing(img_pattern)){
     stop("Only one of `img` or `img_pattern` arguments can be used.", call. = FALSE)
   }
@@ -357,6 +367,30 @@ count_lesions <- function(img,
     if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust,
+                    varlist = c("names_plant", "help_count", "file_name",
+                                "check_names_dir", "file_extension", "image_import",
+                                "image_binary", "watershed", "distmap", "computeFeatures.moment",
+                                "computeFeatures.shape", "colorLabels", "image_show",
+                                "%>%", "image_to_mat", "image_correct", "bwlabel"),
+                    envir=environment())
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      results <-
+        parLapply(clust, names_plant,
+                  function(x){
+                    help_count(x,
+                               img_healthy, img_lesion, img_background, randomize,
+                               nrows, show_image, show_original, show_background, col_background,
+                               save_image, dir_original, dir_processed)
+                  })
+
+    } else{
     results <- list()
     pb <- progress(max = length(plants), style = 4)
     for (i in 1:length(plants)) {
@@ -367,6 +401,7 @@ count_lesions <- function(img,
                    img_healthy, img_lesion, img_background, randomize,
                    nrows, show_image, show_original, show_background, col_background,
                    save_image, dir_original, dir_processed)
+    }
     }
     names(results) <- names_plant
     stats <-

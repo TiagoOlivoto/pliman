@@ -2,22 +2,22 @@
 #'
 #'Counts the number of objects in an image. See more at details.
 #'
-#'Counts the number of objects in an image. A binary image is first generated
-#'to segment the foreground and background. The argument channel is useful to
-#'choose a proper RGB band to segment the image Then, the number of objects in
-#'the foreground is counted. By setting up arguments such as lower_size,
-#'upper_size is possible to set a threshold for lower and upper sizes of the
-#'objects, respectively.  Change tolerance and extension values to better set up
-#'watershed-based object detection.
+#'Counts the number of objects in an image. A binary image is first generated to
+#'segment the foreground and background. The argument index is useful to choose
+#'a proper index to segment the image (see [image_binary()] for more details).
+#'Then, the number of objects in the foreground is counted. By setting up
+#'arguments such as lower_size, upper_size is possible to set a threshold for
+#'lower and upper sizes of the objects, respectively.  Change tolerance and
+#'extension values to better set up watershed-based object detection.
 #'
 #'If color palettes samples are provided, a general linear model (binomial
 #'family) fitted to the RGB values is used to segment fore- and background. By
 #'using `img_pattern` it is possible to process several images with common
 #'pattern names that are stored in the current working directory or in the
-#'subdirectory informed in '`dir_original`. To speed up the computation time,
+#'subdirectory informed in `dir_original`'. To speed up the computation time,
 #'one can set `parallel = TRUE`.
 #' @param img The image to be analyzed.
-#' @param foreground A color palette of the foreground (optional.
+#' @param foreground A color palette of the foreground (optional).
 #' @param background A color palette of the background (optional).
 #' @param img_pattern A pattern of file name used to identify images to be
 #'   processed. For example, if `img_pattern = "im"` all images that the name
@@ -26,14 +26,26 @@
 #'   images that are nammed as 1.-, 2.-, and so on.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
-#'   the processing time, speccialy when `img_pattern` is used is informed.
+#'   the processing time, speccialy when `img_pattern` is used is informed. The
+#'   number of sections is set up to 90% of available cores.
+#' @param workers A positive numeric scalar or a function specifying the maximum
+#'   number of parallel processes that can be active at the same time.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
+#' @param fill_hull Fill holes in the binary image? Defaults to `FALSE`. This is
+#'   useful to fill holes in objects that have portions with a color similar to
+#'   the background. IMPORTANT: Objects touching each other can be combined into
+#'   one single object, which may underestimate the number of objects in an
+#'   image.
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
-#' @param channel A character value specifying the target mode for conversion to
+#' @param index A character value specifying the target mode for conversion to
 #'   binary image. One of `gray`, `grey`, `red`, `green`, or `blue`.
+#' @param object_size The size of the object. Used to automatically set up
+#'   `tolerance` and `extension` parameters. One of the following. `"small"
+#'   (e.g, wheat grains)`, `"medium" (e.g, soybean grains)`, `"large" (e.g,
+#'   peanut grains)`.  `"elarge" (e.g, soybean pods)`.
 #' @param tolerance The minimum height of the object in the units of image
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
@@ -45,7 +57,7 @@
 #'   objects.
 #' @param lower_size,upper_size Lower and upper limits for size for the image
 #'   analysis. Plant images often contain dirt and dust. To prevent dust from
-#'   affecting the image analysis, objects with lesser than 1% of the mean of
+#'   affecting the image analysis, objects with lesser than 10% of the mean of
 #'   all objects are removed. Upper limit is set to `NULL`, i.e., no upper
 #'   limitused. One can set a known area or use `lower_limit = 0` to select all
 #'   objects (not advised). Objects that matches the size of a given range of
@@ -81,9 +93,7 @@
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return A data frame with the results for each image.
 #' @export
-#' @importFrom EBImage channel combine watershed distmap otsu getFrames colorLabels resize
-#' @importFrom future.apply future_lapply
-#' @importFrom future plan multisession
+#' @import EBImage
 #' @md
 #' @examples
 #' \donttest{
@@ -103,9 +113,12 @@ count_objects <- function(img,
                           background = NULL,
                           img_pattern = NULL,
                           parallel = FALSE,
+                          workers = NULL,
                           resize = FALSE,
+                          fill_hull = FALSE,
                           invert = FALSE,
-                          channel = "blue",
+                          index = "NB",
+                          object_size = "medium",
                           tolerance = NULL,
                           extension = NULL,
                           lower_size = NULL,
@@ -126,6 +139,9 @@ count_objects <- function(img,
                           dir_original = NULL,
                           dir_processed = NULL,
                           verbose = TRUE){
+  if(!object_size %in% c("small", "medium", "large", "elarge")){
+    stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
+  }
   if(!missing(img) & !missing(img_pattern)){
     stop("Only one of `img` or `img_pattern` arguments can be used.", call. = FALSE)
   }
@@ -140,8 +156,9 @@ count_objects <- function(img,
     diretorio_processada <- paste("./", dir_processed, sep = "")
   }
   help_count <-
-    function(img, foreground, background, tolerance, extension, randomize,
-             nrows, show_image, show_original, show_background, marker, marker_col, marker_size, save_image, prefix,
+    function(img, foreground, background, resize, fill_hull, tolerance, extension,
+             randomize, nrows, show_image, show_original, show_background, marker,
+             marker_col, marker_size, save_image, prefix,
              dir_original, dir_processed, verbose){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
@@ -150,12 +167,12 @@ count_objects <- function(img,
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
-        if(resize != FALSE){
-          img <- image_resize(img, resize)
-        }
       } else{
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
+      }
+      if(resize != FALSE){
+        img <- image_resize(img, resize)
       }
       if(!is.null(foreground) && !is.null(background)){
         if(is.character(foreground)){
@@ -189,23 +206,35 @@ count_objects <- function(img,
         # foreground_background <- image_correct(foreground_background, perc = correction)
         ID <- c(foreground_background == 1)
         ID2 <- c(foreground_background == 0)
-        tol <- ifelse(is.null(tolerance),
-                      ifelse(nrow(foreground_background) > 1000,
-                             round(nrow(foreground_background) / 750, 0), 1), tolerance)
-        ext <- ifelse(is.null(extension),
-                      ifelse(nrow(foreground_background) > 1000,
-                             round(nrow(foreground_background) / 300, 0), 1), extension)
+        parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+        res <- length(img2)
+        parms2 <- parms[parms$object_size == object_size,]
+        rowid <-
+          which(sapply(as.character(parms2$resolution), function(x) {
+            eval(parse(text=x))}))
+        ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+        tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
         nmask <- watershed(distmap(foreground_background),
                            tolerance = tol,
                            ext = ext)
       } else{
-        img2 <- image_binary(img, invert = invert)
-        tol <- ifelse(is.null(tolerance),
-                      ifelse(nrow(img2) > 1000,
-                             round(nrow(img2) / 750, 0), 1), tolerance)
-        ext <- ifelse(is.null(extension),
-                      ifelse(nrow(img2) > 1000,
-                             round(nrow(img2) / 300, 0), 1), extension)
+        img2 <- image_binary(img,
+                             index = index,
+                             invert = invert,
+                             fill_hull = fill_hull,
+                             resize = FALSE,
+                             show_image = FALSE)[[1]]
+        parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+        res <- length(img2)
+        parms2 <- parms[parms$object_size == object_size,]
+        rowid <-
+          which(sapply(as.character(parms2$resolution), function(x) {
+          eval(parse(text=x))}))
+        ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+        tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+        # print(res)
+        # print(ext)
+        # print(tol)
         nmask <- watershed(distmap(img2),
                            tolerance = tol,
                            ext = ext)
@@ -259,7 +288,7 @@ count_objects <- function(img,
         )
       ifelse(!is.null(lower_size),
              shape <- shape[shape$s.area > lower_size, ],
-             shape <- shape[shape$s.area > mean(shape$s.area) * 0.01, ])
+             shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
       if(!is.null(upper_size)){
         shape <- shape[shape$s.area < upper_size, ]
       }
@@ -268,7 +297,7 @@ count_objects <- function(img,
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
       show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
       marker <- ifelse(is.null(marker), "point", marker)
-      marker_col <- ifelse(is.null(marker_col), "red", marker_col)
+      marker_col <- ifelse(is.null(marker_col), "white", marker_col)
       marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       if(show_image == TRUE){
         if(marker == "text"){
@@ -348,7 +377,7 @@ count_objects <- function(img,
       invisible(results)
     }
   if(missing(img_pattern)){
-    help_count(img, foreground, background, tolerance, extension, randomize,
+    help_count(img, foreground, background, resize, fill_hull, tolerance , extension, randomize,
                nrows, show_image, show_original, show_background, marker,
                marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose)
@@ -368,19 +397,30 @@ count_objects <- function(img,
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     if(parallel == TRUE){
-      plan(multisession)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust,
+                    varlist = c("names_plant", "help_count", "file_name",
+                                "check_names_dir", "file_extension", "image_import",
+                                "image_binary", "watershed", "distmap", "computeFeatures.moment",
+                                "computeFeatures.shape", "colorLabels", "image_show",
+                                "%>%"),
+                    envir=environment())
+      on.exit(stopCluster(clust))
       if(verbose == TRUE){
-        message("Image processing using parallel computation, please wait.")
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
+
       results <-
-        future_lapply(names_plant,
-                      function(x){
-                        help_count(x,
-                                   foreground, background, tolerance, extension, randomize,
-                                   nrows, show_image, show_original, show_background, marker,
-                                   marker_col, marker_size, save_image, prefix,
-                                   dir_original, dir_processed, verbose =  FALSE)
-                      })
+        parLapply(clust, names_plant,
+                  function(x){
+                    help_count(x,
+                               foreground, background, resize, fill_hull,
+                               tolerance , extension, randomize,
+                               nrows, show_image, show_original, show_background, marker,
+                               marker_col, marker_size, save_image, prefix,
+                               dir_original, dir_processed, verbose =  FALSE)
+                  })
 
     } else{
       results <- list()
@@ -390,10 +430,10 @@ count_objects <- function(img,
                      text = paste("Processing image", names_plant[i]))
         results[[i]] <-
           help_count(img  = names_plant[i],
-                     foreground, background, tolerance, extension, randomize,
-                     nrows, show_image, show_original, show_background, marker,
-                     marker_col, marker_size, save_image, prefix,
-                     dir_original, dir_processed, verbose)
+                     foreground, background, resize, fill_hull, tolerance,
+                     extension, randomize, nrows, show_image, show_original,
+                     show_background, marker, marker_col, marker_size, save_image,
+                     prefix, dir_original, dir_processed, verbose)
       }
     }
     names(results) <- names_plant
@@ -413,8 +453,8 @@ count_objects <- function(img,
                   .[, c(10, 1:9)]
               })
       )
-    if(verbose == TRUE){
       summ <- stats[stats$statistics == "n",c(1,3)]
+    if(verbose == TRUE){
       names(summ) <- c("Image", "Objects")
       cat("--------------------------------------------\n")
       print(summ)

@@ -1,24 +1,25 @@
 Package: pliman
 Title: Tools for Plant Image Analysis
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Tiago",
            family = "Olivoto",
            role = c("aut", "cre"),
            email = "tiagoolivoto@gmail.com",
            comment = c(ORCID = "0000-0002-0241-9636"))
-Description: What the package does (one paragraph).
+Description: Provides tools for image manipulation and plant image
+    analysis that will help you to segment images create binary images,
+    measure leaf area, quantify disease severity, count the number of
+    disease lesions, and obtain statistics of objects such as grains,
+    pods, pollen, or any other using images.
 License: GPL (>= 3)
-Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
-biocViews:
 Depends: 
     R (>= 4.0.0)
 Imports: 
-    future,
     EBImage,
     ggplot2,
-    magrittr,
-    future.apply
+    magrittr
+biocViews:
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

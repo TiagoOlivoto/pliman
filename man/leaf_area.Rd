@@ -10,6 +10,8 @@ leaf_area(
   img_background,
   img_template,
   area_template,
+  parallel = FALSE,
+  workers = NULL,
   img_pattern = NULL,
   lower_size = NULL,
   upper_size = NULL,
@@ -25,7 +27,8 @@ leaf_area(
   text_digits = 2,
   save_image = FALSE,
   dir_original = NULL,
-  dir_processed = NULL
+  dir_processed = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -39,6 +42,14 @@ leaf_area(
 
 \item{area_template}{The known area of the template. The leaf area will be
 given in the same unit as \code{area_template}.}
+
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time, speccialy when \code{img_pattern} is used is informed. The
+number of sections is set up to 90\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
 
 \item{img_pattern}{A pattern of file name used to identify images to be
 processed. For example, if \code{img_pattern = "im"} all images that the name
@@ -83,6 +94,8 @@ processed images. Defaults to \code{NULL}. In this case, the function will
 search for the image \code{img} in the current working directory. After
 processing, when \code{save_image = TRUE}, the processed image will be also
 saved in such a directory.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
 A data frame with the results for each image.

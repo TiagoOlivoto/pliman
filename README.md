@@ -88,12 +88,12 @@ count_objects(img)
     # --------------------------------------------
     # Number of objects: 150 
     # --------------------------------------------
-    #  statistics        area   perimeter
-    #         min   431.00000    69.00000
-    #        mean   611.92000    80.60667
-    #         max   844.00000    98.00000
-    #          sd    86.50441     7.09182
-    #         sum 91788.00000 12091.00000
+    #  statistics        area    perimeter
+    #         min   389.00000    64.000000
+    #        mean   564.10000    76.480000
+    #         max   774.00000    95.000000
+    #          sd    79.04936     5.929926
+    #         sum 84615.00000 11472.000000
 
 In the following example, we will enumerate the grains with an area
 greater than the mean of all grains in the image and add a white
@@ -104,7 +104,7 @@ count_objects(img,
               show_segmentation = FALSE,
               col_background = "white",
               marker = "text",
-              lower_size = 611.92,
+              lower_size = 564.1,
               marker_size = 0.5,
               marker_col = "white")
 ```
@@ -113,14 +113,14 @@ count_objects(img,
 
     # 
     # --------------------------------------------
-    # Number of objects: 77 
+    # Number of objects: 74 
     # --------------------------------------------
-    #  statistics        area perimeter
-    #         min   613.00000   78.0000
-    #        mean   682.18182   85.5974
-    #         max   844.00000   98.0000
-    #          sd    50.19009    5.3219
-    #         sum 52528.00000 6591.0000
+    #  statistics        area   perimeter
+    #         min   566.00000   75.000000
+    #        mean   631.68919   81.094595
+    #         max   774.00000   95.000000
+    #          sd    43.52072    4.125327
+    #         sum 46745.00000 6001.000000
 
 # Getting help
 

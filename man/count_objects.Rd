@@ -10,9 +10,12 @@ count_objects(
   background = NULL,
   img_pattern = NULL,
   parallel = FALSE,
+  workers = NULL,
   resize = FALSE,
+  fill_hull = FALSE,
   invert = FALSE,
-  channel = "blue",
+  index = "NB",
+  object_size = "medium",
   tolerance = NULL,
   extension = NULL,
   lower_size = NULL,
@@ -38,7 +41,7 @@ count_objects(
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{foreground}{A color palette of the foreground (optional.}
+\item{foreground}{A color palette of the foreground (optional).}
 
 \item{background}{A color palette of the background (optional).}
 
@@ -50,17 +53,30 @@ images that are nammed as 1.-, 2.-, and so on.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
-the processing time, speccialy when \code{img_pattern} is used is informed.}
+the processing time, speccialy when \code{img_pattern} is used is informed. The
+number of sections is set up to 90\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
 image).}
 
+\item{fill_hull}{Fill holes in the binary image? Defaults to \code{FALSE}. This is
+useful to fill holes in objects that have portions with a color similar to
+the background. IMPORTANT: Objects touching each other can be combined into
+one single object, which may underestimate the number of objects in an
+image.}
+
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
 
-\item{channel}{A character value specifying the target mode for conversion to
+\item{index}{A character value specifying the target mode for conversion to
 binary image. One of \code{gray}, \code{grey}, \code{red}, \code{green}, or \code{blue}.}
+
+\item{object_size}{The size of the object. Used to automatically set up
+\code{tolerance} and \code{extension} parameters. One of the following. \verb{"small" (e.g, wheat grains)}, \verb{"medium" (e.g, soybean grains)}, \verb{"large" (e.g, peanut grains)}.  \verb{"elarge" (e.g, soybean pods)}.}
 
 \item{tolerance}{The minimum height of the object in the units of image
 intensity between its highest point (seed) and the point where it contacts
@@ -75,7 +91,7 @@ objects.}
 
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
 analysis. Plant images often contain dirt and dust. To prevent dust from
-affecting the image analysis, objects with lesser than 1\% of the mean of
+affecting the image analysis, objects with lesser than 10\% of the mean of
 all objects are removed. Upper limit is set to \code{NULL}, i.e., no upper
 limitused. One can set a known area or use \code{lower_limit = 0} to select all
 objects (not advised). Objects that matches the size of a given range of
@@ -128,19 +144,19 @@ A data frame with the results for each image.
 Counts the number of objects in an image. See more at details.
 }
 \details{
-Counts the number of objects in an image. A binary image is first generated
-to segment the foreground and background. The argument channel is useful to
-choose a proper RGB band to segment the image Then, the number of objects in
-the foreground is counted. By setting up arguments such as lower_size,
-upper_size is possible to set a threshold for lower and upper sizes of the
-objects, respectively.  Change tolerance and extension values to better set up
-watershed-based object detection.
+Counts the number of objects in an image. A binary image is first generated to
+segment the foreground and background. The argument index is useful to choose
+a proper index to segment the image (see \code{\link[=image_binary]{image_binary()}} for more details).
+Then, the number of objects in the foreground is counted. By setting up
+arguments such as lower_size, upper_size is possible to set a threshold for
+lower and upper sizes of the objects, respectively.  Change tolerance and
+extension values to better set up watershed-based object detection.
 
 If color palettes samples are provided, a general linear model (binomial
 family) fitted to the RGB values is used to segment fore- and background. By
 using \code{img_pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
-subdirectory informed in '\code{dir_original}. To speed up the computation time,
+subdirectory informed in \code{dir_original}'. To speed up the computation time,
 one can set \code{parallel = TRUE}.
 }
 \examples{

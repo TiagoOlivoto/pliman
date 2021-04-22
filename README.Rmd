@@ -82,7 +82,7 @@ count_objects(img,
               show_segmentation = FALSE,
               col_background = "white",
               marker = "text",
-              lower_size = 611.92,
+              lower_size = 564.1,
               marker_size = 0.5,
               marker_col = "white")
 ```

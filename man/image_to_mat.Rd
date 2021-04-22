@@ -4,11 +4,25 @@
 \alias{image_to_mat}
 \title{Convert an image to numerical matrices}
 \usage{
-image_to_mat(image)
+image_to_mat(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 }
 \arguments{
-\item{image}{An image object.
-frame? Padrao \code{TRUE}.}
+\item{image}{An image object.}
+
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time when \code{image} is a list. The number of sections is set
+up to 90\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+}
+\value{
+A list containing three matrices (R, G, and B), and a data frame
+containing four columns: the name of the image in \code{image} and the R, G, B
+values.
 }
 \description{
 Given an object image, converts it into three matrices (RGB) and a data frame
@@ -20,4 +34,7 @@ img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
 dim(img)
 mat <- image_to_mat(img)
 dim(mat[[1]])
+}
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }

@@ -5,9 +5,9 @@
 \alias{image_import}
 \alias{image_export}
 \alias{image_show}
-\title{Import, export and display images}
+\title{Import, display and export images}
 \usage{
-image_import(image, ...)
+image_import(image, ..., img_pattern = NULL)
 
 image_export(image, name, ...)
 
@@ -22,12 +22,28 @@ image_show(image)
 \item{...}{Alternative arguments passed to the corresponding functions from
 the \code{jpeg}, \code{png}, and \code{tiff} packages.}
 
+\item{img_pattern}{A pattern of file name used to identify images to be
+imported. For example, if \code{img_pattern = "im"} all images in the current
+working directory that the name matches the pattern (e.g., img1.-,
+image1.-, im2.-) will be imported as a list. Providing any number as
+pattern (e.g., \code{img_pattern = "1"}) will select images that are nammed as
+1.-, 2.-, and so on.}
+
 \item{name}{An string specifying the name of the image.}
 }
+\value{
+\itemize{
+\item \code{image_import} returns a new \code{Image} object.
+\item \code{image_export} returns an invisible vector of file names.
+}
+}
 \description{
-Import images from files and URLs, write images to files and show images.
+Import images from files and URLs, write images to files, and show images.
 }
 \examples{
 library(pliman)
 img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+}
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }

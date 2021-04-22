@@ -10,6 +10,8 @@ count_lesions(
   img_lesion,
   img_background = NULL,
   img_pattern = NULL,
+  parallel = FALSE,
+  workers = NULL,
   lower_size = NULL,
   upper_size = NULL,
   randomize = TRUE,
@@ -26,7 +28,8 @@ count_lesions(
   save_image = FALSE,
   prefix = "proc_",
   dir_original = NULL,
-  dir_processed = NULL
+  dir_processed = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -43,6 +46,14 @@ processed. For example, if \code{img_pattern = "im"} all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
 images that are nammed as 1.-, 2.-, and so on.}
+
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time, speccialy when \code{img_pattern} is used is informed. The
+number of sections is set up to 90\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
 
 \item{lower_size}{Lower limit for size for the image analysis. Leaf images
 often contain dirt and dust. To prevent dust from affecting the image
@@ -87,6 +98,8 @@ processed images. Defaults to \code{NULL}. In this case, the function will
 search for the image \code{img} in the current working directory. After
 processing, when \code{save_image = TRUE}, the processed image will be also
 saved in such a directory.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
 A data frame with the results for each image.

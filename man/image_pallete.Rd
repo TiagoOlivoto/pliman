@@ -4,7 +4,14 @@
 \alias{image_pallete}
 \title{Create an image palette}
 \usage{
-image_pallete(image, npal, nstart = 25)
+image_pallete(
+  image,
+  npal,
+  nstart = 25,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{image}{An image object.}
@@ -12,6 +19,16 @@ image_pallete(image, npal, nstart = 25)
 \item{npal}{The number of color palletes.}
 
 \item{nstart}{How many random sets from \code{npal} should be chosen?}
+
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time when \code{image} is a list. The number of sections is set
+up to 90\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \description{
 Creates image palettes by applying the k-means algorithm to the RGB values.
