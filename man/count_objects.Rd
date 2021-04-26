@@ -176,3 +176,6 @@ count_objects(img,
 }
 
 }
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
+}

@@ -850,7 +850,7 @@ image_segment <- function(image,
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
-        image_combine(imgs[[i]][[2]], imgs[[i]][[1]])
+        plot(imgs[[i]][[1]])
       }
     }
     invisible(imgs)
@@ -972,4 +972,49 @@ image_pallete <- function(image,
   }
   return(rgbs)
   }
+}
+
+
+#' Utilities for image resolution
+#'
+#' Provides useful conversions between size (cm), number of pixels (px) and
+#' resolution (dpi)
+#'
+#' @name utils_dpi
+#' @param dpi The image resolution in dots per inch.
+#' @param px The number of pixels.
+#' @param cm The size in centimeters.
+#' @return A numerical value.
+#' @export
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
+#' @examples
+#' library(pliman)
+#' # Convert  dots per inch to centimeter
+#' dpi_to_cm(c(1, 2, 3))
+#'
+#' # Convert centimeters to dots per inch
+#' cm_to_dpi(c(1, 2, 3))
+#'
+#' # Convert centimeters to number of pixels with resolution of 96 dpi.
+#' cm_to_pixels(c(1, 2, 3), 96)
+#'
+#' # Convert number of pixels to cm with resolution of 96 dpi.
+#' pixels_to_cm(c(1, 2, 3), 96)
+dpi_to_cm <- function(dpi){
+  2.54 / dpi
+}
+#' @name utils_dpi
+#' @export
+cm_to_dpi <- function(cm){
+  cm / 2.54
+}
+#' @name utils_dpi
+#' @export
+pixels_to_cm <- function(px, dpi){
+  px * (2.54 / dpi)
+}
+#' @name utils_dpi
+#' @export
+cm_to_pixels <- function(cm, dpi){
+  cm / (2.54 / dpi)
 }

@@ -175,3 +175,6 @@ count_lesions(img = img,
 }
 
 }
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
+}

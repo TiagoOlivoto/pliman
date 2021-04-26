@@ -96,6 +96,7 @@
 #' @export
 #' @import EBImage
 #' @md
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
 #' library(pliman)
@@ -366,8 +367,12 @@ count_objects <- function(img,
                                  sum(shape$s.perimeter))) %>%
         transform(statistics = c("n", "min", "mean", "max", "sd", "sum"))
       stats <- stats[c(3, 1, 2)]
+      shape <- shape[,c(1:6, 8:9, 7)]
+      colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
+                           "radius_min", "radius_max", "radius_sd")
       results <- list(results = shape,
                       statistics = stats)
+      class(results) <- "plm_count"
       if(verbose == TRUE){
         cat("\n--------------------------------------------\n")
         cat("Number of objects:", stats[1,2],"\n")

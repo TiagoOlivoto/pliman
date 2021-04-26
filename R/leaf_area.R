@@ -265,6 +265,9 @@ leaf_area <- function(img,
              cex = text_size)
         dev.off()
       }
+      shape <- shape[,c(1:3, 5:7, 9:10, 8, 11)]
+      colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
+                           "radius_min", "radius_max", "radius_sd", "label")
       return(shape)
     }
   if(missing(img_pattern)){

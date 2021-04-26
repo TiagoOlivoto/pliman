@@ -87,6 +87,7 @@
 #' @return A data frame with the results for each image.
 #' @export
 #' @md
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
 #' library(pliman)
