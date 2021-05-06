@@ -15,6 +15,7 @@ count_lesions(
   resize = FALSE,
   invert = FALSE,
   index = "NB",
+  my_index = NULL,
   lower_size = NULL,
   upper_size = NULL,
   randomize = TRUE,
@@ -70,9 +71,10 @@ image).}
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
 
-\item{index}{A character value specifying the target mode for conversion to
-binary image when \code{img_healthy} and \code{img_lesion} are not declared. Defaults
-to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details.}
+\item{index, my_index}{A character value specifying the target mode for
+conversion to binary image when \code{img_healthy} and \code{img_lesion} are not
+declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
+more details.}
 
 \item{lower_size}{Lower limit for size for the image analysis. Leaf images
 often contain dirt and dust. To prevent dust from affecting the image
@@ -162,16 +164,17 @@ stored in the current working directory or in the subdirectory informed in
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(system.file("tmp_images/sev3.png", package = "pliman"))
-healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-lesions <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-image_show(img)
-image_show(healthy)
-image_show(lesions)
+img <- image_import(image_pliman("sev_leaf_nb.jpg"))
+healthy <- image_import(image_pliman("sev_healthy.jpg"))
+lesions <- image_import(image_pliman("sev_sympt.jpg"))
+image_combine(img, healthy, lesions, ncol = 3)
 count_lesions(img = img,
               img_healthy = healthy,
               img_lesion = lesions,
-              show_image = TRUE)
+              lesion_size = "elarge", # extra large lesions
+              show_image = TRUE,
+              show_segmentation = FALSE,
+              marker = "text")
 }
 
 }

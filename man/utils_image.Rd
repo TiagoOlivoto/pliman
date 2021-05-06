@@ -5,6 +5,7 @@
 \alias{image_import}
 \alias{image_export}
 \alias{image_show}
+\alias{image_pliman}
 \title{Import, display and export images}
 \usage{
 image_import(image, ..., img_pattern = NULL)
@@ -12,11 +13,13 @@ image_import(image, ..., img_pattern = NULL)
 image_export(image, name, ...)
 
 image_show(image)
+
+image_pliman(image)
 }
 \arguments{
 \item{image}{\itemize{
 \item For \code{image_import()}, a character vector of file names or URLs.
-\item For \code{image_export()}, an Image object or an array.
+\item For \code{image_export()}, an Image object, an array or a list of images.
 }}
 
 \item{...}{Alternative arguments passed to the corresponding functions from
@@ -33,16 +36,19 @@ pattern (e.g., \code{img_pattern = "1"}) will select images that are nammed as
 }
 \value{
 \itemize{
-\item \code{image_import} returns a new \code{Image} object.
-\item \code{image_export} returns an invisible vector of file names.
+\item \code{image_import()} returns a new \code{Image} object.
+\item \code{image_export()} returns an invisible vector of file names.
+\item \code{image_pliman()} returns a character string with the path to the example
+image installed with the package.
 }
 }
 \description{
 Import images from files and URLs, write images to files, and show images.
+*
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

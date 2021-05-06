@@ -35,7 +35,7 @@ Creates image palettes by applying the k-means algorithm to the RGB values.
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
 pal <- image_pallete(img, 2)
 image_show(pal[[1]])
 image_show(pal[[2]])

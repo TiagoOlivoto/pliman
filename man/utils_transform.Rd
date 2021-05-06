@@ -6,22 +6,29 @@
 \alias{image_rotate}
 \alias{image_horizontal}
 \alias{image_vertical}
-\alias{image_hreflex}
-\alias{image_vreflex}
+\alias{image_hreflect}
+\alias{image_vreflect}
 \alias{image_resize}
 \title{Spatial transformations}
 \usage{
 image_dimension(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
-image_rotate(image, angle, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_rotate(
+  image,
+  angle,
+  bg_col = "white",
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE
+)
 
 image_horizontal(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
 image_vertical(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
-image_hreflex(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_hreflect(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
-image_vreflex(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_vreflect(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
 image_resize(
   image,
@@ -48,6 +55,8 @@ number of parallel processes that can be active at the same time.}
 
 \item{angle}{The rotation angle in degrees.}
 
+\item{bg_col}{Color used to fill the background pixels, defaults to \code{"white"}.}
+
 \item{rel_size}{The relative size of the resized image. Defaults to 100. For
 example, setting \code{rel_size = 50} to an image of width \verb{1280 x 720}, the new
 image will have a size of \verb{640 x 360}.}
@@ -66,19 +75,19 @@ Performs image rotation and reflection
 \item \code{image_rotate()} rotates the image clockwise by the given angle.
 \item \code{image_horizontal()} converts (if needed) an image to a horizontal image.
 \item \code{image_vertical()} converts (if needed) an image to a vertical image.
-\item \code{image_hreflex()} performs horizontal reflextion of the \code{image}.
-\item \code{image_vreflex()} performs horizontal reflextion of the \code{image}.
+\item \code{image_hreflect()} performs horizontal reflection of the \code{image}.
+\item \code{image_vreflect()} performs vertical reflection of the \code{image}.
 \item \code{image_resize()} resize the \code{image}.
 }
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
 image_show(img)
 img <- image_resize(img, 50)
 img1 <- image_rotate(img, 45)
-img2 <- image_hreflex(img)
-img3 <- image_vreflex(img)
+img2 <- image_hreflect(img)
+img3 <- image_vreflect(img)
 img4 <- image_vertical(img)
 image_combine(img1, img2, img3, img4)
 }

@@ -115,19 +115,21 @@ in the current working directory or in the subdirectory informed in
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(system.file("tmp_images/la.png", package = "pliman"))
-leaf <- image_import(system.file("tmp_images/la2.png", package = "pliman"))
-tmpl <- image_import(system.file("tmp_images/la3.png", package = "pliman"))
-background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
-image_show(img)
-image_show(leaf)
-image_show(tmpl)
-image_show(background)
+img <- image_import(image_pliman("la_pattern.JPG"))
+leaf <- image_import(image_pliman("la_leaf.jpg"))
+tmpl <- image_import(image_pliman("la_temp.jpg"))
+background <- image_import(image_pliman("la_back.jpg"))
+
+# Combine the images
+image_combine(img, leaf, tmpl, background)
+
+# Computes the leaf area
 leaf_area(img = img,
           img_leaf = leaf,
           img_template = tmpl,
           img_background = background,
-          area_template = 27.29)
+          area_template = 4,
+          text_col = "white")
 }
 
 }

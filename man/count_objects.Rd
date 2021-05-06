@@ -15,11 +15,14 @@ count_objects(
   fill_hull = FALSE,
   invert = FALSE,
   index = "NB",
+  my_index = NULL,
   object_size = "medium",
   tolerance = NULL,
   extension = NULL,
   lower_size = NULL,
   upper_size = NULL,
+  topn_lower = NULL,
+  topn_upper = NULL,
   randomize = TRUE,
   nrows = 10000,
   show_image = TRUE,
@@ -72,8 +75,9 @@ image.}
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
 
-\item{index}{A character value specifying the target mode for conversion to
-binary image. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
+\item{index, my_index}{A character value specifying the target mode for
+conversion to binary image when \code{foreground} and \code{background} are not
+declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
 more details.}
 
 \item{object_size}{The size of the object. Used to automatically set up
@@ -85,8 +89,7 @@ peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 intensity between its highest point (seed) and the point where it contacts
 another object (checked for every contact pixel). If the height is smaller
 than the tolerance, the object will be combined with one of its neighbors,
-which is the highest. Tolerance should be chosen according to the range of
-x. Defaults to \code{3}.}
+which is the highest.}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
 neighboring objects. Defaults to 20. Higher value smoothes out small
@@ -96,11 +99,15 @@ objects.}
 analysis. Plant images often contain dirt and dust. To prevent dust from
 affecting the image analysis, objects with lesser than 10\% of the mean of
 all objects are removed. Upper limit is set to \code{NULL}, i.e., no upper
-limitused. One can set a known area or use \code{lower_limit = 0} to select all
+limit used. One can set a known area or use \code{lower_limit = 0} to select all
 objects (not advised). Objects that matches the size of a given range of
 sizes can be selected by setting up the two arguments. For example, if
 \code{lower_size = 120} and \code{upper_size = 140}, objects with size greater than
 or equal 120 and less than or equal 140 will be considered.}
+
+\item{topn_lower, topn_upper}{Select the top \code{n} objects based on its area.
+\code{topn_lower} selects the \code{n} elements with the smallest area whereas
+\code{topn_upper} selects the \code{n} objects with the largest area.}
 
 \item{randomize}{Randomize the lines before training the model?}
 
@@ -151,13 +158,13 @@ Counts the number of objects in an image. A binary image is first generated to
 segment the foreground and background. The argument index is useful to choose
 a proper index to segment the image (see \code{\link[=image_binary]{image_binary()}} for more details).
 Then, the number of objects in the foreground is counted. By setting up
-arguments such as lower_size, upper_size is possible to set a threshold for
-lower and upper sizes of the objects, respectively.  Change tolerance and
-extension values to better set up watershed-based object detection.
+arguments such as \code{lower_size}, \code{upper_size} is possible to set a threshold
+for lower and upper sizes of the objects, respectively.  Change \code{tolerance}
+and \code{extension} values to better set up watershed-based object detection. If
+color palettes samples are provided, a general linear model (binomial family)
+fitted to the RGB values is used to segment fore- and background.
 
-If color palettes samples are provided, a general linear model (binomial
-family) fitted to the RGB values is used to segment fore- and background. By
-using \code{img_pattern} it is possible to process several images with common
+By using \code{img_pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
 subdirectory informed in \code{dir_original}'. To speed up the computation time,
 one can set \code{parallel = TRUE}.
@@ -165,7 +172,7 @@ one can set \code{parallel = TRUE}.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 count_objects(img)
 
 # Enumerate the objects in the original image
@@ -174,7 +181,6 @@ count_objects(img,
               marker = "text",
               marker_col = "white")
 }
-
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

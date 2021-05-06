@@ -1,0 +1,115 @@
+---
+title: "Plant IMage Analysis"
+author: "Tiago Olivoto"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+fig_caption: yes
+link-citations: true
+vignette: >
+  %\VignetteIndexEntry{Plant IMage Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(comment = "#", collapse = TRUE, fig.width = 5)
+```
+
+# Getting started
+`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
+
+* Measure leaf area
+* Measure disease severity
+* Count the number of lesions
+* Count objects in an image
+* Get the RGB values for each object in an image
+
+
+# Leaf area
+The function `leaf_area()` can be used to computes the leaf area using an image with leaves and a template with a known area. A general linear model (binomial family) fitted to the RGB values is used to first separate the leaves and template from the background and then the leaves from the template. The leaf area is then calculated for each leaf based on the pixel area.
+
+In the following example, the area of five three leaves will be computed using a reference template with a known area of 4 cm$^2$.
+
+```{r}
+library(pliman)
+img <- image_import(image_pliman("la_pattern.JPG"))
+leaf <- image_import(image_pliman("la_leaf.jpg"))
+tmpl <- image_import(image_pliman("la_temp.jpg"))
+background <- image_import(image_pliman("la_back.jpg"))
+image_combine(img, leaf, tmpl, background)
+
+
+# Computes the leaf area
+area <- 
+leaf_area(img = img,
+          img_leaf = leaf,
+          img_template = tmpl,
+          img_background = background,
+          area_template = 4,
+          text_col = "white")
+get_measures(area)
+```
+
+
+# Counting crop grains 
+
+Here, we will count the grains in the image `soybean_touch.png`. This image has a cyan background and contains 30 soybean grains that touch with each other.
+
+```{r}
+soy <- image_import(image_pliman("soybean_touch.jpg"))
+image_show(soy)
+
+# Count the objects in the image
+grains <- count_objects(soy)
+
+# Draws the object id (by default)
+plot_measures(grains)
+```
+
+
+
+# Disease severity
+The function `symptomatic_area()` is used to compute the percentage of symptomatic leaf area in a sample or entire leaf based on provided color palettes samples. A general linear model (binomial family) fitted to the RGB values is used to segment the lesions from the healthy leaf. If a pallet of background is provided, the function takes care of the details to isolate it before computing the number and area of lesions.
+
+The next example computes the symptomatic area of a soybean leaf. The proportion of the healthy and symptomatic areas is given as the proportion of the total leaf area, after segmenting the leaf from the background (blue).
+
+```{r}
+img <- image_import(image_pliman("sev_leaf.jpg"))
+healthy <- image_import(image_pliman("sev_healthy.jpg"))
+symptoms <- image_import(image_pliman("sev_sympt.jpg"))
+background <- image_import(image_pliman("sev_back.jpg"))
+image_combine(img, healthy, symptoms,background)
+
+# Computes the symptomatic area
+symptomatic_area(img = img,
+                 img_healthy = healthy,
+                 img_symptoms = symptoms,
+                 img_background = background,
+                 show_image = TRUE)
+```
+
+
+# RGB values for objects
+The function `objects_rgb()` can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for 
+
+```{r}
+img <- image_import(image_pliman("soy_green.jpg"))
+# Segment the foreground (grains) using the normalized blue index
+# Shows the average value of the blue index in each object
+rgb <- objects_rgb(img, marker = "index")
+
+# Draw the object id
+image_show(img)
+plot_measures(rgb)
+
+# plot the distribution of RGB values of each object
+plot(rgb)
+```
+
+
+
+# Getting help
+
+-   If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues)
+
+-   Suggestions and criticisms to improve the quality and usability of the package are welcome!

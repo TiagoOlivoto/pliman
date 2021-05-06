@@ -1,0 +1,106 @@
+---
+title: "Measure leaf area using leaf images"
+author: "Tiago Olivoto"
+date: "`r Sys.Date()`"
+always_allow_html: yes
+output: rmarkdown::html_vignette
+fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Measure leaf area using leaf images}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  rmarkdown.html_vignette.check_title = FALSE,
+  fig.width = 7
+)
+```
+
+# Getting started
+
+Measuring leaf area is a very common task for breeders and agronomists. The leaf area is used as a key trait for computing several indexes, such as the Leaf Area Index (LAI), which quantifies the amount of leaf material in a canopy. In `pliman` researchers can measure the leaf area using leaf images in two main ways. The first, using `leaf_area()` uses a sample of leaves along with a template with a known area. Background, leaf, and template color palettes must be declared. 
+
+
+## Leaf area using leaf_area()
+
+In this example, an image with five tree leaves and a yellow template with a know area of 4 cm$^2$ is used.
+
+```{r}
+library(pliman)
+img <- image_import(image_pliman("la_pattern.JPG"))
+leaf <- image_import(image_pliman("la_leaf.jpg"))
+tmpl <- image_import(image_pliman("la_temp.jpg"))
+background <- image_import(image_pliman("la_back.jpg"))
+
+# Combine the images
+image_combine(img, leaf, tmpl, background)
+
+```
+
+
+To compute the leaf area in the image, the following function is used. Then, `get_measures()` is used to get the values given in the scale of `area_template` argument. The other measures (namely, perimeter, radius_mean, radius_min, and radius_max) are given as pixels.
+
+```{r}
+area <- 
+leaf_area(img = img,
+          img_leaf = leaf,
+          img_template = tmpl,
+          img_background = background,
+          area_template = 4,
+          text_col = "white")
+get_measures(area)
+
+```
+
+
+## Leaf area using count_objects()
+
+An alternative way to compute leaf area in `pliman` is by using `count_objects()`. This function has the advantage of using image segmentation based on several indexes (e.g., red, green, and blue values). So, sample palettes don't need to be informed. Let us to compute the leaf area of `leaves` with this approach. First, we use `image_segmentation()` to identify candidate indexes to segment the image.
+
+```{r }
+leaves <- image_import(image_pliman("la_leaves.JPG"))
+image_show(leaves)
+
+```
+
+```{r fig.width=8, fig.height=8}
+image_segment(leaves, index = "all")
+```
+
+`G` (Green) and `NB` (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the `NB` index here (default option in `count_objects()`). The measurement of the leaf area in this approach is given with the following two steps.
+
+1. Count the number of objects (leaves in this case)
+
+Here, we need to combine `count_objects()` and `plot_measures()` to obtain the identification of each leaf, allowing the further adjustment of the leaf area.
+
+```{r}
+count <- count_objects(leaves)
+plot_measures(count)
+```
+
+
+2. Adjust the leaf area by the area of the known object
+
+The function `get_measures()` is used to adjust the leaf area using the object 6.
+```{r}
+area <- 
+get_measures(count,
+             id = 6,
+             measure = "area",
+             true_value = 4)
+area
+image_show(leaves)
+plot_measures(area, measure = "area")
+
+# compute the difference between the two methods
+142.9 -(sum(area$area) - 4)
+```
+
+
+The weakness of computing leaf area with `count_objects()` is that it is needed to first obtain the object identification to know which object (leaf) is the sample with a known area. This object id may change from image to image, especially from images with a different number of leaves. Thus, batch computing is difficult in this case.
+
+

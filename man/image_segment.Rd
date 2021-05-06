@@ -7,6 +7,7 @@
 image_segment(
   image,
   index = NULL,
+  my_index = NULL,
   fill_hull = FALSE,
   re = NULL,
   nir = NULL,
@@ -27,6 +28,9 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 \code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"}, \code{"BIM"}, \code{"SCI"},
 \code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
 \code{"BGI"}. See \code{\link[=image_index]{image_index()}} for more details.}
+
+\item{my_index}{User can calculate a diferent index using the bands names,
+e.g. \code{my_index = "R+B/G"}.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
@@ -69,7 +73,7 @@ using a given color channel (red, green blue) or even color indexes (See
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 image_show(img)
 image_segment(img, index = c("R, G, B"))
 }

@@ -28,6 +28,7 @@ knitr::opts_chunk$set(
 * Measure disease severity
 * Count the number of lesions
 * Count objects in an image
+* Get the RGB values for each object in an image
 
 # Installation
 
@@ -49,10 +50,10 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 ```{r fig.width=12, fig.height=3}
 library(pliman)
-img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
-healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
+healthy <- image_import(image_pliman("sev_healthy.jpg"))
+symptoms <- image_import(image_pliman("sev_sympt.jpg"))
+background <- image_import(image_pliman("sev_back.jpg"))
 image_combine(img, healthy, symptoms, background, ncol = 4)
 
 ```
@@ -69,7 +70,7 @@ symptomatic_area(img = img,
 The function `count_objects()` can be used to count the grains of an image. In the following example, we will count the number of soybean grains of an image with 150 grains.
 
 ```{r}
-img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 image_show(img)
 count_objects(img)
 

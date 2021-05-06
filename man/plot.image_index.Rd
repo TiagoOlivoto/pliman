@@ -26,7 +26,7 @@ Produces an histogram of an \code{image_index} object
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
 img2 <- image_resize(img, 50)
 ind <- image_index(img2)
 plot(ind)

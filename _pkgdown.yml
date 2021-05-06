@@ -1,0 +1,118 @@
+url: https://tiagoolivoto.github.io/pliman/
+
+home:
+  title: pliman
+  description: Tools for Plant Image Analysis
+
+template:
+  params:
+    bootswatch: spacelab
+    # ganalytics: UA-140429633-1
+    # docsearch:
+    #   api_key: ef40e3bab94bb0e1d687fd3844052701
+    #   index_name: metan
+
+toc:
+  depth: 3
+
+authors:
+  Tiago Olivoto:
+    href: https://www.researchgate.net/profile/Tiago_Olivoto2
+
+navbar:
+  title: "sparklyr"
+  type: inverse
+  left:
+    - icon: fa-home
+      text: "Home"
+      href: index.html
+    - text: "Examples"
+      menu:
+      - text: "Image Operations"
+        href: articles/manipulation.html
+      - text: "Image manipulation"
+        href: articles/manipulation.html
+      - text: "Count objects in an image"
+        href: articles/count_objects.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: News
+      href: news/index.html
+    - text: More
+      menu:
+      - text: Code of Conduct
+        href: CODE_OF_CONDUCT.html
+      - text: Contributing
+        href: CONTRIBUTING.html
+      - text: Issues
+        href: ISSUE_TEMPLATE.html
+      - text: Support
+        href: SUPPORT.html
+      - text: Licence
+        href: LICENSE.html
+  right:
+    - text: "RG"
+      href: https://www.researchgate.net/profile/Tiago_Olivoto2
+    - icon: "fa-github"
+      href: https://github.com/TiagoOlivoto
+    - icon: "fab fa-twitter"
+      href: https://twitter.com/tolivoto
+    - icon: "fab fa-mendeley"
+      href: https://www.mendeley.com/profiles/tiago-olivoto/
+
+
+reference:
+  - title: "Image operations"
+    desc: "Import, show and export images"
+    contents:
+      - utils_image
+      - image_combine
+
+  - title: "Image transformation"
+    desc: "Performs spatial transformations such as rotation, reflection, and resizing"
+    contents:
+      - utils_transform
+
+  - title: "Utilities for files"
+    desc: "Provides utilities for manipulating files"
+    contents:
+      - utils_file
+
+
+  - title: "Utilities for image resolution"
+    desc: "Provides utilities for conversions between size (cm) and resolution (dpi) "
+    contents:
+      - utils_dpi
+
+
+  - title: "Image segmentation"
+    desc: "Performs image segmentation based on indexes such as RGB bands or vegetation indexes "
+    contents:
+      - image_binary
+      - image_index
+      - image_pallete
+      - image_segment
+      - image_to_mat
+      - plot.image_index
+
+
+  - title: "Count objects"
+    desc: "Count objects in an image"
+    contents:
+      - count_lesions
+      - count_objects
+      - utils_measures
+      - objects_rgb
+      - plot.objects_rgb
+
+
+  - title: "Leaf area"
+    desc: "Calculates the leaf area using an image with leaves and a template with a known area"
+    contents:
+      - leaf_area
+
+
+  - title: "Symptomatic area"
+    desc: "Calculates the percentage of symptomatic leaf area based in a sample or entire leaf based on provided color palettes samples"
+    contents:
+      - symptomatic_area

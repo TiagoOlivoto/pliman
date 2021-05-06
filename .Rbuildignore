@@ -6,3 +6,12 @@
 ^README_files$
 ^README\.Rmd$
 ^README\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^man/figures$
+^vignettes/count_objects\.Rmd$
+^vignettes/manipulation\.Rmd$
+^vignettes/operations\.Rmd$
+^vignettes/leaf_area\.Rmd$
+

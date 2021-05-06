@@ -7,6 +7,7 @@
 image_binary(
   image,
   index = NULL,
+  my_index = NULL,
   resize = TRUE,
   fill_hull = FALSE,
   re = NULL,
@@ -28,6 +29,9 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 \code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"}, \code{"BIM"}, \code{"SCI"},
 \code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
 \code{"BGI"}. See \code{\link[=image_index]{image_index()}} for more details.}
+
+\item{my_index}{User can calculate a diferent index using the bands names,
+e.g. \code{my_index = "R+B/G"}.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{TRUE}. Resizes
 the image to 30\% of the original size to speed up image processing.}
@@ -69,7 +73,7 @@ clustering-based image thresholding.
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 image_binary(img, index = c("R, NR"), nrow = 1)
 }
 \references{

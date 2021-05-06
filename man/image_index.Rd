@@ -7,6 +7,7 @@
 image_index(
   image,
   index = NULL,
+  my_index = NULL,
   resize = TRUE,
   re = NULL,
   nir = NULL,
@@ -28,6 +29,9 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 \code{"BGI"}. Defaults to \code{NULL} ((normalized) Red, Green and Blue).  One can
 also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
 indexes.}
+
+\item{my_index}{User can calculate a diferent index using the bands names,
+e.g. \code{my_index = "R+B/G"}.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{TRUE}. Resizes
 the image to 30\% of the original size to speed up image processing.}
@@ -81,7 +85,7 @@ The following indexes are available in pliman.\tabular{lll}{
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 image_index(img, c("R, NR"), nrow = 1)
 }
 \references{

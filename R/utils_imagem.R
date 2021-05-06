@@ -12,8 +12,8 @@
 #' @return A grid with the images in `...`
 #' @examples
 #' library(pliman)
-#'img1 <- image_import(system.file("tmp_images", "sev1.png", package = "pliman"))
-#'img2 <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img1 <- image_import(image_pliman("sev_leaf.jpg"))
+#'img2 <- image_import(image_pliman("sev_leaf_nb.jpg"))
 #'image_combine(img1, img2)
 image_combine <- function(..., nrow = NULL, ncol = NULL){
   if(is.list(c(...))){
@@ -41,10 +41,11 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
 #'Import, display and export images
 #'
 #'Import images from files and URLs, write images to files, and show images.
+#'*
 #' @name utils_image
 #' @param image
 #' * For `image_import()`, a character vector of file names or URLs.
-#' * For `image_export()`, an Image object or an array.
+#' * For `image_export()`, an Image object, an array or a list of images.
 #' @param name An string specifying the name of the image.
 #' @param img_pattern A pattern of file name used to identify images to be
 #'   imported. For example, if `img_pattern = "im"` all images in the current
@@ -58,11 +59,13 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return
-#' * `image_import` returns a new `Image` object.
-#' * `image_export` returns an invisible vector of file names.
+#' * `image_import()` returns a new `Image` object.
+#' * `image_export()` returns an invisible vector of file names.
+#' * `image_pliman()` returns a character string with the path to the example
+#' image installed with the package.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
 image_import <- function(image, ..., img_pattern = NULL){
   if(!is.null(img_pattern)){
     if(img_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
@@ -71,7 +74,7 @@ image_import <- function(image, ..., img_pattern = NULL){
     imgs <- list.files(pattern = img_pattern, getwd())
     extensions <- as.character(sapply(imgs, file_extension))
     names_plant <- as.character(sapply(imgs, file_name))
-    if(length(grep(img_pattern, names_plant)) == 0){
+    if(length(grep(img_pattern, imgs)) == 0){
       stop(paste("'", img_pattern, "' pattern not found in '",
                  paste0(getwd())),
            call. = FALSE)
@@ -89,7 +92,7 @@ image_import <- function(image, ..., img_pattern = NULL){
   img_dir <- file_dir(image)
   all_files <- sapply(list.files(img_dir), file_name)
   img_name <- file_name(image)
-  if(!img_name %in% all_files){
+  if(!grepl("http", img_dir, fixed = TRUE) & !img_name %in% all_files){
     stop(" '", img_name, "' not found in ", img_dir,  call. = FALSE)
   }
   readImage(image, ...)
@@ -98,6 +101,14 @@ image_import <- function(image, ..., img_pattern = NULL){
 #' @export
 #' @name utils_image
 image_export <- function(image, name, ...){
+  if(is.list(image)){
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    lapply(seq_along(image), function(i){
+      writeImage(x = image[[i]], files = names(image[i]), ...)
+    })
+  }
   writeImage(image, name, ...)
 }
 #' @export
@@ -109,7 +120,15 @@ image_show <- function(image){
     plot(image)
   }
 }
-
+#' @export
+#' @name utils_image
+image_pliman <- function(image){
+  files <- list.files(system.file("tmp_images", package = "pliman"))
+  if(!image %in% files){
+    stop("Image not available in pliman.\nAvaliable images: ", paste(files, collapse = ", "), call. = FALSE)
+  }
+  system.file(paste0("tmp_images/", image), package = "pliman")
+}
 
 ##### Spatial transformations
 #'Spatial transformations
@@ -119,8 +138,8 @@ image_show <- function(image){
 #' * `image_rotate()` rotates the image clockwise by the given angle.
 #' * `image_horizontal()` converts (if needed) an image to a horizontal image.
 #' * `image_vertical()` converts (if needed) an image to a vertical image.
-#' * `image_hreflex()` performs horizontal reflextion of the `image`.
-#' * `image_vreflex()` performs horizontal reflextion of the `image`.
+#' * `image_hreflect()` performs horizontal reflection of the `image`.
+#' * `image_vreflect()` performs vertical reflection of the `image`.
 #' * `image_resize()` resize the `image`.
 #' @name utils_transform
 #' @param image An image or a list of images of class `Image`.
@@ -131,6 +150,7 @@ image_show <- function(image){
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param angle The rotation angle in degrees.
+#' @param bg_col Color used to fill the background pixels, defaults to `"white"`.
 #' @param rel_size The relative size of the resized image. Defaults to 100. For
 #'   example, setting `rel_size = 50` to an image of width `1280 x 720`, the new
 #'   image will have a size of `640 x 360`.
@@ -145,12 +165,12 @@ image_show <- function(image){
 #' @return A modified version of `image` depending on the function used.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
 #'image_show(img)
 #'img <- image_resize(img, 50)
 #'img1 <- image_rotate(img, 45)
-#'img2 <- image_hreflex(img)
-#'img3 <- image_vreflex(img)
+#'img2 <- image_hreflect(img)
+#'img3 <- image_vreflect(img)
 #'img4 <- image_vertical(img)
 #'image_combine(img1, img2, img3, img4)
 image_dimension <- function(image,
@@ -207,6 +227,7 @@ image_dimension <- function(image,
 #' @export
 image_rotate <- function(image,
                          angle,
+                         bg_col = "white",
                          parallel = FALSE,
                          workers = NULL,
                          verbose = TRUE){
@@ -222,12 +243,12 @@ image_rotate <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-    parLapply(clust, image, image_rotate, angle)
+    parLapply(clust, image, image_rotate, angle, bg_col)
     } else{
-    lapply(image, image_rotate, angle)
+    lapply(image, image_rotate, angle, bg_col)
     }
   } else{
-    rotate(image, angle)
+    rotate(image, angle, bg.col = bg_col)
   }
 }
 #' @name utils_transform
@@ -296,7 +317,7 @@ image_vertical <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_hreflex <- function(image,
+image_hreflect <- function(image,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
@@ -312,9 +333,9 @@ image_hreflex <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_hreflex)
+      parLapply(clust, image, image_hreflect)
     } else{
-    lapply(image, image_hreflex)
+    lapply(image, image_hreflect)
     }
   } else{
     flop(image)
@@ -322,7 +343,7 @@ image_hreflex <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_vreflex <- function(image,
+image_vreflect <- function(image,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
@@ -338,9 +359,9 @@ image_vreflex <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_vreflex)
+      parLapply(clust, image, image_vreflect)
     } else{
-    lapply(image, image_vreflex)
+    lapply(image, image_vreflect)
     }
   } else{
     flip(image)
@@ -394,6 +415,8 @@ image_resize <- function(image,
 #'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
 #'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
 #'   `"BGI"`. See [image_index()] for more details.
+#' @param my_index User can calculate a diferent index using the bands names,
+#'   e.g. `my_index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
 #'   the image to 30% of the original size to speed up image processing.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
@@ -423,10 +446,11 @@ image_resize <- function(image,
 #' @importFrom utils read.csv
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+#'img <- image_import(image_pliman("soybean_touch.jpg"))
 #'image_binary(img, index = c("R, NR"), nrow = 1)
 image_binary <- function(image,
                          index = NULL,
+                         my_index = NULL,
                          resize = TRUE,
                          fill_hull = FALSE,
                          re = NULL,
@@ -450,27 +474,31 @@ image_binary <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_binary, index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      parLapply(clust, image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
     } else{
-    lapply(image, image_binary, index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
+    lapply(image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
     }
   } else{
   ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-  ifelse(is.null(index),
-         index <- c("R", "G", "B", "NR", "NG", "NB"),
-         if(index %in% c("RGB", "NRGB", "all")){
-           index <-  switch (index,
-                             RGB = c("R", "G", "B"),
-                             NRGB = c("NR", "NG", "NB"),
-                             all = ind$Index
-           )} else{
-             index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
-           })
+  if(is.null(my_index)){
+    ifelse(is.null(index),
+           index <- c("R", "G", "B", "NR", "NG", "NB"),
+           if(index %in% c("RGB", "NRGB", "all")){
+             index <-  switch (index,
+                               RGB = c("R", "G", "B"),
+                               NRGB = c("NR", "NG", "NB"),
+                               all = ind$Index
+             )} else{
+               index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
+             })
+  } else{
+    index <- my_index
+  }
   imgs <- list()
   for(i in 1:length(index)){
     indx <- index[[i]]
-    img2 <- image_index(image, indx, resize, re, nir, show_image = FALSE, nrow, ncol)[[1]]
-    threshold <- otsu(img2, range = range(img2))
+    img2 <- image_index(image, indx, my_index, resize, re, nir, show_image = FALSE, nrow, ncol)[[1]]
+    threshold <- otsu(img2, range = range(img2[!is.infinite(img2)], na.rm = TRUE))
     if(invert == FALSE){
       img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
     } else{
@@ -497,6 +525,10 @@ image_binary <- function(image,
     on.exit(par(op))
     for(i in 1:length(imgs)){
       plot(imgs[[i]])
+      if(verbose == TRUE){
+      dim <- image_dimension(imgs[[i]], verbose = FALSE)
+      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+      }
     }
   }
   invisible(imgs)
@@ -534,6 +566,8 @@ image_binary <- function(image,
 #'   `"BGI"`. Defaults to `NULL` ((normalized) Red, Green and Blue).  One can
 #'   also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
 #'   indexes.
+#' @param my_index User can calculate a diferent index using the bands names,
+#'   e.g. `my_index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
 #'   the image to 30% of the original size to speed up image processing.
 #' @param re Respective position of the red-edge band at the original image
@@ -560,10 +594,11 @@ image_binary <- function(image,
 #'   number of indexes used.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+#'img <- image_import(image_pliman("soybean_touch.jpg"))
 #'image_index(img, c("R, NR"), nrow = 1)
 image_index <- function(image,
                         index = NULL,
+                        my_index = NULL,
                         resize = TRUE,
                         re = NULL,
                         nir = NULL,
@@ -585,15 +620,16 @@ image_index <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_index, index, resize, re, nir, show_image, nrow, ncol)
+      parLapply(clust, image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
     } else{
-      lapply(image, image_index, index, resize, re, nir, show_image, nrow, ncol)
+      lapply(image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
     }
   } else{
   if(resize == TRUE){
     image <- image_resize(image, 30)
   }
   ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+  if(is.null(my_index)){
   ifelse(is.null(index),
          index <- c("R", "G", "B", "NR", "NG", "NB"),
          if(index %in% c("RGB", "NRGB", "all")){
@@ -604,11 +640,14 @@ image_index <- function(image,
            )} else{
              index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
            })
+  } else{
+    index <- my_index
+  }
   nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
   imgs <- list()
   for(i in 1:length(index)){
     indx <- index[[i]]
-    if(indx %in% c("R", "G", "B", "G")){
+    if(indx %in% c("R", "G", "B")){
       indx <-
         switch (indx,
                 R = "red",
@@ -618,7 +657,7 @@ image_index <- function(image,
         )
       img2 <- channel(image, indx)
     } else{
-      if(!indx %in% ind$Index){
+      if(is.null(my_index) & !indx %in% ind$Index){
         stop(paste("Index '",indx,"' is not available in pliman",sep = ""), call. = FALSE)
       }
       frames <- getFrames(image)
@@ -643,8 +682,13 @@ image_index <- function(image,
           NIR <- frames[[nir]]
         }
       }
+      if(is.null(my_index)){
       img2 <- eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==indx])))
+      } else{
+      img2 <- eval(parse(text = as.character(my_index)))
+      }
     }
+
     imgs[[i]] <- img2
   }
   names(imgs) <- index
@@ -664,6 +708,10 @@ image_index <- function(image,
     on.exit(par(op))
     for(i in 1:length(imgs)){
       plot(imgs[[i]])
+      if(verbose == TRUE){
+      dim <- image_dimension(imgs[[i]], verbose = FALSE)
+      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+      }
     }
   }
   invisible(structure(imgs, class = "image_index"))
@@ -683,7 +731,7 @@ image_index <- function(image,
 #'   index.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
 # A half size of the original image
 #'img2 <- image_resize(img, 50)
 #'ind <- image_index(img2)
@@ -740,6 +788,8 @@ plot.image_index <- function(x, facet = TRUE, ...){
 #'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
 #'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
 #'   `"BGI"`. See [image_index()] for more details.
+#' @param my_index User can calculate a diferent index using the bands names,
+#'   e.g. `my_index = "R+B/G"`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
@@ -767,11 +817,12 @@ plot.image_index <- function(x, facet = TRUE, ...){
 #' * `mask` A mask with logical values of 0 and 1 for the segmented image.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "soy_150.png", package = "pliman"))
+#'img <- image_import(image_pliman("soybean_touch.jpg"))
 #'image_show(img)
 #'image_segment(img, index = c("R, G, B"))
 image_segment <- function(image,
                          index = NULL,
+                         my_index = NULL,
                          fill_hull = FALSE,
                          re = NULL,
                          nir = NULL,
@@ -794,27 +845,31 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_segment, index,  fill_hull, re, nir, invert, show_image, nrow, ncol)
+      parLapply(clust, image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
     } else{
-      lapply(image, image_segment, index, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      lapply(image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
     }
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-    ifelse(is.null(index),
-           index <- c("R", "G", "B", "NR", "NG", "NB"),
-           if(index %in% c("RGB", "NRGB", "all")){
-             index <-  switch (index,
-                               RGB = c("R", "G", "B"),
-                               NRGB = c("NR", "NG", "NB"),
-                               all = ind$Index
-             )} else{
-               index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
-             })
+    if(is.null(my_index)){
+      ifelse(is.null(index),
+             index <- c("R", "G", "B", "NR", "NG", "NB"),
+             if(index %in% c("RGB", "NRGB", "all")){
+               index <-  switch (index,
+                                 RGB = c("R", "G", "B"),
+                                 NRGB = c("NR", "NG", "NB"),
+                                 all = ind$Index
+               )} else{
+                 index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
+               })
+    } else{
+      index <- my_index
+    }
     imgs <- list()
     for(i in 1:length(index)){
       indx <- index[[i]]
-      img2 <- image_index(image, indx, resize = FALSE, re, nir, show_image = FALSE, nrow, ncol)[[1]]
-      threshold <- otsu(img2, range = range(img2))
+      img2 <- image_index(image, indx, my_index, resize = FALSE, re, nir, show_image = FALSE, nrow, ncol)[[1]]
+      threshold <- otsu(img2, range = range(img2[!is.infinite(img2)], na.rm = TRUE))
       if(invert == FALSE){
         img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
       } else{
@@ -851,6 +906,10 @@ image_segment <- function(image,
       on.exit(par(op))
       for(i in 1:length(imgs)){
         plot(imgs[[i]][[1]])
+        if(verbose == TRUE){
+        dim <- image_dimension(imgs[[i]][[1]], verbose = FALSE)
+        text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+        }
       }
     }
     invisible(imgs)
@@ -876,7 +935,7 @@ image_segment <- function(image,
 #'   values.
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
 #'dim(img)
 #'mat <- image_to_mat(img)
 #'dim(mat[[1]])
@@ -931,7 +990,7 @@ image_to_mat <- function(image,
 #' @export
 #' @examples
 #' library(pliman)
-#'img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
 #'pal <- image_pallete(img, 2)
 #'image_show(pal[[1]])
 #'image_show(pal[[2]])

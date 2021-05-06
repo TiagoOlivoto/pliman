@@ -30,7 +30,7 @@ where each column corresponds to the RGB values.
 }
 \examples{
 library(pliman)
-img <- image_import(system.file("tmp_images", "sev3.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
 dim(img)
 mat <- image_to_mat(img)
 dim(mat[[1]])

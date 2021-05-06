@@ -28,9 +28,10 @@
 #'   image).
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
-#' @param index A character value specifying the target mode for conversion to
-#'   binary image when `img_healthy` and `img_lesion` are not declared. Defaults
-#'   to `"NB"` (normalized blue). See [image_index()] for more details.
+#' @param index,my_index A character value specifying the target mode for
+#'   conversion to binary image when `img_healthy` and `img_lesion` are not
+#'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
+#'   more details.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
 #'   often contain dirt and dust. To prevent dust from affecting the image
 #'   analysis, the lower limit of analyzed size is set to 0.1, i.e., objects
@@ -91,16 +92,17 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(system.file("tmp_images/sev3.png", package = "pliman"))
-#' healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-#' lesions <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-#' image_show(img)
-#' image_show(healthy)
-#' image_show(lesions)
+#' img <- image_import(image_pliman("sev_leaf_nb.jpg"))
+#' healthy <- image_import(image_pliman("sev_healthy.jpg"))
+#' lesions <- image_import(image_pliman("sev_sympt.jpg"))
+#' image_combine(img, healthy, lesions, ncol = 3)
 #' count_lesions(img = img,
 #'               img_healthy = healthy,
 #'               img_lesion = lesions,
-#'               show_image = TRUE)
+#'               lesion_size = "elarge", # extra large lesions
+#'               show_image = TRUE,
+#'               show_segmentation = FALSE,
+#'               marker = "text")
 #' }
 #'
 count_lesions <- function(img,
@@ -113,6 +115,7 @@ count_lesions <- function(img,
                           resize = FALSE,
                           invert = FALSE,
                           index = "NB",
+                          my_index = NULL,
                           lower_size = NULL,
                           upper_size = NULL,
                           randomize = TRUE,
@@ -150,8 +153,8 @@ count_lesions <- function(img,
     diretorio_processada <- paste("./", dir_processed, sep = "")
   }
   help_count <-
-    function(img, img_healthy, img_lesion, img_background, resize, invert, index,
-             lesion_size, tolerance, extension,
+    function(img, img_healthy, img_lesion, img_background, resize, invert,
+             index, my_index, lesion_size, tolerance, extension,
              randomize, nrows, show_image, show_original, show_background,
              col_leaf, col_lesions, col_background,
              save_image, dir_original, dir_processed){
@@ -164,7 +167,7 @@ count_lesions <- function(img,
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
       } else{
         name_ori <- match.call()[[2]]
-        extens_ori <- "png"
+        extens_ori <- "jpg"
       }
       backg <- !is.null(col_background)
       col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
@@ -394,8 +397,9 @@ count_lesions <- function(img,
       } else{
         imgs <- img[[1]][["image"]][,,1:3]
         img2 <- image_binary(imgs,
-                             index = "SCI",
-                             invert = T,
+                             index = index,
+                             my_index = my_index,
+                             invert = invert,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         img2@.Data[which(imgs[,,1]==1)] <- FALSE
@@ -557,7 +561,7 @@ count_lesions <- function(img,
       return(results)
     }
   if(missing(img_pattern)){
-    help_count(img, img_healthy, img_lesion, img_background, resize, invert, index,
+    help_count(img, img_healthy, img_lesion, img_background, resize, invert, index, my_index,
                lesion_size, tolerance, extension, randomize, nrows, show_image,
                show_original, show_background, col_leaf, col_lesions, col_background,
                save_image, dir_original, dir_processed)
@@ -594,7 +598,7 @@ count_lesions <- function(img,
         parLapply(clust, names_plant,
                   function(x){
                     help_count(x,
-                               img_healthy, img_lesion, img_background, resize, invert, index,
+                               img_healthy, img_lesion, img_background, resize, invert, index, my_index,
                                lesion_size, tolerance, extension, randomize, nrows, show_image,
                                show_original, show_background, col_leaf, col_lesions, col_background,
                                save_image, dir_original, dir_processed)

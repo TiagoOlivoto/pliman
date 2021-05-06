@@ -1,6 +1,6 @@
 #'Calculates the percentage of symptomatic area
 #'
-#'Calculates the percentage of symptomatic leaf area based in a sample or entire
+#'Calculates the percentage of symptomatic leaf area in sample or entire
 #'leaf based on provided color palettes samples. A general linear model
 #'(binomial family) fitted to the RGB values is used to segment the lesions from
 #'the healthy leaf. If a pallet of background is provided, the function takes
@@ -47,20 +47,17 @@
 #' @return A data frame with the results for each image.
 #' @export
 #' @md
-#' @importFrom stats binomial glm predict kmeans sd
+#' @importFrom stats binomial glm predict kmeans sd aggregate
 #' @importFrom grid grid.raster
 #' @importFrom grDevices col2rgb dev.off png hcl.colors
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
-#' healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-#' symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-#' background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
-#' image_show(img)
-#' image_show(healthy)
-#' image_show(symptoms)
-#' image_show(background)
+#' img <- image_import(image_pliman("sev_leaf.jpg"))
+#' healthy <- image_import(image_pliman("sev_healthy.jpg"))
+#' symptoms <- image_import(image_pliman("sev_sympt.jpg"))
+#' background <- image_import(image_pliman("sev_back.jpg"))
+#' image_combine(img, healthy, symptoms,background)
 #' symptomatic_area(img = img,
 #'                  img_healthy = healthy,
 #'                  img_symptoms = symptoms,
@@ -118,7 +115,7 @@ symptomatic_area <- function(img,
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
       } else{
         name_ori <- match.call()[[2]]
-        extens_ori <- "png"
+        extens_ori <- "jpg"
       }
       if(is.character(img_healthy)){
         all_files <- sapply(list.files(diretorio_original), file_name)

@@ -6,13 +6,13 @@
 #'segment the foreground and background. The argument index is useful to choose
 #'a proper index to segment the image (see [image_binary()] for more details).
 #'Then, the number of objects in the foreground is counted. By setting up
-#'arguments such as lower_size, upper_size is possible to set a threshold for
-#'lower and upper sizes of the objects, respectively.  Change tolerance and
-#'extension values to better set up watershed-based object detection.
+#'arguments such as `lower_size`, `upper_size` is possible to set a threshold
+#'for lower and upper sizes of the objects, respectively.  Change `tolerance`
+#'and `extension` values to better set up watershed-based object detection. If
+#'color palettes samples are provided, a general linear model (binomial family)
+#'fitted to the RGB values is used to segment fore- and background.
 #'
-#'If color palettes samples are provided, a general linear model (binomial
-#'family) fitted to the RGB values is used to segment fore- and background. By
-#'using `img_pattern` it is possible to process several images with common
+#'By using `img_pattern` it is possible to process several images with common
 #'pattern names that are stored in the current working directory or in the
 #'subdirectory informed in `dir_original`'. To speed up the computation time,
 #'one can set `parallel = TRUE`.
@@ -40,8 +40,9 @@
 #'   image.
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
-#' @param index A character value specifying the target mode for conversion to
-#'   binary image. Defaults to `"NB"` (normalized blue). See [image_index()] for
+#' @param index,my_index A character value specifying the target mode for
+#'   conversion to binary image when `foreground` and `background` are not
+#'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
 #'   more details.
 #' @param object_size The size of the object. Used to automatically set up
 #'   `tolerance` and `extension` parameters. One of the following. `"small"`
@@ -51,8 +52,7 @@
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
 #'   than the tolerance, the object will be combined with one of its neighbors,
-#'   which is the highest. Tolerance should be chosen according to the range of
-#'   x. Defaults to `3`.
+#'   which is the highest.
 #' @param extension Radius of the neighborhood in pixels for the detection of
 #'   neighboring objects. Defaults to 20. Higher value smoothes out small
 #'   objects.
@@ -60,11 +60,14 @@
 #'   analysis. Plant images often contain dirt and dust. To prevent dust from
 #'   affecting the image analysis, objects with lesser than 10% of the mean of
 #'   all objects are removed. Upper limit is set to `NULL`, i.e., no upper
-#'   limitused. One can set a known area or use `lower_limit = 0` to select all
+#'   limit used. One can set a known area or use `lower_limit = 0` to select all
 #'   objects (not advised). Objects that matches the size of a given range of
 #'   sizes can be selected by setting up the two arguments. For example, if
 #'   `lower_size = 120` and `upper_size = 140`, objects with size greater than
 #'   or equal 120 and less than or equal 140 will be considered.
+#' @param topn_lower,topn_upper Select the top `n` objects based on its area.
+#'   `topn_lower` selects the `n` elements with the smallest area whereas
+#'   `topn_upper` selects the `n` objects with the largest area.
 #' @param randomize Randomize the lines before training the model?
 #' @param nrows The number of lines to be used in training step.
 #' @param show_image Show image after processing?
@@ -100,7 +103,7 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+#' img <- image_import(image_pliman("soybean_touch.jpg"))
 #' count_objects(img)
 #'
 #' # Enumerate the objects in the original image
@@ -109,7 +112,6 @@
 #'               marker = "text",
 #'               marker_col = "white")
 #' }
-#'
 count_objects <- function(img,
                           foreground = NULL,
                           background = NULL,
@@ -120,11 +122,14 @@ count_objects <- function(img,
                           fill_hull = FALSE,
                           invert = FALSE,
                           index = "NB",
+                          my_index = NULL,
                           object_size = "medium",
                           tolerance = NULL,
                           extension = NULL,
                           lower_size = NULL,
                           upper_size = NULL,
+                          topn_lower = NULL,
+                          topn_upper = NULL,
                           randomize = TRUE,
                           nrows = 10000,
                           show_image = TRUE,
@@ -222,6 +227,7 @@ count_objects <- function(img,
       } else{
         img2 <- image_binary(img,
                              index = index,
+                             my_index = my_index,
                              invert = invert,
                              fill_hull = fill_hull,
                              resize = FALSE,
@@ -234,9 +240,6 @@ count_objects <- function(img,
           eval(parse(text=x))}))
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        # print(res)
-        # print(ext)
-        # print(tol)
         nmask <- watershed(distmap(img2),
                            tolerance = tol,
                            ext = ext)
@@ -288,13 +291,21 @@ count_objects <- function(img,
         cbind(data.frame(computeFeatures.shape(nmask)),
               data.frame(computeFeatures.moment(nmask))[,1:2]
         )
+      if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
+        stop("Only one of 'lower_*' or 'topn_*' can be used.")
+      }
       ifelse(!is.null(lower_size),
              shape <- shape[shape$s.area > lower_size, ],
              shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
       if(!is.null(upper_size)){
         shape <- shape[shape$s.area < upper_size, ]
       }
-      # return(shape)
+      if(!is.null(topn_lower)){
+        shape <- shape[order(shape$s.area),][1:topn_lower,]
+      }
+      if(!is.null(topn_upper)){
+        shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
+      }
       shape$id <- 1:nrow(shape)
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
       show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE

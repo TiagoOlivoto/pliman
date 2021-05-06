@@ -9,5 +9,5 @@
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(
     c("Contorno", "display", "CODE", "dir_original" ,"dir_processada",
-      "Spectrum", "value", "area", "id", "."))
+      "Spectrum", "value", "area", "id", ".", 'object'))
   }

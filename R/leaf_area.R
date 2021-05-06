@@ -61,19 +61,21 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(system.file("tmp_images/la.png", package = "pliman"))
-#' leaf <- image_import(system.file("tmp_images/la2.png", package = "pliman"))
-#' tmpl <- image_import(system.file("tmp_images/la3.png", package = "pliman"))
-#' background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
-#' image_show(img)
-#' image_show(leaf)
-#' image_show(tmpl)
-#' image_show(background)
+#' img <- image_import(image_pliman("la_pattern.JPG"))
+#' leaf <- image_import(image_pliman("la_leaf.jpg"))
+#' tmpl <- image_import(image_pliman("la_temp.jpg"))
+#' background <- image_import(image_pliman("la_back.jpg"))
+#'
+#' # Combine the images
+#' image_combine(img, leaf, tmpl, background)
+#'
+#' # Computes the leaf area
 #' leaf_area(img = img,
 #'           img_leaf = leaf,
 #'           img_template = tmpl,
 #'           img_background = background,
-#'           area_template = 27.29)
+#'           area_template = 4,
+#'           text_col = "white")
 #' }
 #'
 leaf_area <- function(img,
@@ -127,7 +129,7 @@ leaf_area <- function(img,
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
       } else{
         name_ori <- match.call()[[2]]
-        extens_ori <- "png"
+        extens_ori <- "jpg"
       }
       if(is.character(img_leaf)){
         all_files <- sapply(list.files(diretorio_original), file_name)
@@ -268,6 +270,8 @@ leaf_area <- function(img,
       shape <- shape[,c(1:3, 5:7, 9:10, 8, 11)]
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
                            "radius_min", "radius_max", "radius_sd", "label")
+      id_obj <- shape[which(shape$area == area_template),1]
+      class(shape) <- c("data.frame", "plm_la", id_obj)
       return(shape)
     }
   if(missing(img_pattern)){
