@@ -719,8 +719,10 @@ image_index <- function(image,
 }
 
 #' Plots an `image_index` object
+#'
 #' Produces an histogram of an `image_index` object
-#'  @name image_index
+#'
+#' @name image_index
 #' @param x An object of class `image_index`.
 #' @param facet Shows RGB values as a facet plot? Defaults to `TRUE`.
 #' @param ... Currently not used

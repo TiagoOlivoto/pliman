@@ -22,13 +22,18 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
+`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. Image indexes can also be used to segment images. The package will help you to:
 
-* Measure leaf area
-* Measure disease severity
-* Count the number of lesions
-* Count objects in an image
-* Get the RGB values for each object in an image
+* Measure leaf area with `leaf_area()`.
+* Measure disease severity with `symptomatic_area()`.
+* Count the number of lesions with `count_lesions()`.
+* Count objects in an image with `count_objects()`.
+* Get the RGB values for each object in an image with `objects_rgb()`.
+* Get object measures with `get_measures()`.
+* Plot objec measures with `plot_measures()`.
+
+`pliman` also provides useful functions for [operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html), [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), and [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html) of images.
+
 
 # Installation
 
@@ -45,7 +50,7 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 *Note*: If you are a Windows user, you should also first download and install the latest version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
 
-# Usage
+# Basic usage
 # Disease severity
 
 ```{r fig.width=12, fig.height=3}
@@ -66,27 +71,17 @@ symptomatic_area(img = img,
                  show_image = TRUE)
 ```
 
-# Count crop grains
-The function `count_objects()` can be used to count the grains of an image. In the following example, we will count the number of soybean grains of an image with 150 grains.
+# Count objects
+The function `count_objects()` can be used to count the objects such as leaves, grains, pods, pollen in an image. In the following example, we will count the number of soybean grains of an image with 30 grains.
 
 ```{r}
 img <- image_import(image_pliman("soybean_touch.jpg"))
 image_show(img)
-count_objects(img)
+count_objects(img, marker = "text")
 
 ```
 
-In the following example, we will enumerate the grains with an area greater than the mean of all grains in the image and add a white background to the processed image.
-
-```{r}
-count_objects(img,
-              show_segmentation = FALSE,
-              col_background = "white",
-              marker = "text",
-              lower_size = 564.1,
-              marker_size = 0.5,
-              marker_col = "white")
-```
+`pliman` takes the advantage of several powerful functions from [EBImage package](https://bioconductor.org/packages/release/bioc/html/EBImage.html). Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!
 
 
 # Getting help

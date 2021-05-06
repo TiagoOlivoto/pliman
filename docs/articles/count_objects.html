@@ -59,13 +59,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/manipulation.html">Image Operations</a>
+      <a href="../articles/operations.html">Image Operations</a>
     </li>
     <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
+      <a href="../articles/segmentation.html">Image segmentation</a>
+    </li>
+    <li>
       <a href="../articles/count_objects.html">Count objects in an image</a>
+    </li>
+    <li>
+      <a href="../articles/leaf_area.html">Measure leaf area</a>
     </li>
   </ul>
 </li>
@@ -430,12 +436,12 @@
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
-#&gt;  statistics      area   perimeter
-#&gt;         min  1577.000  128.000000
-#&gt;        mean  2395.433  159.966667
-#&gt;         max  2793.000  171.000000
-#&gt;          sd   261.420    8.798446
-#&gt;         sum 71863.000 4799.000000</code></pre>
+#&gt;  statistics       area   perimeter
+#&gt;         min  1579.0000  129.000000
+#&gt;        mean  2405.7667  160.600000
+#&gt;         max  2795.0000  172.000000
+#&gt;          sd   260.4312    8.652685
+#&gt;         sum 72173.0000 4818.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,
@@ -461,7 +467,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">Tiago Olivoto</a>.</p>
+  <p>Developed by <a href="https://olivoto.netlify.app/">Tiago Olivoto</a>.</p>
 </div>
 
 <div class="pkgdown">

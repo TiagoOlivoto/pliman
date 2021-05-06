@@ -422,8 +422,10 @@ objects_rgb <- function(img,
 
 
 #' Plots an `objects_rgb` object
+#'
 #' Produces an histogram of an `objects_rgb` object
-#'  @name objects_rgb
+#'
+#' @name objects_rgb
 #' @param x An object of class `objects_rgb`.
 #' @param ... Currently not used
 #' @method plot objects_rgb

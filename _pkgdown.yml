@@ -17,7 +17,7 @@ toc:
 
 authors:
   Tiago Olivoto:
-    href: https://www.researchgate.net/profile/Tiago_Olivoto2
+    href: https://olivoto.netlify.app/
 
 navbar:
   title: "sparklyr"
@@ -29,11 +29,15 @@ navbar:
     - text: "Examples"
       menu:
       - text: "Image Operations"
-        href: articles/manipulation.html
+        href: articles/operations.html
       - text: "Image manipulation"
         href: articles/manipulation.html
+      - text: "Image segmentation"
+        href: articles/segmentation.html
       - text: "Count objects in an image"
         href: articles/count_objects.html
+      - text: "Measure leaf area"
+        href: articles/leaf_area.html
     - text: "Functions"
       href: reference/index.html
     - text: News

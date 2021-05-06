@@ -1,0 +1,35 @@
+---
+title: "Image segmentation with pliman"
+author: "Tiago Olivoto"
+date: "`r Sys.Date()`"
+always_allow_html: yes
+output: rmarkdown::html_vignette
+fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Image segmentation with pliman}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  rmarkdown.html_vignette.check_title = FALSE
+)
+```
+
+# Getting started
+
+
+
+```{r fig.width=7, fig.height=7}
+library(pliman)
+img <- image_import(image_pliman("sev_leaf.jpg"))
+image_segment(img, index = "all")
+```
+
+
+
+
+

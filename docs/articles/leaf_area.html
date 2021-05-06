@@ -59,13 +59,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/manipulation.html">Image Operations</a>
+      <a href="../articles/operations.html">Image Operations</a>
     </li>
     <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
+      <a href="../articles/segmentation.html">Image segmentation</a>
+    </li>
+    <li>
       <a href="../articles/count_objects.html">Count objects in an image</a>
+    </li>
+    <li>
+      <a href="../articles/leaf_area.html">Measure leaf area</a>
     </li>
   </ul>
 </li>
@@ -182,15 +188,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total leaf area  : 142.838 </span>
-<span class="co">#&gt; Average leaf area: 23.806 </span>
+<span class="co">#&gt; Total leaf area  : 142.322 </span>
+<span class="co">#&gt; Average leaf area: 23.72 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt;   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1 510.8776 194.8134 33.655627       752   130.98584  113.06687   174.7239</span>
-<span class="co">#&gt; 2  2 206.7157 201.3425 27.043164       710   119.44667   93.20016   170.4981</span>
-<span class="co">#&gt; 3  3 123.4058 557.3539 30.672108       787   128.73936   95.71346   189.2984</span>
-<span class="co">#&gt; 4  4 623.0032 585.4070 39.370272       860   143.36457  108.13370   203.0038</span>
-<span class="co">#&gt; 5  5 364.7459 508.6049  8.097316       374    64.29471   51.56543    86.4135</span></code></pre></div>
+<span class="co">#&gt; 1  1 510.8765 194.8158 33.530571       752   130.98837  113.06837  174.72523</span>
+<span class="co">#&gt; 2  2 206.7078 201.3495 26.944175       710   119.44987   93.20634  170.49561</span>
+<span class="co">#&gt; 3  3 123.4065 557.3606 30.557623       787   128.74050   95.71413  189.29971</span>
+<span class="co">#&gt; 4  4 623.0052 585.4116 39.223769       860   143.36673  108.13475  203.00611</span>
+<span class="co">#&gt; 5  5 364.7423 508.6023  8.066302       374    64.29255   51.56289   86.41335</span></code></pre></div>
 </div>
 <div id="leaf-area-using-count_objects" class="section level2">
 <h2 class="hasAnchor">
@@ -269,7 +275,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">Tiago Olivoto</a>.</p>
+  <p>Developed by <a href="https://olivoto.netlify.app/">Tiago Olivoto</a>.</p>
 </div>
 
 <div class="pkgdown">

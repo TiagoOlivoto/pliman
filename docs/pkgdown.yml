@@ -7,7 +7,8 @@ articles:
   manipulation: manipulation.html
   operations: operations.html
   pliman_start: pliman_start.html
-last_built: 2021-05-06T19:10Z
+  segmentation: segmentation.html
+last_built: 2021-05-06T21:14Z
 urls:
   reference: https://tiagoolivoto.github.io/pliman//reference
   article: https://tiagoolivoto.github.io/pliman//articles

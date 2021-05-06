@@ -59,13 +59,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/manipulation.html">Image Operations</a>
+      <a href="../articles/operations.html">Image Operations</a>
     </li>
     <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
+      <a href="../articles/segmentation.html">Image segmentation</a>
+    </li>
+    <li>
       <a href="../articles/count_objects.html">Count objects in an image</a>
+    </li>
+    <li>
+      <a href="../articles/leaf_area.html">Measure leaf area</a>
     </li>
   </ul>
 </li>
@@ -191,15 +197,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total leaf area  : 142.902 </span>
-<span class="co"># Average leaf area: 23.817 </span>
+<span class="co"># Total leaf area  : 142.22 </span>
+<span class="co"># Average leaf area: 23.703 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="co">#   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 510.8669 194.8145 33.666248       748   130.92895  113.11213  174.69464</span>
-<span class="co"># 2  2 206.7312 201.3453 27.060968       709   119.41353   93.02778  170.33855</span>
-<span class="co"># 3  3 123.4195 557.3633 30.690132       787   128.71847   95.70373  189.29804</span>
-<span class="co"># 4  4 622.9721 585.4085 39.389692       863   143.37454  108.20450  202.82969</span>
-<span class="co"># 5  5 364.7470 508.5896  8.094909       375    64.29406   51.44727   86.20681</span></code></pre></div>
+<span class="co"># 1  1 510.8633 194.8235 33.500938       748   130.93513  113.11415  174.69995</span>
+<span class="co"># 2  2 206.7302 201.3609 26.926204       708   119.34817   93.15390  170.58215</span>
+<span class="co"># 3  3 123.4144 557.3613 30.538462       787   128.72138   95.70697  189.29817</span>
+<span class="co"># 4  4 622.9618 585.4012 39.200125       863   143.38532  108.19829  202.82928</span>
+<span class="co"># 5  5 364.7495 508.5916  8.053784       375    64.29103   51.44991   86.20696</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -250,7 +256,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
 <pre><code>#    healthy symptomatic
-# 1 89.28617    10.71383</code></pre>
+# 1 88.86862    11.13138</code></pre>
 </div>
 <div id="rgb-values-for-objects" class="section level1">
 <h1 class="hasAnchor">
@@ -295,7 +301,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">Tiago Olivoto</a>.</p>
+  <p>Developed by <a href="https://olivoto.netlify.app/">Tiago Olivoto</a>.</p>
 </div>
 
 <div class="pkgdown">

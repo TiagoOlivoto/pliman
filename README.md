@@ -10,12 +10,23 @@
 `pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze
 plant images, especially related to leaf analysis. You provide color
 palettes, tell `pliman` what each one represents, and it takes care of
-the details. The package will help you to:
+the details. Image indexes can also be used to segment images. The
+package will help you to:
 
--   Measure leaf area
--   Measure disease severity
--   Count the number of lesions
--   Count objects in an image
+-   Measure leaf area with `leaf_area()`.
+-   Measure disease severity with `symptomatic_area()`.
+-   Count the number of lesions with `count_lesions()`.
+-   Count objects in an image with `count_objects()`.
+-   Get the RGB values for each object in an image with `objects_rgb()`.
+-   Get object measures with `get_measures()`.
+-   Plot objec measures with `plot_measures()`.
+
+`pliman` also provides useful functions for
+[operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html),
+[transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html),
+and
+[segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html)
+of images.
 
 # Installation
 
@@ -33,7 +44,7 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 install the latest version of
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-# Usage
+# Basic usage
 
 # Disease severity
 
@@ -43,10 +54,10 @@ library(pliman)
 # | Tools for Plant Image Analysis (pliman)   |
 # | Author: Tiago Olivoto                     |
 # |===========================================|
-img <- image_import(system.file("tmp_images/sev2.png", package = "pliman"))
-healthy <- image_import(system.file("tmp_images/sev_healthy.png", package = "pliman"))
-symptoms <- image_import(system.file("tmp_images/sev_sympt.png", package = "pliman"))
-background <- image_import(system.file("tmp_images/sev_back.png", package = "pliman"))
+img <- image_import(image_pliman("sev_leaf.jpg"))
+healthy <- image_import(image_pliman("sev_healthy.jpg"))
+symptoms <- image_import(image_pliman("sev_sympt.jpg"))
+background <- image_import(image_pliman("sev_back.jpg"))
 image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
@@ -63,64 +74,42 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 88.38373    11.61627
+    # 1 88.99636    11.00364
 
-# Count crop grains
+# Count objects
 
-The function `count_objects()` can be used to count the grains of an
-image. In the following example, we will count the number of soybean
-grains of an image with 150 grains.
+The function `count_objects()` can be used to count the objects such as
+leaves, grains, pods, pollen in an image. In the following example, we
+will count the number of soybean grains of an image with 30 grains.
 
 ``` r
-img <- image_import(system.file("tmp_images/soy_150.png", package = "pliman"))
+img <- image_import(image_pliman("soybean_touch.jpg"))
 image_show(img)
 ```
 
 ![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
-count_objects(img)
+count_objects(img, marker = "text")
 ```
 
 ![](man/figures/README-unnamed-chunk-5-2.png)<!-- -->
 
     # 
     # --------------------------------------------
-    # Number of objects: 150 
+    # Number of objects: 30 
     # --------------------------------------------
-    #  statistics        area    perimeter
-    #         min   389.00000    64.000000
-    #        mean   564.10000    76.480000
-    #         max   774.00000    95.000000
-    #          sd    79.04936     5.929926
-    #         sum 84615.00000 11472.000000
+    #  statistics       area   perimeter
+    #         min  1366.0000  117.000000
+    #        mean  2057.3667  146.600000
+    #         max  2445.0000  158.000000
+    #          sd   230.5574    8.406073
+    #         sum 61721.0000 4398.000000
 
-In the following example, we will enumerate the grains with an area
-greater than the mean of all grains in the image and add a white
-background to the processed image.
-
-``` r
-count_objects(img,
-              show_segmentation = FALSE,
-              col_background = "white",
-              marker = "text",
-              lower_size = 564.1,
-              marker_size = 0.5,
-              marker_col = "white")
-```
-
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
-
-    # 
-    # --------------------------------------------
-    # Number of objects: 74 
-    # --------------------------------------------
-    #  statistics        area   perimeter
-    #         min   566.00000   75.000000
-    #        mean   631.68919   81.094595
-    #         max   774.00000   95.000000
-    #          sd    43.52072    4.125327
-    #         sum 46745.00000 6001.000000
+`pliman` takes the advantage of several powerful functions from [EBImage
+package](https://bioconductor.org/packages/release/bioc/html/EBImage.html).
+Thanks to Andrzej Oleś and collaborators for the impressive job done
+with EBImage!
 
 # Getting help
 
