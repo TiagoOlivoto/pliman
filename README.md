@@ -74,7 +74,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 88.99636    11.00364
+    # 1 89.09871    10.90129
 
 # Count objects
 
