@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   rmarkdown.html_vignette.check_title = FALSE,
-  fig.width = 10
+  fig.width = 7,
+  fig.height = 7
 )
 ```
 
@@ -39,11 +40,13 @@ The above image was produced with Microsoft Power Point. It has a known resoluti
 
 To count the objects in the image we use `count_objects()` and inform the image object (the only mandatory argument). First, we use `image_binary()` to see the most suitable index to segment the objects from background. By default, the R, G, B (first row) and their normalized values (second row) are used.
 
-```{r}
+```{r fig.width=7, fig.height=5}
 image_binary(img)
+```
+
+```{r}
 img_res <- 
   count_objects(img,
-                marker = "text", # identify objects
                 index = "B") # use blue index to segment
 
 ```
@@ -55,7 +58,7 @@ The results were stored in `img_res` and a summary print in the console. The min
 ```{r}
 (measures <- get_measures(img_res))
 image_show(img)
-text(measures$x, measures$y, measures$id)
+plot_measures(measures) # plot the object id
 ```
 
 # Adjusting object measures
@@ -107,44 +110,6 @@ background <- image_import(image_pliman("background.jpg"))
 image_combine(soy, grain, background, ncol = 3)
 ```
 
-## Image segmentation
-### Getting image indexes
-`pliman` provides a set of indexes that can be used to segment images. For a list of supported indexes consult the documentation of `image_index()` function. Here, we use the argument `index"` to test the segmentation based on the RGB and their normalized values. The results are shown in the plot according to the order of the indexes in the `index` argument, filled 'by row'. User can also provide your own index with the argument `my_index`.
-
-```{r }
-indexes <- image_index(soy, index = c("R, G, B, NR, NG, NB"))
-```
-
-```{r}
-# Create a histogram with the RGB values
-plot(indexes)
-```
-
-
-### Producing a segmented image
-
-The function `image_segmentation()` is used to segment images using image indexes. In our example, we will use the same indexes computed below to see how the image is segmented. The output of this function can be used as input in the function `count_objets()`.
-
-```{r}
-segmented <- image_segment(soy, index = c("R, G, B, NR, NG, NB"))
-
-```
-
-It seems that the "NB" index provided better segmentation. "R" and "NR" resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as 'selected' image. To circumvent this problem, we can use the argument `invert` in those functions.
-
-
-### Producing a binary image
-
-We can also produce a binary image with `image_binary()`. Just for curiosity, we will use the indexes `"R"` and `"NB"`.
-
-```{r}
-binary <- image_binary(soy, index = c("R, NB"))
-
-```
-
-
-## Count the grains in the image
-### Using image indexes
 The function `count_objects()` segment the image using as default the normalized blue index, as follows $NB = (B/(R+G+B))$, where $R$, $G$, and $B$ are the red, green, and blue bands. Objects are count and the segmented objects colored with random permutations.
 
 ```{r}
@@ -170,14 +135,14 @@ count <-
 (measures <- get_measures(count))
 ```
 
-In the following example, we will select objects with an area above the average of all objects by using `lower_size = 2051.9667`. Additionally, we will use the argument `show_original = FALSE` to show the results as colors (non-original image).
+In the following example, we will select objects with an area above the average of all objects by using `lower_size = 2057.36`. Additionally, we will use the argument `show_original = FALSE` to show the results as colors (non-original image).
 
 ```{r}
 count_objects(soy,
               marker = "text",
               show_original = FALSE,
               show_segmentation = FALSE,
-              lower_size = 2051.9667,
+              lower_size = 2057.36,
               index = "NB") # default
 ```
 
@@ -213,5 +178,21 @@ count_objects(img = "soy",
 ```
 
 # Batch processing
+In plant image analysis, frequently it is necessary to process more than one image. For example, in plant breeding, the number of grains per plant (e.g., wheat) is frequently used in the indirect selection of high-yielding plants. In `pliman`, batch processing can be done when the user declares the argument `img_pattern`.
+
+The following example would be used to count the objects in the images with a pattern name `"trat"` (e.g., `"trat1"`, `"trat2"`, `"tratn"`) saved into the subfolder "`originals"` in the current working directory. The processed images will be saved into the subfolder `"processed"`. The object `list_res` will be a list with two objects (`results` and `statistics`) for each image.
+
+To speed up the processing time, especially for a large number of images, the argument `parallel = TRUE` can be used. In this case, the images are processed asynchronously (in parallel) in separate `R` sessions running in the background on the same machine. The number of sections is set up to 90% of available cores. This number can be controlled explicitly with the argument `workers`.
+
+```{r eval=FALSE}
+list_res <- 
+count_objects(img_pattern = "trat", # matches the name pattern in 'originals' subfolder
+              dir_original = "originals",
+              dir_processed = "processed",
+              parallel = TRUE, # parallel processing
+              workers = 8, # 8 multiple sections
+              save_image = TRUE)
+```
+
 
 

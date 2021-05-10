@@ -144,7 +144,7 @@
       <h1 data-toc-skip>Plant IMage Analysis</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-06</h4>
+            <h4 class="date">2021-05-10</h4>
       
       
       <div class="hidden name"><code>pliman_start.Rmd</code></div>
@@ -158,11 +158,13 @@
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
 <p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. The package will help you to:</p>
 <ul>
-<li>Measure leaf area</li>
-<li>Measure disease severity</li>
-<li>Count the number of lesions</li>
-<li>Count objects in an image</li>
-<li>Get the RGB values for each object in an image</li>
+<li>Measure leaf area with <code><a href="../reference/leaf_area.html">leaf_area()</a></code>.</li>
+<li>Measure disease severity with <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</li>
+<li>Count the number of lesions with <code><a href="../reference/count_lesions.html">count_lesions()</a></code>.</li>
+<li>Count objects in an image with <code><a href="../reference/count_objects.html">count_objects()</a></code>.</li>
+<li>Get the RGB values for each object in an image with <code><a href="../reference/objects_rgb.html">objects_rgb()</a></code>.</li>
+<li>Get object measures with <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</li>
+<li>Plot objec measures with <code><a href="../reference/utils_measures.html">plot_measures()</a></code>.</li>
 </ul>
 </div>
 <div id="leaf-area" class="section level1">
@@ -197,15 +199,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total leaf area  : 142.22 </span>
-<span class="co"># Average leaf area: 23.703 </span>
+<span class="co"># Total leaf area  : 141.637 </span>
+<span class="co"># Average leaf area: 23.606 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="co">#   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 510.8633 194.8235 33.500938       748   130.93513  113.11415  174.69995</span>
-<span class="co"># 2  2 206.7302 201.3609 26.926204       708   119.34817   93.15390  170.58215</span>
-<span class="co"># 3  3 123.4144 557.3613 30.538462       787   128.72138   95.70697  189.29817</span>
-<span class="co"># 4  4 622.9618 585.4012 39.200125       863   143.38532  108.19829  202.82928</span>
-<span class="co"># 5  5 364.7495 508.5916  8.053784       375    64.29103   51.44991   86.20696</span></code></pre></div>
+<span class="co"># 1  1 510.8461 194.8269 33.367766       753   130.99208  113.17269  174.60288</span>
+<span class="co"># 2  2 206.6877 201.3575 26.814561       710   119.46738   93.21952  170.50039</span>
+<span class="co"># 3  3 123.3994 557.3714 30.404480       787   128.74804   95.71896  189.30487</span>
+<span class="co"># 4  4 622.9791 585.3943 39.032358       861   143.44152  107.98742  202.77408</span>
+<span class="co"># 5  5 364.7410 508.5969  8.018046       375    64.30635   51.52629   86.20932</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -256,7 +258,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
 <pre><code>#    healthy symptomatic
-# 1 88.86862    11.13138</code></pre>
+# 1 88.84292    11.15708</code></pre>
 </div>
 <div id="rgb-values-for-objects" class="section level1">
 <h1 class="hasAnchor">

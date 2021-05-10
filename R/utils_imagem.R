@@ -543,6 +543,9 @@ image_binary <- function(image,
 #'
 #'  | Index | Equation                   | Band |
 #'  |-------|----------------------------|------|
+#'  | R     | R                          | C    |
+#'  | G     | G                          | C    |
+#'  | B     | B                          | C    |
 #'  | NR    | R/(R+G+B)                  | C    |
 #'  | NG    | G/(R+G+B)                  | C    |
 #'  | NB    | B/(R+G+B)                  | C    |

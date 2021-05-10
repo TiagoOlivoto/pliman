@@ -144,7 +144,7 @@
       <h1 data-toc-skip>Count objects in an image</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-06</h4>
+            <h4 class="date">2021-05-10</h4>
       
       
       <div class="hidden name"><code>count_objects.Rmd</code></div>
@@ -165,7 +165,7 @@
 <span class="co">#&gt; |===========================================|</span>
 <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
 <p>The above image was produced with Microsoft Power Point. It has a known resolution of 300 dpi (dots per inch) and shows four objects</p>
 <ul>
 <li>Larger square: 10 x 10 cm (100 cm<sup>2</sup>)</li>
@@ -176,13 +176,12 @@
 <p>To count the objects in the image we use <code><a href="../reference/count_objects.html">count_objects()</a></code> and inform the image object (the only mandatory argument). First, we use <code><a href="../reference/image_binary.html">image_binary()</a></code> to see the most suitable index to segment the objects from background. By default, the R, G, B (first row) and their normalized values (second row) are used.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img_res</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">img</span>,
-                marker <span class="op">=</span> <span class="st">"text"</span>, <span class="co"># identify objects</span>
                 index <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span> <span class="co"># use blue index to segment</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-3-2.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 4 
@@ -206,8 +205,8 @@
 <span class="co">#&gt; 3  3 1737.5482 1296.3454   98363      1030    176.4897   174.8776   177.8908</span>
 <span class="co">#&gt; 4  4 1737.4979  939.4926  111383      1409    197.4469   117.4128   262.9966</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/text.html">text</a></span><span class="op">(</span><span class="va">measures</span><span class="op">$</span><span class="va">x</span>, <span class="va">measures</span><span class="op">$</span><span class="va">y</span>, <span class="va">measures</span><span class="op">$</span><span class="va">id</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
+<span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">measures</span><span class="op">)</span> <span class="co"># plot the object id</span></code></pre></div>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 </div>
 <div id="adjusting-object-measures" class="section level1">
 <h1 class="hasAnchor">
@@ -275,52 +274,13 @@
 <span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"background.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">grain</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
-<div id="image-segmentation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#image-segmentation" class="anchor"></a>Image segmentation</h2>
-<div id="getting-image-indexes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#getting-image-indexes" class="anchor"></a>Getting image indexes</h3>
-<p><code>pliman</code> provides a set of indexes that can be used to segment images. For a list of supported indexes consult the documentation of <code><a href="../reference/image_index.html">image_index()</a></code> function. Here, we use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. The results are shown in the plot according to the order of the indexes in the <code>index</code> argument, filled ‘by row’. User can also provide your own index with the argument <code>my_index</code>.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">indexes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Create a histogram with the RGB values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
-</div>
-<div id="producing-a-segmented-image" class="section level3">
-<h3 class="hasAnchor">
-<a href="#producing-a-segmented-image" class="anchor"></a>Producing a segmented image</h3>
-<p>The function <code>image_segmentation()</code> is used to segment images using image indexes. In our example, we will use the same indexes computed below to see how the image is segmented. The output of this function can be used as input in the function <code>count_objets()</code>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">segmented</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-12-1.png" width="960"></p>
-<p>It seems that the “NB” index provided better segmentation. “R” and “NR” resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as ‘selected’ image. To circumvent this problem, we can use the argument <code>invert</code> in those functions.</p>
-</div>
-<div id="producing-a-binary-image" class="section level3">
-<h3 class="hasAnchor">
-<a href="#producing-a-binary-image" class="anchor"></a>Producing a binary image</h3>
-<p>We can also produce a binary image with <code><a href="../reference/image_binary.html">image_binary()</a></code>. Just for curiosity, we will use the indexes <code>"R"</code> and <code>"NB"</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-13-1.png" width="960"></p>
-</div>
-</div>
-<div id="count-the-grains-in-the-image" class="section level2">
-<h2 class="hasAnchor">
-<a href="#count-the-grains-in-the-image" class="anchor"></a>Count the grains in the image</h2>
-<div id="using-image-indexes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-image-indexes" class="anchor"></a>Using image indexes</h3>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
 <p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> segment the image using as default the normalized blue index, as follows <span class="math inline">\(NB = (B/(R+G+B))\)</span>, where <span class="math inline">\(R\)</span>, <span class="math inline">\(G\)</span>, and <span class="math inline">\(B\)</span> are the red, green, and blue bands. Objects are count and the segmented objects colored with random permutations.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
                 index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-14-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-11-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
@@ -332,14 +292,14 @@
 #&gt;          sd   230.5574    8.406073
 #&gt;         sum 61721.0000 4398.000000</code></pre>
 <p>Users can remove the random coloration and identify the objects (in this example the grains) by using the arguments <code>marker = "text"</code> and <code>show_segmentation = FALSE</code>. The color of the background can also be changed with <code>col_background</code>.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
                 marker <span class="op">=</span> <span class="st">"text"</span>,
                 show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,
                 col_background <span class="op">=</span> <span class="st">"white"</span>,
                 index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-15-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
@@ -350,7 +310,7 @@
 #&gt;         max  2445.0000  158.000000
 #&gt;          sd   230.5574    8.406073
 #&gt;         sum 61721.0000 4398.000000</code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Get the object measures</span>
 <span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    id         x         y area perimeter radius_mean radius_min radius_max</span>
@@ -384,34 +344,34 @@
 <span class="co">#&gt; 28 28 281.03738 474.07147 1819       154    23.48401   17.88658   27.20260</span>
 <span class="co">#&gt; 29 29 273.27251 547.45906 1710       143    22.78041   17.61722   25.90980</span>
 <span class="co">#&gt; 30 30 265.29209 143.41142 1366       117    20.40475   18.59025   22.03007</span></code></pre></div>
-<p>In the following example, we will select objects with an area above the average of all objects by using <code>lower_size = 2051.9667</code>. Additionally, we will use the argument <code>show_original = FALSE</code> to show the results as colors (non-original image).</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p>In the following example, we will select objects with an area above the average of all objects by using <code>lower_size = 2057.36</code>. Additionally, we will use the argument <code>show_original = FALSE</code> to show the results as colors (non-original image).</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
               marker <span class="op">=</span> <span class="st">"text"</span>,
               show_original <span class="op">=</span> <span class="cn">FALSE</span>,
               show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,
-              lower_size <span class="op">=</span> <span class="fl">2051.9667</span>,
+              lower_size <span class="op">=</span> <span class="fl">2057.36</span>,
               index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-17-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
-#&gt; Number of objects: 17 
+#&gt; Number of objects: 16 
 #&gt; --------------------------------------------
-#&gt;  statistics        area   perimeter
-#&gt;         min  2056.00000  144.000000
-#&gt;        mean  2219.17647  151.235294
-#&gt;         max  2445.00000  158.000000
-#&gt;          sd    98.74034    4.023826
-#&gt;         sum 37726.00000 2571.000000</code></pre>
+#&gt;  statistics        area  perimeter
+#&gt;         min  2068.00000  145.00000
+#&gt;        mean  2229.37500  151.68750
+#&gt;         max  2445.00000  158.00000
+#&gt;          sd    92.26908    3.68273
+#&gt;         sum 35670.00000 2427.00000</code></pre>
 <p>Users can also select the top <code>n</code> objects based on either smaller or largest areas. Let’s see how to point out the 5 grains with the smallest area, showing the original grains in a blue background. We will also use the argument <code>my_index</code> to choose a personalized index to segment the image. Just for comparison, we will set up explicitly the normalized blue index by calling <code>my_index = "B/(R+G+B)"</code>.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
               marker <span class="op">=</span> <span class="st">"point"</span>,
               show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,
               topn_lower <span class="op">=</span> <span class="fl">5</span>,
               col_background <span class="op">=</span> <span class="st">"blue"</span>,
               my_index <span class="op">=</span> <span class="st">"B/(R+G+B)"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-18-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 5 
@@ -422,37 +382,46 @@
 #&gt;         max 1819.0000 154.00000
 #&gt;          sd  183.1052  13.54622
 #&gt;         sum 8425.0000 685.00000</code></pre>
-</div>
 <div id="using-sample-palettes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-sample-palettes" class="anchor"></a>Using sample palettes</h3>
 <p>Sometimes it is difficult to choose an image index that segments the image efficiently (even using <code>my_index</code> ). In <code>pliman</code> users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to <code>count_objects</code> which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let’s see how the grains of the above image can be count with this strategy.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">soy</span>,
               background <span class="op">=</span> <span class="va">background</span>,
               foreground <span class="op">=</span> <span class="va">grain</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-19-1.png" width="960"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
 #&gt;  statistics       area   perimeter
-#&gt;         min  1579.0000  129.000000
-#&gt;        mean  2405.7667  160.600000
-#&gt;         max  2795.0000  172.000000
-#&gt;          sd   260.4312    8.652685
-#&gt;         sum 72173.0000 4818.000000</code></pre>
+#&gt;         min  1584.0000  129.000000
+#&gt;        mean  2416.5333  160.900000
+#&gt;         max  2801.0000  174.000000
+#&gt;          sd   261.7821    8.856519
+#&gt;         sum 72496.0000 4827.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,
               background <span class="op">=</span> <span class="st">"background"</span>,
               foreground <span class="op">=</span> <span class="st">"grain"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-</div>
 <div id="batch-processing" class="section level1">
 <h1 class="hasAnchor">
 <a href="#batch-processing" class="anchor"></a>Batch processing</h1>
+<p>In plant image analysis, frequently it is necessary to process more than one image. For example, in plant breeding, the number of grains per plant (e.g., wheat) is frequently used in the indirect selection of high-yielding plants. In <code>pliman</code>, batch processing can be done when the user declares the argument <code>img_pattern</code>.</p>
+<p>The following example would be used to count the objects in the images with a pattern name <code>"trat"</code> (e.g., <code>"trat1"</code>, <code>"trat2"</code>, <code>"tratn"</code>) saved into the subfolder "<code>originals"</code> in the current working directory. The processed images will be saved into the subfolder <code>"processed"</code>. The object <code>list_res</code> will be a list with two objects (<code>results</code> and <code>statistics</code>) for each image.</p>
+<p>To speed up the processing time, especially for a large number of images, the argument <code>parallel = TRUE</code> can be used. In this case, the images are processed asynchronously (in parallel) in separate <code>R</code> sessions running in the background on the same machine. The number of sections is set up to 90% of available cores. This number can be controlled explicitly with the argument <code>workers</code>.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">list_res</span> <span class="op">&lt;-</span> 
+<span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img_pattern <span class="op">=</span> <span class="st">"trat"</span>, <span class="co"># matches the name pattern in 'originals' subfolder</span>
+              dir_original <span class="op">=</span> <span class="st">"originals"</span>,
+              dir_processed <span class="op">=</span> <span class="st">"processed"</span>,
+              parallel <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># parallel processing</span>
+              workers <span class="op">=</span> <span class="fl">8</span>, <span class="co"># 8 multiple sections</span>
+              save_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 

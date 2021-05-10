@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 * Get object measures with `get_measures()`.
 * Plot objec measures with `plot_measures()`.
 
-`pliman` also provides useful functions for [operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html), [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), and [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html) of images.
+`pliman` also provides useful functions for [operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html), [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), and [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html) of images. Please, visit the [Examples](https://tiagoolivoto.github.io/pliman/index.html) page in `pliman` website for a detailed documentation of each function.
 
 
 # Installation
@@ -81,6 +81,7 @@ count_objects(img, marker = "text")
 
 ```
 
+
 `pliman` takes the advantage of several powerful functions from [EBImage package](https://bioconductor.org/packages/release/bioc/html/EBImage.html). Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!
 
 
@@ -89,3 +90,8 @@ count_objects(img, marker = "text")
 -   If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues)
 
 -   Suggestions and criticisms to improve the quality and usability of the package are welcome!
+
+# Code of Conduct
+
+Please note that the pliman project is released with a [Contributor Code of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+

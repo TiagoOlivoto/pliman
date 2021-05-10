@@ -26,7 +26,9 @@ package will help you to:
 [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html),
 and
 [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html)
-of images.
+of images. Please, visit the
+[Examples](https://tiagoolivoto.github.io/pliman/index.html) page in
+`pliman` website for a detailed documentation of each function.
 
 # Installation
 
@@ -73,8 +75,8 @@ symptomatic_area(img = img,
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
-    #    healthy symptomatic
-    # 1 89.09871    10.90129
+    #   healthy symptomatic
+    # 1 88.9799     11.0201
 
 # Count objects
 

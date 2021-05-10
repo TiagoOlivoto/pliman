@@ -47,7 +47,8 @@
 
 
 <meta property="og:title" content="Get Red Green and Blue for image objects — objects_rgb" />
-<meta property="og:description" content="Get the Red Green and Blue (RGB) for objects in an image." />
+<meta property="og:description" content="Get the Red Green and Blue (RGB) for objects in an image.
+Produces an histogram of an objects_rgb object" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -190,6 +191,7 @@
 
     <div class="ref-description">
     <p>Get the Red Green and Blue (RGB) for objects in an image.</p>
+<p>Produces an histogram of an <code>objects_rgb</code> object</p>
     </div>
 
     <pre class="usage"><span class='fu'>objects_rgb</span><span class='op'>(</span>
@@ -223,7 +225,10 @@
   dir_original <span class='op'>=</span> <span class='cn'>NULL</span>,
   dir_processed <span class='op'>=</span> <span class='cn'>NULL</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for objects_rgb</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -367,6 +372,14 @@ saved in such a directory.</p></td>
       <th>verbose</th>
       <td><p>If <code>FALSE</code>, runs the code silently.</p></td>
     </tr>
+    <tr>
+      <th>x</th>
+      <td><p>An object of class <code>objects_rgb</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Currently not used</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -378,6 +391,8 @@ saved in such a directory.</p></td>
 <code>object_index</code>.</p></li>
 </ul>
 
+<p>A <code>ggplot</code> object containing the distribution of the pixels for each
+index.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>A binary image is first generated to segment the foreground and background.
@@ -396,6 +411,7 @@ one can set <code>parallel = TRUE</code>.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
+<p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
@@ -406,6 +422,15 @@ one can set <code>parallel = TRUE</code>.</p>
 <span class='va'>rgb</span> <span class='op'>&lt;-</span> <span class='fu'>objects_rgb</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
 </div><div class='img'><img src='objects_rgb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>rgb</span><span class='op'>)</span>
 </div><div class='img'><img src='objects_rgb-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+<span class='co'># \donttest{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soy_green.jpg"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># Segment the foreground (grains) using the normalized blue index</span>
+<span class='co'># Shows the average value of the blue index in each object</span>
+<span class='va'>rgb</span> <span class='op'>&lt;-</span> <span class='fu'>objects_rgb</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+</div><div class='img'><img src='objects_rgb-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>rgb</span><span class='op'>)</span>
+</div><div class='img'><img src='objects_rgb-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

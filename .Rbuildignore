@@ -15,3 +15,5 @@
 ^vignettes/operations\.Rmd$
 ^vignettes/leaf_area\.Rmd$
 
+^CODE_OF_CONDUCT\.md$
+^\.github$

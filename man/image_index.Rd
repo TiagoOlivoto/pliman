@@ -2,6 +2,7 @@
 % Please edit documentation in R/utils_imagem.R
 \name{image_index}
 \alias{image_index}
+\alias{plot.image_index}
 \title{Image indices}
 \usage{
 image_index(
@@ -18,6 +19,8 @@ image_index(
   workers = NULL,
   verbose = TRUE
 )
+
+\method{plot}{image_index}(x, facet = TRUE, ...)
 }
 \arguments{
 \item{image}{An image object.}
@@ -56,17 +59,31 @@ up to 90\% of available cores.}
 number of parallel processes that can be active at the same time.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+
+\item{x}{An object of class \code{image_index}.}
+
+\item{facet}{Shows RGB values as a facet plot? Defaults to \code{TRUE}.}
+
+\item{...}{Currently not used}
 }
 \value{
 A list containing Grayscale images. The length will depend on the
 number of indexes used.
+
+A \code{ggplot} object containing the distribution of the pixels for each
+index.
 }
 \description{
 Builds image indices using Red, Green, Blue, Red-Edge, and NIR bands.
+
+Produces an histogram of an \code{image_index} object
 }
 \details{
 The following indexes are available in pliman.\tabular{lll}{
    Index \tab Equation \tab Band \cr
+   R \tab R \tab C \cr
+   G \tab G \tab C \cr
+   B \tab B \tab C \cr
    NR \tab R/(R+G+B) \tab C \cr
    NG \tab G/(R+G+B) \tab C \cr
    NB \tab B/(R+G+B) \tab C \cr
@@ -87,6 +104,11 @@ The following indexes are available in pliman.\tabular{lll}{
 library(pliman)
 img <- image_import(image_pliman("soybean_touch.jpg"))
 image_index(img, c("R, NR"), nrow = 1)
+library(pliman)
+img <- image_import(image_pliman("sev_leaf.jpg"))
+img2 <- image_resize(img, 50)
+ind <- image_index(img2)
+plot(ind)
 }
 \references{
 Nobuyuki Otsu, "A threshold selection method from gray-level
@@ -94,5 +116,7 @@ histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
 \doi{10.1109/TSMC.1979.4310076}
 }
 \author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
+
 Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }

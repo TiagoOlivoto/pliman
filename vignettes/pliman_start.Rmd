@@ -18,11 +18,13 @@ knitr::opts_chunk$set(comment = "#", collapse = TRUE, fig.width = 5)
 # Getting started
 `pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
 
-* Measure leaf area
-* Measure disease severity
-* Count the number of lesions
-* Count objects in an image
-* Get the RGB values for each object in an image
+* Measure leaf area with `leaf_area()`.
+* Measure disease severity with `symptomatic_area()`.
+* Count the number of lesions with `count_lesions()`.
+* Count objects in an image with `count_objects()`.
+* Get the RGB values for each object in an image with `objects_rgb()`.
+* Get object measures with `get_measures()`.
+* Plot objec measures with `plot_measures()`.
 
 
 # Leaf area

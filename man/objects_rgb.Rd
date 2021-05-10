@@ -2,6 +2,7 @@
 % Please edit documentation in R/objects_rgb.R
 \name{objects_rgb}
 \alias{objects_rgb}
+\alias{plot.objects_rgb}
 \title{Get Red Green and Blue for image objects}
 \usage{
 objects_rgb(
@@ -36,6 +37,8 @@ objects_rgb(
   dir_processed = NULL,
   verbose = TRUE
 )
+
+\method{plot}{objects_rgb}(x, ...)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -130,6 +133,10 @@ processing, when \code{save_image = TRUE}, the processed image will be also
 saved in such a directory.}
 
 \item{verbose}{If \code{FALSE}, runs the code silently.}
+
+\item{x}{An object of class \code{objects_rgb}.}
+
+\item{...}{Currently not used}
 }
 \value{
 A list with the following objects.
@@ -139,9 +146,14 @@ A list with the following objects.
 \item \code{indexes} A data frame with the index computed according to the argument
 \code{object_index}.
 }
+
+A \code{ggplot} object containing the distribution of the pixels for each
+index.
 }
 \description{
 Get the Red Green and Blue (RGB) for objects in an image.
+
+Produces an histogram of an \code{objects_rgb} object
 }
 \details{
 A binary image is first generated to segment the foreground and background.
@@ -168,7 +180,18 @@ img <- image_import(image_pliman("soy_green.jpg"))
 rgb <- objects_rgb(img)
 plot(rgb)
 }
+\donttest{
+library(pliman)
+
+img <- image_import(image_pliman("soy_green.jpg"))
+# Segment the foreground (grains) using the normalized blue index
+# Shows the average value of the blue index in each object
+rgb <- objects_rgb(img)
+plot(rgb)
+}
 }
 \author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
+
 Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }
