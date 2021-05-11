@@ -379,26 +379,23 @@ saved in such a directory.</p></td>
 <span class='fu'><a href='image_combine.html'>image_combine</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='va'>leaf</span>, <span class='va'>tmpl</span>, <span class='va'>background</span><span class='op'>)</span>
 </div><div class='img'><img src='leaf_area-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Computes the leaf area</span>
+<span class='va'>area</span> <span class='op'>&lt;-</span>
 <span class='fu'>leaf_area</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
           img_leaf <span class='op'>=</span> <span class='va'>leaf</span>,
           img_template <span class='op'>=</span> <span class='va'>tmpl</span>,
           img_background <span class='op'>=</span> <span class='va'>background</span>,
           area_template <span class='op'>=</span> <span class='fl'>4</span>,
           text_col <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span>
-</div><div class='img'><img src='leaf_area-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;    id        x        y      area perimeter radius_mean radius_min radius_max
-#&gt; 1   1 510.8565 194.8096 33.639674       749   130.95431  113.17878  174.56809
-#&gt; 2   2 206.7218 201.3512 27.035154       709   119.42706   93.03665  170.34450
-#&gt; 3   3 123.4041 557.3574 30.662272       787   128.73288   95.71521  189.29975
-#&gt; 4   4 622.9709 585.4137 39.356560       861   143.35174  108.10797  202.86061
-#&gt; 5   5 364.7512 508.5887  8.086629       375    64.29950   51.44991   86.20696
-#&gt; 11  6 357.7567 732.1150  4.000000       309    45.07532   39.18378   55.45137
-#&gt;    radius_sd   label
-#&gt; 1  15.322111 1|33.64
-#&gt; 2  19.262657 2|27.04
-#&gt; 3  24.552868 3|30.66
-#&gt; 4  25.147591 4|39.36
-#&gt; 5   9.706128  5|8.09
-#&gt; 11  4.728836     6|4</div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='leaf_area-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='utils_measures.html'>get_measures</a></span><span class='op'>(</span><span class='va'>area</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; -----------------------------------------
+#&gt; Total leaf area  : 142.78 
+#&gt; Average leaf area: 23.797 
+#&gt; -----------------------------------------</div><div class='output co'>#&gt;   id        x        y      area perimeter radius_mean radius_min radius_max
+#&gt; 1  1 510.8565 194.8096 33.639674       749    130.9543  113.17878  174.56809
+#&gt; 2  2 206.7218 201.3512 27.035154       709    119.4271   93.03665  170.34450
+#&gt; 3  3 123.4041 557.3574 30.662272       787    128.7329   95.71521  189.29975
+#&gt; 4  4 622.9709 585.4137 39.356560       861    143.3517  108.10797  202.86061
+#&gt; 5  5 364.7512 508.5887  8.086629       375     64.2995   51.44991   86.20696</div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

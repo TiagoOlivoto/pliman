@@ -70,12 +70,14 @@
 #' image_combine(img, leaf, tmpl, background)
 #'
 #' # Computes the leaf area
+#' area <-
 #' leaf_area(img = img,
 #'           img_leaf = leaf,
 #'           img_template = tmpl,
 #'           img_background = background,
 #'           area_template = 4,
 #'           text_col = "white")
+#' get_measures(area)
 #' }
 #'
 leaf_area <- function(img,
