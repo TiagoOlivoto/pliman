@@ -156,7 +156,7 @@
 <div id="getting-started" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
-<p>Image segmentation is the process of partitioning a digital image into multiple segments (sets of pixels or image objects). In the context of plant image analysis, segmentation is used to simplify the representation of an image into something that is easier to analyze. For example, when using <code><a href="../reference/count_objects.html">count_objects()</a></code> to count crop grains, first the grains need to be isolated (segmented) from the background. In <code>pliman</code> the following functions can be used to segment an image.</p>
+<p>Image segmentation is the process of partitioning a digital image into multiple segments (sets of pixels or image objects). In the context of plant image analysis, segmentation is used to simplify the representation of an image into something easier to analyze. For example, when using <code><a href="../reference/count_objects.html">count_objects()</a></code> to count crop grains, first the grains need to be isolated (segmented) from the background. In <code>pliman</code> the following functions can be used to segment an image.</p>
 <ul>
 <li>
 <code><a href="../reference/image_binary.html">image_binary()</a></code> to produce a binary (back and white) image</li>
@@ -168,7 +168,7 @@
 <div id="getting-image-indexes" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-image-indexes" class="anchor"></a>Getting image indexes</h1>
-<p><code>pliman</code> provides a set of indexes that can be used to segment images. For a list of supported indexes consult the documentation of <code><a href="../reference/image_index.html">image_index()</a></code> function. Here, we use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. The results are shown in the plot according to the order of the indexes in the <code>index</code> argument, filled ‘by row’. User can also provide your own index with the argument <code>my_index</code>.</p>
+<p><code>pliman</code> provides a set of indexes that can be used to segment images. For a list of supported indexes consult the documentation of <code><a href="../reference/image_index.html">image_index()</a></code> function. Here, we use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. The results are shown in the plot according to the order of the indexes in the <code>index</code> argument, filled ‘by row’. Users can also provide your index with the argument <code>my_index</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
 <span class="co">#&gt; |===========================================|</span>
@@ -181,12 +181,12 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Compute the indexes</span>
 <span class="va">indexes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># Create a histogram with the RGB values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-3-2.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-3-2.png" width="960"></p>
 <p>In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.</p>
 </div>
 <div id="producing-a-segmented-image" class="section level1">
@@ -195,13 +195,13 @@
 <p>The function <code>image_segmentation()</code> is used to segment images using image indexes. In our example, we will use the same indexes computed below to see how the image is segmented. The output of this function can be used as input in the function <code>count_objets()</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">segmented</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
 <p>It seems that the “NB” index provided better segmentation. “R” and “NR” resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as ‘selected’ image. To circumvent this problem, we can use the argument <code>invert</code> in those functions.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>,
               index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NR"</span><span class="op">)</span>,
               invert <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 <div id="producing-a-binary-image" class="section level1">
 <h1 class="hasAnchor">
@@ -209,14 +209,14 @@
 <p>We can also produce a binary image with <code><a href="../reference/image_binary.html">image_binary()</a></code>. Just for curiosity, we will use the indexes <code>"R"</code> and <code>"NB"</code>. By default, <code><a href="../reference/image_binary.html">image_binary()</a></code> rescales the image to 30% of the size of the original image to speed up the computation time. Use the argument <code>resize = FALSE</code> to produce a binary image with the original size.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># original image size</span>
 <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>,
              index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NB"</span><span class="op">)</span>,
              resize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-6-2.png" width="672"></p>
+<p><img src="segmentation_files/figure-html/unnamed-chunk-6-2.png" width="960"></p>
 </div>
   </div>
 

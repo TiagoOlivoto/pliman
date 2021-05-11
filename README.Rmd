@@ -24,13 +24,13 @@ knitr::opts_chunk$set(
 
 `pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. Image indexes can also be used to segment images. The package will help you to:
 
-* Measure leaf area with `leaf_area()`.
-* Measure disease severity with `symptomatic_area()`.
-* Count the number of lesions with `count_lesions()`.
-* Count objects in an image with `count_objects()`.
-* Get the RGB values for each object in an image with `objects_rgb()`.
-* Get object measures with `get_measures()`.
-* Plot objec measures with `plot_measures()`.
+* Measure leaf area with `leaf_area()`
+* Measure disease severity with `symptomatic_area()`
+* Count the number of lesions with `count_lesions()`
+* Count objects in an image with `count_objects()`
+* Get the RGB values for each object in an image with `objects_rgb()`
+* Get object measures with `get_measures()`
+* Plot object measures with `plot_measures()`
 
 `pliman` also provides useful functions for [operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html), [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), and [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html) of images. Please, visit the [Examples](https://tiagoolivoto.github.io/pliman/index.html) page in `pliman` website for a detailed documentation of each function.
 

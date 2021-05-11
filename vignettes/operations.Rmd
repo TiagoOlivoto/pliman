@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 # Importing images
 
-Images are imported with `image_import()`. Users can indicate either a character vector of file names or URLs. Using the argument `img_pattern` several images can be imported at once, and a list of images is created. For example, if `img_pattern = "im"` all images in the current working directory that the name matches the pattern (e.g., `img1.-, image1.-, im2.-`) will be imported to a list. Providing any number as pattern (e.g., `img_pattern = "1"`) will select images that are nammed as `1.-, 2.-`, and so on.
+Images are imported with `image_import()`. Users can indicate either a character vector of file names or URLs. Using the argument `img_pattern` several images can be imported at once, and a list of images is created. For example, if `img_pattern = "im"` all images in the current working directory that the name matches the pattern (e.g., `img1.-, image1.-, im2.-`) will be imported to a list. Providing any number as a pattern (e.g., `img_pattern = "1"`) will select images that are named as `1.-, 2.-`, and so on.
 
 
 ```{r }

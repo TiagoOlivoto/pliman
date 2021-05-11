@@ -59,7 +59,7 @@ get_measures(area)
 
 ## Leaf area using count_objects()
 
-An alternative way to compute leaf area in `pliman` is by using `count_objects()`. This function has the advantage of using image segmentation based on several indexes (e.g., red, green, and blue values). So, sample palettes don't need to be informed. Let us to compute the leaf area of `leaves` with this approach. First, we use `image_segmentation()` to identify candidate indexes to segment the image.
+An alternative way to compute leaf area in `pliman` is by using `count_objects()`. This function has the advantage of using image segmentation based on several indexes (e.g., red, green, and blue values). So, sample palettes don't need to be informed. Let us compute the leaf area of `leaves` with this approach. First, we use `image_segmentation()` to identify candidate indexes to segment the image.
 
 ```{r }
 leaves <- image_import(image_pliman("la_leaves.JPG"))
@@ -102,5 +102,3 @@ plot_measures(area, measure = "area")
 
 
 The weakness of computing leaf area with `count_objects()` is that it is needed to first obtain the object identification to know which object (leaf) is the sample with a known area. This object id may change from image to image, especially from images with a different number of leaves. Thus, batch computing is difficult in this case.
-
-

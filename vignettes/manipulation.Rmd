@@ -33,7 +33,7 @@ image_combine(img_list)
 ```
 
 # Rezise an image
-`image_resize()` is used to resize an image. The argument `rel_size` can be used to resize the image by a relative size. For example, setting `rel_size = 50` to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with `count_objects` and `symptomatic_area()`.
+`image_resize()` is used to resize an image. The argument `rel_size` can be used to resize the image by relative size. For example, setting `rel_size = 50` to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with `count_objects` and `symptomatic_area()`.
 
 ```{r}
 resized <- image_resize(img_list, rel_size = 50)

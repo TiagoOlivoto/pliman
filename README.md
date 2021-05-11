@@ -75,8 +75,8 @@ symptomatic_area(img = img,
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
-    #   healthy symptomatic
-    # 1 88.9799     11.0201
+    #    healthy symptomatic
+    # 1 89.30008    10.69992
 
 # Count objects
 
@@ -120,3 +120,9 @@ with EBImage!
 
 -   Suggestions and criticisms to improve the quality and usability of
     the package are welcome!
+
+# Code of Conduct
+
+Please note that the pliman project is released with a [Contributor Code
+of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.

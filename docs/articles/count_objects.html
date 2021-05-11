@@ -165,15 +165,15 @@
 <span class="co">#&gt; |===========================================|</span>
 <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
-<p>The above image was produced with Microsoft Power Point. It has a known resolution of 300 dpi (dots per inch) and shows four objects</p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
+<p>The above image was produced with Microsoft PowerPoint. It has a known resolution of 300 dpi (dots per inch) and shows four objects</p>
 <ul>
 <li>Larger square: 10 x 10 cm (100 cm<sup>2</sup>)</li>
 <li>Smaller square: 5 x 5 cm (25 cm<sup>2</sup>)</li>
 <li>Rectangle: 4 x 2 cm (8 cm<sup>2</sup>)</li>
 <li>Circle: 3 cm in diameter (~7.08 cm<sup>2</sup>)</li>
 </ul>
-<p>To count the objects in the image we use <code><a href="../reference/count_objects.html">count_objects()</a></code> and inform the image object (the only mandatory argument). First, we use <code><a href="../reference/image_binary.html">image_binary()</a></code> to see the most suitable index to segment the objects from background. By default, the R, G, B (first row) and their normalized values (second row) are used.</p>
+<p>To count the objects in the image we use <code><a href="../reference/count_objects.html">count_objects()</a></code> and inform the image object (the only mandatory argument). First, we use <code><a href="../reference/image_binary.html">image_binary()</a></code> to see the most suitable index to segment the objects from the background. By default, the R, G, B (first row) and their normalized values (second row) are used.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
 <p><img src="count_objects_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
@@ -181,7 +181,7 @@
 <code class="sourceCode R"><span class="va">img_res</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">img</span>,
                 index <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span> <span class="co"># use blue index to segment</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 4 
@@ -196,7 +196,7 @@
 <div id="getting-the-object-measures" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-the-object-measures" class="anchor"></a>Getting the object measures</h1>
-<p>The results were stored in <code>img_res</code> and a summary print in the console. The minimum, mean, maximum, standard deviation and sum of pixels are given for both area, and perimeter. The values for each object can be obtained with <code><a href="../reference/utils_measures.html">get_measures()</a></code>. Since there is no scale declared in the above example, we have no idea about the actual area of the objects in cm<sup>2</sup>, only in pixels.</p>
+<p>The results were stored in <code>img_res</code> and a summary print in the console. The minimum, mean, maximum, standard deviation and sum of pixels are given for both area and perimeter. The values for each object can be obtained with <code><a href="../reference/utils_measures.html">get_measures()</a></code>. Since there is no scale declared in the above example, we have no idea about the actual area of the objects in cm<sup>2</sup>, only in pixels.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;   id         x         y    area perimeter radius_mean radius_min radius_max</span>
@@ -206,12 +206,12 @@
 <span class="co">#&gt; 4  4 1737.4979  939.4926  111383      1409    197.4469   117.4128   262.9966</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">measures</span><span class="op">)</span> <span class="co"># plot the object id</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 <div id="adjusting-object-measures" class="section level1">
 <h1 class="hasAnchor">
 <a href="#adjusting-object-measures" class="anchor"></a>Adjusting object measures</h1>
-<p>There are two main ways of adjusting the object measures (from pixels to cm, for example). The first one is to declare the known area, perimeter, or radius of a given object. The measure for the other objects will be then computed by a simple rule of three. The second one, is by declaring a known image resolution in dpi (dots per inch). In this case, the perimeter, area and radius will be adjusted by the informed dpi.</p>
+<p>There are two main ways of adjusting the object measures (from pixels to cm, for example). The first one is to declare the known area, perimeter, or radius of a given object. The measure for the other objects will be then computed by a simple rule of three. The second one is by declaring a known image resolution in dpi (dots per inch). In this case, the perimeter, area, and radius will be adjusted by the informed dpi.</p>
 <div id="declaring-a-known-value" class="section level2">
 <h2 class="hasAnchor">
 <a href="#declaring-a-known-value" class="anchor"></a>Declaring a known value</h2>
@@ -251,11 +251,11 @@
 <div id="declaring-the-image-resolution" class="section level2">
 <h2 class="hasAnchor">
 <a href="#declaring-the-image-resolution" class="anchor"></a>Declaring the image resolution</h2>
-<p>If the image resolution is known, all the measures will be ajusted according to this resolution. Let us to see a numerical example with <code><a href="../reference/utils_dpi.html">pixels_to_cm()</a></code>. This function converts the number of pixels (<span class="math inline">\(px\)</span>) to cm, considering the image resolution in <span class="math inline">\(dpi\)</span>, as follows: <span class="math inline">\(cm = px \times (2.54/dpi)\)</span>. We known that the larger square has a perimeter of 4720 pixels. So, using the function we have</p>
+<p>If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with <code><a href="../reference/utils_dpi.html">pixels_to_cm()</a></code>. This function converts the number of pixels (<span class="math inline">\(px\)</span>) to cm, considering the image resolution in <span class="math inline">\(dpi\)</span>, as follows: <span class="math inline">\(cm = px \times (2.54/dpi)\)</span>. We have known that the larger square has a perimeter of 4720 pixels. So, using the function we have</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_dpi.html">pixels_to_cm</a></span><span class="op">(</span>px <span class="op">=</span> <span class="fl">4720</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span>
 <span class="co">#&gt; [1] 39.96267</span></code></pre></div>
-<p>The perimeter of the object 1 adjusted by the image resolution is very close to the true (40 cm). Bellow, the values of all measures are adjusted by declaring the <code>dpi</code> argument in <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
+<p>The perimeter of object 1 adjusted by the image resolution is very close to the true (40 cm). Bellow, the values of all measures are adjusted by declaring the <code>dpi</code> argument in <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span>
 <span class="co">#&gt;   id         x         y      area perimeter radius_mean radius_min radius_max</span>
@@ -274,13 +274,13 @@
 <span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"background.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">grain</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
-<p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> segment the image using as default the normalized blue index, as follows <span class="math inline">\(NB = (B/(R+G+B))\)</span>, where <span class="math inline">\(R\)</span>, <span class="math inline">\(G\)</span>, and <span class="math inline">\(B\)</span> are the red, green, and blue bands. Objects are count and the segmented objects colored with random permutations.</p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
+<p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> segment the image using as default the normalized blue index, as follows <span class="math inline">\(NB = (B/(R+G+B))\)</span>, where <span class="math inline">\(R\)</span>, <span class="math inline">\(G\)</span>, and <span class="math inline">\(B\)</span> are the red, green, and blue bands. Objects are count and the segmented objects are colored with random permutations.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
                 index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-11-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
@@ -299,7 +299,7 @@
                 show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,
                 col_background <span class="op">=</span> <span class="st">"white"</span>,
                 index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-12-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
@@ -352,7 +352,7 @@
               show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,
               lower_size <span class="op">=</span> <span class="fl">2057.36</span>,
               index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-14-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 16 
@@ -371,7 +371,7 @@
               topn_lower <span class="op">=</span> <span class="fl">5</span>,
               col_background <span class="op">=</span> <span class="st">"blue"</span>,
               my_index <span class="op">=</span> <span class="st">"B/(R+G+B)"</span><span class="op">)</span> <span class="co"># default</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-15-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 5 
@@ -385,22 +385,22 @@
 <div id="using-sample-palettes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-sample-palettes" class="anchor"></a>Using sample palettes</h3>
-<p>Sometimes it is difficult to choose an image index that segments the image efficiently (even using <code>my_index</code> ). In <code>pliman</code> users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to <code>count_objects</code> which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let’s see how the grains of the above image can be count with this strategy.</p>
+<p>Sometimes it is difficult to choose an image index that segments the image efficiently (even using <code>my_index</code> ). In <code>pliman</code> users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to <code>count_objects</code> which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let’s see how the grains of the above image can be counted with this strategy.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">soy</span>,
               background <span class="op">=</span> <span class="va">background</span>,
               foreground <span class="op">=</span> <span class="va">grain</span><span class="op">)</span></code></pre></div>
-<p><img src="count_objects_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
+<p><img src="count_objects_files/figure-html/unnamed-chunk-16-1.png" width="960"></p>
 <pre><code>#&gt; 
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
 #&gt;  statistics       area   perimeter
-#&gt;         min  1584.0000  129.000000
-#&gt;        mean  2416.5333  160.900000
-#&gt;         max  2801.0000  174.000000
-#&gt;          sd   261.7821    8.856519
-#&gt;         sum 72496.0000 4827.000000</code></pre>
+#&gt;         min  1577.0000  128.000000
+#&gt;        mean  2396.0333  160.100000
+#&gt;         max  2794.0000  171.000000
+#&gt;          sd   260.4527    8.790081
+#&gt;         sum 71881.0000 4803.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,

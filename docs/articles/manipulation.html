@@ -177,7 +177,7 @@
 <div id="rezise-an-image" class="section level1">
 <h1 class="hasAnchor">
 <a href="#rezise-an-image" class="anchor"></a>Rezise an image</h1>
-<p><code><a href="../reference/utils_transform.html">image_resize()</a></code> is used to resize an image. The argument <code>rel_size</code> can be used to resize the image by a relative size. For example, setting <code>rel_size = 50</code> to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with <code>count_objects</code> and <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</p>
+<p><code><a href="../reference/utils_transform.html">image_resize()</a></code> is used to resize an image. The argument <code>rel_size</code> can be used to resize the image by relative size. For example, setting <code>rel_size = 50</code> to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with <code>count_objects</code> and <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">resized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_resize</a></span><span class="op">(</span><span class="va">img_list</span>, rel_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_transform.html">image_dimension</a></span><span class="op">(</span><span class="va">resized</span><span class="op">)</span>
