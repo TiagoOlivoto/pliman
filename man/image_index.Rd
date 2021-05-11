@@ -33,7 +33,7 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
 indexes.}
 
-\item{my_index}{User can calculate a diferent index using the bands names,
+\item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{TRUE}. Resizes

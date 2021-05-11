@@ -32,7 +32,7 @@ manipulate_files(
 
 \item{pattern}{A file name pattern.}
 
-\item{dir}{The working directory containig the files to be manipulated.
+\item{dir}{The working directory containing the files to be manipulated.
 Defaults to the current working directory.}
 
 \item{prefix, suffix}{A prefix or suffix to be added in the new file names.

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(comment = "#", collapse = TRUE, fig.width = 5)
 ```
 
 # Getting started
-`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
+`pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
 
 * Measure leaf area with `leaf_area()`.
 * Measure disease severity with `symptomatic_area()`.

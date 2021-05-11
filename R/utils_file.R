@@ -9,7 +9,7 @@
 #' @name utils_file
 #' @param file The file name.
 #' @param pattern A file name pattern.
-#' @param dir The working directory containig the files to be manipulated.
+#' @param dir The working directory containing the files to be manipulated.
 #'   Defaults to the current working directory.
 #' @param prefix,suffix A prefix or suffix to be added in the new file names.
 #'   Defaults to `NULL` (no prefix or suffix).

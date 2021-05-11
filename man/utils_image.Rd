@@ -29,7 +29,7 @@ the \code{jpeg}, \code{png}, and \code{tiff} packages.}
 imported. For example, if \code{img_pattern = "im"} all images in the current
 working directory that the name matches the pattern (e.g., img1.-,
 image1.-, im2.-) will be imported as a list. Providing any number as
-pattern (e.g., \code{img_pattern = "1"}) will select images that are nammed as
+pattern (e.g., \code{img_pattern = "1"}) will select images that are named as
 1.-, 2.-, and so on.}
 
 \item{name}{An string specifying the name of the image.}

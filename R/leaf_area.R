@@ -14,7 +14,7 @@
 #'   processed. For example, if `img_pattern = "im"` all images that the name
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `img_pattern = "1"`) will select
-#'   images that are nammed as 1.-, 2.-, and so on.
+#'   images that are named as 1.-, 2.-, and so on.
 #' @param img_leaf A color palette of the leaves.
 #' @param img_background A color palette of background area.
 #' @param img_template A color palette of the template areas.
@@ -22,7 +22,7 @@
 #'   given in the same unit as `area_template`.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
-#'   the processing time, speccialy when `img_pattern` is used is informed. The
+#'   the processing time, especially when `img_pattern` is used is informed. The
 #'   number of sections is set up to 90% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.

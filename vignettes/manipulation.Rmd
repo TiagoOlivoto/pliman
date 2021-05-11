@@ -48,7 +48,7 @@ rotated <- image_rotate(img_list, angle = 45)
 image_combine(rotated)
 ```
 
-# Horizontal and vertical reflextion
+# Horizontal and vertical reflection
 `image_hreflect()` and `image_vreflect()` performs vertical and horizontal reflection of images, respectively.
 
 ```{r fig.width=10}

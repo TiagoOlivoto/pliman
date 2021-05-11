@@ -51,7 +51,7 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
 #'   imported. For example, if `img_pattern = "im"` all images in the current
 #'   working directory that the name matches the pattern (e.g., img1.-,
 #'   image1.-, im2.-) will be imported as a list. Providing any number as
-#'   pattern (e.g., `img_pattern = "1"`) will select images that are nammed as
+#'   pattern (e.g., `img_pattern = "1"`) will select images that are named as
 #'   1.-, 2.-, and so on.
 #' @param ... Alternative arguments passed to the corresponding functions from
 #'   the `jpeg`, `png`, and `tiff` packages.
@@ -415,7 +415,7 @@ image_resize <- function(image,
 #'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
 #'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
 #'   `"BGI"`. See [image_index()] for more details.
-#' @param my_index User can calculate a diferent index using the bands names,
+#' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
 #'   the image to 30% of the original size to speed up image processing.
@@ -569,7 +569,7 @@ image_binary <- function(image,
 #'   `"BGI"`. Defaults to `NULL` ((normalized) Red, Green and Blue).  One can
 #'   also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
 #'   indexes.
-#' @param my_index User can calculate a diferent index using the bands names,
+#' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
 #'   the image to 30% of the original size to speed up image processing.
@@ -793,7 +793,7 @@ plot.image_index <- function(x, facet = TRUE, ...){
 #'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
 #'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
 #'   `"BGI"`. See [image_index()] for more details.
-#' @param my_index User can calculate a diferent index using the bands names,
+#' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param re Respective position of the red-edge band at the original image
@@ -983,7 +983,7 @@ image_to_mat <- function(image,
 #'
 #' Creates image palettes by applying the k-means algorithm to the RGB values.
 #' @param image An image object.
-#' @param npal The number of color palletes.
+#' @param npal The number of color palettes.
 #' @param nstart How many random sets from `npal` should be chosen?
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up

@@ -16,7 +16,7 @@ image_pallete(
 \arguments{
 \item{image}{An image object.}
 
-\item{npal}{The number of color palletes.}
+\item{npal}{The number of color palettes.}
 
 \item{nstart}{How many random sets from \code{npal} should be chosen?}
 

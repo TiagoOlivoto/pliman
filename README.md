@@ -7,19 +7,19 @@
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version-ago/metan)](https://CRAN.R-project.org/package=metan) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable) ![Downloads](http://cranlogs.r-pkg.org/badges/metan) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/metan) [<img src="https://zenodo.org/badge/130062661.svg" alt="DOI" width="186"/>](https://zenodo.org/badge/latestdoi/130062661) -->
 <!-- badges: end -->
 
-`pliman` (**pl**ant **im**age **an**anlysis) is designed to analyze
-plant images, especially related to leaf analysis. You provide color
-palettes, tell `pliman` what each one represents, and it takes care of
-the details. Image indexes can also be used to segment images. The
-package will help you to:
+`pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant
+images, especially related to leaf analysis. You provide color palettes,
+tell `pliman` what each one represents, and it takes care of the
+details. Image indexes can also be used to segment images. The package
+will help you to:
 
--   Measure leaf area with `leaf_area()`.
--   Measure disease severity with `symptomatic_area()`.
--   Count the number of lesions with `count_lesions()`.
--   Count objects in an image with `count_objects()`.
--   Get the RGB values for each object in an image with `objects_rgb()`.
--   Get object measures with `get_measures()`.
--   Plot objec measures with `plot_measures()`.
+-   Measure leaf area with `leaf_area()`
+-   Measure disease severity with `symptomatic_area()`
+-   Count the number of lesions with `count_lesions()`
+-   Count objects in an image with `count_objects()`
+-   Get the RGB values for each object in an image with `objects_rgb()`
+-   Get object measures with `get_measures()`
+-   Plot object measures with `plot_measures()`
 
 `pliman` also provides useful functions for
 [operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html),
@@ -76,7 +76,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 89.30008    10.69992
+    # 1 89.18107    10.81893
 
 # Count objects
 

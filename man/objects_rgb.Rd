@@ -51,11 +51,11 @@ objects_rgb(
 processed. For example, if \code{img_pattern = "im"} all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
-images that are nammed as 1.-, 2.-, and so on.}
+images that are named as 1.-, 2.-, and so on.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
-the processing time, speccialy when \code{img_pattern} is used is informed. The
+the processing time, especially when \code{img_pattern} is used is informed. The
 number of sections is set up to 90\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
@@ -94,7 +94,7 @@ than the tolerance, the object will be combined with one of its neighbors,
 which is the highest.}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
-neighboring objects. Defaults to 20. Higher value smoothes out small
+neighboring objects. Defaults to 20. Higher value smooths out small
 objects.}
 
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
