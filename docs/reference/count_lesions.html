@@ -70,6 +70,16 @@ dir_original." />
 <![endif]-->
 
 
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VWN5YL53DP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VWN5YL53DP');
+</script>
+
 
   </head>
 
@@ -268,13 +278,13 @@ stored in the current working directory or in the subdirectory informed in
 processed. For example, if <code>img_pattern = "im"</code> all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., <code>img_pattern = "1"</code>) will select
-images that are nammed as 1.-, 2.-, and so on.</p></td>
+images that are named as 1.-, 2.-, and so on.</p></td>
     </tr>
     <tr>
       <th>parallel</th>
       <td><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
-the processing time, speccialy when <code>img_pattern</code> is used is informed. The
+the processing time, especially when <code>img_pattern</code> is used is informed. The
 number of sections is set up to 90% of available cores.</p></td>
     </tr>
     <tr>
@@ -348,7 +358,7 @@ which is the highest. Defaults to <code>NULL</code>, i.e., starting values are s
     <tr>
       <th>extension</th>
       <td><p>Radius of the neighborhood in pixels for the detection of
-neighboring objects. Defaults to 20. Higher value smoothes out small
+neighboring objects. Defaults to 20. Higher value smooths out small
 objects.</p></td>
     </tr>
     <tr>

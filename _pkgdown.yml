@@ -7,7 +7,7 @@ home:
 template:
   params:
     bootswatch: spacelab
-    # ganalytics: UA-140429633-1
+    ganalytics: G-VWN5YL53DP
     # docsearch:
     #   api_key: ef40e3bab94bb0e1d687fd3844052701
     #   index_name: metan

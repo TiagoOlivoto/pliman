@@ -23,7 +23,13 @@
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<![endif]--><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-VWN5YL53DP"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VWN5YL53DP');
+</script>
 </head>
 <body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
@@ -144,7 +150,7 @@
       <h1 data-toc-skip>Measure leaf area using leaf images</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-10</h4>
+            <h4 class="date">2021-05-11</h4>
       
       
       <div class="hidden name"><code>leaf_area.Rmd</code></div>
@@ -188,15 +194,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total leaf area  : 142.74 </span>
-<span class="co">#&gt; Average leaf area: 23.79 </span>
+<span class="co">#&gt; Total leaf area  : 142.832 </span>
+<span class="co">#&gt; Average leaf area: 23.805 </span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt;   id        x        y     area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1 510.8786 194.8094 33.62386       749   130.92976  112.82682  174.53297</span>
-<span class="co">#&gt; 2  2 206.7334 201.3525 27.02857       710   119.42023   93.18330  170.49584</span>
-<span class="co">#&gt; 3  3 123.4309 557.3506 30.65557       787   128.70875   95.69390  189.29143</span>
-<span class="co">#&gt; 4  4 622.9723 585.4131 39.34317       863   143.33508  108.44722  203.20817</span>
-<span class="co">#&gt; 5  5 364.7478 508.5709  8.08854       374    64.26164   51.44334   86.40534</span></code></pre></div>
+<span class="co">#&gt;   id        x        y      area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1 510.8734 194.8167 33.659868       752   131.02709  113.14348  175.05654</span>
+<span class="co">#&gt; 2  2 206.6770 201.3319 27.047380       710   119.47419   93.22445  170.49789</span>
+<span class="co">#&gt; 3  3 123.3901 557.3619 30.667713       787   128.75564   95.72653  189.30518</span>
+<span class="co">#&gt; 4  4 623.0141 585.4067 39.358017       859   143.35770  108.18431  203.18387</span>
+<span class="co">#&gt; 5  5 364.7361 508.6051  8.098525       374    64.35392   51.63408   86.69852</span></code></pre></div>
 </div>
 <div id="leaf-area-using-count_objects" class="section level2">
 <h2 class="hasAnchor">

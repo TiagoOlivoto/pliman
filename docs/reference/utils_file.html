@@ -72,6 +72,16 @@ directory.
 <![endif]-->
 
 
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VWN5YL53DP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VWN5YL53DP');
+</script>
+
 
   </head>
 
@@ -242,7 +252,7 @@ directory.</p></li>
     </tr>
     <tr>
       <th>dir</th>
-      <td><p>The working directory containig the files to be manipulated.
+      <td><p>The working directory containing the files to be manipulated.
 Defaults to the current working directory.</p></td>
     </tr>
     <tr>
@@ -291,15 +301,15 @@ Set <code>overwrite = TRUE</code> to overwrite the files.</p></td>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='va'>dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "downlit"          "file184435807357" "file184465d14589"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.create</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"/test.txt"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "downlit"          "file283c102b1320" "file283c638924a7"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.create</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"/test.txt"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "downlit"          "file184435807357" "file184465d14589" "test.txt"        </div><div class='input'><span class='fu'>manipulate_files</span><span class='op'>(</span><span class='st'>"test"</span>,
+</div><div class='output co'>#&gt; [1] "downlit"          "file283c102b1320" "file283c638924a7" "test.txt"        </div><div class='input'><span class='fu'>manipulate_files</span><span class='op'>(</span><span class='st'>"test"</span>,
                  dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"\\"</span><span class='op'>)</span>,
                 prefix <span class='op'>=</span> <span class='st'>"chang_"</span>,
                 save_to <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"\\"</span><span class='op'>)</span>,
                 overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>1 files successfully copied to 'C:\Users\tiago\AppData\Local\Temp\RtmpeyeugH\'</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "chang_test.txt"   "downlit"          "file184435807357" "file184465d14589"
+</div><div class='output co'>#&gt; <span class='message'>1 files successfully copied to 'C:\Users\tiago\AppData\Local\Temp\RtmpsrrtAu\'</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "chang_test.txt"   "downlit"          "file283c102b1320" "file283c638924a7"
 #&gt; [5] "test.txt"        </div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>

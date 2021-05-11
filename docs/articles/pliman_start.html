@@ -23,7 +23,13 @@
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<![endif]--><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-VWN5YL53DP"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VWN5YL53DP');
+</script>
 </head>
 <body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
@@ -144,7 +150,7 @@
       <h1 data-toc-skip>Plant IMage Analysis</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-10</h4>
+            <h4 class="date">2021-05-11</h4>
       
       
       <div class="hidden name"><code>pliman_start.Rmd</code></div>
@@ -156,7 +162,7 @@
 <div id="getting-started" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
-<p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>anlysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. The package will help you to:</p>
+<p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. The package will help you to:</p>
 <ul>
 <li>Measure leaf area with <code><a href="../reference/leaf_area.html">leaf_area()</a></code>.</li>
 <li>Measure disease severity with <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</li>
@@ -199,15 +205,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total leaf area  : 143.025 </span>
-<span class="co"># Average leaf area: 23.837 </span>
+<span class="co"># Total leaf area  : 142.845 </span>
+<span class="co"># Average leaf area: 23.807 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="co">#   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 510.8555 194.8186 33.705577       751   131.01921  113.02988   174.8862</span>
-<span class="co"># 2  2 206.6793 201.3429 27.084368       710   119.47320   93.22386   170.4992</span>
-<span class="co"># 3  3 123.3904 557.3615 30.711076       787   128.75586   95.72437   189.3051</span>
-<span class="co"># 4  4 622.9988 585.4120 39.417439       860   143.38086  108.13216   203.0071</span>
-<span class="co"># 5  5 364.7417 508.6090  8.106206       373    64.32359   51.68588    86.5344</span></code></pre></div>
+<span class="co"># 1  1 510.8718 194.8101 33.660863       751   131.03269  113.01765  174.91506</span>
+<span class="co"># 2  2 206.6684 201.3299 27.051922       709   119.47751   93.27623  170.67297</span>
+<span class="co"># 3  3 123.3801 557.3658 30.669176       787   128.76595   95.73569  189.31052</span>
+<span class="co"># 4  4 623.0219 585.4088 39.360627       860   143.40507  108.12326  202.98734</span>
+<span class="co"># 5  5 364.7394 508.6186  8.102275       375    64.38352   51.68407   86.54174</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -258,7 +264,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
 <pre><code>#    healthy symptomatic
-# 1 89.08013    10.91987</code></pre>
+# 1 88.97788    11.02212</code></pre>
 </div>
 <div id="rgb-values-for-objects" class="section level1">
 <h1 class="hasAnchor">
