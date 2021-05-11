@@ -9,8 +9,8 @@ template:
     bootswatch: spacelab
     ganalytics: G-VWN5YL53DP
     # docsearch:
-    #   api_key: ef40e3bab94bb0e1d687fd3844052701
-    #   index_name: metan
+    #   api_key:
+    #   index_name:
 
 toc:
   depth: 3
