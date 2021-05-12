@@ -14,7 +14,8 @@
 ^vignettes/manipulation\.Rmd$
 ^vignettes/operations\.Rmd$
 ^vignettes/leaf_area\.Rmd$
-
+^vignettes/segmentation\.Rmd$
 ^CODE_OF_CONDUCT\.md$
 ^\.github$
 ^cran-comments\.md$
+^CRAN-RELEASE$

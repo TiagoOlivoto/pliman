@@ -61,7 +61,7 @@ file_dir <- function(file){
                 file)
   fd <- ifelse(nchar(ex) == 0,
                paste0("."),
-               paste0("./", ex))
+               ifelse(grepl("^[/]", file), ex, paste0("./", ex)))
   fd <- ifelse(grepl(":", fd, fixed = TRUE),
                substring(fd, 3, nchar(fd)),
                fd)
