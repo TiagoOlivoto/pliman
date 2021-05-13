@@ -58,6 +58,7 @@ The results were stored in `img_res` and a summary print in the console. The min
 (measures <- get_measures(img_res))
 image_show(img)
 plot_measures(measures) # plot the object id
+ls_px <- measures[1, 5] # number of pixels (perimeter) of the largest square
 ```
 
 # Adjusting object measures
@@ -83,10 +84,11 @@ get_measures(img_res,
 
 ## Declaring the image resolution
 
-If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with `pixels_to_cm()`. This function converts the number of pixels ($px$) to cm, considering the image resolution in $dpi$, as follows: $cm = px \times (2.54/dpi)$. We have known that the larger square has a perimeter of 4720 pixels. So, using the function we have
+If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with `pixels_to_cm()`. This function converts the number of pixels ($px$) to cm, considering the image resolution in $dpi$, as follows: $cm = px \times (2.54/dpi)$. Since we known the number of pixels of the larger square, its perimeter in cm is given by
 
 ```{r}
-pixels_to_cm(px = 4720, dpi = 300)
+ls_px
+pixels_to_cm(px = ls_px, dpi = 300)
 
 ```
 The perimeter of object 1 adjusted by the image resolution is very close to the true (40 cm). Bellow, the values of all measures are adjusted by declaring the `dpi` argument in `get_measures()`.

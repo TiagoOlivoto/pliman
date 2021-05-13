@@ -181,10 +181,10 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
 <span class="co"># |========================================================|</span>
-<span class="co"># | Tools for Plant Image Analysis (pliman) v0.1.0         |</span>
+<span class="co"># | Tools for Plant Image Analysis (pliman 0.2.0)          |</span>
 <span class="co"># | Author: Tiago Olivoto                                  |</span>
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial   |</span>
-<span class="co"># | Visit 'https://bit.ly/2RP2kyE' for a complete tutorial |</span>
+<span class="co"># | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
 <span class="co"># |========================================================|</span>
 <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_pattern.JPG"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">leaf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
@@ -207,15 +207,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total leaf area  : 142.856 </span>
-<span class="co"># Average leaf area: 23.809 </span>
+<span class="co"># Total leaf area  : 142.891 </span>
+<span class="co"># Average leaf area: 23.815 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="co">#   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 510.8501 194.8374 33.663373       750   131.02684  112.99700  175.06882</span>
-<span class="co"># 2  2 206.6702 201.3515 27.051922       710   119.49066   93.23015  170.50230</span>
-<span class="co"># 3  3 123.3891 557.3719 30.674824       787   128.77437   95.73161  189.31284</span>
-<span class="co"># 4  4 622.9945 585.4022 39.370667       861   143.47932  107.97597  202.75984</span>
-<span class="co"># 5  5 364.7461 508.5975  8.095373       373    64.32797   51.68842   86.53456</span></code></pre></div>
+<span class="co"># 1  1 510.8427 194.8269 33.673207       751   131.01765  113.03832  174.88995</span>
+<span class="co"># 2  2 206.6797 201.3537 27.057605       710   119.47291   93.22326  170.50058</span>
+<span class="co"># 3  3 123.3917 557.3695 30.681526       787   128.75631   95.72503  189.30636</span>
+<span class="co"># 4  4 622.9783 585.4056 39.386596       861   143.44999  107.98898  202.77981</span>
+<span class="co"># 5  5 364.7495 508.6051  8.092293       375    64.31502   51.53135   86.20962</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -266,7 +266,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
 <pre><code>#    healthy symptomatic
-# 1 89.11622    10.88378</code></pre>
+# 1 89.23938    10.76062</code></pre>
 </div>
 <div id="rgb-values-for-objects" class="section level1">
 <h1 class="hasAnchor">
