@@ -7,11 +7,12 @@ Authors@R:
            role = c("aut", "cre"),
            email = "tiagoolivoto@gmail.com",
            comment = c(ORCID = "0000-0002-0241-9636"))
-Description: Provides tools for image manipulation and plant image
-    analysis that will help you to segment images, create binary images,
-    measure leaf area, quantify disease severity, count the number of
-    disease lesions, and obtain statistics of image objects such as
-    grains, pods, pollen, leaves and more.
+Description: Provides tools for image manipulation that will help you to
+    quantify plant leaf area, disease severity, number of disease lesions,
+    and obtain statistics of image objects such as grains, pods, pollen,
+    leaves, and more. Tools for segment images and create binary images
+    using the method of automatic threshold selection method proposed by
+    Otsu (1979) <doi:10.1109/tsmc.1979.4310076> are also provided.
 License: GPL (>= 3)
 Depends: 
     R (>= 4.0.0)

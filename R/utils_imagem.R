@@ -535,9 +535,9 @@ image_binary <- function(image,
   }
 }
 
-#' Image indices
+#' Image indexes
 #'
-#' Builds image indices using Red, Green, Blue, Red-Edge, and NIR bands.
+#' Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
 #' @details
 #' The following indexes are available in pliman.
 #'
@@ -992,14 +992,17 @@ image_to_mat <- function(image,
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
+#' @return A list with `npal` color palettes of class `Image`.
 #' @export
 #' @examples
+#' \donttest{
 #' library(pliman)
 #'img <- image_import(image_pliman("sev_leaf.jpg"))
-#'pal <- image_pallete(img, 2)
+#'pal <- image_palette(img, 2)
 #'image_show(pal[[1]])
 #'image_show(pal[[2]])
-image_pallete <- function(image,
+#'}
+image_palette <- function(image,
                           npal,
                           nstart = 25,
                           parallel = FALSE,
@@ -1017,9 +1020,9 @@ image_pallete <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_pallete, npal, nstart)
+      parLapply(clust, image, image_palette, npal, nstart)
     } else{
-      lapply(image, image_pallete, npal, nstart)
+      lapply(image, image_palette, npal, nstart)
     }
   } else{
   df <- image_to_mat(image)$df_in
@@ -1032,7 +1035,7 @@ image_pallete <- function(image,
     R <- df1[1:dim_mat^2, 1]
     G <- df1[1:dim_mat^2, 2]
     B <- df1[1:dim_mat^2, 3]
-    rgbs[[i]] <- array(c(R, G, B), dim = c(dim_mat, dim_mat, 3))
+    rgbs[[i]] <- as.Image(array(c(R, G, B), dim = c(dim_mat, dim_mat, 3)))
   }
   return(rgbs)
   }
@@ -1048,7 +1051,8 @@ image_pallete <- function(image,
 #' @param dpi The image resolution in dots per inch.
 #' @param px The number of pixels.
 #' @param cm The size in centimeters.
-#' @return A numerical value.
+#' @return A numeric value or a vector of numeric values if the input data is a
+#'   vector
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples

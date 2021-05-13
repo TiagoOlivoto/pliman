@@ -85,7 +85,12 @@
 #'   processing, when `save_image = TRUE`, the processed image will be also
 #'   saved in such a directory.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A data frame with the results for each image.
+#' @return A list with the following objects:
+#'  * `results` A data frame with the results (area, perimeter, radius) for
+#'  object.
+#'  * `statistics` A data frame with the summary statistics for the image.
+#'  * `count` (If `img_pattern` is used), summarizing the count number for each
+#'  image.
 #' @export
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -96,6 +101,7 @@
 #' healthy <- image_import(image_pliman("sev_healthy.jpg"))
 #' lesions <- image_import(image_pliman("sev_sympt.jpg"))
 #' image_combine(img, healthy, lesions, ncol = 3)
+#' a <-
 #' count_lesions(img = img,
 #'               img_healthy = healthy,
 #'               img_lesion = lesions,
@@ -224,18 +230,6 @@ count_lesions <- function(img,
                  nmask <- watershed(distmap(plant_symp),
                                     tolerance = tol,
                                     ext = ext))
-          # shape <-
-          #   cbind(data.frame(computeFeatures.shape(nmask)),
-          #         data.frame(computeFeatures.moment(nmask))[,1:2]
-          #   )
-          # ifelse(!is.null(lower_size),
-          #        shape <- shape[shape$s.area > lower_size, ],
-          #        shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
-          # if(!is.null(upper_size)){
-          #   shape <- shape[shape$s.area < upper_size, ]
-          # }
-          # shape$id <- 1:nrow(shape)
-          # shape <- shape[, c(9, 7, 8, 1, 2:6)]
           if(show_original == TRUE & show_segmentation == FALSE){
             im2 <- img
             im2@.Data[,,1][!ID] <- col_lesions[1]
@@ -292,14 +286,12 @@ count_lesions <- function(img,
                   sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
                   fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]) %>%
             transform(Y = ifelse(CODE == "img_background", 0, 1))
-          # fundo_resto$CODE <- NULL
           modelo1 <-
             glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto) %>%
             suppressWarnings()
           pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
           plant_background <- matrix(pred1, ncol = ncol(original$R))
           plant_background <- image_correct(plant_background, perc = 0.009)
-          # image_show(plant_background)
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
             rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
@@ -318,7 +310,6 @@ count_lesions <- function(img,
           leaf_sympts <- matrix(pred3, ncol = ncol(original$R))
           leaf_sympts <- 1 - image_correct(leaf_sympts, perc = 0.009)
           plant_background[leaf_sympts == 1] <- 3
-          # mpred1 <- bwlabel(leaf_sympts == 0)
           parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE),
                             header = T, sep = ";")
           parms2 <- parms[parms$object_size == lesion_size,]
@@ -333,18 +324,6 @@ count_lesions <- function(img,
                  nmask <- watershed(distmap(leaf_sympts),
                                     tolerance = tol,
                                     ext = ext))
-          # shape <-
-          #   cbind(data.frame(computeFeatures.shape(nmask)),
-          #         data.frame(computeFeatures.moment(nmask))[,1:2]
-          #   )
-          # ifelse(!is.null(lower_size),
-          #        shape <- shape[shape$s.area > lower_size, ],
-          #        shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
-          # if(!is.null(upper_size)){
-          #   shape <- shape[shape$s.area < upper_size, ]
-          # }
-          # shape$id <- 1:nrow(shape)
-          # shape <- shape[, c(9, 7, 8, 1, 2:6)]
           if(show_original == TRUE & show_segmentation == TRUE){
             im2 <- colorLabels(nmask)
             if(backg){
@@ -413,9 +392,6 @@ count_lesions <- function(img,
             eval(parse(text=x))}))
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        # print(res)
-        # print(ext)
-        # print(tol)
         nmask <- watershed(distmap(img2),
                            tolerance = tol,
                            ext = ext)
@@ -464,8 +440,6 @@ count_lesions <- function(img,
         }
       }
 
-
-
       shape <-
         cbind(data.frame(computeFeatures.shape(nmask)),
               data.frame(computeFeatures.moment(nmask))[,1:2]
@@ -478,7 +452,6 @@ count_lesions <- function(img,
       }
       shape$id <- 1:nrow(shape)
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
-
       show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
       marker <- ifelse(is.null(marker), "point", marker)
       marker_col <- ifelse(is.null(marker_col), "white", marker_col)
@@ -553,8 +526,12 @@ count_lesions <- function(img,
                                  NA)) %>%
         transform(statistics = c("n", "min", "mean", "max", "sd", "sum", "prop"))
       stats <- stats[c(3, 1, 2)]
+      shape <- shape[,c(1:6, 8:9, 7)]
+      colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
+                           "radius_min", "radius_max", "radius_sd")
       results <- list(results = shape,
                       statistics = stats)
+      class(results) <- "plm_count"
       if(verbose == TRUE){
         print(results$statistics, row.names = FALSE)
       }

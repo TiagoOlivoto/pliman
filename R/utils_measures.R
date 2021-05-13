@@ -1,6 +1,6 @@
 #' Utilities for object measures
 #'
-#'* `get_measures()` Computes object measures (area, perimeter, radius) by using
+#'* `get_measures()` computes object measures (area, perimeter, radius) by using
 #'either a known resolution (dpi) or an object with known measurements.
 #' * `plot_measures()` draws the object measures given in an object to the
 #' current plot. The object identification (`"id"`) is drawn by default.
@@ -9,32 +9,33 @@
 #' @param object An object computed with [count_objects()] or [leaf_area()].
 #' @param dpi A known resolution of the image in DPI (dots per inch).
 #' @param id An object in the image to indicate a known value.
-#' @param measure The measure of the known object. One of the following:
-#' * `"area"` The known area of the object.
-#' * `"perimeter"` The known perimeter of the object.
-#' * `"radius_mean"` The known radius of the object.
-#' * `"radius_min"` The known minimum radius of the object. If the object is a
+#' @param measure  A two-sided formula, e.g., `measure = area ~ 100` indicating
+#'   the known value of object `id`. The right-hand side is the known value and
+#'   the left-hand side can be one of the following.
+#' * `area` The known area of the object.
+#' * `perimeter` The known perimeter of the object.
+#' * `radius_mean` The known radius of the object.
+#' * `radius_min` The known minimum radius of the object. If the object is a
 #' square, then the `radius_min` of such object will be `L/2` where `L` is the
 #' length of the square side.
-#' * `"radius_max"` The known maximum radius of the object. If the object is a
+#' * `radius_max` The known maximum radius of the object. If the object is a
 #' square, then the `radius_max` of such object according to the Pythagorean
 #' theorem will be `L x sqrt(2) / 2` where `L` is the length of the square side.
-#' @param true_value The know value of the object `id.`
 #' @param digits The number of significant figures. Defaults to `2.`
 #' @param size The size of the text. Defaults to `0.9`.
 #' @param col The color of the text. Defaults to `"white"`.
 #' @param verbose If `FALSE`, runs the code silently.
 #' @param ... Further arguments passed on to [graphics::text()].
 #' @return
-#' * `get_measures()` returns a data frame with the object `id` and the measures. If any of the
-#'   `"area"`, `"perimeter"`, `"radius_mean"`, `"radius_min"` or `"radius_max"`
-#'   is informed, the informed measure will be returned in the unit given in
-#'   `true_value` and the other measures in pixels. If `dpi` is informed, then
-#'   all the measures will be adjusted to the known `dpi` and the values
-#'   returned in cm2 (area) and cm (the other measures).
+#' * `get_measures()` returns a data frame with the object `id` and the
+#' measures. If `measure` is informed, the pixel values will be corrected by the
+#' value of the known object, given in the unit of the right-hand side of
+#' `measure`. If `dpi` is informed, then all the measures will be adjusted to
+#' the known `dpi`.
 #' * `plot_measures()` returns a `NULL` object, drawing the text according to
 #' the x and y coordinates of the objects in `object`.
 #' @export
+#' @importFrom stats as.formula
 #' @examples
 #' \donttest{
 #' library(pliman)
@@ -62,17 +63,15 @@
 #' measures[1, "radius_max"] * 2
 #'
 #'
-#' # Get object measures by declaring the known area.
+#' # Get object measures by declaring the known area of object 1
 #' get_measures(results,
 #'              id = 1,
-#'              measure = "area",
-#'              true_value = 100)
+#'              area ~ 100)
 #'}
 get_measures <- function(object,
-                         dpi = NULL,
                          id = NULL,
                          measure = NULL,
-                         true_value = NULL,
+                         dpi = NULL,
                          verbose = TRUE){
   if(is.data.frame(object)){
     if(any(c("area", "perimeter", "radius_mean") %in% colnames(object) == FALSE)){
@@ -81,7 +80,7 @@ get_measures <- function(object,
     res <- object
   }
   if(any(class(object) == "plm_count")){
-  res <- object$results
+    res <- object$results
   }
   if(any(class(object) == "plm_la")){
     obj <- as.numeric(class(object)[[3]])
@@ -94,7 +93,7 @@ get_measures <- function(object,
     }
   }
   if(any(class(object) == "objects_rgb")){
-  res <- object[["objects"]]
+    res <- object[["objects"]]
   }
   if(!is.null(id) & !is.null(dpi)){
     stop("Only one of 'dpi' or 'id' can be used.", call. = FALSE)
@@ -102,22 +101,41 @@ get_measures <- function(object,
   if(!is.null(id) & is.null(measure) ){
     stop("'measure' must be informed.", call. = FALSE)
   }
-  if(!is.null(id) &  is.null(true_value)){
-    stop("'true_value' must be informed.", call. = FALSE)
-  }
   if(!is.null(id)){
-    measures <- c("area", "perimeter", "radius_mean", "radius_min",  "radius_max")
-    if(!measure %in% measures){
-      stop("'measure' must be one of ", paste(measures, collapse = ", "), call. = FALSE)
+    if(class(measure) != "formula"){
+      stop("'measure' must be a two-sided formula, e.g., 'area ~ 25'.")
     }
-    id_val <- res[which(res$id == id), measure]
-    values <- res[, measure]
-    corrected <- values * true_value / id_val
-    res[which(colnames(res) == measure)] <- corrected
+    terms <- as.formula(measure)
+    var <- as.character(terms[[2]])
+    value <- as.numeric(terms[[3]])
+    measures <- c("area", "perimeter", "radius_mean", "radius_min",  "radius_max")
+    if(!var %in% measures){
+      stop("The left-hand side of 'measure' must be one of ", paste(measures, collapse = ", "), call. = FALSE)
+    }
+    if(var == "area"){
+      id_val <- res[which(res$id == id), var]
+      px_side <- sqrt(value / id_val)
+      values <- res[, var]
+      corrected <- values * value / id_val
+      res$area <- corrected
+      res$perimeter <- res$perimeter * px_side
+      res$radius_mean <- res$radius_mean * px_side
+      res$radius_min <- res$radius_min * px_side
+      res$radius_max <- res$radius_max * px_side
+    }
+    if(var != "area"){
+      id_val <- res[which(res$id == id), var]
+      px_side <- value / id_val
+      res$area <- res$area * px_side^2
+      res$perimeter <- res$perimeter * px_side
+      res$radius_mean <- res$radius_mean * px_side
+      res$radius_min <- res$radius_min * px_side
+      res$radius_max <- res$radius_max * px_side
+    }
     if(verbose == TRUE){
-    cat("-----------------------------------------\n")
-    cat(paste0("measures corrected with:\nobject id: ", id, "\n", measure, ": ",  true_value, "\n"))
-    cat("-----------------------------------------\n")
+      cat("-----------------------------------------\n")
+      cat(paste0("measures corrected with:\nobject id: ", id, "\n", var, ": ",  value, "\n"))
+      cat("-----------------------------------------\n")
     }
   }
   if(!is.null(dpi)){

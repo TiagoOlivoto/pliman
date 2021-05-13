@@ -3,7 +3,7 @@
 \name{image_index}
 \alias{image_index}
 \alias{plot.image_index}
-\title{Image indices}
+\title{Image indexes}
 \usage{
 image_index(
   image,
@@ -74,7 +74,7 @@ A \code{ggplot} object containing the distribution of the pixels for each
 index.
 }
 \description{
-Builds image indices using Red, Green, Blue, Red-Edge, and NIR bands.
+Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
 
 Produces an histogram of an \code{image_index} object
 }

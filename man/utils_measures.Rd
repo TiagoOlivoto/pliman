@@ -6,14 +6,7 @@
 \alias{plot_measures}
 \title{Utilities for object measures}
 \usage{
-get_measures(
-  object,
-  dpi = NULL,
-  id = NULL,
-  measure = NULL,
-  true_value = NULL,
-  verbose = TRUE
-)
+get_measures(object, id = NULL, measure = NULL, dpi = NULL, verbose = TRUE)
 
 plot_measures(
   object,
@@ -27,24 +20,24 @@ plot_measures(
 \arguments{
 \item{object}{An object computed with \code{\link[=count_objects]{count_objects()}} or \code{\link[=leaf_area]{leaf_area()}}.}
 
-\item{dpi}{A known resolution of the image in DPI (dots per inch).}
-
 \item{id}{An object in the image to indicate a known value.}
 
-\item{measure}{The measure of the known object. One of the following:
+\item{measure}{A two-sided formula, e.g., \code{measure = area ~ 100} indicating
+the known value of object \code{id}. The right-hand side is the known value and
+the left-hand side can be one of the following.
 \itemize{
-\item \code{"area"} The known area of the object.
-\item \code{"perimeter"} The known perimeter of the object.
-\item \code{"radius_mean"} The known radius of the object.
-\item \code{"radius_min"} The known minimum radius of the object. If the object is a
+\item \code{area} The known area of the object.
+\item \code{perimeter} The known perimeter of the object.
+\item \code{radius_mean} The known radius of the object.
+\item \code{radius_min} The known minimum radius of the object. If the object is a
 square, then the \code{radius_min} of such object will be \code{L/2} where \code{L} is the
 length of the square side.
-\item \code{"radius_max"} The known maximum radius of the object. If the object is a
+\item \code{radius_max} The known maximum radius of the object. If the object is a
 square, then the \code{radius_max} of such object according to the Pythagorean
 theorem will be \verb{L x sqrt(2) / 2} where \code{L} is the length of the square side.
 }}
 
-\item{true_value}{The know value of the object \code{id.}}
+\item{dpi}{A known resolution of the image in DPI (dots per inch).}
 
 \item{verbose}{If \code{FALSE}, runs the code silently.}
 
@@ -58,19 +51,18 @@ theorem will be \verb{L x sqrt(2) / 2} where \code{L} is the length of the squar
 }
 \value{
 \itemize{
-\item \code{get_measures()} returns a data frame with the object \code{id} and the measures. If any of the
-\code{"area"}, \code{"perimeter"}, \code{"radius_mean"}, \code{"radius_min"} or \code{"radius_max"}
-is informed, the informed measure will be returned in the unit given in
-\code{true_value} and the other measures in pixels. If \code{dpi} is informed, then
-all the measures will be adjusted to the known \code{dpi} and the values
-returned in cm2 (area) and cm (the other measures).
+\item \code{get_measures()} returns a data frame with the object \code{id} and the
+measures. If \code{measure} is informed, the pixel values will be corrected by the
+value of the known object, given in the unit of the right-hand side of
+\code{measure}. If \code{dpi} is informed, then all the measures will be adjusted to
+the known \code{dpi}.
 \item \code{plot_measures()} returns a \code{NULL} object, drawing the text according to
 the x and y coordinates of the objects in \code{object}.
 }
 }
 \description{
 \itemize{
-\item \code{get_measures()} Computes object measures (area, perimeter, radius) by using
+\item \code{get_measures()} computes object measures (area, perimeter, radius) by using
 either a known resolution (dpi) or an object with known measurements.
 \item \code{plot_measures()} draws the object measures given in an object to the
 current plot. The object identification (\code{"id"}) is drawn by default.
@@ -103,10 +95,9 @@ plot_measures(results, measure = "id")
 measures[1, "radius_max"] * 2
 
 
-# Get object measures by declaring the known area.
+# Get object measures by declaring the known area of object 1
 get_measures(results,
              id = 1,
-             measure = "area",
-             true_value = 100)
+             area ~ 100)
 }
 }

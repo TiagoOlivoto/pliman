@@ -149,7 +149,14 @@ saved in such a directory.}
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
-A data frame with the results for each image.
+A list with the following objects:
+\itemize{
+\item \code{results} A data frame with the results (area, perimeter, radius) for
+object.
+\item \code{statistics} A data frame with the summary statistics for the image.
+\item \code{count} (If \code{img_pattern} is used), summarizing the count number for each
+image.
+}
 }
 \description{
 Counts the number of lesions in a sample or entire leaf based on provided
@@ -168,6 +175,7 @@ img <- image_import(image_pliman("sev_leaf_nb.jpg"))
 healthy <- image_import(image_pliman("sev_healthy.jpg"))
 lesions <- image_import(image_pliman("sev_sympt.jpg"))
 image_combine(img, healthy, lesions, ncol = 3)
+a <-
 count_lesions(img = img,
               img_healthy = healthy,
               img_lesion = lesions,

@@ -29,9 +29,23 @@
 #' @param remove_original Remove original files after manipulation? defaults to
 #'   `FALSE`. If `TRUE` the files in `pattern` will be removed.
 #' @param verbose If `FALSE`, the code is run silently.
+#' @return
+#' * `file_extension()`,  `file_name()`, and `file_dir()` return a character
+#' string.
+#' * `manipulate_files()` No return value. If `verbose == TRUE`, a message is
+#' printed indicating which operation succeeded (or not) for each of the files
+#' attempted.
 #' @export
 #' @examples
 #' \donttest{
+#' library(pliman)
+#' # get file name, directory and extension
+#' file <- "E:/my_folder/my_subfolder/image1.png"
+#' file_dir(file)
+#' file_name(file)
+#' file_extension(file)
+#'
+#' # manipulate files
 #' dir <- tempdir()
 #' list.files(dir)
 #' file.create(paste0(dir, "/test.txt"))

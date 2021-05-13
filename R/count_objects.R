@@ -95,7 +95,12 @@
 #'   processing, when `save_image = TRUE`, the processed image will be also
 #'   saved in such a directory.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A data frame with the results for each image.
+#' @return A list with the following objects:
+#'  * `results` A data frame with the results (area, perimeter, radius) for
+#'  object.
+#'  * `statistics` A data frame with the summary statistics for the image.
+#'  * `count` (If `img_pattern` is used), summarizing the count number for each
+#'  image.
 #' @export
 #' @import EBImage
 #' @md
@@ -245,7 +250,6 @@ count_objects <- function(img,
                            ext = ext)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
-        feat <- computeFeatures.moment(nmask)
       }
       backg <- !is.null(col_background)
       col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
@@ -309,7 +313,7 @@ count_objects <- function(img,
       shape$id <- 1:nrow(shape)
       shape <- shape[, c(9, 7, 8, 1, 2:6)]
       show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
-      marker <- ifelse(is.null(marker), "point", marker)
+      marker <- ifelse(is.null(marker), "text", marker)
       marker_col <- ifelse(is.null(marker_col), "white", marker_col)
       marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       if(show_image == TRUE){
@@ -346,16 +350,16 @@ count_objects <- function(img,
         if(marker == "text"){
           marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
           image_show(im2)
-          text(feat[,1],
-               feat[,2],
-               seq(1:nrow(feat)),
+          text(shape[,2],
+               shape[,3],
+               shape[,1],
                col = marker_col,
                cex = marker_size)
         } else{
           marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
           image_show(im2)
-          points(feat[,1],
-                 feat[,2],
+          text(shape[,2],
+               shape[,3],
                  col = marker_col,
                  pch = 16,
                  cex = marker_size)

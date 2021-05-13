@@ -148,7 +148,14 @@ saved in such a directory.}
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
-A data frame with the results for each image.
+A list with the following objects:
+\itemize{
+\item \code{results} A data frame with the results (area, perimeter, radius) for
+object.
+\item \code{statistics} A data frame with the summary statistics for the image.
+\item \code{count} (If \code{img_pattern} is used), summarizing the count number for each
+image.
+}
 }
 \description{
 Counts the number of objects in an image. See more at details.

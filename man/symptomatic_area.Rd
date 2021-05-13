@@ -84,7 +84,8 @@ saved in such a directory.}
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
-A data frame with the results for each image.
+A data frame with the results (healthy and symptomatic area) for each
+image.
 }
 \description{
 Calculates the percentage of symptomatic leaf area in sample or entire

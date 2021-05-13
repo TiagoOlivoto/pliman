@@ -90,8 +90,7 @@ The function `get_measures()` is used to adjust the leaf area using the object 6
 area <- 
 get_measures(count,
              id = 6,
-             measure = "area",
-             true_value = 4)
+             area ~ 4)
 area
 image_show(leaves)
 plot_measures(area, measure = "area")

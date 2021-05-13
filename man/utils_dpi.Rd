@@ -24,7 +24,8 @@ cm_to_pixels(cm, dpi)
 \item{px}{The number of pixels.}
 }
 \value{
-A numerical value.
+A numeric value or a vector of numeric values if the input data is a
+vector
 }
 \description{
 Provides useful conversions between size (cm), number of pixels (px) and

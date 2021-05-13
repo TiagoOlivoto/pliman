@@ -70,8 +70,7 @@ Since we have known the area of the larger square (object 1), let us adjust the 
 ```{r}
 get_measures(img_res,
              id = 1,
-             measure = "area",
-             true_value = 100)
+             area ~ 100)
 ```
 
 The same can be used to adjust the measures based on the perimeter or radius. Let us adjust the perimeter of objects by the perimeter of object 2 (20 cm).
@@ -79,8 +78,7 @@ The same can be used to adjust the measures based on the perimeter or radius. Le
 ```{r}
 get_measures(img_res,
              id = 2,
-             measure = "perimeter",
-             true_value = 20)
+             perimeter ~ 20)
 ```
 
 ## Declaring the image resolution

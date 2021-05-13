@@ -60,6 +60,15 @@ Set \code{overwrite = TRUE} to overwrite the files.}
 
 \item{verbose}{If \code{FALSE}, the code is run silently.}
 }
+\value{
+\itemize{
+\item \code{file_extension()},  \code{file_name()}, and \code{file_dir()} return a character
+string.
+\item \code{manipulate_files()} No return value. If \code{verbose == TRUE}, a message is
+printed indicating which operation succeeded (or not) for each of the files
+attempted.
+}
+}
 \description{
 \itemize{
 \item \code{file_extension()} Get the extension of a file.
@@ -72,6 +81,14 @@ directory.
 }
 \examples{
 \donttest{
+library(pliman)
+# get file name, directory and extension
+file <- "E:/my_folder/my_subfolder/image1.png"
+file_dir(file)
+file_name(file)
+file_extension(file)
+
+# manipulate files
 dir <- tempdir()
 list.files(dir)
 file.create(paste0(dir, "/test.txt"))

@@ -44,7 +44,8 @@
 #'   processing, when `save_image = TRUE`, the processed image will be also
 #'   saved in such a directory.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A data frame with the results for each image.
+#' @return A data frame with the results (healthy and symptomatic area) for each
+#'   image.
 #' @export
 #' @md
 #' @importFrom stats binomial glm predict kmeans sd aggregate
