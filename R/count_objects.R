@@ -207,13 +207,11 @@ count_objects <- function(img,
         foreground <- image_to_mat(foreground)
         background <- image_to_mat(background)
         back_fore <-
-          rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
-                background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]) %>%
-          transform(Y = ifelse(CODE == "background", 0, 1))
-        modelo1 <-
-          glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore) %>%
-          suppressWarnings()
-        pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+          transform(rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
+                          background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]),
+                    Y = ifelse(CODE == "background", 0, 1))
+        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
+        pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
         foreground_background <- matrix(pred1, ncol = ncol(original$R))
         foreground_background <- image_correct(foreground_background, perc = 0.02)
         ID <- c(foreground_background == 1)
@@ -242,7 +240,7 @@ count_objects <- function(img,
         parms2 <- parms[parms$object_size == object_size,]
         rowid <-
           which(sapply(as.character(parms2$resolution), function(x) {
-          eval(parse(text=x))}))
+            eval(parse(text=x))}))
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
         nmask <- watershed(distmap(img2),
@@ -360,27 +358,27 @@ count_objects <- function(img,
           image_show(im2)
           text(shape[,2],
                shape[,3],
-                 col = marker_col,
-                 pch = 16,
-                 cex = marker_size)
+               col = marker_col,
+               pch = 16,
+               cex = marker_size)
 
         }
         dev.off()
       }
       stats <-
-        data.frame(area = c(n = length(shape$s.area),
-                            min(shape$s.area),
-                            mean(shape$s.area),
-                            max(shape$s.area),
-                            sd(shape$s.area),
-                            sum(shape$s.area)),
-                   perimeter = c(NA,
-                                 min(shape$s.perimeter),
-                                 mean(shape$s.perimeter),
-                                 max(shape$s.perimeter),
-                                 sd(shape$s.perimeter),
-                                 sum(shape$s.perimeter))) %>%
-        transform(statistics = c("n", "min", "mean", "max", "sd", "sum"))
+        transform(data.frame(area = c(n = length(shape$s.area),
+                                      min(shape$s.area),
+                                      mean(shape$s.area),
+                                      max(shape$s.area),
+                                      sd(shape$s.area),
+                                      sum(shape$s.area)),
+                             perimeter = c(NA,
+                                           min(shape$s.perimeter),
+                                           mean(shape$s.perimeter),
+                                           max(shape$s.perimeter),
+                                           sd(shape$s.perimeter),
+                                           sum(shape$s.perimeter))),
+                  statistics = c("n", "min", "mean", "max", "sd", "sum"))
       stats <- stats[c(3, 1, 2)]
       shape <- shape[,c(1:6, 8:9, 7)]
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
@@ -424,8 +422,7 @@ count_objects <- function(img,
                     varlist = c("names_plant", "help_count", "file_name",
                                 "check_names_dir", "file_extension", "image_import",
                                 "image_binary", "watershed", "distmap", "computeFeatures.moment",
-                                "computeFeatures.shape", "colorLabels", "image_show",
-                                "%>%"),
+                                "computeFeatures.shape", "colorLabels", "image_show"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -461,20 +458,18 @@ count_objects <- function(img,
     stats <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["statistics"]] %>%
-                  transform(id =  names(results[i])) %>%
-                  .[,c(4, 1, 2, 3)]
+                transform(results[[i]][["statistics"]],
+                          id =  names(results[i]))[,c(4, 1, 2, 3)]
               })
       )
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["results"]] %>%
-                  transform(img =  names(results[i])) %>%
-                  .[, c(10, 1:9)]
+                transform(results[[i]][["results"]],
+                          img =  names(results[i]))[, c(10, 1:9)]
               })
       )
-      summ <- stats[stats$statistics == "n",c(1,3)]
+    summ <- stats[stats$statistics == "n",c(1,3)]
     if(verbose == TRUE){
       names(summ) <- c("Image", "Objects")
       cat("--------------------------------------------\n")

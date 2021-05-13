@@ -190,15 +190,17 @@ image_dimension <- function(image,
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
       res <-
+        as.data.frame(
         do.call(rbind,
-                parLapply(clust, image,  image_dimension, verbose =  FALSE)) %>%
-        as.data.frame()
+                parLapply(clust, image,  image_dimension, verbose =  FALSE))
+        )
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
     } else{
     res <-
+      as.data.frame(
       do.call(rbind,
-              lapply(image, image_dimension, verbose =  FALSE)) %>%
-      as.data.frame()
+              lapply(image, image_dimension, verbose =  FALSE))
+      )
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
     }
     if(verbose == TRUE){
@@ -742,11 +744,13 @@ image_index <- function(image,
 #'ind <- image_index(img2)
 #'plot(ind)
 plot.image_index <- function(x, facet = TRUE, ...){
-  mat <- do.call(cbind,
-                 lapply(x, function(i){
-                   as.vector(i)}
-                 )) %>%
-    as.data.frame()
+  mat <-
+    as.data.frame(
+      do.call(cbind,
+              lapply(x, function(i){
+                as.vector(i)}
+              ))
+    )
   colnames(mat) <- names(x)
   mat$id <- rownames(mat)
   if(length(x) == 1){

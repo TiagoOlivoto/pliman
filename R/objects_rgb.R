@@ -190,13 +190,11 @@ objects_rgb <- function(img,
         foreground <- image_to_mat(foreground)
         background <- image_to_mat(background)
         back_fore <-
-          rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
-                background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]) %>%
-          transform(Y = ifelse(CODE == "background", 0, 1))
-        modelo1 <-
-          glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore) %>%
-          suppressWarnings()
-        pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+          transform(rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
+                          background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]),
+                    Y = ifelse(CODE == "background", 0, 1))
+        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
+        pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
         foreground_background <- matrix(pred1, ncol = ncol(original$R))
         foreground_background <- image_correct(foreground_background, perc = 0.02)
         ID <- c(foreground_background == 1)
@@ -369,7 +367,7 @@ objects_rgb <- function(img,
                                 "check_names_dir", "file_extension", "image_import",
                                 "image_binary", "watershed", "distmap", "computeFeatures.moment",
                                 "computeFeatures.shape", "colorLabels", "image_show",
-                                "%>%", "image_resize", "detectCores", "makeCluster", "clusterExport",
+                                "image_resize", "detectCores", "makeCluster", "clusterExport",
                                 "stopCluster", "parLapply"),
                     envir=environment())
       on.exit(stopCluster(clust))
@@ -401,17 +399,15 @@ objects_rgb <- function(img,
     objects <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["objects"]] %>%
-                  transform(img =  names(results[i])) %>%
-                  .[,c(10, 1:9)]
+                  transform(results[[i]][["objects"]],
+                            img =  names(results[i]))[,c(10, 1:9)]
               })
       )
     indexes <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["indexes"]] %>%
-                  transform(img =  names(results[i])) %>%
-                  .[, c(3, 1:2)]
+                  transform(results[[i]][["indexes"]],
+                            img =  names(results[i]))[, c(3, 1:2)]
               })
       )
     invisible(list(objects = objects,

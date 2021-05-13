@@ -18,8 +18,7 @@ Depends:
     R (>= 4.0.0)
 Imports: 
     EBImage,
-    ggplot2,
-    magrittr
+    ggplot2
 Suggests: 
     knitr,
     rmarkdown

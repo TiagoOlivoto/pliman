@@ -126,11 +126,11 @@ manipulate_files <- function(pattern,
    name <- names
   } else{
     if(length(name) == 1){
-    name <- lapply(seq_along(names),
-                   function(i){
-                     paste0(name, i, collapse = "_")
-                   }) %>%
-      unlist()
+    name <-
+      unlist(lapply(seq_along(names),
+                    function(i){
+                      paste0(name, i, collapse = "_")
+                    }))
     } else{
       name <- name
       if(length(name) != length(names)){

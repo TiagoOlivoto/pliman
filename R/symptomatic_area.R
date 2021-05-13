@@ -140,20 +140,17 @@ symptomatic_area <- function(img,
       ################## no background #############
       if(is.null(img_background)){
         sadio_sintoma <-
-          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
-          transform(Y = ifelse(CODE == "img_healthy", 1, 0))
+          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+                    Y = ifelse(CODE == "img_healthy", 1, 0))
         usef_area <- nrow(original$df_in)
-        model <-
-          glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma) %>%
-          suppressWarnings()
+        model <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma))
         # isolate plant
-        pred1 <- predict(model, newdata = original$df_in, type="response") %>% round(0)
+        pred1 <- round(predict(model, newdata = original$df_in, type="response"), 0)
         plant_symp <- matrix(pred1, ncol = ncol(original$R))
         plant_symp <- image_correct(plant_symp, perc = 0.01)
         ID <- c(plant_symp == 0)
         pix_sympt <- length(which(ID == TRUE))
-        # pred2 <- predict(model, newdata = original$df_in[ID,], type="response") %>% round(0)
         if(show_original == TRUE){
           if(is.null(col_background)){
             col_background <- col2rgb("green")
@@ -197,28 +194,24 @@ symptomatic_area <- function(img,
         fundo <- image_to_mat(img_background)
         # separate image from background
         fundo_resto <-
-          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
-                fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]) %>%
-          transform(Y = ifelse(CODE == "img_background", 0, 1))
-        modelo1 <-
-          glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto) %>%
-          suppressWarnings()
-        pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
+                          fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]),
+                    Y = ifelse(CODE == "img_background", 0, 1))
+        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto))
+        pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
         plant_background <- matrix(pred1, ncol = ncol(original$R))
         plant_background <- image_correct(plant_background, perc = 0.009)
         plant_background[plant_background == 1] <- 2
         sadio_sintoma <-
-          rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
-          transform(Y = ifelse(CODE == "img_healthy", 1, 0))
-        modelo2 <-
-          glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma) %>%
-          suppressWarnings()
+          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+                    Y = ifelse(CODE == "img_healthy", 1, 0))
+        modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma))
         # isolate plant
         ID <- c(plant_background == 2)
         usef_area <- nrow(original$df_in[ID,])
-        pred3 <- predict(modelo2, newdata = original$df_in[ID,], type="response") %>% round(0)
+        pred3 <- round(predict(modelo2, newdata = original$df_in[ID,], type="response"), 0)
         pix_sympt <- length(which(pred3 == 0))
         if(show_original == TRUE){
           im2 <- img
@@ -298,7 +291,7 @@ symptomatic_area <- function(img,
                                 "check_names_dir", "file_extension", "image_import",
                                 "image_binary", "watershed", "distmap", "computeFeatures.moment",
                                 "computeFeatures.shape", "colorLabels", "image_show",
-                                "%>%", "image_to_mat", "image_correct", "image_export"),
+                                "image_to_mat", "image_correct", "image_export"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -327,10 +320,8 @@ symptomatic_area <- function(img,
                    save_image, dir_original, dir_processed)
     }
     }
-    results <-
-      do.call(rbind, results) %>%
-      transform(sample = names_plant)
-    results <- results[c(3, 1, 2)]
+    results <- transform(do.call(rbind, results),
+                         sample = names_plant)[c(3, 1, 2)]
     return(results)
   }
 }

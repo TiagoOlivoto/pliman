@@ -163,32 +163,28 @@ leaf_area <- function(img,
       background <- image_to_mat(img_background)
       # separate image from background
       background_resto <-
-        rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
-              template$df_in[sample(1:nrow(template$df_in)),][1:nrows,],
-              background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]) %>%
-        transform(Y = ifelse(CODE == "img_background", 1, 0))
+        transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
+                        template$df_in[sample(1:nrow(template$df_in)),][1:nrows,],
+                        background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]),
+                  Y = ifelse(CODE == "img_background", 1, 0))
       background_resto$CODE <- NULL
-      modelo1 <-
-        glm(Y ~ R + G + B, family = binomial("logit"), data = background_resto) %>%
-        suppressWarnings()
-      pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+      modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = background_resto))
+      pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
       plant_background <- matrix(pred1, ncol = ncol(original$R))
       plant_background <- image_correct(plant_background, perc = 0.009)
       plant_background[plant_background == 1] <- 2
       # image_show(plant_background!=2)
       # separate leaf from template
       leaf_template <-
-        rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
-              template$df_in[sample(1:nrow(template$df_in)),][1:nrows,]) %>%
-        transform(Y = ifelse(CODE == "img_leaf", 0, 1))
+        transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
+                        template$df_in[sample(1:nrow(template$df_in)),][1:nrows,]),
+                  Y = ifelse(CODE == "img_leaf", 0, 1))
       background_resto$CODE <- NULL
-      modelo2 <-
-        glm(Y ~ R + G + B, family = binomial("logit"), data = leaf_template) %>%
-        suppressWarnings()
+      modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = leaf_template))
       # isolate plant
       ID <- c(plant_background == 0)
-      pred2 <- predict(modelo2, newdata = original$df_in[ID,], type="response") %>% round(0)
-      pred3 <- predict(modelo2, newdata = original$df_in, type="response") %>% round(0)
+      pred2 <- round(predict(modelo2, newdata = original$df_in[ID,], type="response"), 0)
+      pred3 <- round(predict(modelo2, newdata = original$df_in, type="response"), 0)
       leaf_template <- matrix(pred3, ncol = ncol(original$R))
       leaf_template <- image_correct(leaf_template, perc = 0.009)
       plant_background[leaf_template == 1] <- 3
@@ -218,8 +214,8 @@ leaf_area <- function(img,
       shape <- rbind(shape_leaf, shape_template)
       shape$id <- 1:nrow(shape)
       shape <-
-        shape[, c(10, 7, 8, 1, 9, 2:6)] %>%
-        transform(label = paste(id, "|", round(area, text_digits), sep = ""))
+        transform(shape[, c(10, 7, 8, 1, 9, 2:6)],
+                  label = paste(id, "|", round(area, text_digits), sep = ""))
       if(show_original == TRUE){
         im2 <- img
         if(!is.null(col_background)){
@@ -304,7 +300,7 @@ leaf_area <- function(img,
                                 "check_names_dir", "file_extension", "image_import",
                                 "image_binary", "watershed", "distmap", "computeFeatures.moment",
                                 "computeFeatures.shape", "colorLabels", "image_show",
-                                "%>%", "image_to_mat", "image_correct", "bwlabel"),
+                                "image_to_mat", "image_correct", "bwlabel"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){

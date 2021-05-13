@@ -202,16 +202,14 @@ count_lesions <- function(img,
         ################## no background #############
         if(is.null(img_background)){
           sadio_sintoma <-
-            rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                  sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
-            transform(Y = ifelse(CODE == "img_healthy", 1, 0))
+            transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                            sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+                      Y = ifelse(CODE == "img_healthy", 1, 0))
           sadio_sintoma$CODE <- NULL
           usef_area <- nrow(original$df_in)
-          model <-
-            glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma) %>%
-            suppressWarnings()
+          model <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma))
           # isolate plant
-          pred1 <- predict(model, newdata = original$df_in, type="response") %>% round(0)
+          pred1 <- round(predict(model, newdata = original$df_in, type="response"), 0)
           plant_symp <- matrix(pred1, ncol = ncol(original$R))
           plant_symp <- 1 - image_correct(plant_symp, perc = 0.01)
           ID <- c(plant_symp == 0)
@@ -282,30 +280,28 @@ count_lesions <- function(img,
           fundo <- image_to_mat(img_background)
           # separate image from background
           fundo_resto <-
-            rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                  sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
-                  fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]) %>%
-            transform(Y = ifelse(CODE == "img_background", 0, 1))
-          modelo1 <-
-            glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto) %>%
-            suppressWarnings()
-          pred1 <- predict(modelo1, newdata = original$df_in, type="response") %>% round(0)
+            transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                            sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
+                            fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]),
+                      Y = ifelse(CODE == "img_background", 0, 1))
+          modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+                                          data = fundo_resto))
+          pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
           plant_background <- matrix(pred1, ncol = ncol(original$R))
           plant_background <- image_correct(plant_background, perc = 0.009)
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
-            rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                  sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]) %>%
-            transform(Y = ifelse(CODE == "img_healthy", 1, 0))
+            transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
+                            sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+                      Y = ifelse(CODE == "img_healthy", 1, 0))
           sadio_sintoma$CODE <- NULL
-          modelo2 <-
-            glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma) %>%
-            suppressWarnings()
+          modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+                                          data = sadio_sintoma))
           # isolate plant
           ID <- c(plant_background == 2)
           usef_area <- nrow(original$df_in[ID,])
-          pred2 <- predict(modelo2, newdata = original$df_in[ID,], type="response") %>% round(0)
-          pred3 <- predict(modelo2, newdata = original$df_in, type="response") %>% round(0)
+          pred2 <- round(predict(modelo2, newdata = original$df_in[ID,], type="response"), 0)
+          pred3 <- round(predict(modelo2, newdata = original$df_in, type="response"), 0)
           pred3[!ID] <- 1
           leaf_sympts <- matrix(pred3, ncol = ncol(original$R))
           leaf_sympts <- 1 - image_correct(leaf_sympts, perc = 0.009)
@@ -510,21 +506,21 @@ count_lesions <- function(img,
         dev.off()
       }
       stats <-
-        data.frame(area = c(n = length(shape$s.area),
-                            min(shape$s.area),
-                            mean(shape$s.area),
-                            max(shape$s.area),
-                            sd(shape$s.area),
-                            sum(shape$s.area),
-                            sum(shape$s.area) /usef_area * 100),
-                   perimeter = c(NA,
-                                 min(shape$s.perimeter),
-                                 mean(shape$s.perimeter),
-                                 max(shape$s.perimeter),
-                                 sd(shape$s.perimeter),
-                                 sum(shape$s.perimeter),
-                                 NA)) %>%
-        transform(statistics = c("n", "min", "mean", "max", "sd", "sum", "prop"))
+        transform(data.frame(area = c(n = length(shape$s.area),
+                                      min(shape$s.area),
+                                      mean(shape$s.area),
+                                      max(shape$s.area),
+                                      sd(shape$s.area),
+                                      sum(shape$s.area),
+                                      sum(shape$s.area) /usef_area * 100),
+                             perimeter = c(NA,
+                                           min(shape$s.perimeter),
+                                           mean(shape$s.perimeter),
+                                           max(shape$s.perimeter),
+                                           sd(shape$s.perimeter),
+                                           sum(shape$s.perimeter),
+                                           NA)),
+                  statistics = c("n", "min", "mean", "max", "sd", "sum", "prop"))
       stats <- stats[c(3, 1, 2)]
       shape <- shape[,c(1:6, 8:9, 7)]
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
@@ -565,7 +561,7 @@ count_lesions <- function(img,
                                 "check_names_dir", "file_extension", "image_import",
                                 "image_binary", "watershed", "distmap", "computeFeatures.moment",
                                 "computeFeatures.shape", "colorLabels", "image_show",
-                                "%>%", "image_to_mat", "image_correct", "bwlabel"),
+                                "image_to_mat", "image_correct", "bwlabel"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -598,17 +594,15 @@ count_lesions <- function(img,
     stats <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["statistics"]] %>%
-                  transform(id =  names(results[i])) %>%
-                  .[,c(4, 1, 2, 3)]
+                  transform(results[[i]][["statistics"]],
+                            id =  names(results[i]))[,c(4, 1, 2, 3)]
               })
       )
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                results[[i]][["results"]] %>%
-                  transform(img =  names(results[i])) %>%
-                  .[, c(10, 1:9)]
+                  transform(results[[i]][["results"]],
+                            img =  names(results[i]))[, c(10, 1:9)]
               })
       )
     return(list(statistics = stats,

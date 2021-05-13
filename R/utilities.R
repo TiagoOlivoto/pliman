@@ -32,9 +32,7 @@ run_progress <- function(pb,
                          digits = 0,
                          sleep = 0){
   Sys.sleep(sleep)
-  elapsed <-
-    as.numeric(difftime(Sys.time(), pb$time, units = "secs")) %>%
-    sec_to_hms()
+  elapsed <- sec_to_hms(as.numeric(difftime(Sys.time(), pb$time, units = "secs")))
   temp <- switch(
     pb$style,
     list(extra = nchar(text) + nchar(pb$leftd) + nchar(pb$rightd),
@@ -47,11 +45,10 @@ run_progress <- function(pb,
          text = paste(text, paste(pb$leftd, '%s%s', pb$rightd, sep = ""), '% s%%', elapsed))
   )
   step <- round(actual / pb$max * (pb$width - temp$extra))
-  temp$text %>%
-    sprintf(strrep(pb$char, step),
-            strrep(' ', pb$width - step - temp$extra),
-            round(actual / pb$max * 100, digits = digits)) %>%
-    cat("\r")
+    cat(sprintf(temp$text,
+                strrep(pb$char, step),
+                strrep(' ', pb$width - step - temp$extra),
+                round(actual / pb$max * 100, digits = digits)), "\r")
   if(actual == pb$max){
     cat("\n")
   }
