@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -118,7 +118,7 @@
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fas fa-github"></span>
+    <span class="fab fab-github"></span>
      
   </a>
 </li>
@@ -152,8 +152,7 @@
 <a href="#pliman-" class="anchor"></a>pliman <img src="reference/figures/logo_pliman.svg" align="right" height="140/">
 </h1></div>
 <!-- badges: start -->
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version-ago/metan)](https://CRAN.R-project.org/package=metan) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable) ![Downloads](http://cranlogs.r-pkg.org/badges/metan) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/metan) [<img src="https://zenodo.org/badge/130062661.svg" alt="DOI" width="186"/>](https://zenodo.org/badge/latestdoi/130062661) -->
-<!-- badges: end -->
+
 <p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. Image indexes can also be used to segment images. The package will help you to:</p>
 <ul>
 <li>Measure leaf area with <code><a href="reference/leaf_area.html">leaf_area()</a></code>
@@ -193,10 +192,12 @@
 <a href="#disease-severity" class="anchor"></a>Disease severity</h1>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
-<span class="co"># |===========================================|</span>
-<span class="co"># | Tools for Plant Image Analysis (pliman)   |</span>
-<span class="co"># | Author: Tiago Olivoto                     |</span>
-<span class="co"># |===========================================|</span>
+<span class="co"># |========================================================|</span>
+<span class="co"># | Tools for Plant Image Analysis (pliman) v0.1.0         |</span>
+<span class="co"># | Author: Tiago Olivoto                                  |</span>
+<span class="co"># | Type 'vignette('pliman_start')' for a short tutorial   |</span>
+<span class="co"># | Visit 'https://bit.ly/2RP2kyE' for a complete tutorial |</span>
+<span class="co"># |========================================================|</span>
 <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span><span class="op">)</span>
@@ -211,7 +212,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#    healthy symptomatic</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 89.18107    10.81893</span></span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 88.87378    11.12622</span></span></code></pre></div>
 </div>
 <div id="count-objects" class="section level1">
 <h1 class="hasAnchor">
@@ -275,7 +276,15 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=metan"><img src="https://www.r-pkg.org/badges/version-ago/pliman" alt="CRAN status"></a></li>
+<li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://zenodo.org/badge/latestdoi/352844585"><img src="https://zenodo.org/badge/352844585.svg" alt="DOI"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 

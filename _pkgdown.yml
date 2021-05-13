@@ -8,9 +8,6 @@ template:
   params:
     bootswatch: spacelab
     ganalytics: G-VWN5YL53DP
-    # docsearch:
-    #   api_key:
-    #   index_name:
 
 toc:
   depth: 3
@@ -57,7 +54,7 @@ navbar:
   right:
     - text: "RG"
       href: https://www.researchgate.net/profile/Tiago_Olivoto2
-    - icon: "fa-github"
+    - icon: "fab-github"
       href: https://github.com/TiagoOlivoto
     - icon: "fab fa-twitter"
       href: https://twitter.com/tolivoto
@@ -94,7 +91,7 @@ reference:
     contents:
       - image_binary
       - image_index
-      - image_pallete
+      - image_palette
       - image_segment
       - image_to_mat
       - plot.image_index

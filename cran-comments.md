@@ -1,5 +1,5 @@
 ## Release summary
-This is a resubmission of the `pliman` (0.1.0) that includes the suggestions given by Julia Haider in the first submission of the package to CRAN
+This is a resubmission of the `pliman` (0.1.0) that includes the suggestions given by Julia Haider in the first submission of the package to CRAN.
 
 ## Suggestions
 
@@ -26,7 +26,9 @@ Missing Rd-tags:
       utils_file.Rd: \value
       
 * Done! I have included \value to all the .Rd files.
-      
+
+I hope that fixing these two issues makes the package suitable for publication. If any changes still need to be made, please, let me known.
+Thank you for the time in reviewing this new submission
 
 ## Test environments
 * local R installation, R 4.0.5

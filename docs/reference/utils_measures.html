@@ -49,7 +49,7 @@
 <meta property="og:title" content="Utilities for object measures — utils_measures" />
 <meta property="og:description" content="
 
-get_measures() Computes object measures (area, perimeter, radius) by using
+get_measures() computes object measures (area, perimeter, radius) by using
 either a known resolution (dpi) or an object with known measurements.
 plot_measures() draws the object measures given in an object to the
 current plot. The object identification (&quot;id&quot;) is drawn by default.
@@ -97,7 +97,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -171,7 +171,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fas fa-github"></span>
+    <span class="fab fab-github"></span>
      
   </a>
 </li>
@@ -208,7 +208,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
     <div class="ref-description">
     
 <ul>
-<li><p><code>get_measures()</code> Computes object measures (area, perimeter, radius) by using
+<li><p><code>get_measures()</code> computes object measures (area, perimeter, radius) by using
 either a known resolution (dpi) or an object with known measurements.</p></li>
 <li><p><code>plot_measures()</code> draws the object measures given in an object to the
 current plot. The object identification (<code>"id"</code>) is drawn by default.</p></li>
@@ -216,14 +216,7 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
 
     </div>
 
-    <pre class="usage"><span class='fu'>get_measures</span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  dpi <span class='op'>=</span> <span class='cn'>NULL</span>,
-  id <span class='op'>=</span> <span class='cn'>NULL</span>,
-  measure <span class='op'>=</span> <span class='cn'>NULL</span>,
-  true_value <span class='op'>=</span> <span class='cn'>NULL</span>,
-  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
+    <pre class="usage"><span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>object</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, measure <span class='op'>=</span> <span class='cn'>NULL</span>, dpi <span class='op'>=</span> <span class='cn'>NULL</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='fu'>plot_measures</span><span class='op'>(</span>
   <span class='va'>object</span>,
@@ -242,30 +235,28 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
       <td><p>An object computed with <code><a href='count_objects.html'>count_objects()</a></code> or <code><a href='leaf_area.html'>leaf_area()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>dpi</th>
-      <td><p>A known resolution of the image in DPI (dots per inch).</p></td>
-    </tr>
-    <tr>
       <th>id</th>
       <td><p>An object in the image to indicate a known value.</p></td>
     </tr>
     <tr>
       <th>measure</th>
-      <td><p>The measure of the known object. One of the following:</p><ul>
-<li><p><code>"area"</code> The known area of the object.</p></li>
-<li><p><code>"perimeter"</code> The known perimeter of the object.</p></li>
-<li><p><code>"radius_mean"</code> The known radius of the object.</p></li>
-<li><p><code>"radius_min"</code> The known minimum radius of the object. If the object is a
+      <td><p>A two-sided formula, e.g., <code>measure = area ~ 100</code> indicating
+the known value of object <code>id</code>. The right-hand side is the known value and
+the left-hand side can be one of the following.</p><ul>
+<li><p><code>area</code> The known area of the object.</p></li>
+<li><p><code>perimeter</code> The known perimeter of the object.</p></li>
+<li><p><code>radius_mean</code> The known radius of the object.</p></li>
+<li><p><code>radius_min</code> The known minimum radius of the object. If the object is a
 square, then the <code>radius_min</code> of such object will be <code>L/2</code> where <code>L</code> is the
 length of the square side.</p></li>
-<li><p><code>"radius_max"</code> The known maximum radius of the object. If the object is a
+<li><p><code>radius_max</code> The known maximum radius of the object. If the object is a
 square, then the <code>radius_max</code> of such object according to the Pythagorean
 theorem will be <code>L x sqrt(2) / 2</code> where <code>L</code> is the length of the square side.</p></li>
 </ul></td>
     </tr>
     <tr>
-      <th>true_value</th>
-      <td><p>The know value of the object <code>id.</code></p></td>
+      <th>dpi</th>
+      <td><p>A known resolution of the image in DPI (dots per inch).</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -293,12 +284,11 @@ theorem will be <code>L x sqrt(2) / 2</code> where <code>L</code> is the length 
 
     
 <ul>
-<li><p><code>get_measures()</code> returns a data frame with the object <code>id</code> and the measures. If any of the
-<code>"area"</code>, <code>"perimeter"</code>, <code>"radius_mean"</code>, <code>"radius_min"</code> or <code>"radius_max"</code>
-is informed, the informed measure will be returned in the unit given in
-<code>true_value</code> and the other measures in pixels. If <code>dpi</code> is informed, then
-all the measures will be adjusted to the known <code>dpi</code> and the values
-returned in cm2 (area) and cm (the other measures).</p></li>
+<li><p><code>get_measures()</code> returns a data frame with the object <code>id</code> and the
+measures. If <code>measure</code> is informed, the pixel values will be corrected by the
+value of the known object, given in the unit of the right-hand side of
+<code>measure</code>. If <code>dpi</code> is informed, then all the measures will be adjusted to
+the known <code>dpi</code>.</p></li>
 <li><p><code>plot_measures()</code> returns a <code>NULL</code> object, drawing the text according to
 the x and y coordinates of the objects in <code>object</code>.</p></li>
 </ul>
@@ -345,20 +335,19 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class='va'>measures</span><span class='op'>[</span><span class='fl'>1</span>, <span class='st'>"radius_max"</span><span class='op'>]</span> <span class='op'>*</span> <span class='fl'>2</span>
 </div><div class='output co'>#&gt; [1] 14.11697</div><div class='input'>
 
-<span class='co'># Get object measures by declaring the known area.</span>
+<span class='co'># Get object measures by declaring the known area of object 1</span>
 <span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>results</span>,
              id <span class='op'>=</span> <span class='fl'>1</span>,
-             measure <span class='op'>=</span> <span class='st'>"area"</span>,
-             true_value <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+             <span class='va'>area</span> <span class='op'>~</span> <span class='fl'>100</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; -----------------------------------------
 #&gt; measures corrected with:
 #&gt; object id: 1
 #&gt; area: 100
 #&gt; -----------------------------------------</div><div class='output co'>#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max
-#&gt; 1  1  668.9996  797.9996 100.000000      4715    677.0314   589.8749   833.6795
-#&gt; 2  2 1737.5000  453.0000  25.000108      2358    338.3123   294.5000   416.8396
-#&gt; 3  3 1737.5482 1296.3454   7.052355      1030    176.4897   174.8776   177.8908
-#&gt; 4  4 1737.4979  939.4926   7.985853      1409    197.4469   117.4128   262.9966</div><div class='input'><span class='co'># }</span>
+#&gt; 1  1  668.9996  797.9996 100.000000 39.923894    5.732711  4.9947194   7.059116
+#&gt; 2  2 1737.5000  453.0000  25.000108 19.966181    2.864633  2.4936557   3.529557
+#&gt; 3  3 1737.5482 1296.3454   7.052355  8.721444    1.494413  1.4807620   1.506276
+#&gt; 4  4 1737.4979  939.4926   7.985853 11.930597    1.671866  0.9941839   2.226903</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert an image to numerical matrices — image_to_mat • pliman</title>
+<title>Create an image palette — image_palette • pliman</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,8 @@
 
 
 
-<meta property="og:title" content="Convert an image to numerical matrices — image_to_mat" />
-<meta property="og:description" content="Given an object image, converts it into three matrices (RGB) and a data frame
-where each column corresponds to the RGB values." />
+<meta property="og:title" content="Create an image palette — image_palette" />
+<meta property="og:description" content="Creates image palettes by applying the k-means algorithm to the RGB values." />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -194,17 +193,23 @@ where each column corresponds to the RGB values." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert an image to numerical matrices</h1>
+    <h1>Create an image palette</h1>
     
-    <div class="hidden name"><code>image_to_mat.Rd</code></div>
+    <div class="hidden name"><code>image_palette.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Given an object image, converts it into three matrices (RGB) and a data frame
-where each column corresponds to the RGB values.</p>
+    <p>Creates image palettes by applying the k-means algorithm to the RGB values.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>image_to_mat</span><span class='op'>(</span><span class='va'>image</span>, parallel <span class='op'>=</span> <span class='cn'>FALSE</span>, workers <span class='op'>=</span> <span class='cn'>NULL</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>image_palette</span><span class='op'>(</span>
+  <span class='va'>image</span>,
+  <span class='va'>npal</span>,
+  nstart <span class='op'>=</span> <span class='fl'>25</span>,
+  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -212,6 +217,14 @@ where each column corresponds to the RGB values.</p>
     <tr>
       <th>image</th>
       <td><p>An image object.</p></td>
+    </tr>
+    <tr>
+      <th>npal</th>
+      <td><p>The number of color palettes.</p></td>
+    </tr>
+    <tr>
+      <th>nstart</th>
+      <td><p>How many random sets from <code>npal</code> should be chosen?</p></td>
     </tr>
     <tr>
       <th>parallel</th>
@@ -233,20 +246,17 @@ number of parallel processes that can be active at the same time.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list containing three matrices (R, G, and B), and a data frame
-containing four columns: the name of the image in <code>image</code> and the R, G, B
-values.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
+    <p>A list with <code>npal</code> color palettes of class <code>Image</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 490 578   3</div><div class='input'><span class='va'>mat</span> <span class='op'>&lt;-</span> <span class='fu'>image_to_mat</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 490 578</div></pre>
+<span class='va'>pal</span> <span class='op'>&lt;-</span> <span class='fu'>image_palette</span><span class='op'>(</span><span class='va'>img</span>, <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in image_palette(img, 2): não foi possível encontrar a função "image_palette"</span></div><div class='input'><span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>pal</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in image_show(pal[[1]]): objeto 'pal' não encontrado</span></div><div class='input'><span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>pal</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in image_show(pal[[2]]): objeto 'pal' não encontrado</span></div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

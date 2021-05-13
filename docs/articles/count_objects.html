@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -118,7 +118,7 @@
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fas fa-github"></span>
+    <span class="fab fab-github"></span>
      
   </a>
 </li>
@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Count objects in an image</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-11</h4>
+            <h4 class="date">2021-05-13</h4>
       
       
       <div class="hidden name"><code>count_objects.Rmd</code></div>
@@ -165,10 +165,12 @@
 <p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> can be used to count objects in an image. Let us start with a simple example with the image <code>object_300dpi.png</code> available in the <a href="https://github.com/TiagoOlivoto/pliman/tree/master/image_examples">GitHub page</a>. To facilitate the image importation from this folder, a helper function <code><a href="../reference/utils_image.html">image_pliman()</a></code> is used.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
-<span class="co">#&gt; |===========================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman)   |</span>
-<span class="co">#&gt; | Author: Tiago Olivoto                     |</span>
-<span class="co">#&gt; |===========================================|</span>
+<span class="co">#&gt; |========================================================|</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman) v0.1.0         |</span>
+<span class="co">#&gt; | Author: Tiago Olivoto                                  |</span>
+<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial   |</span>
+<span class="co">#&gt; | Visit 'https://bit.ly/2RP2kyE' for a complete tutorial |</span>
+<span class="co">#&gt; |========================================================|</span>
 <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
 <p><img src="count_objects_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
@@ -225,34 +227,32 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span>,
              id <span class="op">=</span> <span class="fl">1</span>,
-             measure <span class="op">=</span> <span class="st">"area"</span>,
-             true_value <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
+             <span class="va">area</span> <span class="op">~</span> <span class="fl">100</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
 <span class="co">#&gt; object id: 1</span>
 <span class="co">#&gt; area: 100</span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 100.000000      4715    677.0314   589.8749   833.6795</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000  25.000108      2358    338.3123   294.5000   416.8396</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454   7.052355      1030    176.4897   174.8776   177.8908</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926   7.985853      1409    197.4469   117.4128   262.9966</span></code></pre></div>
+<span class="co">#&gt; 1  1  668.9996  797.9996 100.000000 39.923894    5.732711  4.9947194   7.059116</span>
+<span class="co">#&gt; 2  2 1737.5000  453.0000  25.000108 19.966181    2.864633  2.4936557   3.529557</span>
+<span class="co">#&gt; 3  3 1737.5482 1296.3454   7.052355  8.721444    1.494413  1.4807620   1.506276</span>
+<span class="co">#&gt; 4  4 1737.4979  939.4926   7.985853 11.930597    1.671866  0.9941839   2.226903</span></code></pre></div>
 <p>The same can be used to adjust the measures based on the perimeter or radius. Let us adjust the perimeter of objects by the perimeter of object 2 (20 cm).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span>,
              id <span class="op">=</span> <span class="fl">2</span>,
-             measure <span class="op">=</span> <span class="st">"perimeter"</span>,
-             true_value <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>
+             <span class="va">perimeter</span> <span class="op">~</span> <span class="fl">20</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
 <span class="co">#&gt; object id: 2</span>
 <span class="co">#&gt; perimeter: 20</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt;   id         x         y    area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 1394754 39.991518    677.0314   589.8749   833.6795</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000  348690 20.000000    338.3123   294.5000   416.8396</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454   98363  8.736217    176.4897   174.8776   177.8908</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926  111383 11.950806    197.4469   117.4128   262.9966</span></code></pre></div>
+<span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1  668.9996  797.9996 100.339055 39.991518    5.742421  5.0031796   7.071073</span>
+<span class="co">#&gt; 2  2 1737.5000  453.0000  25.084872 20.000000    2.869485  2.4978796   3.535535</span>
+<span class="co">#&gt; 3  3 1737.5482 1296.3454   7.076266  8.736217    1.496944  1.4832701   1.508828</span>
+<span class="co">#&gt; 4  4 1737.4979  939.4926   8.012929 11.950806    1.674698  0.9958679   2.230675</span></code></pre></div>
 </div>
 <div id="declaring-the-image-resolution" class="section level2">
 <h2 class="hasAnchor">
@@ -401,12 +401,12 @@
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
-#&gt;  statistics      area   perimeter
-#&gt;         min  1578.000  128.000000
-#&gt;        mean  2403.967  160.566667
-#&gt;         max  2795.000  171.000000
-#&gt;          sd   260.599    8.850028
-#&gt;         sum 72119.000 4817.000000</code></pre>
+#&gt;  statistics       area   perimeter
+#&gt;         min  1570.0000  128.000000
+#&gt;        mean  2386.7667  159.266667
+#&gt;         max  2785.0000  171.000000
+#&gt;          sd   260.0185    8.815869
+#&gt;         sum 71603.0000 4778.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,

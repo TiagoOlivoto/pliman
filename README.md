@@ -4,7 +4,14 @@
 # pliman <img src="man/figures/logo_pliman.svg" align="right" height="140/"/>
 
 <!-- badges: start -->
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version-ago/metan)](https://CRAN.R-project.org/package=metan) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable) ![Downloads](http://cranlogs.r-pkg.org/badges/metan) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/metan) [<img src="https://zenodo.org/badge/130062661.svg" alt="DOI" width="186"/>](https://zenodo.org/badge/latestdoi/130062661) -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=metan)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+![Downloads](http://cranlogs.r-pkg.org/badges/pliman) ![Total
+Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
+[![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
 <!-- badges: end -->
 
 `pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant
@@ -52,10 +59,12 @@ install the latest version of
 
 ``` r
 library(pliman)
-# |===========================================|
-# | Tools for Plant Image Analysis (pliman)   |
-# | Author: Tiago Olivoto                     |
-# |===========================================|
+# |========================================================|
+# | Tools for Plant Image Analysis (pliman) v0.1.0         |
+# | Author: Tiago Olivoto                                  |
+# | Type 'vignette('pliman_start')' for a short tutorial   |
+# | Visit 'https://bit.ly/2RP2kyE' for a complete tutorial |
+# |========================================================|
 img <- image_import(image_pliman("sev_leaf.jpg"))
 healthy <- image_import(image_pliman("sev_healthy.jpg"))
 symptoms <- image_import(image_pliman("sev_sympt.jpg"))
@@ -76,7 +85,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 89.18107    10.81893
+    # 1 88.87378    11.12622
 
 # Count objects
 

@@ -97,7 +97,7 @@ dir_original." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -171,7 +171,7 @@ dir_original." />
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fas fa-github"></span>
+    <span class="fab fab-github"></span>
      
   </a>
 </li>
@@ -426,7 +426,14 @@ saved in such a directory.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with the results for each image.</p>
+    <p>A list with the following objects:</p><ul>
+<li><p><code>results</code> A data frame with the results (area, perimeter, radius) for
+object.</p></li>
+<li><p><code>statistics</code> A data frame with the summary statistics for the image.</p></li>
+<li><p><code>count</code> (If <code>img_pattern</code> is used), summarizing the count number for each
+image.</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
@@ -438,7 +445,8 @@ saved in such a directory.</p></td>
 <span class='va'>healthy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_healthy.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>lesions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_sympt.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='image_combine.html'>image_combine</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='va'>healthy</span>, <span class='va'>lesions</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-</div><div class='img'><img src='count_lesions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>count_lesions</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
+</div><div class='img'><img src='count_lesions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>a</span> <span class='op'>&lt;-</span>
+<span class='fu'>count_lesions</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
               img_healthy <span class='op'>=</span> <span class='va'>healthy</span>,
               img_lesion <span class='op'>=</span> <span class='va'>lesions</span>,
               lesion_size <span class='op'>=</span> <span class='st'>"elarge"</span>, <span class='co'># extra large lesions</span>
@@ -452,48 +460,7 @@ saved in such a directory.</p></td>
 #&gt;         max 11734.0000  573.0000
 #&gt;          sd  3944.7526  161.3589
 #&gt;         sum 45296.0000 2833.0000
-#&gt;        prop    10.3133        NA</div><div class='output co'>#&gt; $results
-#&gt;    id      m.cx       m.cy s.area s.perimeter s.radius.mean s.radius.sd
-#&gt; 1   1 226.74864 361.042988   9747         382     57.823943  17.2284245
-#&gt; 2   2 200.80552 510.322482  11734         573     65.797924  22.6894732
-#&gt; 3   3  99.04073 596.893770   2504         223     31.647323  12.5573357
-#&gt; 4   4 255.83661  61.843397   8844         440     60.431946  24.3357262
-#&gt; 5   5 288.76724 232.924990   4786         301     42.715639  14.8478563
-#&gt; 6   6 308.76614   8.924956    573          87     13.580101   3.3917897
-#&gt; 7   7 598.45049 251.342791   1727         141     22.087416   4.7227540
-#&gt; 8   8 448.01095 222.248460   1461         138     21.571661   4.6222137
-#&gt; 9   9  55.60646 543.943121   1301         159     20.481443   6.7850480
-#&gt; 10 10 569.73221 326.454765    829         100     16.265195   3.4886276
-#&gt; 11 11 377.51647 343.252964    759          96     15.824742   4.2920924
-#&gt; 12 12 137.50000  78.002525    396          63     10.376633   0.9694018
-#&gt; 13 13 669.86313 448.868715    358          74     11.112182   3.5841225
-#&gt; 14 14 562.66787  17.779783    277          56      8.939503   0.9153334
-#&gt;    s.radius.min s.radius.max
-#&gt; 1     27.887577     86.77147
-#&gt; 2     29.370043    109.38878
-#&gt; 3     11.556555     55.11743
-#&gt; 4     18.676189    102.47552
-#&gt; 5     17.950238     71.32359
-#&gt; 6      6.895498     19.85281
-#&gt; 7     12.862247     29.36475
-#&gt; 8     11.350542     30.56985
-#&gt; 9      7.791427     32.43875
-#&gt; 10     9.998145     23.03135
-#&gt; 11     8.152151     23.14536
-#&gt; 12     8.509846     11.83370
-#&gt; 13     5.324393     18.02770
-#&gt; 14     7.341002     10.87088
-#&gt; 
-#&gt; $statistics
-#&gt;   statistics       area perimeter
-#&gt; 1          n    14.0000        NA
-#&gt; 2        min   277.0000   56.0000
-#&gt; 3       mean  3235.4286  202.3571
-#&gt; 4        max 11734.0000  573.0000
-#&gt; 5         sd  3944.7526  161.3589
-#&gt; 6        sum 45296.0000 2833.0000
-#&gt; 7       prop    10.3133        NA
-#&gt; </div><div class='input'><span class='co'># }</span>
+#&gt;        prop    10.3133        NA</div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>
