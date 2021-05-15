@@ -39,6 +39,13 @@ knitr::opts_chunk$set(
 
 # Installation
 
+Install the latest stable version of `pliman` from [CRAN](https://CRAN.R-project.org/package=pliman) with:
+
+```{r, eval=FALSE}
+install.packages("pliman")
+
+```
+
 The development version of `pliman` can be installed from [GitHub](https://github.com/TiagoOlivoto/pliman) with:
 
 ```{r, eval=FALSE}

@@ -39,6 +39,13 @@ of images. Please, visit the
 
 # Installation
 
+Install the latest stable version of `pliman` from
+[CRAN](https://CRAN.R-project.org/package=pliman) with:
+
+``` r
+install.packages("pliman")
+```
+
 The development version of `pliman` can be installed from
 [GitHub](https://github.com/TiagoOlivoto/pliman) with:
 
@@ -72,7 +79,7 @@ background <- image_import(image_pliman("sev_back.jpg"))
 image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 symptomatic_area(img = img,
@@ -82,10 +89,10 @@ symptomatic_area(img = img,
                  show_image = TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 89.26272    10.73728
+    # 1 89.05037    10.94963
 
 # Count objects
 
@@ -98,13 +105,13 @@ img <- image_import(image_pliman("soybean_touch.jpg"))
 image_show(img)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 count_objects(img, marker = "text")
 ```
 
-![](man/figures/README-unnamed-chunk-5-2.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-2.png)<!-- -->
 
     # 
     # --------------------------------------------

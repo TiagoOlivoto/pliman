@@ -175,8 +175,11 @@
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
-<p>The development version of <code>pliman</code> can be installed from <a href="https://github.com/TiagoOlivoto/pliman">GitHub</a> with:</p>
+<p>Install the latest stable version of <code>pliman</code> from <a href="https://CRAN.R-project.org/package=pliman">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"pliman"</span><span class="op">)</span></code></pre></div>
+<p>The development version of <code>pliman</code> can be installed from <a href="https://github.com/TiagoOlivoto/pliman">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"TiagoOlivoto/pliman"</span><span class="op">)</span>
 
 <span class="co"># To build the HTML vignette use</span>
@@ -190,7 +193,7 @@
 <div id="disease-severity" class="section level1">
 <h1 class="hasAnchor">
 <a href="#disease-severity" class="anchor"></a>Disease severity</h1>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
 <span class="co"># |========================================================|</span>
 <span class="co"># | Tools for Plant Image Analysis (pliman 0.2.0)          |</span>
@@ -203,38 +206,38 @@
 <span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png"><!-- --></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/symptomatic_area.html">symptomatic_area</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
                  img_healthy <span class="op">=</span> <span class="va">healthy</span>,
                  img_symptoms <span class="op">=</span> <span class="va">symptoms</span>,
                  img_background <span class="op">=</span> <span class="va">background</span>,
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#    healthy symptomatic</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 89.26272    10.73728</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#    healthy symptomatic</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 89.05037    10.94963</span></span></code></pre></div>
 </div>
 <div id="count-objects" class="section level1">
 <h1 class="hasAnchor">
 <a href="#count-objects" class="anchor"></a>Count objects</h1>
 <p>The function <code><a href="reference/count_objects.html">count_objects()</a></code> can be used to count the objects such as leaves, grains, pods, pollen in an image. In the following example, we will count the number of soybean grains of an image with 30 grains.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p><img src="reference/figures/README-unnamed-chunk-6-1.png"><!-- --></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">img</span>, marker <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-2.png"><!-- --></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of objects: 30 </span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  statistics       area   perimeter</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         min  1366.0000  117.000000</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#        mean  2057.3667  146.600000</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         max  2445.0000  158.000000</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#          sd   230.5574    8.406073</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         sum 61721.0000 4398.000000</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-2.png"><!-- --></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of objects: 30 </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  statistics       area   perimeter</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         min  1366.0000  117.000000</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#        mean  2057.3667  146.600000</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         max  2445.0000  158.000000</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#          sd   230.5574    8.406073</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         sum 61721.0000 4398.000000</span></span></code></pre></div>
 <p><code>pliman</code> takes the advantage of several powerful functions from <a href="https://bioconductor.org/packages/release/bioc/html/EBImage.html">EBImage package</a>. Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!</p>
 </div>
 <div id="getting-help" class="section level1">
