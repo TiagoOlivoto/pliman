@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 # pliman <img src="man/figures/logo_pliman.svg" align="right" height="140/"/>
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=metan)
+[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 ![Downloads](http://cranlogs.r-pkg.org/badges/pliman)
 ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)

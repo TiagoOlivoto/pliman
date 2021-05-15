@@ -100,7 +100,7 @@ get_measures(img_res, dpi = 300)
 
 # Counting crop grains 
 
-Here, we will count the grains in the image `soybean_touch.png`. This image has a cyan background and contains 50 soybean grains that don't touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes. 
+Here, we will count the grains in the image `soybean_touch.png`. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes. 
 
 ```{r}
 soy <-        image_import(image_pliman("soybean_touch.jpg"))

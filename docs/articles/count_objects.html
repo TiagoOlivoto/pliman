@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Count objects in an image</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-13</h4>
+            <h4 class="date">2021-05-15</h4>
       
       
       <div class="hidden name"><code>count_objects.Rmd</code></div>
@@ -233,7 +233,10 @@
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
 <span class="co">#&gt; object id: 1</span>
-<span class="co">#&gt; area: 100</span>
+<span class="co">#&gt; area     : 100</span>
+<span class="co">#&gt; -----------------------------------------</span>
+<span class="co">#&gt; Total    : 140.038 </span>
+<span class="co">#&gt; Average  : 35.01 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
 <span class="co">#&gt; 1  1  668.9996  797.9996 100.000000 39.923894    5.732711  4.9947194   7.059116</span>
@@ -248,7 +251,10 @@
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
 <span class="co">#&gt; object id: 2</span>
-<span class="co">#&gt; perimeter: 20</span>
+<span class="co">#&gt; perimeter     : 20</span>
+<span class="co">#&gt; -----------------------------------------</span>
+<span class="co">#&gt; Total    : 80.679 </span>
+<span class="co">#&gt; Average  : 20.17 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
 <span class="co">#&gt; 1  1  668.9996  797.9996 100.339055 39.991518    5.742421  5.0031796   7.071073</span>
@@ -278,7 +284,7 @@
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
 <a href="#counting-crop-grains" class="anchor"></a>Counting crop grains</h1>
-<p>Here, we will count the grains in the image <code>soybean_touch.png</code>. This image has a cyan background and contains 50 soybean grains that don’t touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes.</p>
+<p>Here, we will count the grains in the image <code>soybean_touch.png</code>. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span>        <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span><span class="op">)</span>
@@ -406,11 +412,11 @@
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
 #&gt;  statistics       area   perimeter
-#&gt;         min  1570.0000  128.000000
-#&gt;        mean  2383.9333  159.133333
-#&gt;         max  2783.0000  171.000000
-#&gt;          sd   260.6087    8.916213
-#&gt;         sum 71518.0000 4774.000000</code></pre>
+#&gt;         min  1579.0000  129.000000
+#&gt;        mean  2406.0667  160.366667
+#&gt;         max  2795.0000  171.000000
+#&gt;          sd   260.7186    8.552005
+#&gt;         sum 72182.0000 4811.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,

@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Measure leaf area using leaf images</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-13</h4>
+            <h4 class="date">2021-05-15</h4>
       
       
       <div class="hidden name"><code>leaf_area.Rmd</code></div>
@@ -196,15 +196,15 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total leaf area  : 142.8 </span>
-<span class="co">#&gt; Average leaf area: 23.8 </span>
+<span class="co">#&gt; Total leaf area  : 141.912 </span>
+<span class="co">#&gt; Average leaf area: 23.652 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt;   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1 510.8478 194.8216 33.644584       749    130.9455  113.18159  174.54500</span>
-<span class="co">#&gt; 2  2 206.7227 201.3720 27.038619       708    119.3526   93.15962  170.58657</span>
-<span class="co">#&gt; 3  3 123.4080 557.3564 30.671272       787    128.7320   95.71197  189.29962</span>
-<span class="co">#&gt; 4  4 622.9545 585.4018 39.365149       863    143.3932  108.19518  202.83133</span>
-<span class="co">#&gt; 5  5 364.7726 508.5683  8.080377       377     64.3263   51.48042   86.21891</span></code></pre></div>
+<span class="co">#&gt; 1  1 510.8390 194.8255 33.434139       753   130.99067  113.17796  174.60273</span>
+<span class="co">#&gt; 2  2 206.6874 201.3613 26.868277       710   119.46726   93.22077  170.50045</span>
+<span class="co">#&gt; 3  3 123.4029 557.3681 30.464848       787   128.74572   95.71721  189.30356</span>
+<span class="co">#&gt; 4  4 622.9742 585.3928 39.112081       861   143.44260  107.98430  202.77388</span>
+<span class="co">#&gt; 5  5 364.7500 508.5873  8.032424       376    64.33362   51.55607   86.40631</span></code></pre></div>
 </div>
 <div id="leaf-area-using-count_objects" class="section level2">
 <h2 class="hasAnchor">
@@ -248,7 +248,10 @@
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
 <span class="co">#&gt; object id: 6</span>
-<span class="co">#&gt; area: 4</span>
+<span class="co">#&gt; area     : 4</span>
+<span class="co">#&gt; -----------------------------------------</span>
+<span class="co">#&gt; Total    : 147.946 </span>
+<span class="co">#&gt; Average  : 24.658 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="va">area</span>
 <span class="co">#&gt;   id        x        y      area perimeter radius_mean radius_min radius_max</span>

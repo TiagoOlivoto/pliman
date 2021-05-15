@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![CRAN
-status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=metan)
+status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 ![Downloads](http://cranlogs.r-pkg.org/badges/pliman) ![Total
@@ -60,10 +60,10 @@ install the latest version of
 ``` r
 library(pliman)
 # |========================================================|
-# | Tools for Plant Image Analysis (pliman) v0.1.0         |
+# | Tools for Plant Image Analysis (pliman 0.2.0)          |
 # | Author: Tiago Olivoto                                  |
 # | Type 'vignette('pliman_start')' for a short tutorial   |
-# | Visit 'https://bit.ly/2RP2kyE' for a complete tutorial |
+# | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |
 # |========================================================|
 img <- image_import(image_pliman("sev_leaf.jpg"))
 healthy <- image_import(image_pliman("sev_healthy.jpg"))
@@ -85,7 +85,7 @@ symptomatic_area(img = img,
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
     #    healthy symptomatic
-    # 1 88.87378    11.12622
+    # 1 89.26272    10.73728
 
 # Count objects
 

@@ -134,7 +134,11 @@ get_measures <- function(object,
     }
     if(verbose == TRUE){
       cat("-----------------------------------------\n")
-      cat(paste0("measures corrected with:\nobject id: ", id, "\n", var, ": ",  value, "\n"))
+      cat(paste0("measures corrected with:\nobject id: ", id, "\n", var,
+                 "     : ",  value, "\n"))
+      cat("-----------------------------------------\n")
+      cat(paste0("Total    : ", round(sum(res[, var]), 3)), "\n")
+      cat(paste0("Average  : ", round(mean(res[, var]), 3)), "\n")
       cat("-----------------------------------------\n")
     }
   }
