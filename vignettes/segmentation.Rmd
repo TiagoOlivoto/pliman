@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 Image segmentation is the process of partitioning a digital image into multiple segments (sets of pixels or image objects). In the context of plant image analysis, segmentation is used to simplify the representation of an image into something easier to analyze. For example, when using `count_objects()` to count crop grains, first the grains need to be isolated (segmented) from the background. In `pliman` the following functions can be used to segment an image.
 
 * `image_binary()` to produce a binary (back and white) image
-* `image_index()` to produce a segmented image (image objects and a white background).
+* `image_segment()` to produce a segmented image (image objects and a white background).
 
 Both functions segment the image based on the value of some image index, which may be one of the RGB bands or any operation with these bands. Internally, these functions call `image_index()` to compute these indexes.
 

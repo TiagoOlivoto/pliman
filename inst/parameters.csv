@@ -1,25 +1,25 @@
-object_size;resolution;ext;tol;;
-small;res<1600000;2;0.1;;
-small;res >= 1600000 & res < 3200000;2;0.5;;
-small;res >= 3200000 & res < 4800000;3;0.7;;
-small;res >= 4800000 & res < 6400000;3;0.7;;
-small;res >= 6400000 & res < 8000000;5;0.75;;
-small;res>= 8000000;5;1;;
-medium;res<1600000;1;0.6;;
-medium;res >= 1600000 & res < 3200000;1;1;;
-medium;res >= 3200000 & res < 4800000;3;1.5;;
-medium;res >= 4800000 & res < 6400000;5;2;;
-medium;res >= 6400000 & res < 8000000;6;2.5;;
-medium;res>= 8000000;6;3;;
-large;res<1600000;2;3;;
-large;res >= 1600000 & res < 3200000;2;4.2;;
-large;res >= 3200000 & res < 4800000;3;5;;
-large;res >= 4800000 & res < 6400000;3;5.8;;
-large;res >= 6400000 & res < 8000000;4;7;;
-large;res>= 8000000;4;9;;
-elarge;res<1600000;10;10;;
-elarge;res >= 1600000 & res < 3200000;10;12;;
-elarge;res >= 3200000 & res < 4800000;15;14;;
-elarge;res >= 4800000 & res < 6400000;15;20;;
-elarge;res >= 6400000 & res < 8000000;20;25;;
-elarge;res>= 8000000;20;30;;
+object_size;resolution;ext;tol
+small;res<1600000;2;0.1
+small;res >= 1600000 & res < 3200000;2;0.5
+small;res >= 3200000 & res < 4800000;3;0.7
+small;res >= 4800000 & res < 6400000;3;0.7
+small;res >= 6400000 & res < 8000000;5;0.75
+small;res>= 8000000;5;1
+medium;res<1600000;1;0.6
+medium;res >= 1600000 & res < 3200000;1;1
+medium;res >= 3200000 & res < 4800000;3;1.5
+medium;res >= 4800000 & res < 6400000;5;2
+medium;res >= 6400000 & res < 8000000;6;2.5
+medium;res>= 8000000;6;3
+large;res<1600000;2;3
+large;res >= 1600000 & res < 3200000;3;5
+large;res >= 3200000 & res < 4800000;4;7
+large;res >= 4800000 & res < 6400000;5;10
+large;res >= 6400000 & res < 8000000;6;12
+large;res>= 8000000;7;14
+elarge;res<1600000;10;10
+elarge;res >= 1600000 & res < 3200000;10;12
+elarge;res >= 3200000 & res < 4800000;15;14
+elarge;res >= 4800000 & res < 6400000;15;20
+elarge;res >= 6400000 & res < 8000000;20;25
+elarge;res>= 8000000;20;30
