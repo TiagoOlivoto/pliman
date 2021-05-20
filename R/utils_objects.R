@@ -47,13 +47,13 @@
 #' image_show(isolated)
 #' }
 object_coord <- function(image,
-                          id =  NULL,
-                          index = "NB",
-                          edge = 2,
-                          extension = NULL,
-                          tolerance = NULL,
-                          object_size = "large",
-                          show_image = TRUE){
+                         id =  NULL,
+                         index = "NB",
+                         edge = 2,
+                         extension = NULL,
+                         tolerance = NULL,
+                         object_size = "large",
+                         show_image = TRUE){
   # helper function to get coordinates from a mask
   get_coordinates <- function(data_mask, edge){
     nrows <- nrow(data_mask)
@@ -141,9 +141,9 @@ object_isolate <- function(image,
                            id = NULL,
                            ...){
   coord <- object_coord(image,
-                         id = id,
-                         show_image = FALSE,
-                         ...)
+                        id = id,
+                        show_image = FALSE,
+                        ...)
   segmented <- image[coord$row_min:coord$row_max,
                      coord$col_min:coord$col_max,
                      1:3]
@@ -152,6 +152,6 @@ object_isolate <- function(image,
 #' @name utils_objects
 #' @export
 object_id <- function(image, ...){
- count_objects(image, verbose = FALSE, marker = "text", ...)
+  count_objects(image, verbose = FALSE, marker = "text", ...)
 }
 
