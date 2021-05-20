@@ -14,6 +14,8 @@ Description: Provides tools for image manipulation that will help you to
     using the method of automatic threshold selection method proposed by
     Otsu (1979) <doi:10.1109/tsmc.1979.4310076> are also provided.
 License: GPL (>= 3)
+URL: https://github.com/TiagoOlivoto/pliman
+BugReports: https://github.com/TiagoOlivoto/pliman/issues
 Depends: 
     R (>= 4.0.0)
 Imports: 
