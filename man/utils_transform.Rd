@@ -2,6 +2,7 @@
 % Please edit documentation in R/utils_imagem.R
 \name{utils_transform}
 \alias{utils_transform}
+\alias{image_autocrop}
 \alias{image_dimension}
 \alias{image_rotate}
 \alias{image_horizontal}
@@ -11,6 +12,14 @@
 \alias{image_resize}
 \title{Spatial transformations}
 \usage{
+image_autocrop(
+  image,
+  edge = 5,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE
+)
+
 image_dimension(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 
 image_rotate(
@@ -43,6 +52,10 @@ image_resize(
 \arguments{
 \item{image}{An image or a list of images of class \code{Image}.}
 
+\item{edge}{The number of pixels in the edge of the cropped image. If
+\code{edge = 0} the image will be cropped to create a bounding rectangle (x and y
+coordinates) around the image objects.}
+
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when \code{image} is a list. The number of sections is set
@@ -71,6 +84,7 @@ A modified version of \code{image} depending on the function used.
 \description{
 Performs image rotation and reflection
 \itemize{
+\item \code{image_autocrop()} Provides automatic image cropping.
 \item \code{image_dimension()} Gives the dimension (width and height) of an image.
 \item \code{image_rotate()} rotates the image clockwise by the given angle.
 \item \code{image_horizontal()} converts (if needed) an image to a horizontal image.

@@ -381,8 +381,9 @@ count_objects <- function(img,
                   statistics = c("n", "min", "mean", "max", "sd", "sum"))
       stats <- stats[c(3, 1, 2)]
       shape <- shape[,c(1:6, 8:9, 7)]
+      shape <- transform(shape, radius_ratio = s.radius.max / s.radius.min)
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd")
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio")
       results <- list(results = shape,
                       statistics = stats)
       class(results) <- "plm_count"

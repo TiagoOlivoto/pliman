@@ -452,7 +452,6 @@ count_lesions <- function(img,
       marker <- ifelse(is.null(marker), "point", marker)
       marker_col <- ifelse(is.null(marker_col), "white", marker_col)
       marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
-
       if(show_image == TRUE){
         if(marker == "text"){
           image_show(im2)
@@ -523,8 +522,9 @@ count_lesions <- function(img,
                   statistics = c("n", "min", "mean", "max", "sd", "sum", "prop"))
       stats <- stats[c(3, 1, 2)]
       shape <- shape[,c(1:6, 8:9, 7)]
+      shape <- transform(shape, radius_ratio = s.radius.max / s.radius.min)
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd")
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio")
       results <- list(results = shape,
                       statistics = stats)
       class(results) <- "plm_count"

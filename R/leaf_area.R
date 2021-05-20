@@ -57,7 +57,7 @@
 #' @return A data frame with the results for each image.
 #' @export
 #' @md
-#' @importFrom graphics text par points
+#' @importFrom graphics text par points rect
 #' @examples
 #' \donttest{
 #' library(pliman)
@@ -265,9 +265,10 @@ leaf_area <- function(img,
              cex = text_size)
         dev.off()
       }
-      shape <- shape[,c(1:3, 5:7, 9:10, 8, 11)]
+      shape <- transform(shape, radius_ratio = s.radius.max / s.radius.min)
+      shape <- shape[,c(1:3, 5:7, 9:10, 8, 12, 11)]
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd", "label")
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio", "label")
       id_obj <- shape[which(shape$area == area_template),1]
       class(shape) <- c("data.frame", "plm_la", id_obj)
       return(shape)

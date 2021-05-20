@@ -108,7 +108,7 @@ get_measures <- function(object,
     terms <- as.formula(measure)
     var <- as.character(terms[[2]])
     value <- as.numeric(terms[[3]])
-    measures <- c("area", "perimeter", "radius_mean", "radius_min",  "radius_max")
+    measures <- c("area", "perimeter", "radius_mean", "radius_min",  "radius_max", "radius_ratio")
     if(!var %in% measures){
       stop("The left-hand side of 'measure' must be one of ", paste(measures, collapse = ", "), call. = FALSE)
     }
@@ -150,7 +150,6 @@ get_measures <- function(object,
     res$radius_min <- res$radius_min / dpc
     res$radius_max <- res$radius_max / dpc
   }
-  res <- res[,1:8]
   class(res) <- c("data.frame", "plm_measures")
   return(res)
 }
@@ -172,7 +171,7 @@ plot_measures <- function(object,
   } else{
     stop("a")
   }
-  measures <- c("id", "area", "perimeter", "radius_mean", "radius_min", "radius_max")
+  measures <- c("id", "area", "perimeter", "radius_mean", "radius_min", "radius_max", "radius_ratio")
   if(!measure %in% measures){
     stop("'measure' must be one of the", paste(measures, collapse = ", "), call. = FALSE)
   }
