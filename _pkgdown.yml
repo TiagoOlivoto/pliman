@@ -94,6 +94,7 @@ reference:
       - image_palette
       - image_segment
       - image_to_mat
+      - prop_segmented
       - plot.image_index
 
 
