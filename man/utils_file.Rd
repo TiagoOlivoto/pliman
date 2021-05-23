@@ -6,6 +6,7 @@
 \alias{file_name}
 \alias{file_dir}
 \alias{manipulate_files}
+\alias{pliman_indexes}
 \title{Utilities for file manipulation}
 \usage{
 file_extension(file)
@@ -26,6 +27,8 @@ manipulate_files(
   remove_original = FALSE,
   verbose = TRUE
 )
+
+pliman_indexes()
 }
 \arguments{
 \item{file}{The file name.}
@@ -77,6 +80,7 @@ attempted.
 \item \code{manipulate_files()} Manipulate files in a directory with options to rename
 (insert prefix or suffix) and save the new files to the same or other provided
 directory.
+\item \code{pliman_indexes()} Get the indexes available in pliman.
 }
 }
 \examples{

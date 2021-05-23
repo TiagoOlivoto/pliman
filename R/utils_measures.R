@@ -9,9 +9,10 @@
 #' @param object An object computed with [count_objects()] or [leaf_area()].
 #' @param dpi A known resolution of the image in DPI (dots per inch).
 #' @param id An object in the image to indicate a known value.
-#' @param measure  A two-sided formula, e.g., `measure = area ~ 100` indicating
-#'   the known value of object `id`. The right-hand side is the known value and
-#'   the left-hand side can be one of the following.
+#' @param measure For `plot_measures()`, a character string; for
+#'   `get_measures()`, a two-sided formula, e.g., `measure = area ~ 100`
+#'   indicating the known value of object `id`. The right-hand side is the known
+#'   value and the left-hand side can be one of the following.
 #' * `area` The known area of the object.
 #' * `perimeter` The known perimeter of the object.
 #' * `radius_mean` The known radius of the object.

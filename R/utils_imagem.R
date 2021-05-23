@@ -887,8 +887,11 @@ image_segment <- function(image,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
+  if(class(image) == "img_segment"){
+    image <- image[[1]][["image"]]
+  }
   if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(image, class)  %in% c("Image", "img_segment"))){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){

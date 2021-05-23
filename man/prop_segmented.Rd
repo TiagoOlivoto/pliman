@@ -37,6 +37,10 @@ number of parallel processes that can be active at the same time.}
 
 \item{show_image}{Show the image results? Defaults to \code{TRUE}.}
 
+\item{nrow, ncol}{Arguments passed on to \code{\link[=image_combine]{image_combine()}}. The number of rows
+or columns in the plot grid. Defaults to \code{NULL}, i.e., a square grid is
+produced.}
+
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{

@@ -16,11 +16,15 @@
 #'   number of parallel processes that can be active at the same time.
 #' @param show_image Show the image results? Defaults to `TRUE`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
+#' @param nrow,ncol Arguments passed on to [image_combine()]. The number of rows
+#'   or columns in the plot grid. Defaults to `NULL`, i.e., a square grid is
+#'   produced.
 #' @return A list with the following objects
 #' * `results` A data frame with the number of pixels and proportion of pixels
 #' in relation to the previous segmentation.
 #' * `images` A list of segmented images.
 #' @export
+#' @importFrom utils menu
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{

@@ -105,7 +105,7 @@ Here, we will count the grains in the image `soybean_touch.png`. This image has 
 ```{r}
 soy <-        image_import(image_pliman("soybean_touch.jpg"))
 grain <-      image_import(image_pliman("soybean_grain.jpg"))
-background <- image_import(image_pliman("background.jpg"))
+background <- image_import(image_pliman("la_back.jpg"))
 image_combine(soy, grain, background, ncol = 3)
 ```
 

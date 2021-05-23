@@ -22,9 +22,10 @@ plot_measures(
 
 \item{id}{An object in the image to indicate a known value.}
 
-\item{measure}{A two-sided formula, e.g., \code{measure = area ~ 100} indicating
-the known value of object \code{id}. The right-hand side is the known value and
-the left-hand side can be one of the following.
+\item{measure}{For \code{plot_measures()}, a character string; for
+\code{get_measures()}, a two-sided formula, e.g., \code{measure = area ~ 100}
+indicating the known value of object \code{id}. The right-hand side is the known
+value and the left-hand side can be one of the following.
 \itemize{
 \item \code{area} The known area of the object.
 \item \code{perimeter} The known perimeter of the object.

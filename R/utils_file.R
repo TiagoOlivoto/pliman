@@ -6,6 +6,7 @@
 #'* `manipulate_files()` Manipulate files in a directory with options to rename
 #'(insert prefix or suffix) and save the new files to the same or other provided
 #'directory.
+#'* `pliman_indexes()` Get the indexes available in pliman.
 #' @name utils_file
 #' @param file The file name.
 #' @param pattern A file name pattern.
@@ -155,4 +156,13 @@ manipulate_files <- function(pattern,
       warning("Failed to copy ", length(which(a == FALSE)), " files.", call. = FALSE)
     }
   }
+}
+
+#' @name utils_file
+#' @export
+pliman_indexes <- function(){
+  read.csv(file=system.file("indexes.csv",
+                            package = "pliman",
+                            mustWork = TRUE),
+           header = T, sep = ";")$Index
 }
