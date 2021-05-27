@@ -33,8 +33,9 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 \item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
 
-\item{resize}{Resize the image before processing? Defaults to \code{TRUE}. Resizes
-the image to 30\% of the original size to speed up image processing.}
+\item{resize}{Resize the image before processing? Defaults to \code{30}, which
+resizes the image to 30\% of the original size to speed up image processing.
+Set \code{resize = FALSE} to keep the original size of the image.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 

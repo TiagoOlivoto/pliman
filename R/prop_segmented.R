@@ -8,6 +8,8 @@
 #' @param index The index to be used in the image segmentation. See
 #'   [image_index()] for more details.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
+#' @param filter Performs median filtering after image processing? defaults to
+#'   `FALSE`. See more at [image_filter()].
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
@@ -40,6 +42,7 @@ prop_segmented <- function(image,
                            nseg = 1,
                            index = NULL,
                            fill_hull = FALSE,
+                           filter = FALSE,
                            parallel = FALSE,
                            workers = NULL,
                            show_image = TRUE,
@@ -73,6 +76,9 @@ prop_segmented <- function(image,
     return(list(results = results,
                 images = images))
   } else{
+    if(filter == TRUE){
+      image <- image_filter(image)
+    }
     if(nseg == 1){
       if(is.null(index)){
         image_segment(image,
@@ -173,7 +179,7 @@ prop_segmented <- function(image,
       prop <- NULL
       for(i in 2:nrow(pixels)){
         prop[1] <- 100
-        prop[i] <- pixels[i] / pixels[i-1]
+        prop[i] <- pixels[i] / pixels[i-1] * 100
       }
       pixels <- data.frame(pixels)
       pixels$prop <- prop

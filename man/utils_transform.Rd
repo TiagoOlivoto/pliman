@@ -10,6 +10,8 @@
 \alias{image_hreflect}
 \alias{image_vreflect}
 \alias{image_resize}
+\alias{image_filter}
+\alias{image_contrast}
 \title{Spatial transformations}
 \usage{
 image_autocrop(
@@ -48,6 +50,17 @@ image_resize(
   workers = NULL,
   verbose = TRUE
 )
+
+image_filter(
+  image,
+  size = 3,
+  cache = 512,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE
+)
+
+image_contrast(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 }
 \arguments{
 \item{image}{An image or a list of images of class \code{Image}.}
@@ -77,6 +90,11 @@ image will have a size of \verb{640 x 360}.}
 \item{width, height}{Width and height of the resized image. These arguments
 can be missing. In this case, the image is resized according to the
 relative size informed in \code{rel_size}.}
+
+\item{size}{The median filter radius (integer). Defaults to \code{3}.}
+
+\item{cache}{The the L2 cache size of the system CPU in kB (integer).
+Defaults to \code{512}.}
 }
 \value{
 A modified version of \code{image} depending on the function used.
@@ -86,12 +104,16 @@ Performs image rotation and reflection
 \itemize{
 \item \code{image_autocrop()} Provides automatic image cropping.
 \item \code{image_dimension()} Gives the dimension (width and height) of an image.
-\item \code{image_rotate()} rotates the image clockwise by the given angle.
-\item \code{image_horizontal()} converts (if needed) an image to a horizontal image.
-\item \code{image_vertical()} converts (if needed) an image to a vertical image.
-\item \code{image_hreflect()} performs horizontal reflection of the \code{image}.
-\item \code{image_vreflect()} performs vertical reflection of the \code{image}.
-\item \code{image_resize()} resize the \code{image}.
+\item \code{image_rotate()} Rotates the image clockwise by the given angle.
+\item \code{image_horizontal()} Converts (if needed) an image to a horizontal image.
+\item \code{image_vertical()} Converts (if needed) an image to a vertical image.
+\item \code{image_hreflect()} Performs horizontal reflection of the \code{image}.
+\item \code{image_vreflect()} Performs vertical reflection of the \code{image}.
+\item \code{image_resize()} Resize the \code{image}. See more at \code{\link[EBImage:spatial]{EBImage::resize()}}.
+\item \code{image_filter()} Performs median filtering in constant time. See more at
+\code{\link[EBImage:medianFilter]{EBImage::medianFilter()}}
+\item \code{image_contrast()} Improve contrast locally by performing adaptive
+histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}}
 }
 }
 \examples{

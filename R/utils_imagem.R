@@ -18,6 +18,10 @@
 image_combine <- function(..., nrow = NULL, ncol = NULL){
   if(is.list(c(...))){
     plots <- as.list(...)
+    if(class(plots) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      plots <- lapply(plots, function(x){x[[1]]})
+    }
   }else{
     plots <- list(...)
   }
@@ -136,12 +140,16 @@ image_pliman <- function(image){
 #' Performs image rotation and reflection
 #' * `image_autocrop()` Provides automatic image cropping.
 #' * `image_dimension()` Gives the dimension (width and height) of an image.
-#' * `image_rotate()` rotates the image clockwise by the given angle.
-#' * `image_horizontal()` converts (if needed) an image to a horizontal image.
-#' * `image_vertical()` converts (if needed) an image to a vertical image.
-#' * `image_hreflect()` performs horizontal reflection of the `image`.
-#' * `image_vreflect()` performs vertical reflection of the `image`.
-#' * `image_resize()` resize the `image`.
+#' * `image_rotate()` Rotates the image clockwise by the given angle.
+#' * `image_horizontal()` Converts (if needed) an image to a horizontal image.
+#' * `image_vertical()` Converts (if needed) an image to a vertical image.
+#' * `image_hreflect()` Performs horizontal reflection of the `image`.
+#' * `image_vreflect()` Performs vertical reflection of the `image`.
+#' * `image_resize()` Resize the `image`. See more at [EBImage::resize()].
+#' * `image_filter()` Performs median filtering in constant time. See more at
+#' [EBImage::medianFilter()]
+#' * `image_contrast()` Improve contrast locally by performing adaptive
+#' histogram equalization. See more at [EBImage::clahe()]
 #' @name utils_transform
 #' @param image An image or a list of images of class `Image`.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
@@ -161,6 +169,9 @@ image_pliman <- function(image){
 #' @param edge The number of pixels in the edge of the cropped image. If
 #'   `edge = 0` the image will be cropped to create a bounding rectangle (x and y
 #'   coordinates) around the image objects.
+#' @param size The median filter radius (integer). Defaults to `3`.
+#' @param cache The the L2 cache size of the system CPU in kB (integer).
+#'   Defaults to `512`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @md
 #' @importFrom parallel detectCores clusterExport makeCluster parLapply stopCluster
@@ -183,6 +194,10 @@ image_autocrop <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -194,10 +209,11 @@ image_autocrop <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_autocrop, edge)
+      res <- parLapply(clust, image, image_autocrop, edge)
     } else{
-      lapply(image, image_autocrop, edge)
+      res <- lapply(image, image_autocrop, edge)
     }
+    return(structure(res, class = "autocrop_list"))
   } else{
     conv_hull <- object_coord(image,
                               id = NULL,
@@ -216,6 +232,10 @@ image_dimension <- function(image,
                             workers = NULL,
                             verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -272,6 +292,10 @@ image_rotate <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -298,6 +322,10 @@ image_horizontal <- function(image,
                              workers = NULL,
                              verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -330,6 +358,10 @@ image_vertical <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -362,6 +394,10 @@ image_hreflect <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -388,6 +424,10 @@ image_vreflect <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -418,6 +458,10 @@ image_resize <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -440,7 +484,81 @@ image_resize <- function(image,
     resize(image, width, height)
   }
 }
-
+#' @name utils_transform
+#' @export
+image_filter <- function(image,
+                         size = 3,
+                         cache = 512,
+                         parallel = FALSE,
+                         workers = NULL,
+                         verbose = TRUE){
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_resize, size, cache)
+    } else{
+      lapply(image, image_resize, size, cache)
+    }
+  } else{
+    medianFilter(image, size, cache)
+  }
+}
+#' @name utils_transform
+#' @export
+image_contrast <- function(image,
+                           parallel = FALSE,
+                           workers = NULL,
+                           verbose = TRUE){
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_contrast)
+    } else{
+      lapply(image, image_contrast)
+    }
+  } else{
+    get_factors <- function(x) {
+      factors <- vector()
+      for(i in 1:x) {
+        if((x %% i) == 0) {
+          factors[i] <- i
+        }
+      }
+      return(factors[!is.na(factors)])
+    }
+    fx <- get_factors(dim(image)[1])
+    nx <- fx[max(which(fx < 20))]
+    fy <- get_factors(dim(image)[2])
+    ny <- fy[max(which(fy < 20))]
+    clahe(image, nx = nx, ny = ny, bins = 256)
+  }
+}
 
 #' Creates a binary image
 #'
@@ -457,8 +575,9 @@ image_resize <- function(image,
 #'   `"BGI"`. See [image_index()] for more details.
 #' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
-#' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
-#'   the image to 30% of the original size to speed up image processing.
+#' @param resize Resize the image before processing? Defaults to `30`, which
+#'   resizes the image to 30% of the original size to speed up image processing.
+#'   Set `resize = FALSE` to keep the original size of the image.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
@@ -514,10 +633,11 @@ image_binary <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
     } else{
-      lapply(image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_binary, index, my_index, resize, fill_hull, re, nir, invert, show_image, nrow, ncol)
     }
+    return(structure(res, class = "binary_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     if(is.null(my_index)){
@@ -618,8 +738,9 @@ image_binary <- function(image,
 #'   indexes.
 #' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
-#' @param resize Resize the image before processing? Defaults to `TRUE`. Resizes
-#'   the image to 30% of the original size to speed up image processing.
+#' @param resize Resize the image before processing? Defaults to `30`, which
+#'   resizes the image to 30% of the original size to speed up image processing.
+#'   Set `resize = FALSE` to keep the original size of the image.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -649,7 +770,7 @@ image_binary <- function(image,
 image_index <- function(image,
                         index = NULL,
                         my_index = NULL,
-                        resize = TRUE,
+                        resize = 30,
                         re = NULL,
                         nir = NULL,
                         show_image = TRUE,
@@ -670,13 +791,14 @@ image_index <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
     } else{
-      lapply(image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
+      res <- lapply(image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
     }
+    return(structure(res, class = "index_list"))
   } else{
-    if(resize == TRUE){
-      image <- image_resize(image, 30)
+    if(resize != FALSE){
+      image <- image_resize(image, resize)
     }
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     if(is.null(my_index)){
@@ -902,10 +1024,11 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
     } else{
-      lapply(image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
     }
+    return(structure(res, class = "segment_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     if(is.null(my_index)){
@@ -1012,10 +1135,11 @@ image_to_mat <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_to_mat)
+      res <- parLapply(clust, image, image_to_mat)
     } else{
-      lapply(image, image_to_mat)
+      res <- lapply(image, image_to_mat)
     }
+    return(structure(res, class = "img_mat_list"))
   } else{
     d <- match.call()
     ncols <- ncol(image@.Data[,,1])
@@ -1072,10 +1196,11 @@ image_palette <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_palette, npal, nstart)
+      res <- parLapply(clust, image, image_palette, npal, nstart)
     } else{
-      lapply(image, image_palette, npal, nstart)
+      res <- lapply(image, image_palette, npal, nstart)
     }
+    return(structure(res, class = "palette_list"))
   } else{
     df <- image_to_mat(image)$df_in
     df$CODE <- NULL

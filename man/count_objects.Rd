@@ -13,6 +13,7 @@ count_objects(
   workers = NULL,
   resize = FALSE,
   fill_hull = FALSE,
+  filter = FALSE,
   invert = FALSE,
   index = "NB",
   my_index = NULL,
@@ -71,6 +72,9 @@ useful to fill holes in objects that have portions with a color similar to
 the background. IMPORTANT: Objects touching each other can be combined into
 one single object, which may underestimate the number of objects in an
 image.}
+
+\item{filter}{Performs median filtering after image processing? defaults to
+\code{FALSE}. See more at \code{\link[=image_filter]{image_filter()}}.}
 
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}

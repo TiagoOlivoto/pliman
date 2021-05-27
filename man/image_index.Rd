@@ -9,7 +9,7 @@ image_index(
   image,
   index = NULL,
   my_index = NULL,
-  resize = TRUE,
+  resize = 30,
   re = NULL,
   nir = NULL,
   show_image = TRUE,
@@ -36,8 +36,9 @@ indexes.}
 \item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
 
-\item{resize}{Resize the image before processing? Defaults to \code{TRUE}. Resizes
-the image to 30\% of the original size to speed up image processing.}
+\item{resize}{Resize the image before processing? Defaults to \code{30}, which
+resizes the image to 30\% of the original size to speed up image processing.
+Set \code{resize = FALSE} to keep the original size of the image.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}

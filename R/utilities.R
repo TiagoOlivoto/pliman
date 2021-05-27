@@ -88,3 +88,4 @@ image_correct <- function(image, perc){
   return(t(Pp))
 }
 
+

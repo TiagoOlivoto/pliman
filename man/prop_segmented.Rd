@@ -9,6 +9,7 @@ prop_segmented(
   nseg = 1,
   index = NULL,
   fill_hull = FALSE,
+  filter = FALSE,
   parallel = FALSE,
   workers = NULL,
   show_image = TRUE,
@@ -26,6 +27,9 @@ prop_segmented(
 \code{\link[=image_index]{image_index()}} for more details.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
+
+\item{filter}{Performs median filtering after image processing? defaults to
+\code{FALSE}. See more at \code{\link[=image_filter]{image_filter()}}.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
