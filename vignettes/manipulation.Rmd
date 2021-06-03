@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 `pliman` provides useful functions to perform image transformation of unique images or list of images based on the [EBImage package](https://www.bioconductor.org/packages/release/bioc/vignettes/EBImage/inst/doc/EBImage-introduction.html).
 
 ```{r fig.width=10}

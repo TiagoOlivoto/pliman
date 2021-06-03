@@ -11,6 +11,7 @@
 \alias{image_vreflect}
 \alias{image_resize}
 \alias{image_filter}
+\alias{image_blur}
 \alias{image_contrast}
 \title{Spatial transformations}
 \usage{
@@ -60,6 +61,8 @@ image_filter(
   verbose = TRUE
 )
 
+image_blur(image, sigma = 3, parallel = FALSE, workers = NULL, verbose = TRUE)
+
 image_contrast(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 }
 \arguments{
@@ -95,6 +98,9 @@ relative size informed in \code{rel_size}.}
 
 \item{cache}{The the L2 cache size of the system CPU in kB (integer).
 Defaults to \code{512}.}
+
+\item{sigma}{A numeric denoting the standard deviation of the Gaussian filter
+used for blurring. Defaults to \code{3}.}
 }
 \value{
 A modified version of \code{image} depending on the function used.
@@ -110,10 +116,12 @@ Performs image rotation and reflection
 \item \code{image_hreflect()} Performs horizontal reflection of the \code{image}.
 \item \code{image_vreflect()} Performs vertical reflection of the \code{image}.
 \item \code{image_resize()} Resize the \code{image}. See more at \code{\link[EBImage:spatial]{EBImage::resize()}}.
-\item \code{image_filter()} Performs median filtering in constant time. See more at
-\code{\link[EBImage:medianFilter]{EBImage::medianFilter()}}
 \item \code{image_contrast()} Improve contrast locally by performing adaptive
-histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}}
+histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}}.
+\item \code{image_filter()} Performs median filtering in constant time. See more at
+\code{\link[EBImage:medianFilter]{EBImage::medianFilter()}}.
+\item \code{image_blur()} Performs blurring filter of images. See more at
+\code{\link[EBImage:gblur]{EBImage::gblur()}}.
 }
 }
 \examples{

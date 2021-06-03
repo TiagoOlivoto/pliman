@@ -14,6 +14,8 @@
 #' * For `object_isolate()`, a scalar that identifies the object to be extracted.
 #' @param index The index to produce a binary image used to compute bounding
 #'   rectangle coordinates. See [image_binary()] for more details.
+#' @param invert Inverts the binary image, if desired. Defaults to `FALSE`.
+#' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param edge The number of pixels in the edge of the bounding rectangle.
 #'   Defaults to `2`.
 #' @param extension,tolerance,object_size Controls the watershed segmentation of
@@ -49,6 +51,8 @@
 object_coord <- function(image,
                          id =  NULL,
                          index = "NB",
+                         invert = FALSE,
+                         fill_hull = FALSE,
                          edge = 2,
                          extension = NULL,
                          tolerance = NULL,
@@ -85,8 +89,8 @@ object_coord <- function(image,
   }
   img2 <- image_binary(image,
                        index = index,
-                       invert = F,
-                       fill_hull = F,
+                       invert = invert,
+                       fill_hull = fill_hull,
                        show_image = FALSE,
                        resize = FALSE)[[1]]
   if(is.null(id)){

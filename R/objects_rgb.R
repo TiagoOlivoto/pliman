@@ -158,7 +158,7 @@ objects_rgb <- function(img,
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
-        imag <- list.files(diretorio_original, pattern = img)
+        imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
@@ -177,6 +177,9 @@ objects_rgb <- function(img,
           name <- file_name(imag)
           extens <- file_extension(imag)
           foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          if(resize != FALSE){
+            foreground <- image_resize(foreground, resize)
+          }
         }
         if(is.character(background)){
           all_files <- sapply(list.files(diretorio_original), file_name)
@@ -185,6 +188,9 @@ objects_rgb <- function(img,
           name <- file_name(imag)
           extens <- file_extension(imag)
           background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          if(resize != FALSE){
+            background <- image_resize(background, resize)
+          }
         }
         original <- image_to_mat(img)
         foreground <- image_to_mat(foreground)
@@ -237,30 +243,30 @@ objects_rgb <- function(img,
                    B = img@.Data[,,3][which(data_mask == index)])
       }
 
-      if(parallel == TRUE){
-        nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
-        clust <- makeCluster(nworkers)
-        clusterExport(clust,
-                      varlist = c("get_rgb"),
-                      envir=environment())
-        on.exit(stopCluster(clust))
-        if(verbose == TRUE){
-          message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-        }
-        rgb_objects <-
-          do.call(rbind,
-                  parLapply(clust, 1:max(data_mask),
-                            function(i){
-                              get_rgb(img, data_mask, i)
-                            }))
-
-      } else{
+      # if(parallel == TRUE){
+      #   nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      #   clust <- makeCluster(nworkers)
+      #   clusterExport(clust,
+      #                 varlist = c("get_rgb"),
+      #                 envir=environment())
+      #   on.exit(stopCluster(clust))
+      #   if(verbose == TRUE){
+      #     message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      #   }
+      #   rgb_objects <-
+      #     do.call(rbind,
+      #             parLapply(clust, 1:max(data_mask),
+      #                       function(i){
+      #                         get_rgb(img, data_mask, i)
+      #                       }))
+      #
+      # } else{
         rgb_objects <-
           do.call(rbind,
                   lapply(1:max(data_mask), function(i){
                     get_rgb(img, data_mask, i)
                   }))
-      }
+      # }
       shape <-
         cbind(data.frame(computeFeatures.shape(nmask)),
               data.frame(computeFeatures.moment(nmask))[,1:2]
@@ -357,7 +363,7 @@ objects_rgb <- function(img,
            call. = FALSE)
     }
     if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
-      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff.\nExtensions found:", paste(extensions, sep = ", "))
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
@@ -386,8 +392,10 @@ objects_rgb <- function(img,
       results <- list()
       pb <- progress(max = length(plants), style = 4)
       for (i in 1:length(plants)) {
+        if(verbose == TRUE){
         run_progress(pb, actual = i,
                      text = paste("Processing image", names_plant[i]))
+        }
         results[[i]] <-
           help_count(img  = names_plant[i],
                      foreground, background, resize, tolerance, extension,

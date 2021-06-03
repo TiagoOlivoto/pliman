@@ -73,7 +73,8 @@ get_measures <- function(object,
                          id = NULL,
                          measure = NULL,
                          dpi = NULL,
-                         verbose = TRUE){
+                         verbose = TRUE,
+                         digits = 3){
   if(is.data.frame(object)){
     if(any(c("area", "perimeter", "radius_mean") %in% colnames(object) == FALSE)){
       stop("Object informed seems to be not an object computed with pliman.")
@@ -151,6 +152,7 @@ get_measures <- function(object,
     res$radius_min <- res$radius_min / dpc
     res$radius_max <- res$radius_max / dpc
   }
+  res[,1:10] <- apply(res[,1:10], 2, round, digits)
   class(res) <- c("data.frame", "plm_measures")
   return(res)
 }

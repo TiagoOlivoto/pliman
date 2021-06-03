@@ -10,6 +10,7 @@ symptomatic_area(
   img_symptoms,
   img_background = NULL,
   img_pattern = NULL,
+  resize = FALSE,
   parallel = FALSE,
   workers = NULL,
   randomize = TRUE,
@@ -41,6 +42,10 @@ processed. For example, if \code{img_pattern = "im"} all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
 images that are named as 1.-, 2.-, and so on.}
+
+\item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

@@ -8,7 +8,7 @@ image_binary(
   image,
   index = NULL,
   my_index = NULL,
-  resize = TRUE,
+  resize = 30,
   fill_hull = FALSE,
   re = NULL,
   nir = NULL,

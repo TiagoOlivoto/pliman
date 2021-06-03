@@ -4,3 +4,4 @@ package_release.R
 .Rhistory
 .gitignore
 inst/doc
+.RData

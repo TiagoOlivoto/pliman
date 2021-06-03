@@ -146,10 +146,12 @@ image_pliman <- function(image){
 #' * `image_hreflect()` Performs horizontal reflection of the `image`.
 #' * `image_vreflect()` Performs vertical reflection of the `image`.
 #' * `image_resize()` Resize the `image`. See more at [EBImage::resize()].
-#' * `image_filter()` Performs median filtering in constant time. See more at
-#' [EBImage::medianFilter()]
 #' * `image_contrast()` Improve contrast locally by performing adaptive
-#' histogram equalization. See more at [EBImage::clahe()]
+#' histogram equalization. See more at [EBImage::clahe()].
+#' * `image_filter()` Performs median filtering in constant time. See more at
+#' [EBImage::medianFilter()].
+#' * `image_blur()` Performs blurring filter of images. See more at
+#' [EBImage::gblur()].
 #' @name utils_transform
 #' @param image An image or a list of images of class `Image`.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
@@ -170,11 +172,14 @@ image_pliman <- function(image){
 #'   `edge = 0` the image will be cropped to create a bounding rectangle (x and y
 #'   coordinates) around the image objects.
 #' @param size The median filter radius (integer). Defaults to `3`.
+#' @param sigma A numeric denoting the standard deviation of the Gaussian filter
+#'   used for blurring. Defaults to `3`.
 #' @param cache The the L2 cache size of the system CPU in kB (integer).
 #'   Defaults to `512`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @md
-#' @importFrom parallel detectCores clusterExport makeCluster parLapply stopCluster
+#' @importFrom parallel detectCores clusterExport makeCluster parLapply
+#'   stopCluster
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return A modified version of `image` depending on the function used.
@@ -508,12 +513,43 @@ image_filter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_resize, size, cache)
+      parLapply(clust, image, image_filter, size, cache)
     } else{
-      lapply(image, image_resize, size, cache)
+      lapply(image, image_filter, size, cache)
     }
   } else{
     medianFilter(image, size, cache)
+  }
+}
+#' @name utils_transform
+#' @export
+image_blur <- function(image,
+                       sigma = 3,
+                       parallel = FALSE,
+                       workers = NULL,
+                       verbose = TRUE){
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_blur, sigma)
+    } else{
+      lapply(image, image_blur, sigma)
+    }
+  } else{
+    gblur(image, sigma)
   }
 }
 #' @name utils_transform
@@ -610,7 +646,7 @@ image_contrast <- function(image,
 image_binary <- function(image,
                          index = NULL,
                          my_index = NULL,
-                         resize = TRUE,
+                         resize = 30,
                          fill_hull = FALSE,
                          re = NULL,
                          nir = NULL,

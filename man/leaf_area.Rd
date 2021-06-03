@@ -10,6 +10,7 @@ leaf_area(
   img_background,
   img_template,
   area_template,
+  resize = FALSE,
   parallel = FALSE,
   workers = NULL,
   img_pattern = NULL,
@@ -42,6 +43,10 @@ leaf_area(
 
 \item{area_template}{The known area of the template. The leaf area will be
 given in the same unit as \code{area_template}.}
+
+\item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

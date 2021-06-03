@@ -167,7 +167,7 @@ count_lesions <- function(img,
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
-        imag <- list.files(diretorio_original, pattern = img)
+        imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
@@ -581,8 +581,10 @@ count_lesions <- function(img,
       results <- list()
       pb <- progress(max = length(plants), style = 4)
       for (i in 1:length(plants)) {
+        if(verbose == TRUE){
         run_progress(pb, actual = i,
                      text = paste("Processing image", names_plant[i]))
+        }
         results[[i]] <-
           help_count(img  = names_plant[i],
                      img_healthy, img_lesion, img_background, randomize,

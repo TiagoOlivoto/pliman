@@ -11,6 +11,8 @@ object_coord(
   image,
   id = NULL,
   index = "NB",
+  invert = FALSE,
+  fill_hull = FALSE,
   edge = 2,
   extension = NULL,
   tolerance = NULL,
@@ -33,6 +35,10 @@ bounding rectangle. Object ids can be obtained with \code{\link[=object_id]{obje
 
 \item{index}{The index to produce a binary image used to compute bounding
 rectangle coordinates. See \code{\link[=image_binary]{image_binary()}} for more details.}
+
+\item{invert}{Inverts the binary image, if desired. Defaults to \code{FALSE}.}
+
+\item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
 \item{edge}{The number of pixels in the edge of the bounding rectangle.
 Defaults to \code{2}.}

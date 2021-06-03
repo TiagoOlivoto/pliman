@@ -9,14 +9,17 @@
 #'common pattern names that are stored in the current working directory or in
 #'the subdirectory informed in `dir_original`.
 #' @param img The image to be analyzed.
+#' @param img_healthy A color palette of healthy areas.
+#' @param img_symptoms A color palette of symptomatic areas.
+#' @param img_background A color palette of areas with symptoms.
 #' @param img_pattern A pattern of file name used to identify images to be
 #'   processed. For example, if `img_pattern = "im"` all images that the name
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `img_pattern = "1"`) will select
 #'   images that are named as 1.-, 2.-, and so on.
-#' @param img_healthy A color palette of healthy areas.
-#' @param img_symptoms A color palette of symptomatic areas.
-#' @param img_background A color palette of areas with symptoms.
+#' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
+#'   numeric value of range 0-100 (proportion of the size of the original
+#'   image).
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
@@ -72,6 +75,7 @@ symptomatic_area <- function(img,
                              img_symptoms,
                              img_background = NULL,
                              img_pattern = NULL,
+                             resize = FALSE,
                              parallel = FALSE,
                              workers = NULL,
                              randomize = TRUE,
@@ -110,10 +114,13 @@ symptomatic_area <- function(img,
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
-        imag <- list.files(diretorio_original, pattern = img)
+        imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
         name_ori <- file_name(imag)
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+        if(resize != FALSE){
+          img <- image_resize(img, resize)
+        }
       } else{
         name_ori <- match.call()[[2]]
         extens_ori <- "jpg"
@@ -125,6 +132,9 @@ symptomatic_area <- function(img,
         name <- file_name(imag)
         extens <- file_extension(imag)
         img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        if(resize != FALSE){
+          img_healthy <- image_resize(img_healthy, resize)
+        }
       }
       if(is.character(img_symptoms)){
         all_files <- sapply(list.files(diretorio_original), file_name)
@@ -133,6 +143,9 @@ symptomatic_area <- function(img,
         name <- file_name(imag)
         extens <- file_extension(imag)
         img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        if(resize != FALSE){
+          img_symptoms <- image_resize(img_symptoms, resize)
+        }
       }
       original <- image_to_mat(img)
       sadio <- image_to_mat(img_healthy)
@@ -190,6 +203,9 @@ symptomatic_area <- function(img,
           name <- file_name(imag)
           extens <- file_extension(imag)
           img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          if(resize != FALSE){
+            img_background <- image_resize(img_background, resize)
+          }
         }
         fundo <- image_to_mat(img_background)
         # separate image from background
@@ -281,7 +297,8 @@ symptomatic_area <- function(img,
            call. = FALSE)
     }
     if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
-      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+      stop("Extensions that match the name pattern: ", paste(unique(extensions), collapse  = ", "),
+           "\nAllowed extensions are .png, .jpeg, .jpg, .tiff", call. = FALSE)
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
@@ -311,8 +328,10 @@ symptomatic_area <- function(img,
     results <- list()
     pb <- progress(max = length(plants), style = 4)
     for (i in 1:length(plants)) {
+      if(verbose == TRUE){
       run_progress(pb, actual = i,
                    text = paste("Processing image", names_plant[i]))
+      }
       results[[i]] <-
         help_sympt(img  = names_plant[i],
                    img_healthy, img_symptoms, img_background, randomize,

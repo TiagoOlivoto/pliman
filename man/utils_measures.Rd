@@ -6,7 +6,14 @@
 \alias{plot_measures}
 \title{Utilities for object measures}
 \usage{
-get_measures(object, id = NULL, measure = NULL, dpi = NULL, verbose = TRUE)
+get_measures(
+  object,
+  id = NULL,
+  measure = NULL,
+  dpi = NULL,
+  verbose = TRUE,
+  digits = 3
+)
 
 plot_measures(
   object,
