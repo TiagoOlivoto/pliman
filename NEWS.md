@@ -1,4 +1,4 @@
-# pliman (development version)
+# pliman 0.3.0
 ## New functions
 * `image_autocrop()` for automatic image cropping.
 * `image_filter()` to perform median-based filtering.
