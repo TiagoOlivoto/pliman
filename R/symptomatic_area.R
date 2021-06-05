@@ -37,8 +37,8 @@
 #' @param col_background Background color after image processing. Defaults to
 #'   `"NULL"`.
 #' @param save_image Save the image after processing? The image is saved in the
-#'   current working directory named with the prefix provided in `proc_*` where `*` is the image name
-#'   given in `img`.
+#'   current working directory named with the prefix provided in `proc_*` where
+#'   `*` is the image name given in `img`.
 #' @param prefix The prefix to be included in the processed images. Defaults to
 #'   `"proc_"`.
 #' @param dir_original,dir_processed The directory containing the original and

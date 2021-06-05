@@ -74,8 +74,8 @@ background is shown by default when \code{show_original = FALSE}.}
 \code{"NULL"}.}
 
 \item{save_image}{Save the image after processing? The image is saved in the
-current working directory named with the prefix provided in \verb{proc_*} where \code{*} is the image name
-given in \code{img}.}
+current working directory named with the prefix provided in \verb{proc_*} where
+\code{*} is the image name given in \code{img}.}
 
 \item{prefix}{The prefix to be included in the processed images. Defaults to
 \code{"proc_"}.}

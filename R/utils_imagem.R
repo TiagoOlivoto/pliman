@@ -18,7 +18,7 @@
 image_combine <- function(..., nrow = NULL, ncol = NULL){
   if(is.list(c(...))){
     plots <- as.list(...)
-    if(class(plots) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(plots) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       plots <- lapply(plots, function(x){x[[1]]})
     }
@@ -105,6 +105,10 @@ image_import <- function(image, ..., img_pattern = NULL){
 #' @export
 #' @name utils_image
 image_export <- function(image, name, ...){
+  if(class(image) %in% c("binary_list", "segment_list", "index_list",
+                         "img_mat_list", "palette_list")){
+    image <- lapply(image, function(x){x[[1]]})
+  }
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
@@ -199,7 +203,7 @@ image_autocrop <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -237,7 +241,7 @@ image_dimension <- function(image,
                             workers = NULL,
                             verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -297,7 +301,7 @@ image_rotate <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -327,7 +331,7 @@ image_horizontal <- function(image,
                              workers = NULL,
                              verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -363,7 +367,7 @@ image_vertical <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -399,7 +403,7 @@ image_hreflect <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -429,7 +433,7 @@ image_vreflect <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -463,7 +467,7 @@ image_resize <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -498,7 +502,7 @@ image_filter <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -529,7 +533,7 @@ image_blur <- function(image,
                        workers = NULL,
                        verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
@@ -559,7 +563,7 @@ image_contrast <- function(image,
                            workers = NULL,
                            verbose = TRUE){
   if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list", "autocrop_list",
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
       image <- lapply(image, function(x){x[[1]]})
     }
