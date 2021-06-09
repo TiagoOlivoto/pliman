@@ -25,7 +25,7 @@
 NULL
 
 .onAttach <- function(libname, pkgname) {
-  vers <-  "0.2.0"
+  vers <-  "0.3.0"
   packageStartupMessage("|========================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")          |")
   packageStartupMessage("| Author: Tiago Olivoto                                  |")

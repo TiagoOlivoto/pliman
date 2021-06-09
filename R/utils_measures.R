@@ -170,11 +170,11 @@ plot_measures <- function(object,
   } else if(class(object) == "plm_count"){
     object <- object$results
   } else if(class(object) == "objects_rgb"){
-    object <- object[["objects"]]
+    object <- cbind(object[["objects"]], index = object$indexes$index)
   } else{
-    stop("a")
+    stop("Object of ivalid class.")
   }
-  measures <- c("id", "area", "perimeter", "radius_mean", "radius_min", "radius_max", "radius_ratio")
+  measures <- c("id", "area", "perimeter", "radius_mean", "radius_min", "radius_max", "radius_ratio", "index")
   if(!measure %in% measures){
     stop("'measure' must be one of the", paste(measures, collapse = ", "), call. = FALSE)
   }
@@ -185,3 +185,4 @@ plot_measures <- function(object,
        cex = size,
        ...)
 }
+
