@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -194,7 +194,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Computes number of objects in an image</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/count_objects.R'><code>R/count_objects.R</code></a></small>
     <div class="hidden name"><code>count_objects.Rd</code></div>
     </div>
 
@@ -211,6 +211,7 @@
   workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   resize <span class='op'>=</span> <span class='cn'>FALSE</span>,
   fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  filter <span class='op'>=</span> <span class='cn'>FALSE</span>,
   invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
   index <span class='op'>=</span> <span class='st'>"NB"</span>,
   my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -287,6 +288,11 @@ useful to fill holes in objects that have portions with a color similar to
 the background. IMPORTANT: Objects touching each other can be combined into
 one single object, which may underestimate the number of objects in an
 image.</p></td>
+    </tr>
+    <tr>
+      <th>filter</th>
+      <td><p>Performs median filtering after image processing? defaults to
+<code>FALSE</code>. See more at <code><a href='utils_transform.html'>image_filter()</a></code>.</p></td>
     </tr>
     <tr>
       <th>invert</th>
@@ -434,7 +440,7 @@ one can set <code>parallel = TRUE</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>count_objects</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
 </div><div class='img'><img src='count_objects-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; 

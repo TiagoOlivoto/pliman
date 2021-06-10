@@ -91,7 +91,7 @@ Produces an histogram of an objects_rgb object" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -195,7 +195,7 @@ Produces an histogram of an objects_rgb object" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get Red Green and Blue for image objects</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/objects_rgb.R'><code>R/objects_rgb.R</code></a></small>
     <div class="hidden name"><code>objects_rgb.Rd</code></div>
     </div>
 
@@ -425,7 +425,7 @@ one can set <code>parallel = TRUE</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soy_green.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'># Segment the foreground (grains) using the normalized blue index</span>
 <span class='co'># Shows the average value of the blue index in each object</span>
@@ -433,7 +433,7 @@ one can set <code>parallel = TRUE</code>.</p>
 </div><div class='img'><img src='objects_rgb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>rgb</span><span class='op'>)</span>
 </div><div class='img'><img src='objects_rgb-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 <span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soy_green.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'># Segment the foreground (grains) using the normalized blue index</span>

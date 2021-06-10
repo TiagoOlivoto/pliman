@@ -34,6 +34,12 @@
     <loc>https://tiagoolivoto.github.io/pliman//reference/objects_rgb.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/pliman_images.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/prop_segmented.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/symptomatic_area.html</loc>
   </url>
   <url>
@@ -47,6 +53,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/utils_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_objects.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/utils_transform.html</loc>

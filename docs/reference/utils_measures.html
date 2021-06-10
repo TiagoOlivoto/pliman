@@ -97,7 +97,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -201,7 +201,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Utilities for object measures</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/utils_measures.R'><code>R/utils_measures.R</code></a></small>
     <div class="hidden name"><code>utils_measures.Rd</code></div>
     </div>
 
@@ -216,7 +216,14 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
 
     </div>
 
-    <pre class="usage"><span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>object</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, measure <span class='op'>=</span> <span class='cn'>NULL</span>, dpi <span class='op'>=</span> <span class='cn'>NULL</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>get_measures</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  id <span class='op'>=</span> <span class='cn'>NULL</span>,
+  measure <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dpi <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  digits <span class='op'>=</span> <span class='fl'>3</span>
+<span class='op'>)</span>
 
 <span class='fu'>plot_measures</span><span class='op'>(</span>
   <span class='va'>object</span>,
@@ -240,9 +247,10 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
     </tr>
     <tr>
       <th>measure</th>
-      <td><p>A two-sided formula, e.g., <code>measure = area ~ 100</code> indicating
-the known value of object <code>id</code>. The right-hand side is the known value and
-the left-hand side can be one of the following.</p><ul>
+      <td><p>For <code>plot_measures()</code>, a character string; for
+<code>get_measures()</code>, a two-sided formula, e.g., <code>measure = area ~ 100</code>
+indicating the known value of object <code>id</code>. The right-hand side is the known
+value and the left-hand side can be one of the following.</p><ul>
 <li><p><code>area</code> The known area of the object.</p></li>
 <li><p><code>perimeter</code> The known perimeter of the object.</p></li>
 <li><p><code>radius_mean</code> The known radius of the object.</p></li>
@@ -296,7 +304,7 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"objects_300dpi.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
 </div><div class='img'><img src='utils_measures-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Image with four objects with a known resolution of 300 dpi</span>
@@ -323,17 +331,22 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 </div><div class='img'><img src='utils_measures-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Get object measures by declaring the known resolution in dots per inch</span>
 <span class='op'>(</span><span class='va'>measures</span> <span class='op'>&lt;-</span> <span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>results</span>, dpi <span class='op'>=</span> <span class='fl'>300</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   id         x         y      area perimeter radius_mean radius_min radius_max
-#&gt; 1  1  668.9996  797.9996 99.982166 39.920333    5.732200  4.9942740   7.058487
-#&gt; 2  2 1737.5000  453.0000 24.995649 19.964400    2.864377  2.4934333   3.529242
-#&gt; 3  3 1737.5482 1296.3454  7.051097  8.720667    1.494279  1.4806299   1.506142
-#&gt; 4  4 1737.4979  939.4926  7.984428 11.929533    1.671717  0.9940952   2.226705</div><div class='input'>
+</div><div class='output co'>#&gt;   id        x        y   area perimeter radius_mean radius_min radius_max
+#&gt; 1  1  669.000  798.000 99.982    39.920       5.732      4.994      7.058
+#&gt; 2  2 1737.500  453.000 24.996    19.964       2.864      2.493      3.529
+#&gt; 3  3 1737.548 1296.345  7.051     8.721       1.494      1.481      1.506
+#&gt; 4  4 1737.498  939.493  7.984    11.930       1.672      0.994      2.227
+#&gt;   radius_sd radius_ratio
+#&gt; 1    74.267        1.413
+#&gt; 2    37.171        1.415
+#&gt; 3     0.501        1.017
+#&gt; 4    49.911        2.240</div><div class='input'>
 <span class='co'># Calculated diagonal of the object 1</span>
 <span class='co'># 10 * sqrt(2) = 14.14</span>
 
 <span class='co'># Observed diagonal of the object 1</span>
 <span class='va'>measures</span><span class='op'>[</span><span class='fl'>1</span>, <span class='st'>"radius_max"</span><span class='op'>]</span> <span class='op'>*</span> <span class='fl'>2</span>
-</div><div class='output co'>#&gt; [1] 14.11697</div><div class='input'>
+</div><div class='output co'>#&gt; [1] 14.116</div><div class='input'>
 
 <span class='co'># Get object measures by declaring the known area of object 1</span>
 <span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>results</span>,
@@ -346,11 +359,16 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 #&gt; -----------------------------------------
 #&gt; Total    : 140.038 
 #&gt; Average  : 35.01 
-#&gt; -----------------------------------------</div><div class='output co'>#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max
-#&gt; 1  1  668.9996  797.9996 100.000000 39.923894    5.732711  4.9947194   7.059116
-#&gt; 2  2 1737.5000  453.0000  25.000108 19.966181    2.864633  2.4936557   3.529557
-#&gt; 3  3 1737.5482 1296.3454   7.052355  8.721444    1.494413  1.4807620   1.506276
-#&gt; 4  4 1737.4979  939.4926   7.985853 11.930597    1.671866  0.9941839   2.226903</div><div class='input'><span class='co'># }</span>
+#&gt; -----------------------------------------</div><div class='output co'>#&gt;   id        x        y    area perimeter radius_mean radius_min radius_max
+#&gt; 1  1  669.000  798.000 100.000    39.924       5.733      4.995      7.059
+#&gt; 2  2 1737.500  453.000  25.000    19.966       2.865      2.494      3.530
+#&gt; 3  3 1737.548 1296.345   7.052     8.721       1.494      1.481      1.506
+#&gt; 4  4 1737.498  939.493   7.986    11.931       1.672      0.994      2.227
+#&gt;   radius_sd radius_ratio
+#&gt; 1    74.267        1.413
+#&gt; 2    37.171        1.415
+#&gt; 3     0.501        1.017
+#&gt; 4    49.911        2.240</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -91,7 +91,7 @@ Produces an histogram of an image_index object" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -195,7 +195,7 @@ Produces an histogram of an image_index object" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Image indexes</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/utils_imagem.R'><code>R/utils_imagem.R</code></a></small>
     <div class="hidden name"><code>image_index.Rd</code></div>
     </div>
 
@@ -208,7 +208,7 @@ Produces an histogram of an image_index object" />
   <span class='va'>image</span>,
   index <span class='op'>=</span> <span class='cn'>NULL</span>,
   my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resize <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  resize <span class='op'>=</span> <span class='fl'>30</span>,
   re <span class='op'>=</span> <span class='cn'>NULL</span>,
   nir <span class='op'>=</span> <span class='cn'>NULL</span>,
   show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -246,8 +246,9 @@ e.g. <code>my_index = "R+B/G"</code>.</p></td>
     </tr>
     <tr>
       <th>resize</th>
-      <td><p>Resize the image before processing? Defaults to <code>TRUE</code>. Resizes
-the image to 30% of the original size to speed up image processing.</p></td>
+      <td><p>Resize the image before processing? Defaults to <code>30</code>, which
+resizes the image to 30% of the original size to speed up image processing.
+Set <code>resize = FALSE</code> to keep the original size of the image.</p></td>
     </tr>
     <tr>
       <th>re</th>
@@ -314,13 +315,20 @@ index.</p>
 <tr><td>NR</td><td>R/(R+G+B)</td><td>C</td></tr>
 <tr><td>NG</td><td>G/(R+G+B)</td><td>C</td></tr>
 <tr><td>NB</td><td>B/(R+G+B)</td><td>C</td></tr>
+<tr><td>GB</td><td>G/B</td><td>C</td></tr>
+<tr><td>RB</td><td>R/B</td><td>C</td></tr>
+<tr><td>GR</td><td>G/R</td><td>C</td></tr>
 <tr><td>BI</td><td>sqrt((R^2+G^2+B^2)/3)</td><td>C</td></tr>
 <tr><td>BIM</td><td>sqrt((R<em>2+G</em>2+B*2)/3)</td><td>C</td></tr>
 <tr><td>SCI</td><td>(R-G)/(R+G)</td><td>C</td></tr>
 <tr><td>GLI</td><td>(2<em>G-R-B)/(2</em>G+R+B)</td><td>C</td></tr>
 <tr><td>HI</td><td>(2*R-G-B)/(G-B)</td><td>C</td></tr>
-<tr><td>NGRDI</td><td>(G-R)/(G+R)</td><td>C</td></tr>
-<tr><td>SI</td><td>(R-B)/(R+B)</td><td>C</td></tr>
+<tr><td>NDGRI</td><td>(G-R)/(G+R)</td><td>C</td></tr>
+<tr><td>NDGBI</td><td>(G-B)/(G+B)</td><td>C</td></tr>
+<tr><td>NDRBI</td><td>(R-B)/(R+B)</td><td>C</td></tr>
+<tr><td>I</td><td>R+G+B</td><td>C</td></tr>
+<tr><td>S</td><td>((R+G+B)-3*B)/(R+G+B)</td><td>C</td></tr>
+<tr><td>L</td><td>R+G+B/3</td><td>C</td></tr>
 <tr><td>VARI</td><td>(G-R)/(G+R-B)</td><td>C</td></tr>
 <tr><td>HUE</td><td>atan(2*(B-G-R)/30.5*(G-R))</td><td>C</td></tr>
 <tr><td>HUE2</td><td>atan(2*(R-G-R)/30.5*(G-B))</td><td>C</td></tr>
@@ -339,10 +347,10 @@ doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.43100
 <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='img'><img src='image_index-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pliman</span><span class='op'>)</span>
+</div><div class='img'><img src='image_index-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>img2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_transform.html'>image_resize</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='fl'>50</span><span class='op'>)</span>
 <span class='va'>ind</span> <span class='op'>&lt;-</span> <span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img2</span><span class='op'>)</span>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Creates a binary image — image_binary • pliman</title>
+<title>Utilities for working with image objects — utils_objects • pliman</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,11 +46,15 @@
 
 
 
-<meta property="og:title" content="Creates a binary image — image_binary" />
-<meta property="og:description" content="Reduce a color, color near-infrared, or grayscale images to a binary image
-using a given color channel (red, green blue) or even color indexes. The
-Otsu's thresholding method (Otsu, 1979) is used to automatically perform
-clustering-based image thresholding." />
+<meta property="og:title" content="Utilities for working with image objects — utils_objects" />
+<meta property="og:description" content="
+
+object_id() get the object identification in an image.
+object_coord() get the object coordinates and (optionally) draw a
+bounding rectangle around multiple objects in an image.
+object_isolate() isolates an object from an image.
+
+" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -196,124 +200,131 @@ clustering-based image thresholding." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Creates a binary image</h1>
-    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/utils_imagem.R'><code>R/utils_imagem.R</code></a></small>
-    <div class="hidden name"><code>image_binary.Rd</code></div>
+    <h1>Utilities for working with image objects</h1>
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/utils_objects.R'><code>R/utils_objects.R</code></a></small>
+    <div class="hidden name"><code>utils_objects.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Reduce a color, color near-infrared, or grayscale images to a binary image
-using a given color channel (red, green blue) or even color indexes. The
-Otsu's thresholding method (Otsu, 1979) is used to automatically perform
-clustering-based image thresholding.</p>
+    
+<ul>
+<li><p><code>object_id()</code> get the object identification in an image.</p></li>
+<li><p><code>object_coord()</code> get the object coordinates and (optionally) draw a
+bounding rectangle around multiple objects in an image.</p></li>
+<li><p><code>object_isolate()</code> isolates an object from an image.</p></li>
+</ul>
+
     </div>
 
-    <pre class="usage"><span class='fu'>image_binary</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>object_coord</span><span class='op'>(</span>
   <span class='va'>image</span>,
-  index <span class='op'>=</span> <span class='cn'>NULL</span>,
-  my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resize <span class='op'>=</span> <span class='fl'>30</span>,
-  fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  re <span class='op'>=</span> <span class='cn'>NULL</span>,
-  nir <span class='op'>=</span> <span class='cn'>NULL</span>,
+  id <span class='op'>=</span> <span class='cn'>NULL</span>,
+  index <span class='op'>=</span> <span class='st'>"NB"</span>,
   invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  nrow <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ncol <span class='op'>=</span> <span class='cn'>NULL</span>,
-  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
-  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
+  fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  edge <span class='op'>=</span> <span class='fl'>2</span>,
+  extension <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
+  object_size <span class='op'>=</span> <span class='st'>"large"</span>,
+  show_image <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>object_isolate</span><span class='op'>(</span><span class='va'>image</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>object_id</span><span class='op'>(</span><span class='va'>image</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>image</th>
-      <td><p>An image object.</p></td>
+      <td><p>An image of class <code>Image</code>.</p></td>
+    </tr>
+    <tr>
+      <th>id</th>
+      <td><ul>
+<li><p>For <code>object_coord()</code>, a vector (or scalar) of object <code>id</code> to compute the
+bounding rectangle. Object ids can be obtained with <code>object_id()</code>. Set <code>id = "all"</code> to compute the coordinates for all objects in the image. If <code>id = NULL</code> (default) a bounding rectangle is drawn including all the objects.</p></li>
+<li><p>For <code>object_isolate()</code>, a scalar that identifies the object to be extracted.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>index</th>
-      <td><p>A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  <code>"R"</code>,
-<code>"G"</code>, <code>"B"</code> <code>"GR"</code>, <code>"NR"</code>, <code>"NG"</code>, <code>"NB"</code>, <code>"BI"</code>, <code>"BIM"</code>, <code>"SCI"</code>,
-<code>"GLI"</code>, <code>"HI"</code>, <code>"NGRDI"</code>, <code>"SI"</code>, <code>"VARI"</code>, <code>"HUE"</code>, <code>"HUE2"</code>, <code>"BGI"</code>,
-<code>"BGI"</code>. See <code><a href='image_index.html'>image_index()</a></code> for more details.</p></td>
+      <td><p>The index to produce a binary image used to compute bounding
+rectangle coordinates. See <code><a href='image_binary.html'>image_binary()</a></code> for more details.</p></td>
     </tr>
     <tr>
-      <th>my_index</th>
-      <td><p>User can calculate a different index using the bands names,
-e.g. <code>my_index = "R+B/G"</code>.</p></td>
-    </tr>
-    <tr>
-      <th>resize</th>
-      <td><p>Resize the image before processing? Defaults to <code>30</code>, which
-resizes the image to 30% of the original size to speed up image processing.
-Set <code>resize = FALSE</code> to keep the original size of the image.</p></td>
+      <th>invert</th>
+      <td><p>Inverts the binary image, if desired. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>fill_hull</th>
       <td><p>Fill holes in the objects? Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
-      <th>re</th>
-      <td><p>Respective position of the red-edge band at the original image
-file.</p></td>
+      <th>edge</th>
+      <td><p>The number of pixels in the edge of the bounding rectangle.
+Defaults to <code>2</code>.</p></td>
     </tr>
     <tr>
-      <th>nir</th>
-      <td><p>Respective position of the near-infrared band at the original
-image file.</p></td>
-    </tr>
-    <tr>
-      <th>invert</th>
-      <td><p>Inverts the binary image, if desired.</p></td>
+      <th>extension, tolerance, object_size</th>
+      <td><p>Controls the watershed segmentation of
+objects in the image. See <code><a href='count_objects.html'>count_objects()</a></code> for more details.</p></td>
     </tr>
     <tr>
       <th>show_image</th>
-      <td><p>Show image after processing?</p></td>
+      <td><p>Shows the image with bounding rectangles? Defaults to
+<code>TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>nrow, ncol</th>
-      <td><p>The number of rows or columns in the plot grid. Defaults to
-<code>NULL</code>, i.e., a square grid is produced.</p></td>
-    </tr>
-    <tr>
-      <th>parallel</th>
-      <td><p>Processes the images asynchronously (in parallel) in separate
-R sessions running in the background on the same machine. It may speed up
-the processing time when <code>image</code> is a list. The number of sections is set
-up to 90% of available cores.</p></td>
-    </tr>
-    <tr>
-      <th>workers</th>
-      <td><p>A positive numeric scalar or a function specifying the maximum
-number of parallel processes that can be active at the same time.</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>If <code>TRUE</code> (default) a summary is shown in the console.</p></td>
+      <th>...</th>
+      <td><ul>
+<li><p>For <code>object_isolate()</code>, further arguments passed on to <code>object_coord()</code>.</p></li>
+<li><p>For <code>object_id()</code>, further arguments passed on to <code><a href='count_objects.html'>count_objects()</a></code>.</p></li>
+</ul></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list containing binary images. The length will depend on the number
-of indexes used.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    
+<ul>
+<li><p><code>object_id()</code> An image of class <code>"Image"</code> containing the object's
+identification.</p></li>
+<li><p><code>object_coord()</code> A list with the coordinates for the bounding rectangles.
+If <code>id = "all"</code> or a numeric vector, a list with a vector of coordinates is
+returned.</p></li>
+<li><p><code>object_isolate()</code> An image of class <code>"Image"</code> containing the isolated
+object.</p></li>
+</ul>
 
-    <p>Nobuyuki Otsu, "A threshold selection method from gray-level
-histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
-doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.4310076</a></p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>image_binary</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='img'><img src='image_binary-1.png' alt='' width='700' height='433' /></div></pre>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"la_leaves.JPG"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># Get the object's (leaves) identification</span>
+<span class='fu'>object_id</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+</div><div class='img'><img src='utils_objects-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Get the coordinates and draw a bounding rectangle around leaves 1 and 3</span>
+<span class='fu'>object_coord</span><span class='op'>(</span><span class='va'>img</span>, id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='utils_objects-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; $col_min
+#&gt; [1] 320 304
+#&gt; 
+#&gt; $col_max
+#&gt; [1] 641 607
+#&gt; 
+#&gt; $row_min
+#&gt; [1] 435  21
+#&gt; 
+#&gt; $row_max
+#&gt; [1] 641 202
+#&gt; </div><div class='input'>
+<span class='co'># Isolate leaf 3</span>
+<span class='va'>isolated</span> <span class='op'>&lt;-</span> <span class='fu'>object_isolate</span><span class='op'>(</span><span class='va'>img</span>, id <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>isolated</span><span class='op'>)</span>
+</div><div class='img'><img src='utils_objects-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

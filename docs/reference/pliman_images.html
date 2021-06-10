@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Creates a binary image — image_binary • pliman</title>
+<title>Sample images — pliman_images • pliman</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,11 +46,8 @@
 
 
 
-<meta property="og:title" content="Creates a binary image — image_binary" />
-<meta property="og:description" content="Reduce a color, color near-infrared, or grayscale images to a binary image
-using a given color channel (red, green blue) or even color indexes. The
-Otsu's thresholding method (Otsu, 1979) is used to automatically perform
-clustering-based image thresholding." />
+<meta property="og:title" content="Sample images — pliman_images" />
+<meta property="og:description" content="Sample images installed with the pliman package" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -196,124 +193,44 @@ clustering-based image thresholding." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Creates a binary image</h1>
-    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/utils_imagem.R'><code>R/utils_imagem.R</code></a></small>
-    <div class="hidden name"><code>image_binary.Rd</code></div>
+    <h1>Sample images</h1>
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/zzz.R'><code>R/zzz.R</code></a></small>
+    <div class="hidden name"><code>pliman_images.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Reduce a color, color near-infrared, or grayscale images to a binary image
-using a given color channel (red, green blue) or even color indexes. The
-Otsu's thresholding method (Otsu, 1979) is used to automatically perform
-clustering-based image thresholding.</p>
+    <p>Sample images installed with the <span class="pkg">pliman</span> package</p>
     </div>
 
-    <pre class="usage"><span class='fu'>image_binary</span><span class='op'>(</span>
-  <span class='va'>image</span>,
-  index <span class='op'>=</span> <span class='cn'>NULL</span>,
-  my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resize <span class='op'>=</span> <span class='fl'>30</span>,
-  fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  re <span class='op'>=</span> <span class='cn'>NULL</span>,
-  nir <span class='op'>=</span> <span class='cn'>NULL</span>,
-  invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  nrow <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ncol <span class='op'>=</span> <span class='cn'>NULL</span>,
-  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
-  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>image</th>
-      <td><p>An image object.</p></td>
-    </tr>
-    <tr>
-      <th>index</th>
-      <td><p>A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  <code>"R"</code>,
-<code>"G"</code>, <code>"B"</code> <code>"GR"</code>, <code>"NR"</code>, <code>"NG"</code>, <code>"NB"</code>, <code>"BI"</code>, <code>"BIM"</code>, <code>"SCI"</code>,
-<code>"GLI"</code>, <code>"HI"</code>, <code>"NGRDI"</code>, <code>"SI"</code>, <code>"VARI"</code>, <code>"HUE"</code>, <code>"HUE2"</code>, <code>"BGI"</code>,
-<code>"BGI"</code>. See <code><a href='image_index.html'>image_index()</a></code> for more details.</p></td>
-    </tr>
-    <tr>
-      <th>my_index</th>
-      <td><p>User can calculate a different index using the bands names,
-e.g. <code>my_index = "R+B/G"</code>.</p></td>
-    </tr>
-    <tr>
-      <th>resize</th>
-      <td><p>Resize the image before processing? Defaults to <code>30</code>, which
-resizes the image to 30% of the original size to speed up image processing.
-Set <code>resize = FALSE</code> to keep the original size of the image.</p></td>
-    </tr>
-    <tr>
-      <th>fill_hull</th>
-      <td><p>Fill holes in the objects? Defaults to <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>re</th>
-      <td><p>Respective position of the red-edge band at the original image
-file.</p></td>
-    </tr>
-    <tr>
-      <th>nir</th>
-      <td><p>Respective position of the near-infrared band at the original
-image file.</p></td>
-    </tr>
-    <tr>
-      <th>invert</th>
-      <td><p>Inverts the binary image, if desired.</p></td>
-    </tr>
-    <tr>
-      <th>show_image</th>
-      <td><p>Show image after processing?</p></td>
-    </tr>
-    <tr>
-      <th>nrow, ncol</th>
-      <td><p>The number of rows or columns in the plot grid. Defaults to
-<code>NULL</code>, i.e., a square grid is produced.</p></td>
-    </tr>
-    <tr>
-      <th>parallel</th>
-      <td><p>Processes the images asynchronously (in parallel) in separate
-R sessions running in the background on the same machine. It may speed up
-the processing time when <code>image</code> is a list. The number of sections is set
-up to 90% of available cores.</p></td>
-    </tr>
-    <tr>
-      <th>workers</th>
-      <td><p>A positive numeric scalar or a function specifying the maximum
-number of parallel processes that can be active at the same time.</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>If <code>TRUE</code> (default) a summary is shown in the console.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A list containing binary images. The length will depend on the number
-of indexes used.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    <p><code>*.jpg</code> format</p><ul>
+<li><p><code>la_back.jpg</code> A cyan palette representing the background of images
+la_pattern, la_leaves, and soybean_touch.</p></li>
+<li><p><code>la_leaf.jpg</code> A sample of the leaves in <code>la_leaves</code></p></li>
+<li><p><code>la_leaves.JPG</code> Tree leaves with a sample of known area.</p></li>
+<li><p><code>la_pattern.JPG</code> Tree leaves with a yellow sample of known area.</p></li>
+<li><p><code>la_temp.jpg</code> The yellow sample of <code>la_pattern.JPG</code>.</p></li>
+<li><p><code>objects_300dpi.jpg</code> An image with 300 dpi resolution.</p></li>
+<li><p><code>sev_leaf.jpg</code> A soybean leaf with a blue background.</p></li>
+<li><p><code>sev_leaf_nb.jpg</code> A soybean leaf without background.</p></li>
+<li><p><code>sev_back.jpg</code> A blue palette representing the background of <code>sev_leaf</code>.</p></li>
+<li><p><code>sev_healthy.jpg</code> Healthy area of <code>sev_leaf</code>.</p></li>
+<li><p><code>sev_sympt.jpg</code> The symptomatic area <code>sev_leaf</code>.</p></li>
+<li><p><code>soy_green.jpg</code> Soybean grains with a white background.</p></li>
+<li><p><code>soybean_grain.jpg</code> A sample palette of the grains in <code>soy_green</code>.</p></li>
+<li><p><code>soybean_touch.jpg</code> Soybean grains with a cyan background touching one each other.</p></li>
+</ul>
 
-    <p>Nobuyuki Otsu, "A threshold selection method from gray-level
-histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
-doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.4310076</a></p>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Personal data</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>image_binary</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='img'><img src='image_binary-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

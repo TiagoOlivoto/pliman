@@ -105,6 +105,8 @@ reference:
       - count_objects
       - utils_measures
       - objects_rgb
+      - pliman_images
+      - utils_objects
       - plot.objects_rgb
 
 

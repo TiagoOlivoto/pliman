@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -144,15 +144,15 @@
 
       
 
-      </header><script src="count_objects_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="count_objects_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Count objects in an image</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-15</h4>
+            <h4 class="date">2021-06-10</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/count_objects.Rmd"><code>vignettes/count_objects.Rmd</code></a></small>
       <div class="hidden name"><code>count_objects.Rmd</code></div>
 
     </div>
@@ -164,9 +164,9 @@
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
 <p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> can be used to count objects in an image. Let us start with a simple example with the image <code>object_300dpi.png</code> available in the <a href="https://github.com/TiagoOlivoto/pliman/tree/master/image_examples">GitHub page</a>. To facilitate the image importation from this folder, a helper function <code><a href="../reference/utils_image.html">image_pliman()</a></code> is used.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |========================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.2.0)          |</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)          |</span>
 <span class="co">#&gt; | Author: Tiago Olivoto                                  |</span>
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial   |</span>
 <span class="co">#&gt; | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
@@ -207,11 +207,16 @@
 <p>The results were stored in <code>img_res</code> and a summary print in the console. The minimum, mean, maximum, standard deviation and sum of pixels are given for both area and perimeter. The values for each object can be obtained with <code><a href="../reference/utils_measures.html">get_measures()</a></code>. Since there is no scale declared in the above example, we have no idea about the actual area of the objects in cm<sup>2</sup>, only in pixels.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;   id         x         y    area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 1394754      4715    677.0314   589.8749   833.6795</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000  348690      2358    338.3123   294.5000   416.8396</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454   98363      1030    176.4897   174.8776   177.8908</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926  111383      1409    197.4469   117.4128   262.9966</span>
+<span class="co">#&gt;   id        x        y    area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1  669.000  798.000 1394754      4715     677.031    589.875    833.680</span>
+<span class="co">#&gt; 2  2 1737.500  453.000  348690      2358     338.312    294.500    416.840</span>
+<span class="co">#&gt; 3  3 1737.548 1296.345   98363      1030     176.490    174.878    177.891</span>
+<span class="co">#&gt; 4  4 1737.498  939.493  111383      1409     197.447    117.413    262.997</span>
+<span class="co">#&gt;   radius_sd radius_ratio</span>
+<span class="co">#&gt; 1    74.267        1.413</span>
+<span class="co">#&gt; 2    37.171        1.415</span>
+<span class="co">#&gt; 3     0.501        1.017</span>
+<span class="co">#&gt; 4    49.911        2.240</span>
 <span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">measures</span><span class="op">)</span> <span class="co"># plot the object id</span></code></pre></div>
 <p><img src="count_objects_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
@@ -238,11 +243,16 @@
 <span class="co">#&gt; Total    : 140.038 </span>
 <span class="co">#&gt; Average  : 35.01 </span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 100.000000 39.923894    5.732711  4.9947194   7.059116</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000  25.000108 19.966181    2.864633  2.4936557   3.529557</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454   7.052355  8.721444    1.494413  1.4807620   1.506276</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926   7.985853 11.930597    1.671866  0.9941839   2.226903</span></code></pre></div>
+<span class="co">#&gt;   id        x        y    area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1  669.000  798.000 100.000    39.924       5.733      4.995      7.059</span>
+<span class="co">#&gt; 2  2 1737.500  453.000  25.000    19.966       2.865      2.494      3.530</span>
+<span class="co">#&gt; 3  3 1737.548 1296.345   7.052     8.721       1.494      1.481      1.506</span>
+<span class="co">#&gt; 4  4 1737.498  939.493   7.986    11.931       1.672      0.994      2.227</span>
+<span class="co">#&gt;   radius_sd radius_ratio</span>
+<span class="co">#&gt; 1    74.267        1.413</span>
+<span class="co">#&gt; 2    37.171        1.415</span>
+<span class="co">#&gt; 3     0.501        1.017</span>
+<span class="co">#&gt; 4    49.911        2.240</span></code></pre></div>
 <p>The same can be used to adjust the measures based on the perimeter or radius. Let us adjust the perimeter of objects by the perimeter of object 2 (20 cm).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span>,
@@ -256,11 +266,16 @@
 <span class="co">#&gt; Total    : 80.679 </span>
 <span class="co">#&gt; Average  : 20.17 </span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt;   id         x         y       area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 100.339055 39.991518    5.742421  5.0031796   7.071073</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000  25.084872 20.000000    2.869485  2.4978796   3.535535</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454   7.076266  8.736217    1.496944  1.4832701   1.508828</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926   8.012929 11.950806    1.674698  0.9958679   2.230675</span></code></pre></div>
+<span class="co">#&gt;   id        x        y    area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1  669.000  798.000 100.339    39.992       5.742      5.003      7.071</span>
+<span class="co">#&gt; 2  2 1737.500  453.000  25.085    20.000       2.869      2.498      3.536</span>
+<span class="co">#&gt; 3  3 1737.548 1296.345   7.076     8.736       1.497      1.483      1.509</span>
+<span class="co">#&gt; 4  4 1737.498  939.493   8.013    11.951       1.675      0.996      2.231</span>
+<span class="co">#&gt;   radius_sd radius_ratio</span>
+<span class="co">#&gt; 1    74.267        1.413</span>
+<span class="co">#&gt; 2    37.171        1.415</span>
+<span class="co">#&gt; 3     0.501        1.017</span>
+<span class="co">#&gt; 4    49.911        2.240</span></code></pre></div>
 </div>
 <div id="declaring-the-image-resolution" class="section level2">
 <h2 class="hasAnchor">
@@ -274,11 +289,16 @@
 <p>The perimeter of object 1 adjusted by the image resolution is very close to the true (40 cm). Bellow, the values of all measures are adjusted by declaring the <code>dpi</code> argument in <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">img_res</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span>
-<span class="co">#&gt;   id         x         y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1  668.9996  797.9996 99.982166 39.920333    5.732200  4.9942740   7.058487</span>
-<span class="co">#&gt; 2  2 1737.5000  453.0000 24.995649 19.964400    2.864377  2.4934333   3.529242</span>
-<span class="co">#&gt; 3  3 1737.5482 1296.3454  7.051097  8.720667    1.494279  1.4806299   1.506142</span>
-<span class="co">#&gt; 4  4 1737.4979  939.4926  7.984428 11.929533    1.671717  0.9940952   2.226705</span></code></pre></div>
+<span class="co">#&gt;   id        x        y   area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1  1  669.000  798.000 99.982    39.920       5.732      4.994      7.058</span>
+<span class="co">#&gt; 2  2 1737.500  453.000 24.996    19.964       2.864      2.493      3.529</span>
+<span class="co">#&gt; 3  3 1737.548 1296.345  7.051     8.721       1.494      1.481      1.506</span>
+<span class="co">#&gt; 4  4 1737.498  939.493  7.984    11.930       1.672      0.994      2.227</span>
+<span class="co">#&gt;   radius_sd radius_ratio</span>
+<span class="co">#&gt; 1    74.267        1.413</span>
+<span class="co">#&gt; 2    37.171        1.415</span>
+<span class="co">#&gt; 3     0.501        1.017</span>
+<span class="co">#&gt; 4    49.911        2.240</span></code></pre></div>
 </div>
 </div>
 <div id="counting-crop-grains" class="section level1">
@@ -288,7 +308,7 @@
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span>        <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"background.jpg"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_back.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">grain</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <p><img src="count_objects_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
 <p>The function <code><a href="../reference/count_objects.html">count_objects()</a></code> segment the image using as default the normalized blue index, as follows <span class="math inline">\(NB = (B/(R+G+B))\)</span>, where <span class="math inline">\(R\)</span>, <span class="math inline">\(G\)</span>, and <span class="math inline">\(B\)</span> are the red, green, and blue bands. Objects are count and the segmented objects are colored with random permutations.</p>
@@ -329,37 +349,68 @@
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Get the object measures</span>
 <span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;    id         x         y area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1   1 245.83333 509.84077 2286       158    26.54285   22.76306   28.94132</span>
-<span class="co">#&gt; 2   2 538.05611 401.89604 2299       153    26.60716   24.95688   28.40020</span>
-<span class="co">#&gt; 3   3 237.59170 339.82483 2312       152    26.69878   23.96521   29.04402</span>
-<span class="co">#&gt; 4   4 345.35665 105.78323 2445       158    27.51343   24.68250   30.47116</span>
-<span class="co">#&gt; 5   5 406.93136  77.54909 2302       153    26.64891   23.96546   29.63586</span>
-<span class="co">#&gt; 6   6 277.44521 260.55941 2163       149    25.76600   24.29055   27.88707</span>
-<span class="co">#&gt; 7   7 301.20568 370.09157 2217       154    26.11345   23.59087   28.68747</span>
-<span class="co">#&gt; 8   8 192.82827 379.64522 2207       149    26.10523   23.71544   28.85848</span>
-<span class="co">#&gt; 9   9 434.71021 553.70653 2174       148    25.89026   23.74971   28.50595</span>
-<span class="co">#&gt; 10 10 594.74403  47.31095 2219       153    26.16024   23.35200   29.65932</span>
-<span class="co">#&gt; 11 11 468.99698  56.42549 2315       155    26.76542   23.03064   30.78003</span>
-<span class="co">#&gt; 12 12 461.17241 156.02713 2175       148    25.93324   23.07091   29.51196</span>
-<span class="co">#&gt; 13 13 202.07541 203.46115 2188       153    26.00756   22.48701   29.80797</span>
-<span class="co">#&gt; 14 14 403.48649 169.01474 2035       143    25.01919   22.39798   27.00994</span>
-<span class="co">#&gt; 15 15 245.98677 221.37506 2117       148    25.52815   21.95011   29.11295</span>
-<span class="co">#&gt; 16 16 250.40020 436.93432 1964       142    24.55216   22.97147   26.25762</span>
-<span class="co">#&gt; 17 17  84.67109 206.43152 2183       151    25.92309   22.82494   28.74282</span>
-<span class="co">#&gt; 18 18 448.41151 296.20890 2068       145    25.19611   23.35700   27.03161</span>
-<span class="co">#&gt; 19 19 296.17753 186.50535 2056       144    25.13231   22.63931   27.21284</span>
-<span class="co">#&gt; 20 20 321.97321 321.69110 1978       151    24.63527   21.22252   27.36964</span>
-<span class="co">#&gt; 21 21 550.20165 200.50645 1939       141    24.39962   22.57787   26.35292</span>
-<span class="co">#&gt; 22 22 106.29396 432.08949 1922       140    24.30404   22.83775   26.26388</span>
-<span class="co">#&gt; 23 23 242.94029 388.54309 1926       146    24.39053   22.41236   27.41985</span>
-<span class="co">#&gt; 24 24 492.98784 344.44104 1891       139    24.07625   21.89427   25.98781</span>
-<span class="co">#&gt; 25 25 721.70496 586.34204 1915       140    24.24984   21.88597   26.81782</span>
-<span class="co">#&gt; 26 26 510.46838 158.37213 1787       137    23.46584   21.17273   26.18003</span>
-<span class="co">#&gt; 27 27  92.83821 569.39472 1743       134    23.12420   21.24944   25.33156</span>
-<span class="co">#&gt; 28 28 281.03738 474.07147 1819       154    23.48401   17.88658   27.20260</span>
-<span class="co">#&gt; 29 29 273.27251 547.45906 1710       143    22.78041   17.61722   25.90980</span>
-<span class="co">#&gt; 30 30 265.29209 143.41142 1366       117    20.40475   18.59025   22.03007</span></code></pre></div>
+<span class="co">#&gt;    id       x       y area perimeter radius_mean radius_min radius_max</span>
+<span class="co">#&gt; 1   1 245.833 509.841 2286       158      26.543     22.763     28.941</span>
+<span class="co">#&gt; 2   2 538.056 401.896 2299       153      26.607     24.957     28.400</span>
+<span class="co">#&gt; 3   3 237.592 339.825 2312       152      26.699     23.965     29.044</span>
+<span class="co">#&gt; 4   4 345.357 105.783 2445       158      27.513     24.682     30.471</span>
+<span class="co">#&gt; 5   5 406.931  77.549 2302       153      26.649     23.965     29.636</span>
+<span class="co">#&gt; 6   6 277.445 260.559 2163       149      25.766     24.291     27.887</span>
+<span class="co">#&gt; 7   7 301.206 370.092 2217       154      26.113     23.591     28.687</span>
+<span class="co">#&gt; 8   8 192.828 379.645 2207       149      26.105     23.715     28.858</span>
+<span class="co">#&gt; 9   9 434.710 553.707 2174       148      25.890     23.750     28.506</span>
+<span class="co">#&gt; 10 10 594.744  47.311 2219       153      26.160     23.352     29.659</span>
+<span class="co">#&gt; 11 11 468.997  56.425 2315       155      26.765     23.031     30.780</span>
+<span class="co">#&gt; 12 12 461.172 156.027 2175       148      25.933     23.071     29.512</span>
+<span class="co">#&gt; 13 13 202.075 203.461 2188       153      26.008     22.487     29.808</span>
+<span class="co">#&gt; 14 14 403.486 169.015 2035       143      25.019     22.398     27.010</span>
+<span class="co">#&gt; 15 15 245.987 221.375 2117       148      25.528     21.950     29.113</span>
+<span class="co">#&gt; 16 16 250.400 436.934 1964       142      24.552     22.971     26.258</span>
+<span class="co">#&gt; 17 17  84.671 206.432 2183       151      25.923     22.825     28.743</span>
+<span class="co">#&gt; 18 18 448.412 296.209 2068       145      25.196     23.357     27.032</span>
+<span class="co">#&gt; 19 19 296.178 186.505 2056       144      25.132     22.639     27.213</span>
+<span class="co">#&gt; 20 20 321.973 321.691 1978       151      24.635     21.223     27.370</span>
+<span class="co">#&gt; 21 21 550.202 200.506 1939       141      24.400     22.578     26.353</span>
+<span class="co">#&gt; 22 22 106.294 432.089 1922       140      24.304     22.838     26.264</span>
+<span class="co">#&gt; 23 23 242.940 388.543 1926       146      24.391     22.412     27.420</span>
+<span class="co">#&gt; 24 24 492.988 344.441 1891       139      24.076     21.894     25.988</span>
+<span class="co">#&gt; 25 25 721.705 586.342 1915       140      24.250     21.886     26.818</span>
+<span class="co">#&gt; 26 26 510.468 158.372 1787       137      23.466     21.173     26.180</span>
+<span class="co">#&gt; 27 27  92.838 569.395 1743       134      23.124     21.249     25.332</span>
+<span class="co">#&gt; 28 28 281.037 474.071 1819       154      23.484     17.887     27.203</span>
+<span class="co">#&gt; 29 29 273.273 547.459 1710       143      22.780     17.617     25.910</span>
+<span class="co">#&gt; 30 30 265.292 143.411 1366       117      20.405     18.590     22.030</span>
+<span class="co">#&gt;    radius_sd radius_ratio</span>
+<span class="co">#&gt; 1      1.425        1.271</span>
+<span class="co">#&gt; 2      0.935        1.138</span>
+<span class="co">#&gt; 3      1.233        1.212</span>
+<span class="co">#&gt; 4      1.730        1.235</span>
+<span class="co">#&gt; 5      1.640        1.237</span>
+<span class="co">#&gt; 6      0.765        1.148</span>
+<span class="co">#&gt; 7      1.358        1.216</span>
+<span class="co">#&gt; 8      1.488        1.217</span>
+<span class="co">#&gt; 9      1.437        1.200</span>
+<span class="co">#&gt; 10     1.856        1.270</span>
+<span class="co">#&gt; 11     2.349        1.336</span>
+<span class="co">#&gt; 12     1.656        1.279</span>
+<span class="co">#&gt; 13     1.987        1.326</span>
+<span class="co">#&gt; 14     1.168        1.206</span>
+<span class="co">#&gt; 15     1.793        1.326</span>
+<span class="co">#&gt; 16     0.798        1.143</span>
+<span class="co">#&gt; 17     1.708        1.259</span>
+<span class="co">#&gt; 18     0.993        1.157</span>
+<span class="co">#&gt; 19     1.211        1.202</span>
+<span class="co">#&gt; 20     1.595        1.290</span>
+<span class="co">#&gt; 21     0.849        1.167</span>
+<span class="co">#&gt; 22     0.891        1.150</span>
+<span class="co">#&gt; 23     0.958        1.223</span>
+<span class="co">#&gt; 24     1.180        1.187</span>
+<span class="co">#&gt; 25     1.350        1.225</span>
+<span class="co">#&gt; 26     1.009        1.236</span>
+<span class="co">#&gt; 27     1.044        1.192</span>
+<span class="co">#&gt; 28     2.497        1.521</span>
+<span class="co">#&gt; 29     1.792        1.471</span>
+<span class="co">#&gt; 30     0.772        1.185</span></code></pre></div>
 <p>In the following example, we will select objects with an area above the average of all objects by using <code>lower_size = 2057.36</code>. Additionally, we will use the argument <code>show_original = FALSE</code> to show the results as colors (non-original image).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">soy</span>,
@@ -411,12 +462,12 @@
 #&gt; --------------------------------------------
 #&gt; Number of objects: 30 
 #&gt; --------------------------------------------
-#&gt;  statistics       area   perimeter
-#&gt;         min  1584.0000  129.000000
-#&gt;        mean  2416.7667  160.900000
-#&gt;         max  2800.0000  174.000000
-#&gt;          sd   261.7378    8.856519
-#&gt;         sum 72503.0000 4827.000000</code></pre>
+#&gt;  statistics      area   perimeter
+#&gt;         min  1596.000  128.000000
+#&gt;        mean  2409.667  160.900000
+#&gt;         max  2797.000  171.000000
+#&gt;          sd   263.389    9.117433
+#&gt;         sum 72290.000 4827.000000</code></pre>
 <p>Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"soy"</span>,

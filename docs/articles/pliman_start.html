@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -144,15 +144,15 @@
 
       
 
-      </header><script src="pliman_start_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="pliman_start_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Plant IMage Analysis</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-05-15</h4>
+            <h4 class="date">2021-06-10</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/pliman_start.Rmd"><code>vignettes/pliman_start.Rmd</code></a></small>
       <div class="hidden name"><code>pliman_start.Rmd</code></div>
 
     </div>
@@ -179,9 +179,9 @@
 <p>The function <code><a href="../reference/leaf_area.html">leaf_area()</a></code> can be used to computes the leaf area using an image with leaves and a template with a known area. A general linear model (binomial family) fitted to the RGB values is used to first separate the leaves and template from the background and then the leaves from the template. The leaf area is then calculated for each leaf based on the pixel area.</p>
 <p>In the following example, the area of five three leaves will be computed using a reference template with a known area of 4 cm<span class="math inline">\(^2\)</span>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pliman</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co"># |========================================================|</span>
-<span class="co"># | Tools for Plant Image Analysis (pliman 0.2.0)          |</span>
+<span class="co"># | Tools for Plant Image Analysis (pliman 0.3.0)          |</span>
 <span class="co"># | Author: Tiago Olivoto                                  |</span>
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial   |</span>
 <span class="co"># | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
@@ -207,15 +207,21 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total leaf area  : 142.975 </span>
-<span class="co"># Average leaf area: 23.829 </span>
+<span class="co"># Total leaf area  : 142.724 </span>
+<span class="co"># Average leaf area: 23.787 </span>
 <span class="co"># -----------------------------------------</span>
-<span class="co">#   id        x        y      area perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 510.8414 194.8432 33.692936       750   131.03322  113.00396  175.07130</span>
-<span class="co"># 2  2 206.6716 201.3585 27.075667       711   119.51351   93.21739  170.65630</span>
-<span class="co"># 3  3 123.3911 557.3789 30.700785       787   128.77774   95.73186  189.31534</span>
-<span class="co"># 4  4 622.9804 585.4001 39.408477       861   143.48948  107.96767  202.76156</span>
-<span class="co"># 5  5 364.7460 508.6112  8.096703       374    64.34862   51.65360   86.32985</span></code></pre></div>
+<span class="co">#   id       x       y   area perimeter radius_mean radius_min radius_max</span>
+<span class="co"># 1  1 510.870 194.816 33.623       748     130.927    113.109    174.695</span>
+<span class="co"># 2  2 206.729 201.344 27.026       709     119.412     93.029    170.339</span>
+<span class="co"># 3  3 123.420 557.361 30.651       787     128.717     95.703    189.297</span>
+<span class="co"># 4  4 622.974 585.408 39.340       863     143.373    108.206    202.830</span>
+<span class="co"># 5  5 364.747 508.590  8.085       375      64.294     51.447     86.207</span>
+<span class="co">#   radius_sd radius_ratio</span>
+<span class="co"># 1    15.337        1.544</span>
+<span class="co"># 2    19.262        1.831</span>
+<span class="co"># 3    24.557        1.978</span>
+<span class="co"># 4    25.136        1.874</span>
+<span class="co"># 5     9.710        1.676</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -266,7 +272,7 @@
                  show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
 <pre><code>#    healthy symptomatic
-# 1 89.04018    10.95982</code></pre>
+# 1 89.03889    10.96111</code></pre>
 </div>
 <div id="rgb-values-for-objects" class="section level1">
 <h1 class="hasAnchor">

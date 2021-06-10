@@ -89,7 +89,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -193,13 +193,40 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      
+      <small>Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="pliman-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#pliman-development-version" class="anchor"></a>pliman (development version)<small> Unreleased </small>
+    <div id="pliman-030" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.0">
+<a href="#pliman-030" class="anchor"></a>pliman 0.3.0<small> 2021-06-10 </small>
 </h1>
+<div id="new-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions" class="anchor"></a>New functions</h2>
+<ul>
+<li>
+<code><a href="../reference/utils_transform.html">image_autocrop()</a></code> for automatic image cropping.</li>
+<li>
+<code><a href="../reference/utils_transform.html">image_filter()</a></code> to perform median-based filtering.</li>
+<li>
+<code><a href="../reference/utils_transform.html">image_contrast()</a></code> to improve contrast by performing adaptive histogram equalization</li>
+<li>
+<code><a href="../reference/utils_objects.html">object_coord()</a></code> to get the object coordinates and (optionally) draw a bounding rectangle around multiple objects in an image.</li>
+<li>
+<code><a href="../reference/utils_objects.html">object_id()</a></code> to get the object identification in an image.</li>
+<li>
+<code><a href="../reference/utils_objects.html">object_isolate()</a></code> to isolate an object from an image.</li>
+<li>
+<code><a href="../reference/prop_segmented.html">prop_segmented()</a></code> to perform (iterative) image segmentation with pixels proportion.</li>
+</ul>
+</div>
+<div id="minor-improvements" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<ul>
+<li>New argument <code>filter</code> in <code><a href="../reference/count_objects.html">count_objects()</a></code> and <code><a href="../reference/prop_segmented.html">prop_segmented()</a></code>.</li>
+</ul>
+</div>
 </div>
     <div id="pliman-020" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.0">
