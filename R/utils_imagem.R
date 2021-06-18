@@ -592,13 +592,42 @@ image_contrast <- function(image,
       }
       return(factors[!is.na(factors)])
     }
-    fx <- get_factors(dim(image)[1])
-    nx <- fx[max(which(fx < 20))]
-    fy <- get_factors(dim(image)[2])
-    ny <- fy[max(which(fy < 20))]
+    img_width <- dim(image)[1]
+    img_height <- dim(image)[2]
+    fx <- get_factors(img_width)
+    nx <- suppressWarnings(fx[max(which(fx > 1 & fx < 100))])
+    fy <- get_factors(img_height)
+    ny <- suppressWarnings(fy[max(which(fy > 1 & fy < 100))])
+    testx <- any(fx > 1 & fx < 100) == FALSE
+    if(testx == TRUE){
+      while(testx == TRUE){
+        img_width <- img_width + 1
+        fx <- get_factors(img_width)
+        testx <- !any(fx > 1 & fx < 100)
+        if(any(fx) > 100){
+          break
+        }
+      }
+      image <- resize(image, w = img_width, h = img_height)
+      nx <- suppressWarnings(fx[max(which(fx > 1 & fx < 100))])
+    }
+    testy <- any(fy > 1 & fy < 100) == FALSE
+    if(testy == TRUE){
+      while(testy == TRUE){
+        img_height <- img_height + 1
+        fy <- get_factors(img_height)
+        testy <- !any(fy > 1 & fy < 100)
+        if(any(fy) > 100){
+          break
+        }
+      }
+      image <- resize(image, w = img_width, h = img_height)
+      ny <- suppressWarnings(fy[max(which(fy > 1 & fy < 100))])
+    }
     clahe(image, nx = nx, ny = ny, bins = 256)
   }
 }
+
 
 #' Creates a binary image
 #'
