@@ -13,6 +13,7 @@ count_lesions(
   parallel = FALSE,
   workers = NULL,
   resize = FALSE,
+  fill_hull = TRUE,
   invert = FALSE,
   index = "NB",
   my_index = NULL,
@@ -67,6 +68,10 @@ number of parallel processes that can be active at the same time.}
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
 image).}
+
+\item{fill_hull}{Fill holes in the image? Defaults to \code{TRUE}. This is useful
+to fill holes in leaves, e.g., those caused by insect attack, ensuring the
+hole area will be accounted for the leaf, not background.}
 
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}

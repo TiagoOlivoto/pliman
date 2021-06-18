@@ -26,6 +26,9 @@
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
+#' @param fill_hull Fill holes in the image? Defaults to `TRUE`. This is useful
+#'   to fill holes in leaves, e.g., those caused by insect attack, ensuring the
+#'   hole area will be accounted for the leaf, not background.
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
 #' @param index,my_index A character value specifying the target mode for
@@ -119,6 +122,7 @@ count_lesions <- function(img,
                           parallel = FALSE,
                           workers = NULL,
                           resize = FALSE,
+                          fill_hull = TRUE,
                           invert = FALSE,
                           index = "NB",
                           my_index = NULL,
@@ -287,8 +291,9 @@ count_lesions <- function(img,
           modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
                                           data = fundo_resto))
           pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
-          plant_background <- matrix(pred1, ncol = ncol(original$R))
-          plant_background <- image_correct(plant_background, perc = 0.009)
+          ifelse(fill_hull == TRUE,
+                 plant_background <- fillHull(matrix(pred1, ncol = ncol(original$R))),
+                 plant_background <- matrix(pred1, ncol = ncol(original$R)))
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
             transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],

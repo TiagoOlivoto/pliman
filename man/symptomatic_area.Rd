@@ -11,6 +11,7 @@ symptomatic_area(
   img_background = NULL,
   img_pattern = NULL,
   resize = FALSE,
+  fill_hull = TRUE,
   parallel = FALSE,
   workers = NULL,
   randomize = TRUE,
@@ -46,6 +47,10 @@ images that are named as 1.-, 2.-, and so on.}
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
 image).}
+
+\item{fill_hull}{Fill holes in the image? Defaults to \code{TRUE}. This is useful
+to fill holes in leaves, e.g., those caused by insect attack, ensuring the
+hole area will be accounted for the leaf, not background.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

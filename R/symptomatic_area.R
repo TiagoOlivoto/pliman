@@ -20,6 +20,9 @@
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
+#' @param fill_hull Fill holes in the image? Defaults to `TRUE`. This is useful
+#'   to fill holes in leaves, e.g., those caused by insect attack, ensuring the
+#'   hole area will be accounted for the leaf, not background.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
@@ -76,6 +79,7 @@ symptomatic_area <- function(img,
                              img_background = NULL,
                              img_pattern = NULL,
                              resize = FALSE,
+                             fill_hull = TRUE,
                              parallel = FALSE,
                              workers = NULL,
                              randomize = TRUE,
@@ -216,8 +220,9 @@ symptomatic_area <- function(img,
                     Y = ifelse(CODE == "img_background", 0, 1))
         modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto))
         pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
-        plant_background <- matrix(pred1, ncol = ncol(original$R))
-        plant_background <- image_correct(plant_background, perc = 0.009)
+        ifelse(fill_hull == TRUE,
+               plant_background <- fillHull(matrix(pred1, ncol = ncol(original$R))),
+               plant_background <- matrix(pred1, ncol = ncol(original$R)))
         plant_background[plant_background == 1] <- 2
         sadio_sintoma <-
           transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
@@ -269,10 +274,10 @@ symptomatic_area <- function(img,
           dir.create(diretorio_processada)
         }
         image_export(im2,
-                   name = paste0(diretorio_processada, "/",
-                                 prefix,
-                                 name_ori, ".",
-                                 extens_ori))
+                     name = paste0(diretorio_processada, "/",
+                                   prefix,
+                                   name_ori, ".",
+                                   extens_ori))
       }
       symptomatic <- pix_sympt /  usef_area * 100
       healthy <- 100 - symptomatic
@@ -325,19 +330,19 @@ symptomatic_area <- function(img,
                   })
 
     } else{
-    results <- list()
-    pb <- progress(max = length(plants), style = 4)
-    for (i in 1:length(plants)) {
-      if(verbose == TRUE){
-      run_progress(pb, actual = i,
-                   text = paste("Processing image", names_plant[i]))
+      results <- list()
+      pb <- progress(max = length(plants), style = 4)
+      for (i in 1:length(plants)) {
+        if(verbose == TRUE){
+          run_progress(pb, actual = i,
+                       text = paste("Processing image", names_plant[i]))
+        }
+        results[[i]] <-
+          help_sympt(img  = names_plant[i],
+                     img_healthy, img_symptoms, img_background, randomize,
+                     nrows, show_image, show_original, show_background, col_background,
+                     save_image, dir_original, dir_processed)
       }
-      results[[i]] <-
-        help_sympt(img  = names_plant[i],
-                   img_healthy, img_symptoms, img_background, randomize,
-                   nrows, show_image, show_original, show_background, col_background,
-                   save_image, dir_original, dir_processed)
-    }
     }
     results <- transform(do.call(rbind, results),
                          sample = names_plant)[c(3, 1, 2)]
