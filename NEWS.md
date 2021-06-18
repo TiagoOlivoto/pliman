@@ -1,3 +1,8 @@
+# pliman (development version)
+## Minor improvements
+* Include `fill_hull` argument in `symptomatic_area()` and `count_lesions()`
+* Improve `image_contrast()` function to avoid error regarding image resolution.
+
 # pliman 0.3.0
 ## New functions
 * `image_autocrop()` for automatic image cropping.
