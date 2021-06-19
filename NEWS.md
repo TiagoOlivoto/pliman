@@ -2,6 +2,8 @@
 ## Minor improvements
 * Include `fill_hull` argument in `symptomatic_area()` and `count_lesions()`
 * Improve `image_contrast()` function to avoid error regarding image resolution.
+* New argument `subfolder` in `image_export()` to export an image to a subfolder.
+
 
 # pliman 0.3.0
 ## New functions

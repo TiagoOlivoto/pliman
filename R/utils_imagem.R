@@ -57,6 +57,9 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
 #'   image1.-, im2.-) will be imported as a list. Providing any number as
 #'   pattern (e.g., `img_pattern = "1"`) will select images that are named as
 #'   1.-, 2.-, and so on.
+#' @param subfolder Optional character string indicating a subfolder within the
+#'   current working directory to save the image(s). If the folder doesn't
+#'   exist, it will be created.
 #' @param ... Alternative arguments passed to the corresponding functions from
 #'   the `jpeg`, `png`, and `tiff` packages.
 #' @md
@@ -104,7 +107,10 @@ image_import <- function(image, ..., img_pattern = NULL){
 
 #' @export
 #' @name utils_image
-image_export <- function(image, name, ...){
+image_export <- function(image,
+                         name,
+                         subfolder = NULL,
+                         ...){
   if(class(image) %in% c("binary_list", "segment_list", "index_list",
                          "img_mat_list", "palette_list")){
     image <- lapply(image, function(x){x[[1]]})
@@ -113,11 +119,27 @@ image_export <- function(image, name, ...){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
-    lapply(seq_along(image), function(i){
+    if(!missing(subfolder)){
+      dir_out <- paste0(getwd(), "/", subfolder)
+      if(dir.exists(dir_out) == FALSE){
+        dir.create(dir_out)
+      }
+    names(image) <- paste0(dir_out, "/", names(image))
+    }
+    a <-
+      lapply(seq_along(image), function(i){
       writeImage(x = image[[i]], files = names(image[i]), ...)
     })
-  }
+  } else{
+    if(!missing(subfolder)){
+      dir_out <- paste0(getwd(), "/", subfolder)
+      if(dir.exists(dir_out) == FALSE){
+        dir.create(dir_out)
+        name <- paste0(dir_out, "/", name)
+      }
+    }
   writeImage(image, name, ...)
+  }
 }
 #' @export
 #' @name utils_image

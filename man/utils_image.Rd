@@ -10,7 +10,7 @@
 \usage{
 image_import(image, ..., img_pattern = NULL)
 
-image_export(image, name, ...)
+image_export(image, name, subfolder = NULL, ...)
 
 image_show(image)
 
@@ -33,6 +33,10 @@ pattern (e.g., \code{img_pattern = "1"}) will select images that are named as
 1.-, 2.-, and so on.}
 
 \item{name}{An string specifying the name of the image.}
+
+\item{subfolder}{Optional character string indicating a subfolder within the
+current working directory to save the image(s). If the folder doesn't
+exist, it will be created.}
 }
 \value{
 \itemize{
