@@ -26,7 +26,7 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 90% of available cores.
+#'   number of sections is set up to 80% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param randomize Randomize the lines before training the model?
@@ -306,7 +306,7 @@ symptomatic_area <- function(img,
            "\nAllowed extensions are .png, .jpeg, .jpg, .tiff", call. = FALSE)
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.8), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust,
                     varlist = c("names_plant", "help_sympt", "file_name",
@@ -328,6 +328,9 @@ symptomatic_area <- function(img,
                                nrows, show_image, show_original, show_background, col_background,
                                save_image, dir_original, dir_processed)
                   })
+
+
+
 
     } else{
       results <- list()

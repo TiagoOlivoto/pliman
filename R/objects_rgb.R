@@ -242,31 +242,11 @@ objects_rgb <- function(img,
                    G = img@.Data[,,2][which(data_mask == index)],
                    B = img@.Data[,,3][which(data_mask == index)])
       }
-
-      # if(parallel == TRUE){
-      #   nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
-      #   clust <- makeCluster(nworkers)
-      #   clusterExport(clust,
-      #                 varlist = c("get_rgb"),
-      #                 envir=environment())
-      #   on.exit(stopCluster(clust))
-      #   if(verbose == TRUE){
-      #     message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      #   }
-      #   rgb_objects <-
-      #     do.call(rbind,
-      #             parLapply(clust, 1:max(data_mask),
-      #                       function(i){
-      #                         get_rgb(img, data_mask, i)
-      #                       }))
-      #
-      # } else{
-        rgb_objects <-
-          do.call(rbind,
-                  lapply(1:max(data_mask), function(i){
-                    get_rgb(img, data_mask, i)
-                  }))
-      # }
+      rgb_objects <-
+        do.call(rbind,
+                lapply(1:max(data_mask), function(i){
+                  get_rgb(img, data_mask, i)
+                }))
       shape <-
         cbind(data.frame(computeFeatures.shape(nmask)),
               data.frame(computeFeatures.moment(nmask))[,1:2]
@@ -293,23 +273,23 @@ objects_rgb <- function(img,
       marker_col <- ifelse(is.null(marker_col), "white", marker_col)
       marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       if(show_image == TRUE){
-      image_show(img)
-      if(!is.null(marker)){
-      if(marker != "index"){
-        text(shape[,2],
-             shape[,3],
-             shape[,1],
-             col = marker_col,
-             cex = marker_size)
-      } else{
-        text(shape[,2],
-             shape[,3],
-             round(indexes[,2], 2),
-             col = marker_col,
-             cex = marker_size)
+        image_show(img)
+        if(!is.null(marker)){
+          if(marker != "index"){
+            text(shape[,2],
+                 shape[,3],
+                 shape[,1],
+                 col = marker_col,
+                 cex = marker_size)
+          } else{
+            text(shape[,2],
+                 shape[,3],
+                 round(indexes[,2], 2),
+                 col = marker_col,
+                 cex = marker_size)
 
-      }
-      }
+          }
+        }
 
 
       }
@@ -325,20 +305,20 @@ objects_rgb <- function(img,
             height = dim(img@.Data)[2])
         image_show(img)
         if(!is.null(marker)){
-        if(marker != "index"){
-          text(shape[,2],
-               shape[,3],
-               shape[,1],
-               col = marker_col,
-               cex = marker_size)
-        } else{
-          text(shape[,2],
-               shape[,3],
-               round(indexes[,2], 2),
-               col = marker_col,
-               cex = marker_size)
+          if(marker != "index"){
+            text(shape[,2],
+                 shape[,3],
+                 shape[,1],
+                 col = marker_col,
+                 cex = marker_size)
+          } else{
+            text(shape[,2],
+                 shape[,3],
+                 round(indexes[,2], 2),
+                 col = marker_col,
+                 cex = marker_size)
 
-        }
+          }
         }
         dev.off()
       }
@@ -393,8 +373,8 @@ objects_rgb <- function(img,
       pb <- progress(max = length(plants), style = 4)
       for (i in 1:length(plants)) {
         if(verbose == TRUE){
-        run_progress(pb, actual = i,
-                     text = paste("Processing image", names_plant[i]))
+          run_progress(pb, actual = i,
+                       text = paste("Processing image", names_plant[i]))
         }
         results[[i]] <-
           help_count(img  = names_plant[i],
@@ -407,15 +387,15 @@ objects_rgb <- function(img,
     objects <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                  transform(results[[i]][["objects"]],
-                            img =  names(results[i]))[,c(10, 1:9)]
+                transform(results[[i]][["objects"]],
+                          img =  names(results[i]))[,c(10, 1:9)]
               })
       )
     indexes <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
-                  transform(results[[i]][["indexes"]],
-                            img =  names(results[i]))[, c(3, 1:2)]
+                transform(results[[i]][["indexes"]],
+                          img =  names(results[i]))[, c(3, 1:2)]
               })
       )
     invisible(list(objects = objects,

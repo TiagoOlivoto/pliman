@@ -27,7 +27,7 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 90% of available cores.
+#'   number of sections is set up to 80% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
