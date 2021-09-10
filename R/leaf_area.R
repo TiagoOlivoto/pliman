@@ -26,7 +26,7 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 80% of available cores.
+#'   number of sections is set up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
@@ -108,6 +108,7 @@ leaf_area <- function(img,
                       dir_original = NULL,
                       dir_processed = NULL,
                       verbose = TRUE){
+  check_ebi()
   # Some parts adapted from
   # https://github.com/AlcineiAzevedo/Segmentacao-conchonilha2
   # Thanks to Alcinei Azevedo for his tips
@@ -134,7 +135,7 @@ leaf_area <- function(img,
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
         if(resize != FALSE){
-          img <- image_resize(img, resize)
+          img <- EBImage::resize(img, resize)
         }
       } else{
         name_ori <- match.call()[[2]]
@@ -148,7 +149,7 @@ leaf_area <- function(img,
         extens <- file_extension(imag)
         img_leaf <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         if(resize != FALSE){
-          img_leaf <- image_resize(img_leaf, resize)
+          img_leaf <- EBImage::resize(img_leaf, resize)
         }
       }
       if(is.character(img_template)){
@@ -159,7 +160,7 @@ leaf_area <- function(img,
         extens <- file_extension(imag)
         img_template <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         if(resize != FALSE){
-          img_template <- image_resize(img_template, resize)
+          img_template <- EBImage::resize(img_template, resize)
         }
       }
       if(is.character(img_background)){
@@ -170,7 +171,7 @@ leaf_area <- function(img,
         extens <- file_extension(imag)
         img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         if(resize != FALSE){
-          img_background <- image_resize(img_background, resize)
+          img_background <- EBImage::resize(img_background, resize)
         }
       }
       original <- image_to_mat(img)
@@ -189,7 +190,6 @@ leaf_area <- function(img,
       plant_background <- matrix(pred1, ncol = ncol(original$R))
       plant_background <- image_correct(plant_background, perc = 0.009)
       plant_background[plant_background == 1] <- 2
-      # image_show(plant_background!=2)
       # separate leaf from template
       leaf_template <-
         transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),][1:nrows,],
@@ -204,18 +204,18 @@ leaf_area <- function(img,
       leaf_template <- matrix(pred3, ncol = ncol(original$R))
       leaf_template <- image_correct(leaf_template, perc = 0.009)
       plant_background[leaf_template == 1] <- 3
-      mpred1 <- bwlabel(leaf_template == 1)
+      mpred1 <- EBImage::bwlabel(leaf_template == 1)
       shape_template <-
-        cbind(data.frame(computeFeatures.shape(mpred1)),
-              data.frame(computeFeatures.moment(mpred1))[,1:2]
+        cbind(data.frame(EBImage::computeFeatures.shape(mpred1)),
+              data.frame(EBImage::computeFeatures.moment(mpred1))[,1:2]
         )
       shape_template$area <- area_template
       shape_template <- shape_template[shape_template$s.area >= mean(shape_template$s.area), ]
       npix_ref <- shape_template[1, 1]
-      mpred2 <- bwlabel(plant_background == 0)
+      mpred2 <- EBImage::bwlabel(plant_background == 0)
       shape_leaf <-
-        cbind(data.frame(computeFeatures.shape(mpred2)),
-              data.frame(computeFeatures.moment(mpred2))[, c(1, 2)]
+        cbind(data.frame(EBImage::computeFeatures.shape(mpred2)),
+              data.frame(EBImage::computeFeatures.moment(mpred2))[, c(1, 2)]
         )
       shape_leaf$area <- shape_leaf$s.area * area_template / npix_ref
       if(!is.null(lower_size)){
@@ -256,7 +256,7 @@ leaf_area <- function(img,
         im2@.Data[,,3][!ID] <- col_background[3]
       }
       if(show_image == TRUE){
-        image_show(im2)
+        plot(im2)
         text(shape[,2],
              shape[,3],
              shape$label,
@@ -273,7 +273,7 @@ leaf_area <- function(img,
                   collapse = "", sep = ""),
             width = dim(im2@.Data)[1],
             height = dim(im2@.Data)[2])
-        image_show(im2)
+        plot(im2)
         text(shape[,2],
              shape[,3],
              shape$label,
@@ -315,9 +315,7 @@ leaf_area <- function(img,
       clusterExport(clust,
                     varlist = c("names_plant", "help_area", "file_name",
                                 "check_names_dir", "file_extension", "image_import",
-                                "image_binary", "watershed", "distmap", "computeFeatures.moment",
-                                "computeFeatures.shape", "colorLabels", "image_show",
-                                "image_to_mat", "image_correct", "bwlabel"),
+                                "image_binary", "image_to_mat", "image_correct", "bwlabel"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){

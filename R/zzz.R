@@ -24,6 +24,7 @@
 #' @keywords images
 NULL
 
+
 .onAttach <- function(libname, pkgname) {
   vers <-  "0.3.0"
   packageStartupMessage("|=======================================================|")
@@ -32,6 +33,7 @@ NULL
   packageStartupMessage("| Type 'vignette('pliman_start')' for a short tutorial  |")
   packageStartupMessage("| Visit 'https://bit.ly/pliman' for a complete tutorial |")
   packageStartupMessage("|=======================================================|")
+  check_ebi()
 }
 
 if (getRversion() >= "2.15.1") {

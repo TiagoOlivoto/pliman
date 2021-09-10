@@ -44,14 +44,14 @@ rectangle coordinates. See \code{\link[=image_binary]{image_binary()}} for more 
 Defaults to \code{2}.}
 
 \item{extension, tolerance, object_size}{Controls the watershed segmentation of
-objects in the image. See \code{\link[=count_objects]{count_objects()}} for more details.}
+objects in the image. See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}
 
 \item{show_image}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
 
 \item{...}{\itemize{
 \item For \code{object_isolate()}, further arguments passed on to \code{\link[=object_coord]{object_coord()}}.
-\item For \code{object_id()}, further arguments passed on to \code{\link[=count_objects]{count_objects()}}.
+\item For \code{object_id()}, further arguments passed on to \code{\link[=analyze_objects]{analyze_objects()}}.
 }}
 }
 \value{
@@ -85,6 +85,6 @@ object_coord(img, id = c(1, 3))
 
 # Isolate leaf 3
 isolated <- object_isolate(img, id = 3)
-image_show(isolated)
+plot(isolated)
 }
 }

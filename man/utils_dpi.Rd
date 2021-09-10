@@ -6,6 +6,7 @@
 \alias{cm_to_dpi}
 \alias{pixels_to_cm}
 \alias{cm_to_pixels}
+\alias{dpi}
 \title{Utilities for image resolution}
 \usage{
 dpi_to_cm(dpi)
@@ -15,6 +16,8 @@ cm_to_dpi(cm)
 pixels_to_cm(px, dpi)
 
 cm_to_pixels(cm, dpi)
+
+dpi(image)
 }
 \arguments{
 \item{dpi}{The image resolution in dots per inch.}
@@ -22,14 +25,37 @@ cm_to_pixels(cm, dpi)
 \item{cm}{The size in centimeters.}
 
 \item{px}{The number of pixels.}
+
+\item{image}{An image object.}
 }
 \value{
-A numeric value or a vector of numeric values if the input data is a
-vector
+\itemize{
+\item \code{\link[=dpi_to_cm]{dpi_to_cm()}}, \code{\link[=cm_to_dpi]{cm_to_dpi()}}, \code{\link[=pixels_to_cm]{pixels_to_cm()}}, and \code{\link[=cm_to_pixels]{cm_to_pixels()}} return
+a numeric value or a vector of numeric values if the input data is a vector.
+\item \code{\link[=dpi]{dpi()}} returns the computed dpi (dots per inch) given the known distance
+informed in the plot.
+}
 }
 \description{
 Provides useful conversions between size (cm), number of pixels (px) and
-resolution (dpi)
+dots per inch (dpi).
+\itemize{
+\item \code{\link[=dpi_to_cm]{dpi_to_cm()}} converts a known dpi value to centimeters.
+\item \code{\link[=cm_to_dpi]{cm_to_dpi()}} converts a known centimeter values to dpi.
+\item \code{\link[=pixels_to_cm]{pixels_to_cm()}} converts the number of pixels to centimeters, given a
+known resolution (dpi).
+\item \code{\link[=cm_to_pixels]{cm_to_pixels()}} converts a distance (cm) to number of pixels, given a
+known resolution (dpi).
+\item \code{\link[=dpi]{dpi()}} An interactive function to compute the image resolution given a
+known distance informed by the user. See more information in the \strong{Details}
+section.
+}
+}
+\details{
+\code{\link[=dpi]{dpi()}} only run in an interactive section. To compute the image
+resolution (dpi) the user must use the left button mouse to create a line
+of known distance. This can be done, for example, using a template with
+known distance in the image (e.g., \code{la_leaves.JPG}).
 }
 \examples{
 library(pliman)
@@ -44,6 +70,24 @@ cm_to_pixels(c(1, 2, 3), 96)
 
 # Convert number of pixels to cm with resolution of 96 dpi.
 pixels_to_cm(c(1, 2, 3), 96)
+
+if(isTRUE(interactive())){
+#### compute the dpi (dots per inch) resolution ####
+# only works in an interactive section
+# objects_300dpi.jpg has a known resolution of 300 dpi
+img <- image_import(image_pliman("objects_300dpi.jpg"))
+# Higher square: 10 x 10 cm
+# 1) Run the function dpi()
+# 2) Use the left mouse button to create a line in the higher square
+# 3) Declare a known distance (10 cm)
+# 4) See the computed dpi
+dpi(img)
+
+
+img2 <- image_import(image_pliman("la_leaves.JPG"))
+# square leaf sample (2 x 2 cm)
+dpi(img2)
+}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

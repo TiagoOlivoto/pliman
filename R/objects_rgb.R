@@ -28,7 +28,7 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 90% of available cores.
+#'   number of sections is set up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
@@ -136,6 +136,7 @@ objects_rgb <- function(img,
                         dir_original = NULL,
                         dir_processed = NULL,
                         verbose = TRUE){
+  check_ebi()
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
@@ -167,7 +168,7 @@ objects_rgb <- function(img,
         extens_ori <- "jpg"
       }
       if(resize != FALSE){
-        img <- image_resize(img, resize)
+        img <- EBImage::resize(img, resize)
       }
       if(!is.null(foreground) && !is.null(background)){
         if(is.character(foreground)){
@@ -178,7 +179,7 @@ objects_rgb <- function(img,
           extens <- file_extension(imag)
           foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
           if(resize != FALSE){
-            foreground <- image_resize(foreground, resize)
+            foreground <- EBImage::resize(foreground, resize)
           }
         }
         if(is.character(background)){
@@ -189,7 +190,7 @@ objects_rgb <- function(img,
           extens <- file_extension(imag)
           background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
           if(resize != FALSE){
-            background <- image_resize(background, resize)
+            background <- EBImage::resize(background, resize)
           }
         }
         original <- image_to_mat(img)
@@ -213,7 +214,7 @@ objects_rgb <- function(img,
             eval(parse(text=x))}))
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        nmask <- watershed(distmap(foreground_background),
+        nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
                            tolerance = tol,
                            ext = ext)
       } else{
@@ -231,7 +232,7 @@ objects_rgb <- function(img,
             eval(parse(text=x))}))
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        nmask <- watershed(distmap(img2),
+        nmask <- EBImage::watershed(EBImage::distmap(img2),
                            tolerance = tol,
                            ext = ext)
       }
@@ -248,8 +249,8 @@ objects_rgb <- function(img,
                   get_rgb(img, data_mask, i)
                 }))
       shape <-
-        cbind(data.frame(computeFeatures.shape(nmask)),
-              data.frame(computeFeatures.moment(nmask))[,1:2]
+        cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
+              data.frame(EBImage::computeFeatures.moment(nmask))[,1:2]
         )
       shape$id <- 1:nrow(shape)
       ifelse(!is.null(lower_size),
@@ -273,7 +274,7 @@ objects_rgb <- function(img,
       marker_col <- ifelse(is.null(marker_col), "white", marker_col)
       marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       if(show_image == TRUE){
-        image_show(img)
+        plot(img)
         if(!is.null(marker)){
           if(marker != "index"){
             text(shape[,2],
@@ -303,7 +304,7 @@ objects_rgb <- function(img,
                    extens_ori),
             width = dim(img@.Data)[1],
             height = dim(img@.Data)[2])
-        image_show(img)
+        plot(img)
         if(!is.null(marker)){
           if(marker != "index"){
             text(shape[,2],
@@ -346,14 +347,12 @@ objects_rgb <- function(img,
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff.\nExtensions found:", paste(extensions, sep = ", "))
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust,
                     varlist = c("names_plant", "help_count", "file_name",
                                 "check_names_dir", "file_extension", "image_import",
-                                "image_binary", "watershed", "distmap", "computeFeatures.moment",
-                                "computeFeatures.shape", "colorLabels", "image_show",
-                                "image_resize", "detectCores", "makeCluster", "clusterExport",
+                                "image_binary", "image_resize", "detectCores", "makeCluster", "clusterExport",
                                 "stopCluster", "parLapply"),
                     envir=environment())
       on.exit(stopCluster(clust))

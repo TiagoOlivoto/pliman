@@ -13,12 +13,12 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param show_image Show the image results? Defaults to `TRUE`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @param nrow,ncol Arguments passed on to [image_combine()]. The number of rows
+#' @param nrow,ncol Arguments passed on to [EBImage::combine()]. The number of rows
 #'   or columns in the plot grid. Defaults to `NULL`, i.e., a square grid is
 #'   produced.
 #' @return A list with the following objects
@@ -31,7 +31,7 @@
 #' @examples
 #' \donttest{
 #' img <- image_import(image_pliman("sev_leaf.jpg"))
-#' image_show(img)
+#' plot(img)
 #'
 #' prop_segmented(img,
 #'                nseg = 2,
@@ -49,12 +49,13 @@ prop_segmented <- function(image,
                            ncol = NULL,
                            nrow = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, c("image", "image_segment", "image_combine"))
       on.exit(stopCluster(clust))

@@ -18,10 +18,8 @@ knitr::opts_chunk$set(comment = "#", collapse = TRUE, fig.width = 5)
 # Getting started
 `pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
 
-* Measure leaf area with `leaf_area()`.
+* Get object statistics (number, area, perimeter, etc.) with `analyze_objects()`.
 * Measure disease severity with `symptomatic_area()`.
-* Count the number of lesions with `count_lesions()`.
-* Count objects in an image with `count_objects()`.
 * Get the RGB values for each object in an image with `objects_rgb()`.
 * Get object measures with `get_measures()`.
 * Plot objec measures with `plot_measures()`.
@@ -59,10 +57,10 @@ Here, we will count the grains in the image `soybean_touch.png`. This image has 
 
 ```{r}
 soy <- image_import(image_pliman("soybean_touch.jpg"))
-image_show(soy)
+plot(soy)
 
 # Count the objects in the image
-grains <- count_objects(soy)
+grains <- analyze_objects(soy)
 
 # Draws the object id (by default)
 plot_measures(grains)
@@ -101,7 +99,7 @@ img <- image_import(image_pliman("soy_green.jpg"))
 rgb <- objects_rgb(img, marker = "index")
 
 # Draw the object id
-image_show(img)
+plot(img)
 plot_measures(rgb)
 
 # plot the distribution of RGB values of each object

@@ -6,7 +6,7 @@
 #' current plot. The object identification (`"id"`) is drawn by default.
 #'
 #' @name utils_measures
-#' @param object An object computed with [count_objects()] or [leaf_area()].
+#' @param object An object computed with [analyze_objects()].
 #' @param dpi A known resolution of the image in DPI (dots per inch).
 #' @param id An object in the image to indicate a known value.
 #' @param measure For `plot_measures()`, a character string; for
@@ -28,11 +28,21 @@
 #' @param verbose If `FALSE`, runs the code silently.
 #' @param ... Further arguments passed on to [graphics::text()].
 #' @return
-#' * `get_measures()` returns a data frame with the object `id` and the
-#' measures. If `measure` is informed, the pixel values will be corrected by the
-#' value of the known object, given in the unit of the right-hand side of
-#' `measure`. If `dpi` is informed, then all the measures will be adjusted to
-#' the known `dpi`.
+#' * For `get_measures()`, if `measure` is informed, the pixel values will be
+#' corrected by the value of the known object, given in the unit of the
+#' right-hand side of `measure`. If `dpi` is informed, then all the measures
+#' will be adjusted to the known `dpi`.
+#'
+#'    -  If applied to an object of class `anal_obj`, returns a data frame with the
+#' object `id` and the (corrected) measures.
+#'    - If applied to an object of class `anal_obj_ls`, returns a list of class
+#'    `measures_ls`, with two objects: (i) `results`, a data frame containing
+#'    the identification of each image (img) and object within each image (id);
+#'    and (ii) `summary` a data frame containing the values for each image. If
+#'    more than one object is detected in a given image, the number of objects
+#'    (`n`), total area (`area_sum`), mean area (`area_mean`) and the standard
+#'    deviation of the area (`area_sd`) will be computed. For the other measures
+#'    (perimeter and radius), the mean values are presented.
 #' * `plot_measures()` returns a `NULL` object, drawing the text according to
 #' the x and y coordinates of the objects in `object`.
 #' @export
@@ -41,7 +51,7 @@
 #' \donttest{
 #' library(pliman)
 #' img <- image_import(image_pliman("objects_300dpi.jpg"))
-#' image_show(img)
+#' plot(img)
 #' # Image with four objects with a known resolution of 300 dpi
 #' # Higher square: 10 x 10 cm
 #' # Lower square: 5 x 5 cm
@@ -50,7 +60,7 @@
 #'
 #' # Count the objects using the blue band to segment the image
 #' results <-
-#'    count_objects(img,
+#'    analyze_objects(img,
 #'                  index = "B")
 #' plot_measures(results, measure = "id")
 #'
@@ -81,7 +91,7 @@ get_measures <- function(object,
     }
     res <- object
   }
-  if(any(class(object) == "plm_count")){
+  if(any(class(object) %in% c("anal_obj", "anal_obj_ls"))){
     res <- object$results
   }
   if(any(class(object) == "plm_la")){
@@ -124,6 +134,7 @@ get_measures <- function(object,
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
       res$radius_max <- res$radius_max * px_side
+      res$major_axis <- res$major_axis * px_side
     }
     if(var != "area"){
       id_val <- res[which(res$id == id), var]
@@ -133,6 +144,7 @@ get_measures <- function(object,
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
       res$radius_max <- res$radius_max * px_side
+      res$major_axis <- res$major_axis * px_side
     }
     if(verbose == TRUE){
       cat("-----------------------------------------\n")
@@ -151,10 +163,37 @@ get_measures <- function(object,
     res$radius_mean <- res$radius_mean / dpc
     res$radius_min <- res$radius_min / dpc
     res$radius_max <- res$radius_max / dpc
+    res$major_axis <- res$major_axis / dpc
   }
-  res[,1:10] <- apply(res[,1:10], 2, round, digits)
-  class(res) <- c("data.frame", "plm_measures")
-  return(res)
+  if("img" %in% names(res)){
+    res[,2:14] <- apply(res[,2:14], 2, round, digits)
+    smr <-
+      do.call(cbind,
+              lapply(5:14, function(i){
+                if(i == 5){
+                  n <- aggregate(res[[i]] ~ img, res, length)[[2]]
+                  s <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                  a <- aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                  d <- aggregate(res[[i]] ~ img, res, sd, na.rm = TRUE)[2]
+                  cbind(n, s, a, d)
+                } else{
+                  aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                }
+              })
+      )
+    names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:14]))
+    smr$img <- unique(res$img)
+    smr <- smr[,c(14, 1:13)]
+    out <-
+      list(results = res,
+           summary = smr)
+    class(out) <- c("measures_ls")
+    return(out)
+  } else{
+    res[,1:10] <- apply(res[,1:10], 2, round, digits)
+    class(res) <- c("data.frame", "measures")
+    return(res)
+  }
 }
 
 #' @name utils_measures
@@ -165,9 +204,9 @@ plot_measures <- function(object,
                           size = 0.9,
                           col = "white",
                           ...){
-  if("plm_measures"  %in% class(object)){
+  if("measures"  %in% class(object)){
     object <- object
-  } else if(class(object) == "plm_count"){
+  } else if(class(object) == "anal_obj"){
     object <- object$results
   } else if(class(object) == "objects_rgb"){
     object <- cbind(object[["objects"]], index = object$indexes$index)

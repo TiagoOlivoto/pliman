@@ -28,11 +28,15 @@
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
 #'   number of sections is set up to 70% of available cores.
-#' @param workers A positive numeric scalar or a function specifying the maximum
-#'   number of parallel processes that can be active at the same time.
+#' @param workers A positive numeric scalar or a function specifying the number
+#'   of parallel processes that can be active at the same time.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
+#' @param trim Number of pixels removed from edges in the analysis. The edges of
+#'   images are often shaded, which can affect image analysis. The edges of
+#'   images can be removed by specifying the number of pixels. Defaults to
+#'   `FALSE` (no trimmed edges).
 #' @param fill_hull Fill holes in the binary image? Defaults to `FALSE`. This is
 #'   useful to fill holes in objects that have portions with a color similar to
 #'   the background. IMPORTANT: Objects touching each other can be combined into
@@ -71,7 +75,8 @@
 #'   `topn_lower` selects the `n` elements with the smallest area whereas
 #'   `topn_upper` selects the `n` objects with the largest area.
 #' @param randomize Randomize the lines before training the model?
-#' @param nrows The number of lines to be used in training step.
+#' @param nrows The number of lines to be used in training step. Defaults to
+#'   2000.
 #' @param show_image Show image after processing?
 #' @param show_original Show the count objects in the original image?
 #' @param show_background Show the background? Defaults to `TRUE`. A white
@@ -110,48 +115,53 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' ###### deprecated use analyze_objects() instead ############
 #' img <- image_import(image_pliman("soybean_touch.jpg"))
 #' analyze_objects(img)
 #'
+#' # Enumerate the objects in the original image
+#' analyze_objects(img,
+#'                 show_segmentation = FALSE,
+#'                 marker = "text",
+#'                 marker_col = "white")
 #' }
 #'
-count_objects <- function(img,
-                          foreground = NULL,
-                          background = NULL,
-                          img_pattern = NULL,
-                          parallel = FALSE,
-                          workers = NULL,
-                          resize = FALSE,
-                          fill_hull = FALSE,
-                          filter = FALSE,
-                          invert = FALSE,
-                          index = "NB",
-                          my_index = NULL,
-                          object_size = "medium",
-                          tolerance = NULL,
-                          extension = NULL,
-                          lower_size = NULL,
-                          upper_size = NULL,
-                          topn_lower = NULL,
-                          topn_upper = NULL,
-                          randomize = TRUE,
-                          nrows = 10000,
-                          show_image = TRUE,
-                          show_original = TRUE,
-                          show_background = TRUE,
-                          show_segmentation = TRUE,
-                          col_foreground = NULL,
-                          col_background = NULL,
-                          marker = NULL,
-                          marker_col = NULL,
-                          marker_size = NULL,
-                          save_image = FALSE,
-                          prefix = "proc_",
-                          dir_original = NULL,
-                          dir_processed = NULL,
-                          verbose = TRUE){
-  stop("'count_objects()' is deprecated as of {pliman} 0.4.0. Use 'analyze_objects()' instead.", call. = FALSE)
+analyze_objects <- function(img,
+                            foreground = NULL,
+                            background = NULL,
+                            img_pattern = NULL,
+                            parallel = FALSE,
+                            workers = NULL,
+                            resize = FALSE,
+                            trim = FALSE,
+                            fill_hull = FALSE,
+                            filter = FALSE,
+                            invert = FALSE,
+                            index = "NB",
+                            my_index = NULL,
+                            object_size = "medium",
+                            tolerance = NULL,
+                            extension = NULL,
+                            lower_size = NULL,
+                            upper_size = NULL,
+                            topn_lower = NULL,
+                            topn_upper = NULL,
+                            randomize = TRUE,
+                            nrows = 2000,
+                            show_image = TRUE,
+                            show_original = TRUE,
+                            show_background = TRUE,
+                            show_segmentation = TRUE,
+                            col_foreground = NULL,
+                            col_background = NULL,
+                            marker = NULL,
+                            marker_col = NULL,
+                            marker_size = NULL,
+                            save_image = FALSE,
+                            prefix = "proc_",
+                            dir_original = NULL,
+                            dir_processed = NULL,
+                            verbose = TRUE){
+  # check_ebi()
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
@@ -184,8 +194,11 @@ count_objects <- function(img,
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
       }
+      if(trim != TRUE){
+        img <- image_trim(img, trim)
+      }
       if(resize != FALSE){
-        img <- EBImage::resize(img, resize)
+        img <- image_resize(img, resize)
       }
       if(filter != FALSE){
         img <- image_filter(img)
@@ -207,16 +220,28 @@ count_objects <- function(img,
           extens <- file_extension(imag)
           background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
-        original <- image_to_mat(img)
-        foreground <- image_to_mat(foreground)
-        background <- image_to_mat(background)
+        original <-
+          data.frame(CODE = "img",
+                     R = c(img@.Data[,,1]),
+                     G = c(img@.Data[,,2]),
+                     B = c(img@.Data[,,3]))
+        foreground <-
+          data.frame(CODE = "foreground",
+                     R = c(foreground@.Data[,,1]),
+                     G = c(foreground@.Data[,,2]),
+                     B = c(foreground@.Data[,,3]))
+        background <-
+          data.frame(CODE = "background",
+                     R = c(background@.Data[,,1]),
+                     G = c(background@.Data[,,2]),
+                     B = c(background@.Data[,,3]))
         back_fore <-
-          transform(rbind(foreground$df_in[sample(1:nrow(foreground$df_in)),][1:nrows,],
-                          background$df_in[sample(1:nrow(background$df_in)),][1:nrows,]),
+          transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
+                          background[sample(1:nrow(background)),][1:nrows,]),
                     Y = ifelse(CODE == "background", 0, 1))
         modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
-        pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
-        foreground_background <- matrix(pred1, ncol = ncol(original$R))
+        pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
+        foreground_background <- matrix(pred1, ncol = dim(img)[[2]])
         foreground_background <- image_correct(foreground_background, perc = 0.02)
         ID <- c(foreground_background == 1)
         ID2 <- c(foreground_background == 0)
@@ -229,8 +254,8 @@ count_objects <- function(img,
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
         nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
-                           tolerance = tol,
-                           ext = ext)
+                                    tolerance = tol,
+                                    ext = ext)
       } else{
         img2 <- image_binary(img,
                              index = index,
@@ -248,54 +273,14 @@ count_objects <- function(img,
         ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
         tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
         nmask <- EBImage::watershed(EBImage::distmap(img2),
-                           tolerance = tol,
-                           ext = ext)
+                                    tolerance = tol,
+                                    ext = ext)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
       }
-      backg <- !is.null(col_background)
-      col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
-      col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
-      if(show_original == TRUE & show_segmentation == FALSE){
-        im2 <- img
-        if(backg){
-          im3 <- EBImage::colorLabels(nmask)
-          im2@.Data[,,1][which(im3@.Data[,,1]==0)] <- col_background[1]
-          im2@.Data[,,2][which(im3@.Data[,,2]==0)] <- col_background[2]
-          im2@.Data[,,3][which(im3@.Data[,,3]==0)] <- col_background[3]
-        }
-      }
-      if(show_original == TRUE & show_segmentation == TRUE){
-        im2 <- EBImage::colorLabels(nmask)
-        if(backg){
-          im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
-          im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
-          im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
-        } else{
-          im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- img@.Data[,,1][which(im2@.Data[,,1]==0)]
-          im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- img@.Data[,,2][which(im2@.Data[,,2]==0)]
-          im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- img@.Data[,,3][which(im2@.Data[,,3]==0)]
-        }
-      }
-      if(show_original == FALSE){
-        if(show_segmentation == TRUE){
-          im2 <- EBImage::colorLabels(nmask)
-          im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
-          im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
-          im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
-        } else{
-          im2 <- img
-          im2@.Data[,,1][ID] <- col_foreground[1]
-          im2@.Data[,,2][ID] <- col_foreground[2]
-          im2@.Data[,,3][ID] <- col_foreground[3]
-          im2@.Data[,,1][ID2] <- col_background[1]
-          im2@.Data[,,2][ID2] <- col_background[2]
-          im2@.Data[,,3][ID2] <- col_background[3]
-        }
-      }
       shape <-
         cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
-              data.frame(EBImage::computeFeatures.moment(nmask))[,1:2]
+              data.frame(EBImage::computeFeatures.moment(nmask))
         )
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
@@ -312,63 +297,10 @@ count_objects <- function(img,
       if(!is.null(topn_upper)){
         shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
       }
-      shape$id <- 1:nrow(shape)
-      shape <- shape[, c(9, 7, 8, 1, 2:6)]
-      show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
-      marker <- ifelse(is.null(marker), "text", marker)
-      marker_col <- ifelse(is.null(marker_col), "white", marker_col)
-      marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
-      if(show_image == TRUE){
-        if(marker == "text"){
-          plot(im2)
-          if(show_mark){
-            text(shape[,2],
-                 shape[,3],
-                 shape[,1],
-                 col = marker_col,
-                 cex = marker_size)
-          }
-        } else{
-          plot(im2)
-          if(show_mark){
-            points(shape[,2],
-                   shape[,3],
-                   col = marker_col,
-                   pch = 16,
-                   cex = marker_size)
-          }
-        }
-      }
-      if(save_image == TRUE){
-        if(dir.exists(diretorio_processada) == FALSE){
-          dir.create(diretorio_processada)
-        }
-        png(paste0(diretorio_processada, "/",
-                   prefix,
-                   name_ori, ".",
-                   extens_ori),
-            width = dim(im2@.Data)[1],
-            height = dim(im2@.Data)[2])
-        if(marker == "text"){
-          marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-          plot(im2)
-          text(shape[,2],
-               shape[,3],
-               shape[,1],
-               col = marker_col,
-               cex = marker_size)
-        } else{
-          marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-          plot(im2)
-          text(shape[,2],
-               shape[,3],
-               col = marker_col,
-               pch = 16,
-               cex = marker_size)
-
-        }
-        dev.off()
-      }
+      shape <- transform(shape,
+                         id = 1:nrow(shape),
+                         radius_ratio = s.radius.max / s.radius.min)
+      shape <- shape[, c(12, 7, 8, 1:3, 5:6, 4, 13, 9:11)]
       stats <-
         transform(data.frame(area = c(n = length(shape$s.area),
                                       min(shape$s.area),
@@ -384,13 +316,111 @@ count_objects <- function(img,
                                            sum(shape$s.perimeter))),
                   statistics = c("n", "min", "mean", "max", "sd", "sum"))
       stats <- stats[c(3, 1, 2)]
-      shape <- shape[,c(1:6, 8:9, 7)]
-      shape <- transform(shape, radius_ratio = s.radius.max / s.radius.min)
+
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd", "radius_ratio")
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio",
+                           "major_axis", "eccentricity", "theta")
       results <- list(results = shape,
                       statistics = stats)
-      class(results) <- "plm_count"
+      class(results) <- "anal_obj"
+
+      if(show_image == TRUE | save_image == TRUE){
+        backg <- !is.null(col_background)
+        col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
+        col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
+        if(show_original == TRUE & show_segmentation == FALSE){
+          im2 <- img
+          if(backg){
+            im3 <- EBImage::colorLabels(nmask)
+            im2@.Data[,,1][which(im3@.Data[,,1]==0)] <- col_background[1]
+            im2@.Data[,,2][which(im3@.Data[,,2]==0)] <- col_background[2]
+            im2@.Data[,,3][which(im3@.Data[,,3]==0)] <- col_background[3]
+          }
+        }
+        if(show_original == TRUE & show_segmentation == TRUE){
+          im2 <- EBImage::colorLabels(nmask)
+          if(backg){
+            im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
+            im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
+            im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
+          } else{
+            im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- img@.Data[,,1][which(im2@.Data[,,1]==0)]
+            im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- img@.Data[,,2][which(im2@.Data[,,2]==0)]
+            im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- img@.Data[,,3][which(im2@.Data[,,3]==0)]
+          }
+        }
+        if(show_original == FALSE){
+          if(show_segmentation == TRUE){
+            im2 <- EBImage::colorLabels(nmask)
+            im2@.Data[,,1][which(im2@.Data[,,1]==0)] <- col_background[1]
+            im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
+            im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
+          } else{
+            im2 <- img
+            im2@.Data[,,1][ID] <- col_foreground[1]
+            im2@.Data[,,2][ID] <- col_foreground[2]
+            im2@.Data[,,3][ID] <- col_foreground[3]
+            im2@.Data[,,1][ID2] <- col_background[1]
+            im2@.Data[,,2][ID2] <- col_background[2]
+            im2@.Data[,,3][ID2] <- col_background[3]
+          }
+        }
+        show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
+        marker <- ifelse(is.null(marker), "text", marker)
+        marker_col <- ifelse(is.null(marker_col), "white", marker_col)
+        marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
+        if(show_image == TRUE){
+          if(marker == "text"){
+            plot(im2)
+            if(show_mark){
+              text(shape[,2],
+                   shape[,3],
+                   shape[,1],
+                   col = marker_col,
+                   cex = marker_size)
+            }
+          } else{
+            plot(im2)
+            if(show_mark){
+              points(shape[,2],
+                     shape[,3],
+                     col = marker_col,
+                     pch = 16,
+                     cex = marker_size)
+            }
+          }
+        }
+        if(save_image == TRUE){
+          if(dir.exists(diretorio_processada) == FALSE){
+            dir.create(diretorio_processada)
+          }
+          png(paste0(diretorio_processada, "/",
+                     prefix,
+                     name_ori, ".",
+                     extens_ori),
+              width = dim(im2@.Data)[1],
+              height = dim(im2@.Data)[2])
+          if(marker == "text"){
+            marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
+            plot(im2)
+            text(shape[,2],
+                 shape[,3],
+                 shape[,1],
+                 col = marker_col,
+                 cex = marker_size)
+          } else{
+            marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
+            plot(im2)
+            text(shape[,2],
+                 shape[,3],
+                 col = marker_col,
+                 pch = 16,
+                 cex = marker_size)
+
+          }
+          dev.off()
+        }
+      }
       if(verbose == TRUE){
         cat("\n--------------------------------------------\n")
         cat("Number of objects:", stats[1,2],"\n")
@@ -413,7 +443,7 @@ count_objects <- function(img,
     extensions <- as.character(sapply(plants, file_extension))
     names_plant <- as.character(sapply(plants, file_name))
     if(length(grep(img_pattern, names_plant)) == 0){
-      stop(paste("'", img_pattern, "' pattern not found in '",
+      stop(paste("'",img_pattern,"' pattern not found in '",
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
@@ -432,7 +462,6 @@ count_objects <- function(img,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-
       results <-
         parLapply(clust, names_plant,
                   function(x){
@@ -449,8 +478,8 @@ count_objects <- function(img,
       pb <- progress(max = length(plants), style = 4)
       for (i in 1:length(plants)) {
         if(verbose == TRUE){
-        run_progress(pb, actual = i,
-                     text = paste("Processing image", names_plant[i]))
+          run_progress(pb, actual = i,
+                       text = paste("Processing image", names_plant[i]))
         }
         results[[i]] <-
           help_count(img  = names_plant[i],
@@ -472,10 +501,10 @@ count_objects <- function(img,
       do.call(rbind,
               lapply(seq_along(results), function(i){
                 transform(results[[i]][["results"]],
-                          img =  names(results[i]))[, c(10, 1:9)]
+                          img =  names(results[i]))[, c(14, 1:13)]
               })
       )
-    summ <- stats[stats$statistics == "n",c(1,3)]
+    summ <- stats[stats$statistics == "n", c(1,3)]
     if(verbose == TRUE){
       names(summ) <- c("Image", "Objects")
       cat("--------------------------------------------\n")
@@ -484,9 +513,14 @@ count_objects <- function(img,
       message("Done!")
 
     }
-    invisible(list(statistics = stats,
-                   count = summ,
-                   results = results))
+    invisible(
+      structure(
+        list(statistics = stats,
+             count = summ,
+             results = results),
+        class = "anal_obj_ls"
+      )
+    )
   }
 }
 

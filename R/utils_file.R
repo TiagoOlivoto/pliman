@@ -19,6 +19,8 @@
 #'   length as the number of files manipulated. If one value is informed, a
 #'   sequential vector of names will be created as "`name`_1", "`name`_2", and
 #'   so on.
+#' @param extension The new extension of the file. If not declared (default),
+#'   the original extensions will be used.
 #' @param sep An optional separator. Defaults to `""`.
 #' @param save_to The directory to save the new files. Defaults to the current
 #'   working directory. If the file name of a file is not changed, nothing will
@@ -59,27 +61,40 @@
 #' list.files(dir)
 #' }
 file_extension <- function(file){
-  ex <- strsplit(basename(file), split="\\.")[[1]]
-  return(ex[-1])
+  sapply(seq_along(file), function(x){
+    strsplit(basename(file[x]), split="\\.")[[1]][-1]
+  })
 }
 #' @export
 #' @name utils_file
 file_name <- function(file){
-  ex <- strsplit(basename(file), split="\\.")[[1]]
-  return(ex[1])
+  sapply(seq_along(file), function(x){
+    strsplit(basename(file[x]), split="\\.")[[1]][1]
+  })
 }
 #' @export
 #' @name utils_file
 file_dir <- function(file){
   ex <-  ifelse(grepl(".", file, fixed = TRUE),
-                paste0(gsub('.$', "", gsub(basename(file), "", file))),
+                sapply(seq_along(file),
+                       function(x){
+                         paste0(gsub('.$', "", gsub(basename(file[x]), "", file[x])))
+                       }),
                 file)
-  fd <- ifelse(nchar(ex) == 0,
-               paste0("."),
-               ifelse(grepl("^[/]", file), ex, paste0("./", ex)))
-  fd <- ifelse(grepl(":", fd, fixed = TRUE),
-               substring(fd, 3, nchar(fd)),
-               fd)
+  fd <-
+    sapply(seq_along(ex),
+           function(x){
+             ifelse(nchar(x) == 0,
+                    paste0("."),
+                    ifelse(grepl("^[/]", file[x]), ex[x], paste0("./", ex[x])))
+           })
+  fd <-
+    sapply(seq_along(fd),
+           function(x){
+             ifelse(grepl(":", fd[x], fixed = TRUE),
+                    substring(fd[x], 3, nchar(fd[x])),
+                    fd[x])
+           })
   return(fd)
 }
 #' @export
@@ -89,6 +104,7 @@ manipulate_files <- function(pattern,
                              prefix = NULL,
                              name = NULL,
                              suffix = NULL,
+                             extension = NULL,
                              sep = "",
                              save_to = NULL,
                              overwrite = FALSE,
@@ -121,17 +137,20 @@ manipulate_files <- function(pattern,
                              paste0(dir, "/"),
                              paste(dir)), old_files)
   names <- sapply(old_files, file_name)
-  extens <- sapply(old_files, file_extension)
+
+  ifelse(!missing(extension),
+         extens <- rep(extension, length(old_files)),
+         extens <- sapply(old_files, file_extension))
   prefix <- ifelse(is.null(prefix), "", prefix)
   if(is.null(name)){
-   name <- names
+    name <- names
   } else{
     if(length(name) == 1){
-    name <-
-      unlist(lapply(seq_along(names),
-                    function(i){
-                      paste0(name, i, collapse = "_")
-                    }))
+      name <-
+        unlist(lapply(seq_along(names),
+                      function(i){
+                        paste0(name, i, collapse = "_")
+                      }))
     } else{
       name <- name
       if(length(name) != length(names)){

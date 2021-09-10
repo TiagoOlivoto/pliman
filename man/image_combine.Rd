@@ -4,7 +4,7 @@
 \alias{image_combine}
 \title{Combines images to a grid}
 \usage{
-image_combine(..., nrow = NULL, ncol = NULL)
+image_combine(..., nrow = NULL, ncol = NULL, verbose = TRUE)
 }
 \arguments{
 \item{...}{a comma-separated name of image objects or a list containing image
@@ -12,6 +12,10 @@ objects.}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
+
+\item{verbose}{Shows the name of objects declared in \code{...} or a numeric
+sequence if a list with no names is provided. Set to \code{FALSE} to supress the
+text.}
 }
 \value{
 A grid with the images in \code{...}

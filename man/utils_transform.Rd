@@ -10,6 +10,7 @@
 \alias{image_hreflect}
 \alias{image_vreflect}
 \alias{image_resize}
+\alias{image_trim}
 \alias{image_filter}
 \alias{image_blur}
 \alias{image_contrast}
@@ -52,9 +53,21 @@ image_resize(
   verbose = TRUE
 )
 
+image_trim(
+  image,
+  edge = NULL,
+  top = NULL,
+  bottom = NULL,
+  left = NULL,
+  right = NULL,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE
+)
+
 image_filter(
   image,
-  size = 3,
+  size = 2,
   cache = 512,
   parallel = FALSE,
   workers = NULL,
@@ -68,14 +81,18 @@ image_contrast(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 \arguments{
 \item{image}{An image or a list of images of class \code{Image}.}
 
-\item{edge}{The number of pixels in the edge of the cropped image. If
-\code{edge = 0} the image will be cropped to create a bounding rectangle (x and y
-coordinates) around the image objects.}
+\item{edge}{\itemize{
+\item for \code{\link[=image_autocrop]{image_autocrop()}} the number of pixels in the edge of the cropped
+image. If \code{edge = 0} the image will be cropped to create a bounding rectangle
+(x and y coordinates) around the image objects.
+\item for \code{\link[=image_trim]{image_trim()}}, the number of pixels removed from the edges. By
+default, 20 pixels are removed from all the edges.
+}}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when \code{image} is a list. The number of sections is set
-up to 90\% of available cores.}
+up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
@@ -94,6 +111,9 @@ image will have a size of \verb{640 x 360}.}
 can be missing. In this case, the image is resized according to the
 relative size informed in \code{rel_size}.}
 
+\item{top, bottom, left, right}{The number of pixels removed from \code{top},
+\code{bottom}, \code{left}, and \code{right} when using \code{\link[=image_trim]{image_trim()}}.}
+
 \item{size}{The median filter radius (integer). Defaults to \code{3}.}
 
 \item{cache}{The the L2 cache size of the system CPU in kB (integer).
@@ -109,6 +129,7 @@ A modified version of \code{image} depending on the function used.
 Performs image rotation and reflection
 \itemize{
 \item \code{image_autocrop()} Provides automatic image cropping.
+\item \code{image_trim()} Remove pixels from the edges of an image (20 by default).
 \item \code{image_dimension()} Gives the dimension (width and height) of an image.
 \item \code{image_rotate()} Rotates the image clockwise by the given angle.
 \item \code{image_horizontal()} Converts (if needed) an image to a horizontal image.
@@ -127,7 +148,7 @@ histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}
 \examples{
 library(pliman)
 img <- image_import(image_pliman("sev_leaf.jpg"))
-image_show(img)
+plot(img)
 img <- image_resize(img, 50)
 img1 <- image_rotate(img, 45)
 img2 <- image_hreflect(img)

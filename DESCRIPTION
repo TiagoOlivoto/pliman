@@ -19,9 +19,10 @@ BugReports: https://github.com/TiagoOlivoto/pliman/issues
 Depends: 
     R (>= 4.1)
 Imports: 
-    EBImage,
     ggplot2
 Suggests: 
+    BiocManager,
+    EBImage,
     knitr,
     rmarkdown
 VignetteBuilder: 

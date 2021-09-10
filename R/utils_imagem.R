@@ -5,6 +5,9 @@
 #'   objects.
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
+#' @param verbose Shows the name of objects declared in `...` or a numeric
+#'   sequence if a list with no names is provided. Set to `FALSE` to supress the
+#'   text.
 #' @import ggplot2
 #' @importFrom stats reshape
 #' @export
@@ -15,7 +18,10 @@
 #'img1 <- image_import(image_pliman("sev_leaf.jpg"))
 #'img2 <- image_import(image_pliman("sev_leaf_nb.jpg"))
 #'image_combine(img1, img2)
-image_combine <- function(..., nrow = NULL, ncol = NULL){
+image_combine <- function(...,
+                          nrow = NULL,
+                          ncol = NULL,
+                          verbose = TRUE){
   if(is.list(c(...))){
     plots <- as.list(...)
     if(class(plots) %in% c("binary_list", "segment_list", "index_list",
@@ -24,6 +30,7 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
     }
   }else{
     plots <- list(...)
+    names(plots) <- strsplit(gsub("c\\(|\\)",  "", deparse(substitute(c(...)))), "\\s*(\\s|,)\\s*")[[1]]
   }
   num_plots <- length(plots)
   if (is.null(nrow) && is.null(ncol)){
@@ -38,19 +45,32 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
   }
   op <- par(mfrow = c(nrow, ncol))
   on.exit(par(op))
+  ifelse(is.null(names(plots)), index <- 1:length(plots), index <- names(plots))
   for(i in 1:length(plots)){
     plot(plots[[i]])
+    if(verbose == TRUE){
+      dim <- image_dimension(plots[[i]], verbose = FALSE)
+      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+    }
   }
 }
-#'Import, display and export images
+
+#'Import and export images
 #'
-#'Import images from files and URLs, write images to files, and show images.
+#'Import images from files and URLs and write images to files, possibly with
+#'batch processing.
 #'*
 #' @name utils_image
 #' @param image
 #' * For `image_import()`, a character vector of file names or URLs.
 #' * For `image_export()`, an Image object, an array or a list of images.
-#' @param name An string specifying the name of the image.
+#' @param name An string specifying the name of the image. It can be either a
+#'   charactere with the image name (e.g., "img1") or name and extension (e.g.,
+#'   "img1.jpg"). If none file extension is provided, the image will be saved as
+#'   a *.jpg file.
+#' @param extension When `image` is a list, `extension` can be used to define
+#'   the extension of exported files. This will overwrite the file extensions
+#'   given in `image`.
 #' @param img_pattern A pattern of file name used to identify images to be
 #'   imported. For example, if `img_pattern = "im"` all images in the current
 #'   working directory that the name matches the pattern (e.g., img1.-,
@@ -74,6 +94,7 @@ image_combine <- function(..., nrow = NULL, ncol = NULL){
 #' library(pliman)
 #'img <- image_import(image_pliman("sev_leaf.jpg"))
 image_import <- function(image, ..., img_pattern = NULL){
+  check_ebi()
   if(!is.null(img_pattern)){
     if(img_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       img_pattern <- "^[0-9].*$"
@@ -91,7 +112,7 @@ image_import <- function(image, ..., img_pattern = NULL){
     }
     list_img <-
       lapply(imgs, function(x){
-        readImage(x, ...)
+        EBImage::readImage(x, ...)
       })
     names(list_img) <- imgs
     return(list_img)
@@ -99,18 +120,31 @@ image_import <- function(image, ..., img_pattern = NULL){
   img_dir <- file_dir(image)
   all_files <- sapply(list.files(img_dir), file_name)
   img_name <- file_name(image)
-  if(!grepl("http", img_dir, fixed = TRUE) & !img_name %in% all_files){
-    stop(" '", img_name, "' not found in ", img_dir,  call. = FALSE)
+  test <- img_name %in% all_files
+  if(!any(grepl("http", img_dir, fixed = TRUE)) & !all(test)){
+    stop(" '",img_name[which(test == FALSE)],"' not found in ", img_dir[which(test == FALSE)],  call. = FALSE)
   }
-  readImage(image, ...)
+  if(length(image) > 1){
+    ls <-
+      lapply(seq_along(image),
+             function(x){
+               EBImage::readImage(image[x], ...)
+             })
+    names(ls) <- paste0(img_name, ".", file_extension(image))
+    return(ls)
+  } else{
+    EBImage::readImage(image, ...)
+  }
 }
 
 #' @export
 #' @name utils_image
 image_export <- function(image,
                          name,
+                         extension = NULL,
                          subfolder = NULL,
                          ...){
+  check_ebi()
   if(class(image) %in% c("binary_list", "segment_list", "index_list",
                          "img_mat_list", "palette_list")){
     image <- lapply(image, function(x){x[[1]]})
@@ -119,18 +153,39 @@ image_export <- function(image,
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
+    name <- file_name(names(image))
+    extens <- file_extension(names(image))
+    if(any(sapply(extens, length)) ==  0 & is.null(extension)){
+      extens <- rep("jpg", length(image))
+      message("Image(s) exported as *.jpg file(s).")
+    }
+    if(!is.null(extension)){
+      extens <- rep(extension, length(image))
+    }
+    names(image) <- paste0(name, ".", extens)
     if(!missing(subfolder)){
       dir_out <- paste0(getwd(), "/", subfolder)
       if(dir.exists(dir_out) == FALSE){
         dir.create(dir_out)
       }
-    names(image) <- paste0(dir_out, "/", names(image))
+      names(image) <- paste0(dir_out, "/", name, ".", extens)
     }
     a <-
       lapply(seq_along(image), function(i){
-      writeImage(x = image[[i]], files = names(image[i]), ...)
-    })
+        EBImage::writeImage(x = image[[i]], files = names(image[i]), ...)
+      })
   } else{
+    filname <- file_name(name)
+    extens <- unlist(file_extension(name))
+    if(length(extens) ==  1){
+      extens <- extens
+    } else if(length(extens) ==  0 & is.null(extension)){
+      extens <- "jpg"
+      message("Image(s) exported as *.jpg file(s).")
+    } else if(!is.null(extension)){
+      extens <- extension
+    }
+    name <- paste0(filname, ".", extens)
     if(!missing(subfolder)){
       dir_out <- paste0(getwd(), "/", subfolder)
       if(dir.exists(dir_out) == FALSE){
@@ -138,12 +193,13 @@ image_export <- function(image,
         name <- paste0(dir_out, "/", name)
       }
     }
-  writeImage(image, name, ...)
+    EBImage::writeImage(image, name, ...)
   }
 }
 #' @export
 #' @name utils_image
 image_show <- function(image){
+  warning("'image_show()' is deprecated as of {pliman} 0.4.0. Use 'plot()' instead.", call. = FALSE)
   if(any(class(image) != "Image")){
     grid.raster(image)
   } else{
@@ -165,6 +221,7 @@ image_pliman <- function(image){
 #'
 #' Performs image rotation and reflection
 #' * `image_autocrop()` Provides automatic image cropping.
+#' * `image_trim()` Remove pixels from the edges of an image (20 by default).
 #' * `image_dimension()` Gives the dimension (width and height) of an image.
 #' * `image_rotate()` Rotates the image clockwise by the given angle.
 #' * `image_horizontal()` Converts (if needed) an image to a horizontal image.
@@ -183,9 +240,18 @@ image_pliman <- function(image){
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
+#' @param edge
+#' * for [image_autocrop()] the number of pixels in the edge of the cropped
+#' image. If `edge = 0` the image will be cropped to create a bounding rectangle
+#' (x and y coordinates) around the image objects.
+#' * for [image_trim()], the number of pixels removed from the edges. By
+#' default, 20 pixels are removed from all the edges.
+#'
+#' @param top,bottom,left,right The number of pixels removed from `top`,
+#'   `bottom`, `left`, and `right` when using [image_trim()].
 #' @param angle The rotation angle in degrees.
 #' @param bg_col Color used to fill the background pixels, defaults to `"white"`.
 #' @param rel_size The relative size of the resized image. Defaults to 100. For
@@ -194,9 +260,6 @@ image_pliman <- function(image){
 #' @param width,height Width and height of the resized image. These arguments
 #'   can be missing. In this case, the image is resized according to the
 #'   relative size informed in `rel_size`.
-#' @param edge The number of pixels in the edge of the cropped image. If
-#'   `edge = 0` the image will be cropped to create a bounding rectangle (x and y
-#'   coordinates) around the image objects.
 #' @param size The median filter radius (integer). Defaults to `3`.
 #' @param sigma A numeric denoting the standard deviation of the Gaussian filter
 #'   used for blurring. Defaults to `3`.
@@ -212,7 +275,7 @@ image_pliman <- function(image){
 #' @examples
 #' library(pliman)
 #'img <- image_import(image_pliman("sev_leaf.jpg"))
-#'image_show(img)
+#'plot(img)
 #'img <- image_resize(img, 50)
 #'img1 <- image_rotate(img, 45)
 #'img2 <- image_hreflect(img)
@@ -224,6 +287,7 @@ image_autocrop <- function(image,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -233,7 +297,7 @@ image_autocrop <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -271,7 +335,7 @@ image_dimension <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -322,6 +386,7 @@ image_rotate <- function(image,
                          parallel = FALSE,
                          workers = NULL,
                          verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -331,7 +396,7 @@ image_rotate <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -343,7 +408,7 @@ image_rotate <- function(image,
       lapply(image, image_rotate, angle, bg_col)
     }
   } else{
-    rotate(image, angle, bg.col = bg_col)
+    EBImage::rotate(image, angle, bg.col = bg_col)
   }
 }
 #' @name utils_transform
@@ -352,6 +417,7 @@ image_horizontal <- function(image,
                              parallel = FALSE,
                              workers = NULL,
                              verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -361,7 +427,7 @@ image_horizontal <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -376,7 +442,7 @@ image_horizontal <- function(image,
     width <- dim(image)[[1]]
     height <- dim(image)[[2]]
     if(width < height){
-      image_rotate(image, 90)
+      EBImage::rotate(image, 90)
     } else{
       image
     }
@@ -388,6 +454,7 @@ image_vertical <- function(image,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -397,7 +464,7 @@ image_vertical <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -412,7 +479,7 @@ image_vertical <- function(image,
     width <- dim(image)[[1]]
     height <- dim(image)[[2]]
     if(width > height){
-      image_rotate(image, 90)
+      EBImage::rotate(image, 90)
     } else{
       image
     }
@@ -424,6 +491,7 @@ image_hreflect <- function(image,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -433,7 +501,7 @@ image_hreflect <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -445,7 +513,7 @@ image_hreflect <- function(image,
       lapply(image, image_hreflect)
     }
   } else{
-    flop(image)
+    EBImage::flop(image)
   }
 }
 #' @name utils_transform
@@ -454,6 +522,7 @@ image_vreflect <- function(image,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -463,7 +532,7 @@ image_vreflect <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -475,7 +544,7 @@ image_vreflect <- function(image,
       lapply(image, image_vreflect)
     }
   } else{
-    flip(image)
+    EBImage::flip(image)
   }
 }
 
@@ -488,6 +557,7 @@ image_resize <- function(image,
                          parallel = FALSE,
                          workers = NULL,
                          verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -497,7 +567,7 @@ image_resize <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -512,17 +582,32 @@ image_resize <- function(image,
     nrow <- dim(image)[[1]]
     new_row <- nrow * rel_size / 100
     width <- ifelse(missing(width), new_row, width)
-    resize(image, width, height)
+    EBImage::resize(image, width, height)
   }
 }
+
 #' @name utils_transform
 #' @export
-image_filter <- function(image,
-                         size = 3,
-                         cache = 512,
-                         parallel = FALSE,
-                         workers = NULL,
-                         verbose = TRUE){
+image_trim <- function(image,
+                       edge = NULL,
+                       top  = NULL,
+                       bottom  = NULL,
+                       left = NULL,
+                       right = NULL,
+                       parallel = FALSE,
+                       workers = NULL,
+                       verbose = TRUE){
+  check_ebi()
+  if(is.null(edge) & all(sapply(list(top, bottom, left, right), is.null))){
+    edge <- 20
+  }
+  if(is.null(edge) & !all(sapply(list(top, bottom, left, right), is.null))){
+    edge <- 0
+  }
+  top <- ifelse(is.null(top), edge, top)
+  bottom <- ifelse(is.null(bottom), edge, bottom)
+  left <- ifelse(is.null(left), edge, left)
+  right <- ifelse(is.null(right), edge, right)
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -532,7 +617,44 @@ image_filter <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_trim, edge, top, bottom, left, right)
+    } else{
+      lapply(image, image_trim, edge, top, bottom, left, right)
+    }
+  } else{
+    image <- image[, -c(1:top) ,]
+    image <- image[, -c((dim(image)[2] - bottom + 1):dim(image)[2]) ,]
+    image <- image[-c((dim(image)[1] - right + 1):dim(image)[1]) ,  ,]
+    image <- image[-c(1:left), ,]
+    return(image)
+  }
+}
+#' @name utils_transform
+#' @export
+image_filter <- function(image,
+                         size = 2,
+                         cache = 512,
+                         parallel = FALSE,
+                         workers = NULL,
+                         verbose = TRUE){
+  check_ebi()
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -544,7 +666,7 @@ image_filter <- function(image,
       lapply(image, image_filter, size, cache)
     }
   } else{
-    medianFilter(image, size, cache)
+    EBImage::medianFilter(image, size, cache)
   }
 }
 #' @name utils_transform
@@ -554,6 +676,7 @@ image_blur <- function(image,
                        parallel = FALSE,
                        workers = NULL,
                        verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -563,7 +686,7 @@ image_blur <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -575,7 +698,7 @@ image_blur <- function(image,
       lapply(image, image_blur, sigma)
     }
   } else{
-    gblur(image, sigma)
+    EBImage::gblur(image, sigma)
   }
 }
 #' @name utils_transform
@@ -584,6 +707,7 @@ image_contrast <- function(image,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -593,7 +717,7 @@ image_contrast <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -630,7 +754,7 @@ image_contrast <- function(image,
           break
         }
       }
-      image <- resize(image, w = img_width, h = img_height)
+      image <- EBImage::resize(image, w = img_width, h = img_height)
       nx <- suppressWarnings(fx[max(which(fx > 1 & fx < 100))])
     }
     testy <- any(fy > 1 & fy < 100) == FALSE
@@ -643,10 +767,10 @@ image_contrast <- function(image,
           break
         }
       }
-      image <- resize(image, w = img_width, h = img_height)
+      image <- EBImage::resize(image, w = img_width, h = img_height)
       ny <- suppressWarnings(fy[max(which(fy > 1 & fy < 100))])
     }
-    clahe(image, nx = nx, ny = ny, bins = 256)
+    EBImage::clahe(image, nx = nx, ny = ny, bins = 256)
   }
 }
 
@@ -681,7 +805,7 @@ image_contrast <- function(image,
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
@@ -717,7 +841,7 @@ image_binary <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -749,29 +873,31 @@ image_binary <- function(image,
     for(i in 1:length(index)){
       indx <- index[[i]]
       img2 <- image_index(image, indx, my_index, resize, re, nir, show_image = FALSE, nrow, ncol)[[1]]
-      threshold <- otsu(img2, range = range(img2[!is.infinite(img2)], na.rm = TRUE))
+      no_inf <- img2[!is.infinite(img2)]
+      threshold <- EBImage::otsu(img2, range = c(min(no_inf, na.rm = TRUE),
+                                                 max(no_inf, na.rm = TRUE)))
       if(invert == FALSE){
-        img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
+        img2 <- EBImage::combine(mapply(function(frame, th) frame < th, EBImage::getFrames(img2), threshold, SIMPLIFY=FALSE))
       } else{
-        img2 <- combine(mapply(function(frame, th) frame > th, getFrames(img2), threshold, SIMPLIFY=FALSE))
+        img2 <- EBImage::combine(mapply(function(frame, th) frame > th, EBImage::getFrames(img2), threshold, SIMPLIFY=FALSE))
       }
       ifelse(fill_hull == TRUE,
-             imgs[[i]] <- fillHull(img2),
+             imgs[[i]] <- EBImage::fillHull(img2),
              imgs[[i]] <- img2)
     }
     names(imgs) <- index
-    num_plots <- length(imgs)
-    if (is.null(nrow) && is.null(ncol)){
-      ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
-      nrow <- ceiling(num_plots/ncol)
-    }
-    if (is.null(ncol)){
-      ncol <- ceiling(num_plots/nrow)
-    }
-    if (is.null(nrow)){
-      nrow <- ceiling(num_plots/ncol)
-    }
     if(show_image == TRUE){
+      num_plots <- length(imgs)
+      if (is.null(nrow) && is.null(ncol)){
+        ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
+        nrow <- ceiling(num_plots/ncol)
+      }
+      if (is.null(ncol)){
+        ncol <- ceiling(num_plots/nrow)
+      }
+      if (is.null(nrow)){
+        nrow <- ceiling(num_plots/ncol)
+      }
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
@@ -842,7 +968,7 @@ image_binary <- function(image,
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
@@ -870,12 +996,13 @@ image_index <- function(image,
                         parallel = FALSE,
                         workers = NULL,
                         verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -918,12 +1045,12 @@ image_index <- function(image,
                   B = "green",
                   GR = "gray"
           )
-        img2 <- channel(image, indx)
+        img2 <- EBImage::channel(image, indx)
       } else{
         if(is.null(my_index) & !indx %in% ind$Index){
           stop(paste("Index '",indx,"' is not available in pliman",sep = ""), call. = FALSE)
         }
-        frames <- getFrames(image)
+        frames <- EBImage::getFrames(image)
         num_band <- length(frames)
         if(num_band < 3){
           stop("At least 3 bands (RGB) are necessary to calculate indices available in pliman.", call. = FALSE)
@@ -931,10 +1058,10 @@ image_index <- function(image,
         R <- frames[[1]]
         G <- frames[[2]]
         B <- frames[[3]]
-        if(indx %in% nir_ind & is.null(nir)){
-          stop(paste("Index ", indx, " need NIR/RedEdge band to be calculated."), call. = FALSE)
-        }
         if(!is.null(re)|!is.null(nir)){
+          if(indx %in% nir_ind & is.null(nir)){
+            stop(paste("Index ", indx, " need NIR/RedEdge band to be calculated."), call. = FALSE)
+          }
           if(num_band < 4){
             stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
           }
@@ -955,18 +1082,18 @@ image_index <- function(image,
       imgs[[i]] <- img2
     }
     names(imgs) <- index
-    num_plots <- length(imgs)
-    if (is.null(nrow) && is.null(ncol)){
-      ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
-      nrow <- ceiling(num_plots/ncol)
-    }
-    if (is.null(ncol)){
-      ncol <- ceiling(num_plots/nrow)
-    }
-    if (is.null(nrow)){
-      nrow <- ceiling(num_plots/ncol)
-    }
     if(show_image == TRUE){
+      num_plots <- length(imgs)
+      if (is.null(nrow) && is.null(ncol)){
+        ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
+        nrow <- ceiling(num_plots/ncol)
+      }
+      if (is.null(ncol)){
+        ncol <- ceiling(num_plots/nrow)
+      }
+      if (is.null(nrow)){
+        nrow <- ceiling(num_plots/ncol)
+      }
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
@@ -980,6 +1107,7 @@ image_index <- function(image,
     invisible(structure(imgs, class = "image_index"))
   }
 }
+
 
 #' Plots an `image_index` object
 #'
@@ -998,7 +1126,7 @@ image_index <- function(image,
 #' library(pliman)
 #'img <- image_import(image_pliman("sev_leaf.jpg"))
 # A half size of the original image
-#'img2 <- image_resize(img, 50)
+#'img2 <- EBImage::resize(img, 50)
 #'ind <- image_index(img2)
 #'plot(ind)
 plot.image_index <- function(x, facet = TRUE, ...){
@@ -1069,7 +1197,7 @@ plot.image_index <- function(x, facet = TRUE, ...){
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
@@ -1085,7 +1213,7 @@ plot.image_index <- function(x, facet = TRUE, ...){
 #' @examples
 #' library(pliman)
 #'img <- image_import(image_pliman("soybean_touch.jpg"))
-#'image_show(img)
+#'plot(img)
 #'image_segment(img, index = c("R, G, B"))
 image_segment <- function(image,
                           index = NULL,
@@ -1100,6 +1228,7 @@ image_segment <- function(image,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
+  check_ebi()
   if(class(image) == "img_segment"){
     image <- image[[1]][["image"]]
   }
@@ -1108,7 +1237,7 @@ image_segment <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -1140,14 +1269,14 @@ image_segment <- function(image,
     for(i in 1:length(index)){
       indx <- index[[i]]
       img2 <- image_index(image, indx, my_index, resize = FALSE, re, nir, show_image = FALSE, nrow, ncol)[[1]]
-      threshold <- otsu(img2, range = range(img2[!is.infinite(img2)], na.rm = TRUE))
+      threshold <- EBImage::otsu(img2, range = range(img2[!is.infinite(img2)], na.rm = TRUE))
       if(invert == FALSE){
-        img2 <- combine(mapply(function(frame, th) frame < th, getFrames(img2), threshold, SIMPLIFY=FALSE))
+        img2 <- EBImage::combine(mapply(function(frame, th) frame < th, EBImage::getFrames(img2), threshold, SIMPLIFY=FALSE))
       } else{
-        img2 <- combine(mapply(function(frame, th) frame > th, getFrames(img2), threshold, SIMPLIFY=FALSE))
+        img2 <- EBImage::combine(mapply(function(frame, th) frame > th, EBImage::getFrames(img2), threshold, SIMPLIFY=FALSE))
       }
       ifelse(fill_hull == TRUE,
-             img2 <- fillHull(img2),
+             img2 <- EBImage::fillHull(img2),
              img2 <- img2)
       ID <- which(img2@.Data == FALSE)
       img <- image
@@ -1157,7 +1286,7 @@ image_segment <- function(image,
       mask <- image@.Data[,,1]
       mask[ID] <- 1
       mask[!ID] <- 0
-      mask <- as.Image(mask)
+      mask <- EBImage::as.Image(mask)
       imgs[[i]] <- list(image = img, mask = mask)
     }
     names(imgs) <- index
@@ -1195,7 +1324,7 @@ image_segment <- function(image,
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
@@ -1219,7 +1348,7 @@ image_to_mat <- function(image,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
@@ -1251,11 +1380,15 @@ image_to_mat <- function(image,
 #' Creates image palettes by applying the k-means algorithm to the RGB values.
 #' @param image An image object.
 #' @param npal The number of color palettes.
-#' @param nstart How many random sets from `npal` should be chosen?
+#' @param filter Performs median filtering. This can be useful to reduce the
+#'   noise in produced palettes. Defaults to `TRUE`. See more at
+#'   [image_filter()].
+#' @param blur Performs blurring filter of palettes?  Defaults to `FALSE`. See more at
+#'   [image_blur()].
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
-#'   up to 90% of available cores.
+#'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
@@ -1264,64 +1397,95 @@ image_to_mat <- function(image,
 #' @examples
 #' \donttest{
 #' library(pliman)
-#'img <- image_import(image_pliman("sev_leaf.jpg"))
-#'pal <- image_palette(img, 2)
-#'image_show(pal[[1]])
-#'image_show(pal[[2]])
+#'img <- image_import(image_pliman("sev_leaf_nb.jpg"))
+#'pal <- image_palette(img, npal = 4)
+#'
+#'image_combine(pal)
 #'}
 image_palette <- function(image,
                           npal,
-                          nstart = 25,
+                          filter = TRUE,
+                          blur = FALSE,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
+  check_ebi()
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust, c("image", "image_to_mat"))
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_palette, npal, nstart)
+      res <- parLapply(clust, image, image_palette, npal)
     } else{
-      res <- lapply(image, image_palette, npal, nstart)
+      res <- lapply(image, image_palette, npal)
     }
     return(structure(res, class = "palette_list"))
   } else{
-    df <- image_to_mat(image)$df_in
-    df$CODE <- NULL
+    imgRGB <-
+      data.frame(R = as.vector(image[,,1]),
+                 G = as.vector(image[,,2]),
+                 B = as.vector(image[,,3]))
+    kms <- kmeans(imgRGB, centers = npal)
     rgbs <- list()
-    b <- kmeans(df, centers = npal, nstart = nstart)
     for (i in 1:npal) {
-      df1 <- df[which(b$cluster == i),]
-      dim_mat <- trunc(sqrt(nrow(df1)))
-      R <- df1[1:dim_mat^2, 1]
-      G <- df1[1:dim_mat^2, 2]
-      B <- df1[1:dim_mat^2, 3]
-      rgbs[[i]] <- as.Image(array(c(R, G, B), dim = c(dim_mat, dim_mat, 3)))
+      ID <- which(kms$cluster == i)
+      dim_mat <- trunc(sqrt(length(ID))*0.9)
+      ID <- sample(ID[1:dim_mat^2])
+      R <- image@.Data[,,1][ID]
+      G <- image@.Data[,,2][ID]
+      B <- image@.Data[,,3][ID]
+      pal <- EBImage::Image(c(R, G, B), dim = c(dim_mat, dim_mat, 3), colormode = "Color")
+      if(filter == TRUE){
+        pal <- image_filter(pal, size = 2)
+      }
+      if(blur == TRUE){
+        pal <- image_blur(pal, sigma = 1)
+      }
+      rgbs[[i]] <-  pal
     }
     return(rgbs)
   }
 }
 
-
 #' Utilities for image resolution
 #'
 #' Provides useful conversions between size (cm), number of pixels (px) and
-#' resolution (dpi)
+#' dots per inch (dpi).
+#' * [dpi_to_cm()] converts a known dpi value to centimeters.
+#' * [cm_to_dpi()] converts a known centimeter values to dpi.
+#' * [pixels_to_cm()] converts the number of pixels to centimeters, given a
+#' known resolution (dpi).
+#' * [cm_to_pixels()] converts a distance (cm) to number of pixels, given a
+#' known resolution (dpi).
+#' * [dpi()] An interactive function to compute the image resolution given a
+#' known distance informed by the user. See more information in the **Details**
+#' section.
+#'
+#' @details [dpi()] only run in an interactive section. To compute the image
+#'   resolution (dpi) the user must use the left button mouse to create a line
+#'   of known distance. This can be done, for example, using a template with
+#'   known distance in the image (e.g., `la_leaves.JPG`).
 #'
 #' @name utils_dpi
+#' @param image An image object.
 #' @param dpi The image resolution in dots per inch.
 #' @param px The number of pixels.
 #' @param cm The size in centimeters.
-#' @return A numeric value or a vector of numeric values if the input data is a
-#'   vector
+#' @return
+#' * [dpi_to_cm()], [cm_to_dpi()], [pixels_to_cm()], and [cm_to_pixels()] return
+#' a numeric value or a vector of numeric values if the input data is a vector.
+#' * [dpi()] returns the computed dpi (dots per inch) given the known distance
+#' informed in the plot.
 #' @export
+#' @importFrom grDevices rgb2hsv
+#' @importFrom graphics locator
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' library(pliman)
@@ -1336,6 +1500,24 @@ image_palette <- function(image,
 #'
 #' # Convert number of pixels to cm with resolution of 96 dpi.
 #' pixels_to_cm(c(1, 2, 3), 96)
+#'
+#' if(isTRUE(interactive())){
+#' #### compute the dpi (dots per inch) resolution ####
+#' # only works in an interactive section
+#' # objects_300dpi.jpg has a known resolution of 300 dpi
+#' img <- image_import(image_pliman("objects_300dpi.jpg"))
+#' # Higher square: 10 x 10 cm
+#' # 1) Run the function dpi()
+#' # 2) Use the left mouse button to create a line in the higher square
+#' # 3) Declare a known distance (10 cm)
+#' # 4) See the computed dpi
+#' dpi(img)
+#'
+#'
+#' img2 <- image_import(image_pliman("la_leaves.JPG"))
+#' # square leaf sample (2 x 2 cm)
+#' dpi(img2)
+#' }
 dpi_to_cm <- function(dpi){
   2.54 / dpi
 }
@@ -1353,4 +1535,42 @@ pixels_to_cm <- function(px, dpi){
 #' @export
 cm_to_pixels <- function(cm, dpi){
   cm / (2.54 / dpi)
+}
+#' @name utils_dpi
+#' @export
+dpi <- function(image){
+  if(isTRUE(interactive())){
+    plot(image)
+    message("Use the first mouse button to create a line in the plot.")
+    coords <- locator(type = "l",
+                      n = 2,
+                      lwd = 2,
+                      col = "red")
+    pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
+    known <- as.numeric(readline("known distance (cm): "))
+    pix / (known / 2.54)
+  }
+}
+
+#' Color spaces
+#'
+#' Convert RGB to LAB color space.
+#' @param image An image object.
+#' @export
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
+#' @return A list containing the image in the new color space.
+#' @examples
+#' library(pliman)
+#'img <- image_import(image_pliman("sev_leaf.jpg"))
+#'img2 <- rgb_to_hsv(img)
+#'image_combine(img, img2)
+rgb_to_hsv <- function(image){
+  hsv <- rgb2hsv(r = c(image[,,1]),
+                 g = c(image[,,2]),
+                 b = c(image[,,3]),
+                 maxColorValue = 1)
+  img <- EBImage::Image(array(c(hsv[1,], hsv[2,], hsv[3,]),
+                              c(dim(image)[1], dim(image)[2], 3)),
+                        colormode = "Color")
+  return(img)
 }

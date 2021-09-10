@@ -21,6 +21,7 @@ manipulate_files(
   prefix = NULL,
   name = NULL,
   suffix = NULL,
+  extension = NULL,
   sep = "",
   save_to = NULL,
   overwrite = FALSE,
@@ -46,6 +47,9 @@ Defaults to \code{NULL} (no prefix or suffix).}
 length as the number of files manipulated. If one value is informed, a
 sequential vector of names will be created as "\code{name}_1", "\code{name}_2", and
 so on.}
+
+\item{extension}{The new extension of the file. If not declared (default),
+the original extensions will be used.}
 
 \item{sep}{An optional separator. Defaults to \code{""}.}
 

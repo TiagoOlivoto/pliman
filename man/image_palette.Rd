@@ -7,7 +7,8 @@
 image_palette(
   image,
   npal,
-  nstart = 25,
+  filter = TRUE,
+  blur = FALSE,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE
@@ -18,12 +19,17 @@ image_palette(
 
 \item{npal}{The number of color palettes.}
 
-\item{nstart}{How many random sets from \code{npal} should be chosen?}
+\item{filter}{Performs median filtering. This can be useful to reduce the
+noise in produced palettes. Defaults to \code{TRUE}. See more at
+\code{\link[=image_filter]{image_filter()}}.}
+
+\item{blur}{Performs blurring filter of palettes?  Defaults to \code{FALSE}. See more at
+\code{\link[=image_blur]{image_blur()}}.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when \code{image} is a list. The number of sections is set
-up to 90\% of available cores.}
+up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
@@ -39,9 +45,9 @@ Creates image palettes by applying the k-means algorithm to the RGB values.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
-pal <- image_palette(img, 2)
-image_show(pal[[1]])
-image_show(pal[[2]])
+img <- image_import(image_pliman("sev_leaf_nb.jpg"))
+pal <- image_palette(img, npal = 4)
+
+image_combine(pal)
 }
 }

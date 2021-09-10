@@ -88,4 +88,23 @@ image_correct <- function(image, perc){
   return(t(Pp))
 }
 
-
+check_ebi <- function(){
+  if(!requireNamespace("EBImage", quietly = TRUE)) {
+    if(interactive() == TRUE){
+    inst <-
+    switch(menu(c("Yes", "No"), title = "Package {EBImage} required but not available.\nDo you want to install it now?"),
+           "yes", "no")
+    if(inst == "yes"){
+      if(!requireNamespace("BiocManager", quietly = TRUE)) {
+        install.packages("BiocManager", quiet = TRUE)
+      }
+      BiocManager::install("EBImage",
+                           update = FALSE,
+                           ask = FALSE,
+                           quiet = TRUE)
+    } else{
+      message("To use {pliman}, first install {EBImage} following the directions at 'https://bioconductor.org/packages/EBImage'")
+    }
+    }
+  }
+}

@@ -19,12 +19,12 @@
 #' @param edge The number of pixels in the edge of the bounding rectangle.
 #'   Defaults to `2`.
 #' @param extension,tolerance,object_size Controls the watershed segmentation of
-#'   objects in the image. See [count_objects()] for more details.
+#'   objects in the image. See [analyze_objects()] for more details.
 #' @param show_image Shows the image with bounding rectangles? Defaults to
 #'   `TRUE`.
 #' @param ...
 #' * For `object_isolate()`, further arguments passed on to [object_coord()].
-#' * For `object_id()`, further arguments passed on to [count_objects()].
+#' * For `object_id()`, further arguments passed on to [analyze_objects()].
 #' @return
 #' * `object_id()` An image of class `"Image"` containing the object's
 #' identification.
@@ -46,7 +46,7 @@
 #'
 #' # Isolate leaf 3
 #' isolated <- object_isolate(img, id = 3)
-#' image_show(isolated)
+#' plot(isolated)
 #' }
 object_coord <- function(image,
                          id =  NULL,
@@ -58,6 +58,7 @@ object_coord <- function(image,
                          tolerance = NULL,
                          object_size = "large",
                          show_image = TRUE){
+  check_ebi()
   # helper function to get coordinates from a mask
   get_coordinates <- function(data_mask, edge){
     nrows <- nrow(data_mask)
@@ -106,7 +107,7 @@ object_coord <- function(image,
         eval(parse(text=x))}))
     ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
     tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-    nmask <- watershed(distmap(img2),
+    nmask <- EBImage::watershed(EBImage::distmap(img2),
                        tolerance = tol,
                        ext = ext)
     data_mask <- nmask@.Data
@@ -127,7 +128,7 @@ object_coord <- function(image,
                   row_max = as.numeric(coord[4,]))
   }
   if(show_image == TRUE){
-    image_show(image)
+    plot(image)
     rect(xleft = coord$row_min,
          xright = coord$row_max,
          ybottom = coord$col_min,
@@ -156,6 +157,6 @@ object_isolate <- function(image,
 #' @name utils_objects
 #' @export
 object_id <- function(image, ...){
-  count_objects(image, verbose = FALSE, marker = "text", ...)
+  analyze_objects(image, verbose = FALSE, marker = "text", ...)
 }
 

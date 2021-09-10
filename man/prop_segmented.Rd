@@ -34,14 +34,14 @@ prop_segmented(
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when \code{image} is a list. The number of sections is set
-up to 90\% of available cores.}
+up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
 \item{show_image}{Show the image results? Defaults to \code{TRUE}.}
 
-\item{nrow, ncol}{Arguments passed on to \code{\link[=image_combine]{image_combine()}}. The number of rows
+\item{nrow, ncol}{Arguments passed on to \code{\link[EBImage:combine]{EBImage::combine()}}. The number of rows
 or columns in the plot grid. Defaults to \code{NULL}, i.e., a square grid is
 produced.}
 
@@ -63,7 +63,7 @@ using color palettes.
 \examples{
 \donttest{
 img <- image_import(image_pliman("sev_leaf.jpg"))
-image_show(img)
+plot(img)
 
 prop_segmented(img,
                nseg = 2,

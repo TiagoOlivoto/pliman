@@ -54,7 +54,7 @@ image file.}
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when \code{image} is a list. The number of sections is set
-up to 90\% of available cores.}
+up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
@@ -114,7 +114,7 @@ img <- image_import(image_pliman("soybean_touch.jpg"))
 image_index(img, c("R, NR"), nrow = 1)
 library(pliman)
 img <- image_import(image_pliman("sev_leaf.jpg"))
-img2 <- image_resize(img, 50)
+img2 <- EBImage::resize(img, 50)
 ind <- image_index(img2)
 plot(ind)
 }

@@ -6,11 +6,11 @@
 \alias{image_export}
 \alias{image_show}
 \alias{image_pliman}
-\title{Import, display and export images}
+\title{Import and export images}
 \usage{
 image_import(image, ..., img_pattern = NULL)
 
-image_export(image, name, subfolder = NULL, ...)
+image_export(image, name, extension = NULL, subfolder = NULL, ...)
 
 image_show(image)
 
@@ -32,7 +32,14 @@ image1.-, im2.-) will be imported as a list. Providing any number as
 pattern (e.g., \code{img_pattern = "1"}) will select images that are named as
 1.-, 2.-, and so on.}
 
-\item{name}{An string specifying the name of the image.}
+\item{name}{An string specifying the name of the image. It can be either a
+charactere with the image name (e.g., "img1") or name and extension (e.g.,
+"img1.jpg"). If none file extension is provided, the image will be saved as
+a *.jpg file.}
+
+\item{extension}{When \code{image} is a list, \code{extension} can be used to define
+the extension of exported files. This will overwrite the file extensions
+given in \code{image}.}
 
 \item{subfolder}{Optional character string indicating a subfolder within the
 current working directory to save the image(s). If the folder doesn't
@@ -47,7 +54,8 @@ image installed with the package.
 }
 }
 \description{
-Import images from files and URLs, write images to files, and show images.
+Import images from files and URLs and write images to files, possibly with
+batch processing.
 *
 }
 \examples{

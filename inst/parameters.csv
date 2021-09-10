@@ -11,15 +11,15 @@ medium;res >= 3200000 & res < 4800000;3;1.5
 medium;res >= 4800000 & res < 6400000;5;2
 medium;res >= 6400000 & res < 8000000;6;2.5
 medium;res>= 8000000;6;3
-large;res<1600000;2;3
-large;res >= 1600000 & res < 3200000;3;5
-large;res >= 3200000 & res < 4800000;4;7
-large;res >= 4800000 & res < 6400000;5;10
-large;res >= 6400000 & res < 8000000;6;12
-large;res>= 8000000;7;14
-elarge;res<1600000;10;10
-elarge;res >= 1600000 & res < 3200000;10;12
-elarge;res >= 3200000 & res < 4800000;15;14
-elarge;res >= 4800000 & res < 6400000;15;20
-elarge;res >= 6400000 & res < 8000000;20;25
-elarge;res>= 8000000;20;30
+large;res<1600000;2;5
+large;res >= 1600000 & res < 3200000;3;7
+large;res >= 3200000 & res < 4800000;4;9
+large;res >= 4800000 & res < 6400000;5;12
+large;res >= 6400000 & res < 8000000;6;15
+large;res>= 8000000;7;18
+elarge;res<1600000;15;30
+elarge;res >= 1600000 & res < 3200000;18;32
+elarge;res >= 3200000 & res < 4800000;20;34
+elarge;res >= 4800000 & res < 6400000;22;36
+elarge;res >= 6400000 & res < 8000000;24;38
+elarge;res>= 8000000;26;40

@@ -26,11 +26,12 @@
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 80% of available cores.
+#'   number of sections is set up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param randomize Randomize the lines before training the model?
-#' @param nrows The number of lines to be used in training step.
+#' @param nrows The number of lines to be used in training step. Defaults to
+#'   5000.
 #' @param show_image Show image after processing?
 #' @param show_original Show the symptoms in the original image?
 #' @param show_background Show the background? Defaults to `TRUE`. A white
@@ -74,27 +75,28 @@
 #'
 #'
 symptomatic_area <- function(img,
-                             img_healthy,
-                             img_symptoms,
-                             img_background = NULL,
-                             img_pattern = NULL,
-                             resize = FALSE,
-                             fill_hull = TRUE,
-                             parallel = FALSE,
-                             workers = NULL,
-                             randomize = TRUE,
-                             nrows = 10000,
-                             show_image = FALSE,
-                             show_original = TRUE,
-                             show_background = TRUE,
-                             col_leaf = "green",
-                             col_symptoms = "red",
-                             col_background = NULL,
-                             save_image = FALSE,
-                             prefix = "proc_",
-                             dir_original = NULL,
-                             dir_processed = NULL,
-                             verbose = TRUE){
+                              img_healthy,
+                              img_symptoms,
+                              img_background = NULL,
+                              img_pattern = NULL,
+                              resize = FALSE,
+                              fill_hull = TRUE,
+                              parallel = FALSE,
+                              workers = NULL,
+                              randomize = TRUE,
+                              nrows = 5000,
+                              show_image = FALSE,
+                              show_original = TRUE,
+                              show_background = TRUE,
+                              col_leaf = "green",
+                              col_symptoms = "red",
+                              col_background = NULL,
+                              save_image = FALSE,
+                              prefix = "proc_",
+                              dir_original = NULL,
+                              dir_processed = NULL,
+                              verbose = TRUE){
+  # check_ebi()
   if(!missing(img) & !missing(img_pattern)){
     stop("Only one of `img` or `img_pattern` arguments can be used.", call. = FALSE)
   }
@@ -123,7 +125,7 @@ symptomatic_area <- function(img,
         extens_ori <- file_extension(imag)
         img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
         if(resize != FALSE){
-          img <- image_resize(img, resize)
+          img <- EBImage::resize(img, resize)
         }
       } else{
         name_ori <- match.call()[[2]]
@@ -137,7 +139,7 @@ symptomatic_area <- function(img,
         extens <- file_extension(imag)
         img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         if(resize != FALSE){
-          img_healthy <- image_resize(img_healthy, resize)
+          img_healthy <- EBImage::resize(img_healthy, resize)
         }
       }
       if(is.character(img_symptoms)){
@@ -148,24 +150,40 @@ symptomatic_area <- function(img,
         extens <- file_extension(imag)
         img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         if(resize != FALSE){
-          img_symptoms <- image_resize(img_symptoms, resize)
+          img_symptoms <- EBImage::resize(img_symptoms, resize)
         }
       }
-      original <- image_to_mat(img)
-      sadio <- image_to_mat(img_healthy)
-      sintoma <- image_to_mat(img_symptoms)
+      original <-
+        data.frame(CODE = "img",
+                   R = c(img@.Data[,,1]),
+                   G = c(img@.Data[,,2]),
+                   B = c(img@.Data[,,3]))
+      sadio <-
+        data.frame(CODE = "img_healthy",
+                   R = c(img_healthy@.Data[,,1]),
+                   G = c(img_healthy@.Data[,,2]),
+                   B = c(img_healthy@.Data[,,3]))
+      sintoma <-
+        data.frame(CODE = "img_symptoms",
+                   R = c(img_symptoms@.Data[,,1]),
+                   G = c(img_symptoms@.Data[,,2]),
+                   B = c(img_symptoms@.Data[,,3]))
+      ncol_img <- dim(img)[[2]]
+
+      # original <- image_to_mat(img)
+      # sadio <- image_to_mat(img_healthy)
+      # sintoma <- image_to_mat(img_symptoms)
       ################## no background #############
       if(is.null(img_background)){
         sadio_sintoma <-
-          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+          transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
+                          sintoma[sample(1:nrow(sintoma)),][1:nrows,]),
                     Y = ifelse(CODE == "img_healthy", 1, 0))
-        usef_area <- nrow(original$df_in)
+        usef_area <- nrow(original)
         model <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma))
         # isolate plant
-        pred1 <- round(predict(model, newdata = original$df_in, type="response"), 0)
-        plant_symp <- matrix(pred1, ncol = ncol(original$R))
-        plant_symp <- image_correct(plant_symp, perc = 0.01)
+        pred1 <- round(predict(model, newdata = original, type = "response"), 0)
+        plant_symp <- matrix(pred1, ncol = ncol_img)
         ID <- c(plant_symp == 0)
         pix_sympt <- length(which(ID == TRUE))
         if(show_original == TRUE){
@@ -208,64 +226,72 @@ symptomatic_area <- function(img,
           extens <- file_extension(imag)
           img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
           if(resize != FALSE){
-            img_background <- image_resize(img_background, resize)
+            img_background <- EBImage::resize(img_background, resize)
           }
         }
-        fundo <- image_to_mat(img_background)
+        # fundo <- image_to_mat(img_background)
+        fundo <-
+          data.frame(CODE = "img_background",
+                     R = c(img_background@.Data[,,1]),
+                     G = c(img_background@.Data[,,2]),
+                     B = c(img_background@.Data[,,3]))
         # separate image from background
         fundo_resto <-
-          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,],
-                          fundo$df_in[sample(1:nrow(fundo$df_in)),][1:nrows,]),
+          transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
+                          sintoma[sample(1:nrow(sintoma)),][1:nrows,],
+                          fundo[sample(1:nrow(fundo)),][1:nrows,]),
                     Y = ifelse(CODE == "img_background", 0, 1))
         modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = fundo_resto))
-        pred1 <- round(predict(modelo1, newdata = original$df_in, type="response"), 0)
+        pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
         ifelse(fill_hull == TRUE,
-               plant_background <- fillHull(matrix(pred1, ncol = ncol(original$R))),
-               plant_background <- matrix(pred1, ncol = ncol(original$R)))
+               plant_background <- EBImage::fillHull(matrix(pred1, ncol = ncol_img)),
+               plant_background <- matrix(pred1, ncol = ncol_img))
         plant_background[plant_background == 1] <- 2
         sadio_sintoma <-
-          transform(rbind(sadio$df_in[sample(1:nrow(sadio$df_in)),][1:nrows,],
-                          sintoma$df_in[sample(1:nrow(sintoma$df_in)),][1:nrows,]),
+          transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
+                          sintoma[sample(1:nrow(sintoma)),][1:nrows,]),
                     Y = ifelse(CODE == "img_healthy", 1, 0))
         modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = sadio_sintoma))
         # isolate plant
         ID <- c(plant_background == 2)
-        usef_area <- nrow(original$df_in[ID,])
-        pred3 <- round(predict(modelo2, newdata = original$df_in[ID,], type="response"), 0)
+        usef_area <- nrow(original[ID,])
+        pred3 <- round(predict(modelo2, newdata = original[ID,], type="response"), 0)
         pix_sympt <- length(which(pred3 == 0))
-        if(show_original == TRUE){
-          im2 <- img
-          col_symptoms <- col2rgb(col_symptoms)
-          im2@.Data[,,1][ID][which(pred3 == 0)] <- col_symptoms[1]
-          im2@.Data[,,2][ID][which(pred3 == 0)] <- col_symptoms[2]
-          im2@.Data[,,3][ID][which(pred3 == 0)] <- col_symptoms[3]
-          if(!is.null(col_background)){
-            col_background <- col2rgb(col_background)
+        if(show_image == TRUE | save_image == TRUE){
+          if(show_original == TRUE){
+            im2 <- img
+            col_symptoms <- col2rgb(col_symptoms)
+            im2@.Data[,,1][ID][which(pred3 == 0)] <- col_symptoms[1]
+            im2@.Data[,,2][ID][which(pred3 == 0)] <- col_symptoms[2]
+            im2@.Data[,,3][ID][which(pred3 == 0)] <- col_symptoms[3]
+            if(!is.null(col_background)){
+              col_background <- col2rgb(col_background)
+              im2@.Data[,,1][!ID] <- col_background[1]
+              im2@.Data[,,2][!ID] <- col_background[2]
+              im2@.Data[,,3][!ID] <- col_background[3]
+            }
+          } else{
+            if(is.null(col_background)){
+              col_background <- col2rgb("white")
+            } else{
+              col_background <- col2rgb(col_background)
+            }
+            col_leaf <- col2rgb(col_leaf)
+            col_symptoms <- col2rgb(col_symptoms)
+            im2 <- img
+            im2@.Data[,,1][ID][which(pred3 == 0)] <- col_symptoms[1]
+            im2@.Data[,,2][ID][which(pred3 == 0)] <- col_symptoms[2]
+            im2@.Data[,,3][ID][which(pred3 == 0)] <- col_symptoms[3]
+            im2@.Data[,,1][ID][which(pred3 != 0)] <- col_leaf[1]
+            im2@.Data[,,2][ID][which(pred3 != 0)] <- col_leaf[2]
+            im2@.Data[,,3][ID][which(pred3 != 0)] <- col_leaf[3]
             im2@.Data[,,1][!ID] <- col_background[1]
             im2@.Data[,,2][!ID] <- col_background[2]
             im2@.Data[,,3][!ID] <- col_background[3]
           }
-        } else{
-          if(is.null(col_background)){
-            col_background <- col2rgb("white")
-          } else{
-            col_background <- col2rgb(col_background)
-          }
-          col_leaf <- col2rgb(col_leaf)
-          col_symptoms <- col2rgb(col_symptoms)
-          im2 <- img
-          im2@.Data[,,1][ID][which(pred3 == 0)] <- col_symptoms[1]
-          im2@.Data[,,2][ID][which(pred3 == 0)] <- col_symptoms[2]
-          im2@.Data[,,3][ID][which(pred3 == 0)] <- col_symptoms[3]
-          im2@.Data[,,1][ID][which(pred3 != 0)] <- col_leaf[1]
-          im2@.Data[,,2][ID][which(pred3 != 0)] <- col_leaf[2]
-          im2@.Data[,,3][ID][which(pred3 != 0)] <- col_leaf[3]
-          im2@.Data[,,1][!ID] <- col_background[1]
-          im2@.Data[,,2][!ID] <- col_background[2]
-          im2@.Data[,,3][!ID] <- col_background[3]
         }
       }
+
       if(show_image == TRUE){
         plot(im2)
       }
@@ -311,9 +337,7 @@ symptomatic_area <- function(img,
       clusterExport(clust,
                     varlist = c("names_plant", "help_sympt", "file_name",
                                 "check_names_dir", "file_extension", "image_import",
-                                "image_binary", "watershed", "distmap", "computeFeatures.moment",
-                                "computeFeatures.shape", "colorLabels", "image_show",
-                                "image_to_mat", "image_correct", "image_export"),
+                                "image_binary", "image_to_mat", "image_correct", "image_export"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -352,3 +376,282 @@ symptomatic_area <- function(img,
     return(results)
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

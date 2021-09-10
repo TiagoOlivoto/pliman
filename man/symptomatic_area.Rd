@@ -15,7 +15,7 @@ symptomatic_area(
   parallel = FALSE,
   workers = NULL,
   randomize = TRUE,
-  nrows = 10000,
+  nrows = 5000,
   show_image = FALSE,
   show_original = TRUE,
   show_background = TRUE,
@@ -55,14 +55,15 @@ hole area will be accounted for the leaf, not background.}
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, especially when \code{img_pattern} is used is informed. The
-number of sections is set up to 80\% of available cores.}
+number of sections is set up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
 \item{randomize}{Randomize the lines before training the model?}
 
-\item{nrows}{The number of lines to be used in training step.}
+\item{nrows}{The number of lines to be used in training step. Defaults to
+5000.}
 
 \item{show_image}{Show image after processing?}
 
