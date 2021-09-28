@@ -107,6 +107,9 @@ get_measures <- function(object,
   if(any(class(object) == "objects_rgb")){
     res <- object[["objects"]]
   }
+  if(class(object) == "plm_disease"){
+    res <- object$shape
+  }
   if(!is.null(id) & !is.null(dpi)){
     stop("Only one of 'dpi' or 'id' can be used.", call. = FALSE)
   }
@@ -210,6 +213,8 @@ plot_measures <- function(object,
     object <- object$results
   } else if(class(object) == "objects_rgb"){
     object <- object$objects
+  } else if(class(object) == "plm_disease"){
+    object <- object$shape
   } else{
     stop("Object of ivalid class.")
   }
