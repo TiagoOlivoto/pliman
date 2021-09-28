@@ -108,3 +108,18 @@ check_ebi <- function(){
     }
   }
 }
+
+# get RGB values from a mask computed with EBImage::watershed()
+get_rgb <- function(img, data_mask, index){
+  data.frame(object = index,
+             R = img@.Data[,,1][which(data_mask == index)],
+             G = img@.Data[,,2][which(data_mask == index)],
+             B = img@.Data[,,3][which(data_mask == index)])
+}
+
+# plot contours obtained with with EBImage::ocontour()
+plot_contour <- function(contours, col = "white", lwd = 1){
+  for(i in 1:length(contours)){
+    lines(contours[[i]][,1], contours[[i]][,2], col = "white", lwd = lwd)
+  }
+}

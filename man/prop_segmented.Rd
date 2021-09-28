@@ -8,6 +8,7 @@ prop_segmented(
   image,
   nseg = 1,
   index = NULL,
+  threshold = "Otsu",
   fill_hull = FALSE,
   filter = FALSE,
   parallel = FALSE,
@@ -25,6 +26,12 @@ prop_segmented(
 
 \item{index}{The index to be used in the image segmentation. See
 \code{\link[=image_index]{image_index()}} for more details.}
+
+\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than "Otsu" to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
@@ -65,10 +72,11 @@ using color palettes.
 img <- image_import(image_pliman("sev_leaf.jpg"))
 plot(img)
 
-prop_segmented(img,
-               nseg = 2,
-               index = c("G", "GLI"),
-               ncol = 3)
+# prop_segmented() will be deprecated in the future. Use image_segment_iter() instead.
+image_segment_iter(img,
+                   nseg = 2,
+                   index = c("G", "GLI"),
+                   ncol = 3)
 }
 }
 \author{

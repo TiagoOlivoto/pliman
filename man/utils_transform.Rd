@@ -3,6 +3,7 @@
 \name{utils_transform}
 \alias{utils_transform}
 \alias{image_autocrop}
+\alias{image_crop}
 \alias{image_dimension}
 \alias{image_rotate}
 \alias{image_horizontal}
@@ -11,6 +12,9 @@
 \alias{image_vreflect}
 \alias{image_resize}
 \alias{image_trim}
+\alias{image_dilate}
+\alias{image_erode}
+\alias{image_skeleton}
 \alias{image_filter}
 \alias{image_blur}
 \alias{image_contrast}
@@ -21,7 +25,18 @@ image_autocrop(
   edge = 5,
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_crop(
+  image,
+  width = NULL,
+  height = NULL,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
 )
 
 image_dimension(image, parallel = FALSE, workers = NULL, verbose = TRUE)
@@ -32,16 +47,41 @@ image_rotate(
   bg_col = "white",
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = TRUE
 )
 
-image_horizontal(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_horizontal(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 
-image_vertical(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_vertical(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 
-image_hreflect(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_hreflect(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 
-image_vreflect(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_vreflect(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 
 image_resize(
   image,
@@ -50,7 +90,8 @@ image_resize(
   height,
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = FALSE
 )
 
 image_trim(
@@ -62,7 +103,39 @@ image_trim(
   right = NULL,
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_dilate(
+  image,
+  kern = NULL,
+  size = NULL,
+  shape = "disc",
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_erode(
+  image,
+  kern = NULL,
+  size = NULL,
+  shape = "disc",
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_skeleton(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE,
+  ...
 )
 
 image_filter(
@@ -71,12 +144,26 @@ image_filter(
   cache = 512,
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = FALSE
 )
 
-image_blur(image, sigma = 3, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_blur(
+  image,
+  sigma = 3,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 
-image_contrast(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_contrast(
+  image,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
 }
 \arguments{
 \item{image}{An image or a list of images of class \code{Image}.}
@@ -99,6 +186,17 @@ number of parallel processes that can be active at the same time.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
+\item{plot}{If \code{TRUE} plots the modified image. Defaults to \code{FALSE}.}
+
+\item{width, height}{\itemize{
+\item For \code{image_resize()} the Width and height of the resized image. These arguments
+can be missing. In this case, the image is resized according to the
+relative size informed in \code{rel_size}.
+\item For \code{image_crop()} a numeric vector indicating the pixel range (x and y,
+respectively) that will be maintained in the cropped image, e.g., width =
+100:200
+}}
+
 \item{angle}{The rotation angle in degrees.}
 
 \item{bg_col}{Color used to fill the background pixels, defaults to \code{"white"}.}
@@ -107,14 +205,24 @@ number of parallel processes that can be active at the same time.}
 example, setting \code{rel_size = 50} to an image of width \verb{1280 x 720}, the new
 image will have a size of \verb{640 x 360}.}
 
-\item{width, height}{Width and height of the resized image. These arguments
-can be missing. In this case, the image is resized according to the
-relative size informed in \code{rel_size}.}
-
 \item{top, bottom, left, right}{The number of pixels removed from \code{top},
 \code{bottom}, \code{left}, and \code{right} when using \code{\link[=image_trim]{image_trim()}}.}
 
-\item{size}{The median filter radius (integer). Defaults to \code{3}.}
+\item{kern}{An \code{Image} object or an array, containing the structuring
+element. Defaults to a brushe generated with \code{\link[EBImage:morphology]{EBImage::makeBrush()}}.}
+
+\item{size}{\itemize{
+\item For \code{image_filter()} is the median filter radius (integer). Defaults to \code{3}.
+\item For \code{image_dilate()} and \code{image_erode()} is an odd number containing the
+size of the brush in pixels. Even numbers are rounded to the next odd one.
+The default depends on the image resolution and is computed as the image
+resolution (megapixels) times 20.
+}}
+
+\item{shape}{A character vector indicating the shape of the brush. Can be
+\code{box}, \code{disc}, \code{diamond}, \code{Gaussian} or \code{line}. Default is \code{disc}.}
+
+\item{...}{Additional arguments passed on to \code{\link[=image_binary]{image_binary()}}.}
 
 \item{cache}{The the L2 cache size of the system CPU in kB (integer).
 Defaults to \code{512}.}
@@ -123,12 +231,18 @@ Defaults to \code{512}.}
 used for blurring. Defaults to \code{3}.}
 }
 \value{
-A modified version of \code{image} depending on the function used.
+\itemize{
+\item \code{image_skeleton()} returns a binary \code{Image} object.
+\item All other functions returns a  modified version of \code{image} depending on the
+\verb{image_*()} function used.
+\item If \code{image} is a list, a list of the same length will be returned.
+}
 }
 \description{
 Performs image rotation and reflection
 \itemize{
-\item \code{image_autocrop()} Provides automatic image cropping.
+\item \verb{image autocrop()} Crops automatically  an image to the area of objects.
+\item \code{image_crop()} Crops an image to the desired area.
 \item \code{image_trim()} Remove pixels from the edges of an image (20 by default).
 \item \code{image_dimension()} Gives the dimension (width and height) of an image.
 \item \code{image_rotate()} Rotates the image clockwise by the given angle.
@@ -139,10 +253,13 @@ Performs image rotation and reflection
 \item \code{image_resize()} Resize the \code{image}. See more at \code{\link[EBImage:spatial]{EBImage::resize()}}.
 \item \code{image_contrast()} Improve contrast locally by performing adaptive
 histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}}.
+\item \code{image_dilate()} Performs image dilatation. See more at \code{\link[EBImage:morphology]{EBImage::dilate()}}.
+\item \code{image_erode()} Performs image erosion. See more at \code{\link[EBImage:morphology]{EBImage::erode()}}.
 \item \code{image_filter()} Performs median filtering in constant time. See more at
 \code{\link[EBImage:medianFilter]{EBImage::medianFilter()}}.
 \item \code{image_blur()} Performs blurring filter of images. See more at
 \code{\link[EBImage:gblur]{EBImage::gblur()}}.
+\item \code{image_skeleton()} Performs image skeletonization.
 }
 }
 \examples{

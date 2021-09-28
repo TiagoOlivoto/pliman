@@ -1,35 +1,50 @@
-#' Computes number of objects in an image
+#' Analyzes objects in an image
 #'
-#'Counts the number of objects in an image. See more at details.
+#' * [analyze_objects()] provides tools for counting and extracting object
+#' features (e.g., area, perimeter, radius, pixel intensity) in an image. See
+#' more at **Details** section.
+#' * [plot.anal_obj()] Produces an histogram for the R, G, and B values when
+#' argument `object_index` is used in the function [analyze_objects()].
 #'
-#'Counts the number of objects in an image. A binary image is first generated to
-#'segment the foreground and background. The argument index is useful to choose
-#'a proper index to segment the image (see [image_binary()] for more details).
-#'Then, the number of objects in the foreground is counted. By setting up
-#'arguments such as `lower_size`, `upper_size` is possible to set a threshold
-#'for lower and upper sizes of the objects, respectively.  Change `tolerance`
-#'and `extension` values to better set up watershed-based object detection. If
-#'color palettes samples are provided, a general linear model (binomial family)
-#'fitted to the RGB values is used to segment fore- and background.
+#' @details
+#'A binary image is first generated to segment the foreground and background.
+#'The argument index is useful to choose a proper index to segment the image
+#'(see [image_binary()] for more details). Then, the number of objects in the
+#'foreground is counted. By setting up arguments such as `lower_size`,
+#'`upper_size` it is possible to set a threshold for lower and upper sizes of
+#'the objects, respectively. The argument `object_size` can be used to set up
+#'pre-defined values of `tolerance` and `extension` depending on the image
+#'resolution. This will influence the watershed-based object segmentation. Users
+#'can also tune-up `tolerance` and `extension` explicitly to a better precision
+#'of watershed segmentation. If color palettes samples are provided, a general
+#'linear model (binomial family) fitted to the RGB values is used to segment
+#'fore- and background.
 #'
-#'By using `img_pattern` it is possible to process several images with common
+#'By using `pattern` it is possible to process several images with common
 #'pattern names that are stored in the current working directory or in the
 #'subdirectory informed in `dir_original`'. To speed up the computation time,
 #'one can set `parallel = TRUE`.
 #' @param img The image to be analyzed.
 #' @param foreground A color palette of the foreground (optional).
 #' @param background A color palette of the background (optional).
-#' @param img_pattern A pattern of file name used to identify images to be
-#'   processed. For example, if `img_pattern = "im"` all images that the name
-#'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
-#'   Providing any number as pattern (e.g., `img_pattern = "1"`) will select
-#'   images that are named as 1.-, 2.-, and so on.
-#' @param parallel Processes the images asynchronously (in parallel) in separate
-#'   R sessions running in the background on the same machine. It may speed up
-#'   the processing time, especially when `img_pattern` is used is informed. The
-#'   number of sections is set up to 70% of available cores.
+#' @param pattern A pattern of file name used to identify images to be imported.
+#'   For example, if `pattern = "im"` all images in the current working
+#'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
+#'   will be imported as a list. Providing any number as pattern (e.g., `pattern
+#'   = "1"`) will select images that are named as 1.-, 2.-, and so on. An error
+#'   will be returned if the pattern matches any file that is not supported
+#'   (e.g., img1.pdf).
+#' @param img_pattern Deprecated. Use `pattern` instead.
+#' @param parallel If `TRUE` processes the images asynchronously (in parallel)
+#'   in separate R sessions running in the background on the same machine. It
+#'   may speed up the processing time, especially when `pattern` is used is
+#'   informed. When `object_index` is informed, multiple sections will be used
+#'   to extract the RGB values for each object in the image. This may
+#'   significantly speed up processing time when an image has lots of objects
+#'   (say >1000).
 #' @param workers A positive numeric scalar or a function specifying the number
-#'   of parallel processes that can be active at the same time.
+#'   of parallel processes that can be active at the same time. By default, the
+#'   number of sections is set up to 50% of available cores.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
@@ -46,22 +61,28 @@
 #'   `FALSE`. See more at [image_filter()].
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
-#' @param index,my_index A character value specifying the target mode for
-#'   conversion to binary image when `foreground` and `background` are not
-#'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
-#'   more details.
 #' @param object_size The size of the object. Used to automatically set up
 #'   `tolerance` and `extension` parameters. One of the following. `"small"`
 #'   (e.g, wheat grains), `"medium"` (e.g, soybean grains), `"large"`(e.g,
 #'   peanut grains), and `"elarge"` (e.g, soybean pods)`.
+#' @param index,my_index A character value specifying the target mode for
+#'   conversion to binary image when `foreground` and `background` are not
+#'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
+#'   more details.
+#' @param object_index Defaults to `FALSE`. If an index is informed, the average
+#'   value for each object is returned. It can be the R, G, and B values or any
+#'   operation involving them, e.g., `object_index = "R/B"` will return, for
+#'   each object in the image, the average value of the R/B ratio.
+#' @param threshold A numeric value for the segmentation threshold.  By default,
+#'   a threshold value based on Otsu's method is used to reduce the grayscale
+#'   image to a binary image.
 #' @param tolerance The minimum height of the object in the units of image
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
 #'   than the tolerance, the object will be combined with one of its neighbors,
 #'   which is the highest.
 #' @param extension Radius of the neighborhood in pixels for the detection of
-#'   neighboring objects. Defaults to 20. Higher value smooths out small
-#'   objects.
+#'   neighboring objects. Higher value smooths out small objects.
 #' @param lower_size,upper_size Lower and upper limits for size for the image
 #'   analysis. Plant images often contain dirt and dust. To prevent dust from
 #'   affecting the image analysis, objects with lesser than 10% of the mean of
@@ -79,18 +100,18 @@
 #'   2000.
 #' @param show_image Show image after processing?
 #' @param show_original Show the count objects in the original image?
+#' @param show_contour Show a contour line around the objects? Defaults
+#'   to `FALSE`.
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
-#'   permutations. Defaults to `TRUE`.
+#'   permutations. Defaults to `FALSE`.
 #' @param col_foreground,col_background Foreground and background color after
 #'   image processing. Defaults to `NULL`, in which `"black"`, and `"white"` are
 #'   used, respectively.
 #' @param marker,marker_col,marker_size The type, color and size of the object
-#'   marker. Defaults to `NULL`, which shows a red point when `show_segmentation
-#'   = FALSE`. To force a marker to be used with segmented objects, set up to
-#'   `marker = "point"` (to show a point) or `marker = "text"` to enumerate the
-#'   objects.
+#'   marker. Defaults to `NULL`, which plots the object id. Use `marker = "point"` to show a point in each
+#'   object or `marker = FALSE` to omit object marker
 #' @param save_image Save the image after processing? The image is saved in the
 #'   current working directory named as `proc_*` where `*` is the image name
 #'   given in `img`.
@@ -102,13 +123,31 @@
 #'   processing, when `save_image = TRUE`, the processed image will be also
 #'   saved in such a directory.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A list with the following objects:
-#'  * `results` A data frame with the results (area, perimeter, radius) for
-#'  object.
-#'  * `statistics` A data frame with the summary statistics for the image.
-#'  * `count` (If `img_pattern` is used), summarizing the count number for each
-#'  image.
+#' @return `analyze_objects()` returns a list with the following objects:
+#'  * `results` A data frame with the following variables for each object in the
+#'  image:
+#'     - `id`  object identification.
+#'     - `x`,`y`,  x and y coordinates for the center of mass of the object.
+#'     - `area`:  area size (in pixels).
+#'     - `perimeter`: perimeter (in pixels).
+#'     - `radius_min`, `radius_mean`, and `radius_max`: The minimum, mean, and
+#'     maximum radius (in pixels), respectively.
+#'     - `radius_sd`: standard deviation of the mean radius (in pixels).
+#'     - `radius_ratio`: radius ratio given by `radius_max / radius_min`.
+#'     - `major_axis`: elliptical fit major axis (in pixels).
+#'     - `eccentricity`: elliptical eccentricity defined by
+#'     sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
+#'     line eccentricity is 1.
+#'     - `theta`: object angle (in radians).
+#'     - `index`: (when `object_index` is declared) the index for pixel
+#'     intensity of each object. By default, the mean value of B (blue).
+#'  * `statistics`: A data frame with the summary statistics for the area of the
+#'  objects.
+#'  * `count`: If `pattern` is used, shows the number of objects in each image.
+#'  * `object_rgb`: If `object_index` is used, returns the R, G, and B values
+#'  for each pixel of each object.
 #' @export
+#' @name analyze_objects
 #' @importFrom  utils install.packages
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -121,13 +160,14 @@
 #' # Enumerate the objects in the original image
 #' analyze_objects(img,
 #'                 show_segmentation = FALSE,
-#'                 marker = "text",
+#'                 marker = "id",
 #'                 marker_col = "white")
 #' }
 #'
 analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
+                            pattern = NULL,
                             img_pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
@@ -136,9 +176,11 @@ analyze_objects <- function(img,
                             fill_hull = FALSE,
                             filter = FALSE,
                             invert = FALSE,
+                            object_size = "medium",
                             index = "NB",
                             my_index = NULL,
-                            object_size = "medium",
+                            object_index = NULL,
+                            threshold = "Otsu",
                             tolerance = NULL,
                             extension = NULL,
                             lower_size = NULL,
@@ -149,11 +191,12 @@ analyze_objects <- function(img,
                             nrows = 2000,
                             show_image = TRUE,
                             show_original = TRUE,
+                            show_contour = TRUE,
                             show_background = TRUE,
-                            show_segmentation = TRUE,
+                            show_segmentation = FALSE,
                             col_foreground = NULL,
                             col_background = NULL,
-                            marker = NULL,
+                            marker = FALSE,
                             marker_col = NULL,
                             marker_size = NULL,
                             save_image = FALSE,
@@ -161,25 +204,29 @@ analyze_objects <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  # check_ebi()
+  check_ebi()
+  if(!missing(img_pattern)){
+    warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.", call. = FALSE)
+    pattern <- img_pattern
+  }
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
-  if(!missing(img) & !missing(img_pattern)){
-    stop("Only one of `img` or `img_pattern` arguments can be used.", call. = FALSE)
+  if(!missing(img) & !missing(pattern)){
+    stop("Only one of `img` or `pattern` arguments can be used.", call. = FALSE)
   }
   if(is.null(dir_original)){
-    diretorio_original <- paste("./", sep = "")
+    diretorio_original <- paste0("./")
   } else{
-    diretorio_original <- paste("./", dir_original, sep = "")
+    diretorio_original <- paste0("./", dir_original)
   }
   if(is.null(dir_processed)){
-    diretorio_processada <- paste("./", sep = "")
+    diretorio_processada <- paste0("./")
   } else{
-    diretorio_processada <- paste("./", dir_processed, sep = "")
+    diretorio_processada <- paste0("./", dir_processed)
   }
   help_count <-
-    function(img, foreground, background, resize, fill_hull, filter, tolerance, extension,
+    function(img, foreground, background, resize, fill_hull, threshold, filter, tolerance, extension,
              randomize, nrows, show_image, show_original, show_background, marker,
              marker_col, marker_size, save_image, prefix,
              dir_original, dir_processed, verbose){
@@ -201,7 +248,7 @@ analyze_objects <- function(img,
         img <- image_resize(img, resize)
       }
       if(filter != FALSE){
-        img <- image_filter(img)
+        img <- image_filter(img, size = filter)
       }
       if(!is.null(foreground) && !is.null(background)){
         if(is.character(foreground)){
@@ -262,6 +309,7 @@ analyze_objects <- function(img,
                              my_index = my_index,
                              invert = invert,
                              fill_hull = fill_hull,
+                             threshold = threshold,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
@@ -301,30 +349,64 @@ analyze_objects <- function(img,
                          id = 1:nrow(shape),
                          radius_ratio = s.radius.max / s.radius.min)
       shape <- shape[, c(12, 7, 8, 1:3, 5:6, 4, 13, 9:11)]
-      stats <-
-        transform(data.frame(area = c(n = length(shape$s.area),
-                                      min(shape$s.area),
-                                      mean(shape$s.area),
-                                      max(shape$s.area),
-                                      sd(shape$s.area),
-                                      sum(shape$s.area)),
-                             perimeter = c(NA,
-                                           min(shape$s.perimeter),
-                                           mean(shape$s.perimeter),
-                                           max(shape$s.perimeter),
-                                           sd(shape$s.perimeter),
-                                           sum(shape$s.perimeter))),
-                  statistics = c("n", "min", "mean", "max", "sd", "sum"))
-      stats <- stats[c(3, 1, 2)]
-
       colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
                            "radius_min", "radius_max", "radius_sd", "radius_ratio",
                            "major_axis", "eccentricity", "theta")
+      if(!is.null(object_index)){
+        if(!is.character(object_index)){
+          stop("`object_index` must be a character.", call. = FALSE)
+        }
+        object_index <- toupper(object_index)
+        bands <- unique(unlist(strsplit(unlist(object_index), "[^a-zA-Z]+")))
+        if(!all(bands %in% c("R", "G", "B"))){
+          stop("`object_index` must contains only R, G, and B values.", call. = FALSE)
+        }
+        data_mask <- nmask@.Data
+        if(isTRUE(parallel)){
+          nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+          clust <- makeCluster(nworkers)
+          clusterExport(clust,
+                        varlist = c("img", "data_mask", "get_rgb"),
+                        envir=environment())
+          on.exit(stopCluster(clust))
+          object_rgb <-
+            do.call(rbind,
+                    parLapply(clust, 1:max(data_mask),
+                              function(i){
+                                get_rgb(img, data_mask, i)
+                              })
+            )
+        } else{
+          object_rgb <-
+            do.call(rbind,
+                    lapply(1:max(data_mask), function(i){
+                      get_rgb(img, data_mask, i)
+                    }))
+        }
+        object_rgb <- subset(object_rgb, object %in% shape$id)
+        indexes <- transform(object_rgb, index = eval(parse(text = object_index)))
+        indexes <- aggregate(index ~ object, data = indexes, FUN = mean)
+        shape <- cbind(shape, index = indexes[, 2])
+        colnames(shape[14]) <- "index"
+      } else{
+        object_rgb <- NULL
+      }
+      stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
+                                   "sd_area", "sum_area"),
+                          value = c(length(shape$area),
+                                    min(shape$area),
+                                    mean(shape$area),
+                                    max(shape$area),
+                                    sd(shape$area),
+                                    sum(shape$area)))
       results <- list(results = shape,
-                      statistics = stats)
+                      statistics = stats,
+                      object_rgb = object_rgb)
       class(results) <- "anal_obj"
-
       if(show_image == TRUE | save_image == TRUE){
+        if(isTRUE(show_contour)){
+          object_contour <- EBImage::ocontour(nmask)
+        }
         backg <- !is.null(col_background)
         col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
         col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
@@ -365,11 +447,52 @@ analyze_objects <- function(img,
             im2@.Data[,,3][ID2] <- col_background[3]
           }
         }
-        show_mark <- !is.null(marker) && show_segmentation == TRUE | show_segmentation == FALSE
-        marker <- ifelse(is.null(marker), "text", marker)
+        show_mark <- ifelse(isFALSE(marker), FALSE, TRUE)
+        marker <- ifelse(is.null(marker), "id", marker)
+        if(!isFALSE(show_mark) & marker != "point" & !marker %in% colnames(shape)){
+          warning("Accepted 'marker' are: {", paste(colnames(shape), collapse = ", "),
+                  "}. Drawing the object id.", call. = FALSE)
+          marker <- "id"
+        }
         marker_col <- ifelse(is.null(marker_col), "white", marker_col)
-        marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
+        marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
         if(show_image == TRUE){
+          if(marker != "point"){
+            plot(im2)
+            if(show_mark){
+              text(shape[, 2],
+                   shape[, 3],
+                   round(shape[, marker], 2),
+                   col = marker_col,
+                   cex = marker_size)
+            }
+            if(isTRUE(show_contour)){
+              plot_contour(object_contour, col = marker_col, lwd = 1)
+            }
+          } else{
+            plot(im2)
+            if(show_mark){
+              points(shape[, 2],
+                     shape[, 3],
+                     col = marker_col,
+                     pch = 16,
+                     cex = marker_size)
+            }
+            if(object_contour){
+              plot_contour(object_contour, col = marker_col, lwd = 1)
+            }
+          }
+        }
+        if(save_image == TRUE){
+          if(dir.exists(diretorio_processada) == FALSE){
+            dir.create(diretorio_processada, recursive = TRUE)
+          }
+          png(paste0(diretorio_processada, "/",
+                     prefix,
+                     name_ori, ".",
+                     extens_ori),
+              width = dim(im2@.Data)[1],
+              height = dim(im2@.Data)[2])
           if(marker == "text"){
             plot(im2)
             if(show_mark){
@@ -379,71 +502,41 @@ analyze_objects <- function(img,
                    col = marker_col,
                    cex = marker_size)
             }
+            if(object_contour){
+              plot_contour(object_contour, col = marker_col, lwd = 1)
+            }
           } else{
             plot(im2)
             if(show_mark){
-              points(shape[,2],
-                     shape[,3],
-                     col = marker_col,
-                     pch = 16,
-                     cex = marker_size)
+              text(shape[,2],
+                   shape[,3],
+                   col = marker_col,
+                   pch = 16,
+                   cex = marker_size)
             }
-          }
-        }
-        if(save_image == TRUE){
-          if(dir.exists(diretorio_processada) == FALSE){
-            dir.create(diretorio_processada)
-          }
-          png(paste0(diretorio_processada, "/",
-                     prefix,
-                     name_ori, ".",
-                     extens_ori),
-              width = dim(im2@.Data)[1],
-              height = dim(im2@.Data)[2])
-          if(marker == "text"){
-            marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-            plot(im2)
-            text(shape[,2],
-                 shape[,3],
-                 shape[,1],
-                 col = marker_col,
-                 cex = marker_size)
-          } else{
-            marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-            plot(im2)
-            text(shape[,2],
-                 shape[,3],
-                 col = marker_col,
-                 pch = 16,
-                 cex = marker_size)
-
+            if(object_contour){
+              plot_contour(object_contour, col = marker_col, lwd = 1)
+            }
           }
           dev.off()
         }
       }
-      if(verbose == TRUE){
-        cat("\n--------------------------------------------\n")
-        cat("Number of objects:", stats[1,2],"\n")
-        cat("--------------------------------------------\n")
-        print(stats[-1,], row.names = FALSE)
-        cat("\n")
-      }
       invisible(results)
     }
-  if(missing(img_pattern)){
-    help_count(img, foreground, background, resize, fill_hull, filter, tolerance , extension, randomize,
-               nrows, show_image, show_original, show_background, marker,
-               marker_col, marker_size, save_image, prefix,
+  if(missing(pattern)){
+    help_count(img, foreground, background, resize, fill_hull, threshold, filter,
+               tolerance , extension, randomize, nrows, show_image, show_original,
+               show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose)
   } else{
-    if(img_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
-      img_pattern <- "^[0-9].*$"
+    if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      pattern <- "^[0-9].*$"
     }
-    plants <- list.files(pattern = img_pattern, diretorio_original)
+    plants <- list.files(pattern = pattern, diretorio_original)
     extensions <- as.character(sapply(plants, file_extension))
     names_plant <- as.character(sapply(plants, file_name))
-    if(length(grep(img_pattern, names_plant)) == 0){
-      stop(paste("'",img_pattern,"' pattern not found in '",
+    if(length(grep(pattern, names_plant)) == 0){
+      stop(paste("Pattern '", pattern, "' not found in '",
                  paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
            call. = FALSE)
     }
@@ -451,12 +544,10 @@ analyze_objects <- function(img,
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust,
-                    varlist = c("names_plant", "help_count", "file_name",
-                                "check_names_dir", "file_extension", "image_import",
-                                "image_binary"),
+                    varlist = c("names_plant"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -466,45 +557,49 @@ analyze_objects <- function(img,
         parLapply(clust, names_plant,
                   function(x){
                     help_count(x,
-                               foreground, background, resize, fill_hull, filter,
-                               tolerance , extension, randomize,
-                               nrows, show_image, show_original, show_background, marker,
-                               marker_col, marker_size, save_image, prefix,
+                               foreground, background, resize, fill_hull, threshold,
+                               filter, tolerance , extension, randomize,
+                               nrows, show_image, show_original, show_background,
+                               marker, marker_col, marker_size, save_image, prefix,
                                dir_original, dir_processed, verbose =  FALSE)
                   })
 
     } else{
-      results <- list()
       pb <- progress(max = length(plants), style = 4)
-      for (i in 1:length(plants)) {
-        if(verbose == TRUE){
-          run_progress(pb, actual = i,
-                       text = paste("Processing image", names_plant[i]))
-        }
-        results[[i]] <-
-          help_count(img  = names_plant[i],
-                     foreground, background, resize, fill_hull, filter, tolerance,
-                     extension, randomize, nrows, show_image, show_original,
-                     show_background, marker, marker_col, marker_size, save_image,
-                     prefix, dir_original, dir_processed, verbose)
+      foo <- function(plants, ...){
+        run_progress(pb, ...)
+        help_count(img  = plants,
+                   foreground, background, resize, fill_hull, threshold, filter,
+                   tolerance, extension, randomize, nrows, show_image, show_original,
+                   show_background, marker, marker_col, marker_size, save_image,
+                   prefix, dir_original, dir_processed, verbose)
       }
+      results <-
+        lapply(seq_along(names_plant), function(i){
+          foo(names_plant[i],
+              actual = i,
+              text = paste("Processing image", names_plant[i]))
+        })
     }
     names(results) <- names_plant
     stats <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
                 transform(results[[i]][["statistics"]],
-                          id =  names(results[i]))[,c(4, 1, 2, 3)]
+                          id =  names(results[i]))[,c(3, 1, 2)]
               })
       )
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
                 transform(results[[i]][["results"]],
-                          img =  names(results[i]))[, c(14, 1:13)]
+                          img =  names(results[i]))
               })
       )
-    summ <- stats[stats$statistics == "n", c(1,3)]
+    if("img" %in% colnames(results)){
+      results <- results[, c(ncol(results), 1:ncol(results) - 1)]
+    }
+    summ <- stats[stats$stat == "n", c(1, 3)]
     if(verbose == TRUE){
       names(summ) <- c("Image", "Objects")
       cat("--------------------------------------------\n")
@@ -524,3 +619,49 @@ analyze_objects <- function(img,
   }
 }
 
+
+#' @name analyze_objects
+#' @param x An object of class `anal_obj`.
+#' @param ... Currently not used
+#' @method plot anal_obj
+#' @export
+#' @return `plot.anal_obj()` returns a `ggplot` object containing the distribution of the pixels for each
+#'   object
+#' @examples
+#' \donttest{
+#' library(pliman)
+#'
+#' img <- image_import(image_pliman("soy_green.jpg"))
+#' # Segment the foreground (grains) using the normalized blue index
+#' # Shows the average value of the blue index in each object
+#' rgb <-
+#'    analyze_objects(img,
+#'                    index = "NB", # default
+#'                    object_index = "B")
+#' plot(rgb)
+#' }
+plot.anal_obj <- function(x, ...){
+  rgb <- x$object_rgb
+  if(is.null(rgb)){
+    stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.", call. = FALSE)
+  }
+  rgb$id <- rownames(rgb)
+  rgb <-
+    reshape(rgb,
+            direction = "long",
+            varying = list(names(rgb)[2:4]),
+            v.names = "value",
+            idvar = "id",
+            timevar = "Spectrum",
+            times = c("r", "g", "b"))
+  rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
+  ggplot(rgb, aes(value, fill = Spectrum)) +
+    geom_density(alpha = 0.6) +
+    scale_y_continuous(expand = expansion(c(0, 0.05))) +
+    scale_x_continuous(expand = expansion(c(0, 0))) +
+    facet_wrap(~object) +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          axis.ticks.length = unit(0.2, "cm"),
+          panel.grid.minor = element_blank())
+}

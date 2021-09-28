@@ -8,7 +8,14 @@
 \alias{image_pliman}
 \title{Import and export images}
 \usage{
-image_import(image, ..., img_pattern = NULL)
+image_import(
+  image,
+  ...,
+  pattern = NULL,
+  path = NULL,
+  plot = FALSE,
+  img_pattern = NULL
+)
 
 image_export(image, name, extension = NULL, subfolder = NULL, ...)
 
@@ -25,12 +32,20 @@ image_pliman(image)
 \item{...}{Alternative arguments passed to the corresponding functions from
 the \code{jpeg}, \code{png}, and \code{tiff} packages.}
 
-\item{img_pattern}{A pattern of file name used to identify images to be
-imported. For example, if \code{img_pattern = "im"} all images in the current
-working directory that the name matches the pattern (e.g., img1.-,
-image1.-, im2.-) will be imported as a list. Providing any number as
-pattern (e.g., \code{img_pattern = "1"}) will select images that are named as
-1.-, 2.-, and so on.}
+\item{pattern}{A pattern of file name used to identify images to be imported.
+For example, if \code{pattern = "im"} all images in the current working
+directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
+will be imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-, 2.-, and so on. An error
+will be returned if the pattern matches any file that is not supported
+(e.g., img1.pdf).}
+
+\item{path}{A character vector of full path names; the default corresponds to
+the working directory, \code{\link[=getwd]{getwd()}}. It will overwrite (if given) the path
+informed in \code{image} argument.}
+
+\item{plot}{Plots the image after importing? Defaults to \code{FALSE}.}
+
+\item{img_pattern}{Deprecated. Use \code{pattern} instead.}
 
 \item{name}{An string specifying the name of the image. It can be either a
 charactere with the image name (e.g., "img1") or name and extension (e.g.,
@@ -56,11 +71,14 @@ image installed with the package.
 \description{
 Import images from files and URLs and write images to files, possibly with
 batch processing.
-*
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
+(full_path <- image_pliman("sev_leaf.jpg"))
+(path <- file_dir(full_path))
+(file <- basename(full_path))
+image_import(image = full_path)
+image_import(image = file, path = path)
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

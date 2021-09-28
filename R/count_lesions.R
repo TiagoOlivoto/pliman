@@ -129,7 +129,7 @@ count_lesions <- function(img,
                           lower_size = NULL,
                           upper_size = NULL,
                           randomize = TRUE,
-                          nrows = 10000,
+                          nrows = 3000,
                           lesion_size = "medium",
                           segment = TRUE,
                           tolerance = NULL,
@@ -384,7 +384,6 @@ count_lesions <- function(img,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         img2@.Data[which(imgs[,,1]==1)] <- FALSE
-
         parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
         res <- length(img2)
         usef_area <- res

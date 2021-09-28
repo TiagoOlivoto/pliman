@@ -9,15 +9,16 @@ symptomatic_area(
   img_healthy,
   img_symptoms,
   img_background = NULL,
+  pattern = NULL,
   img_pattern = NULL,
   resize = FALSE,
   fill_hull = TRUE,
   parallel = FALSE,
   workers = NULL,
-  randomize = TRUE,
-  nrows = 5000,
+  nrows = 3000,
   show_image = FALSE,
   show_original = TRUE,
+  show_contour = TRUE,
   show_background = TRUE,
   col_leaf = "green",
   col_symptoms = "red",
@@ -38,11 +39,14 @@ symptomatic_area(
 
 \item{img_background}{A color palette of areas with symptoms.}
 
-\item{img_pattern}{A pattern of file name used to identify images to be
-processed. For example, if \code{img_pattern = "im"} all images that the name
-matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
-Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
-images that are named as 1.-, 2.-, and so on.}
+\item{pattern}{A pattern of file name used to identify images to be imported.
+For example, if \code{pattern = "im"} all images in the current working
+directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
+will be imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-, 2.-, and so on. An error
+will be returned if the pattern matches any file that is not supported
+(e.g., img1.pdf).}
+
+\item{img_pattern}{Deprecated. Use \code{pattern} instead.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -58,16 +62,20 @@ the processing time, especially when \code{img_pattern} is used is informed. The
 number of sections is set up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
-number of parallel processes that can be active at the same time.}
-
-\item{randomize}{Randomize the lines before training the model?}
+number of parallel processes that can be active at the same time. Defaults
+to 50\% of available cores.}
 
 \item{nrows}{The number of lines to be used in training step. Defaults to
-5000.}
+3000.}
 
 \item{show_image}{Show image after processing?}
 
-\item{show_original}{Show the symptoms in the original image?}
+\item{show_original}{Show the symptoms in the original image? Defaults to
+\code{TRUE}.}
+
+\item{show_contour}{Show a contour line around the symptomatic area? Defaults
+to \code{TRUE}. If false, the symptomatic area will be filled with the color
+informed in \code{col_symptoms} argument.}
 
 \item{show_background}{Show the background? Defaults to \code{TRUE}. A white
 background is shown by default when \code{show_original = FALSE}.}
@@ -104,7 +112,7 @@ leaf based on provided color palettes samples. A general linear model
 (binomial family) fitted to the RGB values is used to segment the lesions from
 the healthy leaf. If a pallet of background is provided, the function takes
 care of the details to isolate it before computing the number and area of
-lesions. By using \code{img_pattern} it is possible to process several images with
+lesions. By using \code{pattern} it is possible to process several images with
 common pattern names that are stored in the current working directory or in
 the subdirectory informed in \code{dir_original}.
 }
@@ -122,6 +130,4 @@ symptomatic_area(img = img,
                  img_background = background,
                  show_image = TRUE)
 }
-
-
 }

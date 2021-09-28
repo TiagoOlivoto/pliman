@@ -1,8 +1,8 @@
 object_size;resolution;ext;tol
-small;res<1600000;2;0.1
-small;res >= 1600000 & res < 3200000;2;0.5
-small;res >= 3200000 & res < 4800000;3;0.7
-small;res >= 4800000 & res < 6400000;3;0.7
+small;res<1600000;3;0.1
+small;res >= 1600000 & res < 3200000;3;0.1
+small;res >= 3200000 & res < 4800000;3;0.4
+small;res >= 4800000 & res < 6400000;4;0.6
 small;res >= 6400000 & res < 8000000;5;0.75
 small;res>= 8000000;5;1
 medium;res<1600000;1;0.6

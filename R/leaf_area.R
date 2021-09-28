@@ -63,24 +63,15 @@
 #' @importFrom graphics text par points rect
 #' @examples
 #' \donttest{
+#' # use analyze_objects() to compute the leaf area.
+#'
 #' library(pliman)
-#' img <- image_import(image_pliman("la_pattern.JPG"))
-#' leaf <- image_import(image_pliman("la_leaf.jpg"))
-#' tmpl <- image_import(image_pliman("la_temp.jpg"))
-#' background <- image_import(image_pliman("la_back.jpg"))
+#' img <- image_import(image_pliman("la_leaves.JPG"))
+#' lef_area <- analyze_objects(img, marker = "text")
 #'
-#' # Combine the images
-#' image_combine(img, leaf, tmpl, background)
-#'
-#' # Computes the leaf area
-#' area <-
-#' leaf_area(img = img,
-#'           img_leaf = leaf,
-#'           img_template = tmpl,
-#'           img_background = background,
-#'           area_template = 4,
-#'           text_col = "white")
-#' get_measures(area)
+#' # correct pixel to metric units using the image dpi (~84)
+#' # the object 6 (leaf square) has a known area of ~ 4 cm2.
+#' get_measures(lef_area, dpi = 84)
 #' }
 #'
 leaf_area <- function(img,
@@ -109,6 +100,7 @@ leaf_area <- function(img,
                       dir_processed = NULL,
                       verbose = TRUE){
   check_ebi()
+  message("`leaf_area()` will be deprecated in the future. Use `analyze_objects()` instead.")
   # Some parts adapted from
   # https://github.com/AlcineiAzevedo/Segmentacao-conchonilha2
   # Thanks to Alcinei Azevedo for his tips

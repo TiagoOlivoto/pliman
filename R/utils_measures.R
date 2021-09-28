@@ -166,10 +166,9 @@ get_measures <- function(object,
     res$major_axis <- res$major_axis / dpc
   }
   if("img" %in% names(res)){
-    res[,2:14] <- apply(res[,2:14], 2, round, digits)
     smr <-
       do.call(cbind,
-              lapply(5:14, function(i){
+              lapply(5:ncol(res), function(i){
                 if(i == 5){
                   n <- aggregate(res[[i]] ~ img, res, length)[[2]]
                   s <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
@@ -181,16 +180,17 @@ get_measures <- function(object,
                 }
               })
       )
-    names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:14]))
+    names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:ncol(res)]))
     smr$img <- unique(res$img)
-    smr <- smr[,c(14, 1:13)]
+    smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
+    smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
     out <-
       list(results = res,
            summary = smr)
     class(out) <- c("measures_ls")
     return(out)
   } else{
-    res[,1:10] <- apply(res[,1:10], 2, round, digits)
+    res[,2:ncol(res)] <- apply(res[,2:ncol(res)], 2, round, digits)
     class(res) <- c("data.frame", "measures")
     return(res)
   }
@@ -209,13 +209,13 @@ plot_measures <- function(object,
   } else if(class(object) == "anal_obj"){
     object <- object$results
   } else if(class(object) == "objects_rgb"){
-    object <- cbind(object[["objects"]], index = object$indexes$index)
+    object <- object$objects
   } else{
     stop("Object of ivalid class.")
   }
-  measures <- c("id", "area", "perimeter", "radius_mean", "radius_min", "radius_max", "radius_ratio", "index")
+  measures <- colnames(object)
   if(!measure %in% measures){
-    stop("'measure' must be one of the", paste(measures, collapse = ", "), call. = FALSE)
+    stop("'measure' must be one of {", paste(measures, collapse = ", "),"}.", call. = FALSE)
   }
   text(x = object[,2],
        y = object[,3],

@@ -1,6 +1,8 @@
 #' Get Red Green and Blue for image objects
 #'
-#' Get the Red Green and Blue (RGB) for objects in an image.
+#' Get the Red Green and Blue (RGB) for objects in an image. This function will
+#' be deprecated in a near future. Use [analyze_objects()] with the argument
+#' `object_index` instead.
 #'
 #'A binary image is first generated to segment the foreground and background.
 #'The argument index is useful to choose a proper index to segment the image
@@ -99,12 +101,8 @@
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
-#' library(pliman)
-#' img <- image_import(image_pliman("soy_green.jpg"))
-#' # Segment the foreground (grains) using the normalized blue index
-#' # Shows the average value of the blue index in each object
-#' rgb <- objects_rgb(img)
-#' plot(rgb)
+#' # objects_rgb() will be deprecated in the future.
+#' # Use analyze_objects() with the argument `object_index` instead.
 #' }
 objects_rgb <- function(img,
                         foreground = NULL,
@@ -137,6 +135,7 @@ objects_rgb <- function(img,
                         dir_processed = NULL,
                         verbose = TRUE){
   check_ebi()
+  message("`objects_rgb()` will be deprecated in the future. Use `analyze_objects()` with the argument `object_index` instead.")
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
@@ -404,47 +403,4 @@ objects_rgb <- function(img,
 
 
 
-#' Plots an `objects_rgb` object
-#'
-#' Produces an histogram of an `objects_rgb` object
-#'
-#' @name objects_rgb
-#' @param x An object of class `objects_rgb`.
-#' @param ... Currently not used
-#' @method plot objects_rgb
-#' @export
-#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
-#' @return A `ggplot` object containing the distribution of the pixels for each
-#'   index.
-#' @examples
-#' \donttest{
-#' library(pliman)
-#'
-#' img <- image_import(image_pliman("soy_green.jpg"))
-#' # Segment the foreground (grains) using the normalized blue index
-#' # Shows the average value of the blue index in each object
-#' rgb <- objects_rgb(img)
-#' plot(rgb)
-#' }
-plot.objects_rgb <- function(x, ...){
-  rgb <- x$rgb
-  rgb$id <- rownames(rgb)
-  rgb <-
-    reshape(rgb,
-            direction = "long",
-            varying = list(names(rgb)[2:4]),
-            v.names = "value",
-            idvar = "id",
-            timevar = "Spectrum",
-            times = c("r", "g", "b"))
-  rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
-  ggplot(rgb, aes(value, fill = Spectrum)) +
-    geom_density(alpha = 0.6) +
-    scale_y_continuous(expand = expansion(c(0, 0.05))) +
-    scale_x_continuous(expand = expansion(c(0, 0))) +
-    facet_wrap(~object) +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          axis.ticks.length = unit(0.2, "cm"),
-          panel.grid.minor = element_blank())
-}
+

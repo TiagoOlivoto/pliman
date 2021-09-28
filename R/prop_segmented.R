@@ -7,6 +7,11 @@
 #' @param nseg The number of iterative segmentation steps to be performed.
 #' @param index The index to be used in the image segmentation. See
 #'   [image_index()] for more details.
+#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
+#'   on Otsu's method is used to reduce the grayscale image to a binary image.
+#'   If a numeric value is informed, this value will be used as a threshold.
+#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
+#'   the threshold based on a raster plot showing pixel intensity of the index.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param filter Performs median filtering after image processing? defaults to
 #'   `FALSE`. See more at [image_filter()].
@@ -33,14 +38,16 @@
 #' img <- image_import(image_pliman("sev_leaf.jpg"))
 #' plot(img)
 #'
-#' prop_segmented(img,
-#'                nseg = 2,
-#'                index = c("G", "GLI"),
-#'                ncol = 3)
+#' # prop_segmented() will be deprecated in the future. Use image_segment_iter() instead.
+#' image_segment_iter(img,
+#'                    nseg = 2,
+#'                    index = c("G", "GLI"),
+#'                    ncol = 3)
 #' }
 prop_segmented <- function(image,
                            nseg = 1,
                            index = NULL,
+                           threshold = "Otsu",
                            fill_hull = FALSE,
                            filter = FALSE,
                            parallel = FALSE,
@@ -49,6 +56,7 @@ prop_segmented <- function(image,
                            ncol = NULL,
                            nrow = NULL,
                            verbose = TRUE){
+  message("`prop_segmented()` will be deprecated in the future. Use `image_segment_iter()` instead.")
   check_ebi()
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
@@ -84,6 +92,7 @@ prop_segmented <- function(image,
       if(is.null(index)){
         image_segment(image,
                       index = "all",
+                      threshold = threshold,
                       fill_hull = fill_hull,
                       show_image = show_image)
         avali_index <- pliman_indexes()
@@ -98,6 +107,7 @@ prop_segmented <- function(image,
       segmented <-
         image_segment(image,
                       index = index,
+                      threshold = threshold,
                       fill_hull = fill_hull,
                       show_image = FALSE)
       total <- length(image)
@@ -119,6 +129,7 @@ prop_segmented <- function(image,
       if(is.null(index)){
         image_segment(image,
                       index = "all",
+                      threshold = threshold,
                       fill_hull = fill_hull,
                       show_image = show_image)
         avali_index <- pliman_indexes()
@@ -139,12 +150,14 @@ prop_segmented <- function(image,
         image_segment(image,
                       index = indx,
                       fill_hull = fill_hull,
+                      threshold = threshold,
                       show_image = FALSE)
       segmented[[1]] <- first
       for (i in 2:(nseg)) {
         if(is.null(index)){
           image_segment(first,
                         index = "all",
+                        threshold = threshold,
                         fill_hull = fill_hull,
                         show_image = T)
           avali_index <- pliman_indexes()
@@ -162,6 +175,7 @@ prop_segmented <- function(image,
         second <-
           image_segment(first,
                         index = indx,
+                        threshold = threshold,
                         fill_hull = fill_hull,
                         show_image = FALSE)
         segmented[[i]] <- second

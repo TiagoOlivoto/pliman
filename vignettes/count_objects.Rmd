@@ -22,12 +22,11 @@ knitr::opts_chunk$set(
 
 # Getting started
 
-The function `count_objects()` can be used to count objects in an image. Let us start with a simple example with the image `object_300dpi.png` available in the [GitHub page](https://github.com/TiagoOlivoto/pliman/tree/master/image_examples). To facilitate the image importation from this folder, a helper function `image_pliman()` is used.
+The function `analyze_objects()` can be used to count objects in an image. Let us start with a simple example with the image `object_300dpi.png` available in the [GitHub page](https://github.com/TiagoOlivoto/pliman/tree/master/image_examples). To facilitate the image importation from this folder, a helper function `image_pliman()` is used.
 
 ```{r}
 library(pliman)
-img <- image_import(image_pliman("objects_300dpi.jpg"))
-image_show(img)
+img <- image_import(image_pliman("objects_300dpi.jpg"), plot = TRUE)
 ```
 
 The above image was produced with Microsoft PowerPoint. It has a known resolution of 300 dpi (dots per inch) and shows four objects
@@ -37,7 +36,7 @@ The above image was produced with Microsoft PowerPoint. It has a known resolutio
 -   Rectangle: 4 x 2 cm (8 cm^2^)
 -   Circle: 3 cm in diameter (\~7.08 cm^2^)
 
-To count the objects in the image we use `count_objects()` and inform the image object (the only mandatory argument). First, we use `image_binary()` to see the most suitable index to segment the objects from the background. By default, the R, G, B (first row) and their normalized values (second row) are used.
+To count the objects in the image we use `analyze_objects()` and inform the image object (the only mandatory argument). First, we use `image_binary()` to see the most suitable index to segment the objects from the background. By default, the R, G, B (first row) and their normalized values (second row) are used.
 
 ```{r fig.width=7, fig.height=5}
 image_binary(img)
@@ -45,23 +44,15 @@ image_binary(img)
 
 ```{r}
 img_res <- 
-  count_objects(img,
-                index = "B") # use blue index to segment
+  analyze_objects(img,
+                  marker = "area",
+                  index = "B") # use blue index to segment
 
-```
-
-# Getting the object measures
-
-The results were stored in `img_res` and a summary print in the console. The minimum, mean, maximum, standard deviation and sum of pixels are given for both area and perimeter. The values for each object can be obtained with `get_measures()`. Since there is no scale declared in the above example, we have no idea about the actual area of the objects in cm^2^, only in pixels.
-
-```{r}
-(measures <- get_measures(img_res))
-image_show(img)
-plot_measures(measures) # plot the object id
-ls_px <- measures[1, 5] # number of pixels (perimeter) of the largest square
 ```
 
 # Adjusting object measures
+
+The results were stored in `img_res`. Since there is no scale declared in the above example, we have no idea about the actual area of the objects in cm^2^, only in pixels. In this case, we use `get_measures()` to adjust the measures from pixels to metric units.
 
 There are two main ways of adjusting the object measures (from pixels to cm, for example). The first one is to declare the known area, perimeter, or radius of a given object. The measure for the other objects will be then computed by a simple rule of three. The second one is by declaring a known image resolution in dpi (dots per inch). In this case, the perimeter, area, and radius will be adjusted by the informed dpi. 
 
@@ -87,7 +78,8 @@ get_measures(img_res,
 If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with `pixels_to_cm()`. This function converts the number of pixels ($px$) to cm, considering the image resolution in $dpi$, as follows: $cm = px \times (2.54/dpi)$. Since we known the number of pixels of the larger square, its perimeter in cm is given by
 
 ```{r}
-ls_px
+# number of pixels for the highest square perimeter
+ls_px <- img_res$results$perimeter[1]
 pixels_to_cm(px = ls_px, dpi = 300)
 
 ```
@@ -109,24 +101,25 @@ background <- image_import(image_pliman("la_back.jpg"))
 image_combine(soy, grain, background, ncol = 3)
 ```
 
-The function `count_objects()` segment the image using as default the normalized blue index, as follows $NB = (B/(R+G+B))$, where $R$, $G$, and $B$ are the red, green, and blue bands. Objects are count and the segmented objects are colored with random permutations.
+The function `analyze_objects()` segment the image using as default the normalized blue index, as follows $NB = (B/(R+G+B))$, where $R$, $G$, and $B$ are the red, green, and blue bands. Objects are count and the segmented objects are colored with random permutations.
 
 ```{r}
 count <- 
-  count_objects(soy,
-                index = "NB") # default
+  analyze_objects(soy,
+                  index = "NB") # default
 
 ```
 
-Users can remove the random coloration and identify the objects (in this example the grains) by using the arguments `marker = "text"` and `show_segmentation = FALSE`. The color of the background can also be changed with `col_background`.
+Users can set `show_contour = FALSE` to remove the contour line and identify the objects (in this example the grains) by using the arguments `marker = "id"`. The color of the background can also be changed with `col_background`.
 
 ```{r}
 count <- 
-  count_objects(soy,
-                marker = "text",
-                show_segmentation = FALSE,
-                col_background = "white",
-                index = "NB") # default
+  analyze_objects(soy,
+                  show_contour = FALSE,
+                  marker = "id",
+                  show_segmentation = FALSE,
+                  col_background = "white",
+                  index = "NB") # default
 ```
 
 ```{r}
@@ -137,60 +130,60 @@ count <-
 In the following example, we will select objects with an area above the average of all objects by using `lower_size = 2057.36`. Additionally, we will use the argument `show_original = FALSE` to show the results as colors (non-original image).
 
 ```{r}
-count_objects(soy,
-              marker = "text",
-              show_original = FALSE,
-              show_segmentation = FALSE,
-              lower_size = 2057.36,
-              index = "NB") # default
+analyze_objects(soy,
+                marker = "id",
+                show_original = FALSE,
+                show_segmentation = FALSE,
+                lower_size = 2057.36,
+                index = "NB") # default
 ```
 
-Users can also select the top `n` objects based on either smaller or largest areas. Let's see how to point out the 5 grains with the smallest area, showing the original grains in a blue background. We will also use the argument `my_index` to choose a personalized index to segment the image. Just for comparison, we will set up explicitly the normalized blue index by calling `my_index = "B/(R+G+B)"`.
+Users can also use the `topn_*` arguments to select the top `n` objects based on either smaller or largest areas. Let's see how to point out the 5 grains with the smallest area, showing the original grains in a blue background. We will also use the argument `my_index` to choose a personalized index to segment the image. Just for comparison, we will set up explicitly the normalized blue index by calling `my_index = "B/(R+G+B)"`.
 
 ```{r}
-count_objects(soy,
-              marker = "point",
-              show_segmentation = FALSE,
-              topn_lower = 5,
-              col_background = "blue",
-              my_index = "B/(R+G+B)") # default
+analyze_objects(soy,
+                marker = "id",
+                show_segmentation = FALSE,
+                topn_lower = 5,
+                col_background = "blue",
+                my_index = "B/(R+G+B)") # default
 ```
 
 
 ### Using sample palettes
 
-Sometimes it is difficult to choose an image index that segments the image efficiently (even using `my_index` ). In `pliman` users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to `count_objects` which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let's see how the grains of the above image can be counted with this strategy.
+Sometimes it is difficult to choose an image index that segments the image efficiently (even using `my_index` ). In `pliman` users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to `analyze_objects` which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let's see how the grains of the above image can be counted with this strategy.
 
 ```{r}
-count_objects(img = soy,
-              background = background,
-              foreground = grain)
+analyze_objects(img = soy,
+                background = background,
+                foreground = grain)
 ```
 
 
 Provided that the images are stored in the current working directory (or subdirectory), users can count the objects with no need to first import the image into the R environment. In this case, image names need to be declared as characters. Assuming that soy, background, and grain are the images saved into the current working directory, the same result as above is obtained with
 
 ```{r eval=FALSE}
-count_objects(img = "soy",
-              background = "background",
-              foreground = "grain")
+analyze_objects(img = "soy",
+                background = "background",
+                foreground = "grain")
 ```
 
 # Batch processing
-In plant image analysis, frequently it is necessary to process more than one image. For example, in plant breeding, the number of grains per plant (e.g., wheat) is frequently used in the indirect selection of high-yielding plants. In `pliman`, batch processing can be done when the user declares the argument `img_pattern`.
+In plant image analysis, frequently it is necessary to process more than one image. For example, in plant breeding, the number of grains per plant (e.g., wheat) is frequently used in the indirect selection of high-yielding plants. In `pliman`, batch processing can be done when the user declares the argument `pattern`.
 
 The following example would be used to count the objects in the images with a pattern name `"trat"` (e.g., `"trat1"`, `"trat2"`, `"tratn"`) saved into the subfolder "`originals"` in the current working directory. The processed images will be saved into the subfolder `"processed"`. The object `list_res` will be a list with two objects (`results` and `statistics`) for each image.
 
-To speed up the processing time, especially for a large number of images, the argument `parallel = TRUE` can be used. In this case, the images are processed asynchronously (in parallel) in separate `R` sessions running in the background on the same machine. The number of sections is set up to 90% of available cores. This number can be controlled explicitly with the argument `workers`.
+To speed up the processing time, especially for a large number of images, the argument `parallel = TRUE` can be used. In this case, the images are processed asynchronously (in parallel) in separate `R` sessions running in the background on the same machine. The number of sections is set up to 50% of available cores. This number can be controlled explicitly with the argument `workers`.
 
 ```{r eval=FALSE}
 list_res <- 
-count_objects(img_pattern = "trat", # matches the name pattern in 'originals' subfolder
-              dir_original = "originals",
-              dir_processed = "processed",
-              parallel = TRUE, # parallel processing
-              workers = 8, # 8 multiple sections
-              save_image = TRUE)
+  analyze_objects(pattern = "trat", # matches the name pattern in 'originals' subfolder
+                  dir_original = "originals",
+                  dir_processed = "processed",
+                  parallel = TRUE, # parallel processing
+                  workers = 8, # 8 multiple sections
+                  save_image = TRUE)
 ```
 
 

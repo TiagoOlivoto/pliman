@@ -6,6 +6,7 @@
 \alias{cm_to_dpi}
 \alias{pixels_to_cm}
 \alias{cm_to_pixels}
+\alias{npixels}
 \alias{dpi}
 \title{Utilities for image resolution}
 \usage{
@@ -16,6 +17,8 @@ cm_to_dpi(cm)
 pixels_to_cm(px, dpi)
 
 cm_to_pixels(cm, dpi)
+
+npixels(image)
 
 dpi(image)
 }
@@ -49,6 +52,7 @@ known resolution (dpi).
 \item \code{\link[=dpi]{dpi()}} An interactive function to compute the image resolution given a
 known distance informed by the user. See more information in the \strong{Details}
 section.
+\item \code{\link[=npixels]{npixels()}} returns the number of pixels of an image.
 }
 }
 \details{

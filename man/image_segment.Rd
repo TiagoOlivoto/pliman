@@ -2,12 +2,14 @@
 % Please edit documentation in R/utils_imagem.R
 \name{image_segment}
 \alias{image_segment}
+\alias{image_segment_iter}
 \title{Image segmentation}
 \usage{
 image_segment(
   image,
   index = NULL,
   my_index = NULL,
+  threshold = "Otsu",
   fill_hull = FALSE,
   re = NULL,
   nir = NULL,
@@ -18,6 +20,19 @@ image_segment(
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE
+)
+
+image_segment_iter(
+  image,
+  nseg = 1,
+  index = NULL,
+  show_image = TRUE,
+  verbose = TRUE,
+  nrow = NULL,
+  ncol = NULL,
+  parallel = FALSE,
+  workers = NULL,
+  ...
 )
 }
 \arguments{
@@ -31,6 +46,12 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 
 \item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
+
+\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than "Otsu" to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
@@ -56,6 +77,10 @@ up to 70\% of available cores.}
 number of parallel processes that can be active at the same time.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+
+\item{nseg}{The number of iterative segmentation steps to be performed.}
+
+\item{...}{Additional arguments passed on to \code{image_segment()}.}
 }
 \value{
 A list containing \code{n} objects where \code{n} is the number of indexes
@@ -66,10 +91,20 @@ used. Each objects contains:
 }
 }
 \description{
-Reduce a color, color near-infrared, or grayscale images to a segmented image
+\itemize{
+\item \code{image_segment()} reduces a color, color near-infrared, or grayscale images to a segmented image
 using a given color channel (red, green blue) or even color indexes (See
 \code{\link[=image_index]{image_index()}} for more details). The Otsu's thresholding method (Otsu,
-1979) is used to automatically perform clustering-based image thresholding.
+}
+\enumerate{
+\item is used to automatically perform clustering-based image thresholding.
+}
+}
+\details{
+\itemize{
+\item \code{image_segment_iter()} Provides an iterative image segmentation, returning
+the proportions of segmented pixels.
+}
 }
 \examples{
 library(pliman)

@@ -23,3 +23,4 @@ HUE;atan(2*(B-G-R)/30.5*(G-R));C
 HUE2;atan(2*(R-G-R)/30.5*(G-B));C
 BGI;B/G;C
 L;R+G+B/3;C
+GRAY;0.299*R + 0.587*G + 0.114*B;C

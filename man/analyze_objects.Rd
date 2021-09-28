@@ -2,12 +2,14 @@
 % Please edit documentation in R/analyze_objects.R
 \name{analyze_objects}
 \alias{analyze_objects}
-\title{Computes number of objects in an image}
+\alias{plot.anal_obj}
+\title{Analyzes objects in an image}
 \usage{
 analyze_objects(
   img,
   foreground = NULL,
   background = NULL,
+  pattern = NULL,
   img_pattern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -16,9 +18,11 @@ analyze_objects(
   fill_hull = FALSE,
   filter = FALSE,
   invert = FALSE,
+  object_size = "medium",
   index = "NB",
   my_index = NULL,
-  object_size = "medium",
+  object_index = NULL,
+  threshold = "Otsu",
   tolerance = NULL,
   extension = NULL,
   lower_size = NULL,
@@ -29,11 +33,12 @@ analyze_objects(
   nrows = 2000,
   show_image = TRUE,
   show_original = TRUE,
+  show_contour = TRUE,
   show_background = TRUE,
-  show_segmentation = TRUE,
+  show_segmentation = FALSE,
   col_foreground = NULL,
   col_background = NULL,
-  marker = NULL,
+  marker = FALSE,
   marker_col = NULL,
   marker_size = NULL,
   save_image = FALSE,
@@ -42,6 +47,8 @@ analyze_objects(
   dir_processed = NULL,
   verbose = TRUE
 )
+
+\method{plot}{anal_obj}(x, ...)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -50,19 +57,26 @@ analyze_objects(
 
 \item{background}{A color palette of the background (optional).}
 
-\item{img_pattern}{A pattern of file name used to identify images to be
-processed. For example, if \code{img_pattern = "im"} all images that the name
-matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
-Providing any number as pattern (e.g., \code{img_pattern = "1"}) will select
-images that are named as 1.-, 2.-, and so on.}
+\item{pattern}{A pattern of file name used to identify images to be imported.
+For example, if \code{pattern = "im"} all images in the current working
+directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
+will be imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-, 2.-, and so on. An error
+will be returned if the pattern matches any file that is not supported
+(e.g., img1.pdf).}
 
-\item{parallel}{Processes the images asynchronously (in parallel) in separate
-R sessions running in the background on the same machine. It may speed up
-the processing time, especially when \code{img_pattern} is used is informed. The
-number of sections is set up to 70\% of available cores.}
+\item{img_pattern}{Deprecated. Use \code{pattern} instead.}
+
+\item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel)
+in separate R sessions running in the background on the same machine. It
+may speed up the processing time, especially when \code{pattern} is used is
+informed. When \code{object_index} is informed, multiple sections will be used
+to extract the RGB values for each object in the image. This may
+significantly speed up processing time when an image has lots of objects
+(say >1000).}
 
 \item{workers}{A positive numeric scalar or a function specifying the number
-of parallel processes that can be active at the same time.}
+of parallel processes that can be active at the same time. By default, the
+number of sections is set up to 50\% of available cores.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -85,15 +99,24 @@ image.}
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
 
+\item{object_size}{The size of the object. Used to automatically set up
+\code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
+(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
+peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
+
 \item{index, my_index}{A character value specifying the target mode for
 conversion to binary image when \code{foreground} and \code{background} are not
 declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
 more details.}
 
-\item{object_size}{The size of the object. Used to automatically set up
-\code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
-(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
-peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
+\item{object_index}{Defaults to \code{FALSE}. If an index is informed, the average
+value for each object is returned. It can be the R, G, and B values or any
+operation involving them, e.g., \code{object_index = "R/B"} will return, for
+each object in the image, the average value of the R/B ratio.}
+
+\item{threshold}{A numeric value for the segmentation threshold.  By default,
+a threshold value based on Otsu's method is used to reduce the grayscale
+image to a binary image.}
 
 \item{tolerance}{The minimum height of the object in the units of image
 intensity between its highest point (seed) and the point where it contacts
@@ -102,8 +125,7 @@ than the tolerance, the object will be combined with one of its neighbors,
 which is the highest.}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
-neighboring objects. Defaults to 20. Higher value smooths out small
-objects.}
+neighboring objects. Higher value smooths out small objects.}
 
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
 analysis. Plant images often contain dirt and dust. To prevent dust from
@@ -128,20 +150,22 @@ or equal 120 and less than or equal 140 will be considered.}
 
 \item{show_original}{Show the count objects in the original image?}
 
+\item{show_contour}{Show a contour line around the objects? Defaults
+to \code{FALSE}.}
+
 \item{show_background}{Show the background? Defaults to \code{TRUE}. A white
 background is shown by default when \code{show_original = FALSE}.}
 
 \item{show_segmentation}{Shows the object segmentation colored with random
-permutations. Defaults to \code{TRUE}.}
+permutations. Defaults to \code{FALSE}.}
 
 \item{col_foreground, col_background}{Foreground and background color after
 image processing. Defaults to \code{NULL}, in which \code{"black"}, and \code{"white"} are
 used, respectively.}
 
 \item{marker, marker_col, marker_size}{The type, color and size of the object
-marker. Defaults to \code{NULL}, which shows a red point when \code{show_segmentation = FALSE}. To force a marker to be used with segmented objects, set up to
-\code{marker = "point"} (to show a point) or \code{marker = "text"} to enumerate the
-objects.}
+marker. Defaults to \code{NULL}, which plots the object id. Use \code{marker = "point"} to show a point in each
+object or \code{marker = FALSE} to omit object marker}
 
 \item{save_image}{Save the image after processing? The image is saved in the
 current working directory named as \verb{proc_*} where \code{*} is the image name
@@ -157,32 +181,67 @@ processing, when \code{save_image = TRUE}, the processed image will be also
 saved in such a directory.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+
+\item{x}{An object of class \code{anal_obj}.}
+
+\item{...}{Currently not used}
 }
 \value{
-A list with the following objects:
+\code{analyze_objects()} returns a list with the following objects:
 \itemize{
-\item \code{results} A data frame with the results (area, perimeter, radius) for
-object.
-\item \code{statistics} A data frame with the summary statistics for the image.
-\item \code{count} (If \code{img_pattern} is used), summarizing the count number for each
-image.
+\item \code{results} A data frame with the following variables for each object in the
+image:
+\itemize{
+\item \code{id}  object identification.
+\item \code{x},\code{y},  x and y coordinates for the center of mass of the object.
+\item \code{area}:  area size (in pixels).
+\item \code{perimeter}: perimeter (in pixels).
+\item \code{radius_min}, \code{radius_mean}, and \code{radius_max}: The minimum, mean, and
+maximum radius (in pixels), respectively.
+\item \code{radius_sd}: standard deviation of the mean radius (in pixels).
+\item \code{radius_ratio}: radius ratio given by \code{radius_max / radius_min}.
+\item \code{major_axis}: elliptical fit major axis (in pixels).
+\item \code{eccentricity}: elliptical eccentricity defined by
+sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
+line eccentricity is 1.
+\item \code{theta}: object angle (in radians).
+\item \code{index}: (when \code{object_index} is declared) the index for pixel
+intensity of each object. By default, the mean value of B (blue).
 }
+\item \code{statistics}: A data frame with the summary statistics for the area of the
+objects.
+\item \code{count}: If \code{pattern} is used, shows the number of objects in each image.
+\item \code{object_rgb}: If \code{object_index} is used, returns the R, G, and B values
+for each pixel of each object.
+}
+
+\code{plot.anal_obj()} returns a \code{ggplot} object containing the distribution of the pixels for each
+object
 }
 \description{
-Counts the number of objects in an image. See more at details.
+\itemize{
+\item \code{\link[=analyze_objects]{analyze_objects()}} provides tools for counting and extracting object
+features (e.g., area, perimeter, radius, pixel intensity) in an image. See
+more at \strong{Details} section.
+\item \code{\link[=plot.anal_obj]{plot.anal_obj()}} Produces an histogram for the R, G, and B values when
+argument \code{object_index} is used in the function \code{\link[=analyze_objects]{analyze_objects()}}.
+}
 }
 \details{
-Counts the number of objects in an image. A binary image is first generated to
-segment the foreground and background. The argument index is useful to choose
-a proper index to segment the image (see \code{\link[=image_binary]{image_binary()}} for more details).
-Then, the number of objects in the foreground is counted. By setting up
-arguments such as \code{lower_size}, \code{upper_size} is possible to set a threshold
-for lower and upper sizes of the objects, respectively.  Change \code{tolerance}
-and \code{extension} values to better set up watershed-based object detection. If
-color palettes samples are provided, a general linear model (binomial family)
-fitted to the RGB values is used to segment fore- and background.
+A binary image is first generated to segment the foreground and background.
+The argument index is useful to choose a proper index to segment the image
+(see \code{\link[=image_binary]{image_binary()}} for more details). Then, the number of objects in the
+foreground is counted. By setting up arguments such as \code{lower_size},
+\code{upper_size} it is possible to set a threshold for lower and upper sizes of
+the objects, respectively. The argument \code{object_size} can be used to set up
+pre-defined values of \code{tolerance} and \code{extension} depending on the image
+resolution. This will influence the watershed-based object segmentation. Users
+can also tune-up \code{tolerance} and \code{extension} explicitly to a better precision
+of watershed segmentation. If color palettes samples are provided, a general
+linear model (binomial family) fitted to the RGB values is used to segment
+fore- and background.
 
-By using \code{img_pattern} it is possible to process several images with common
+By using \code{pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
 subdirectory informed in \code{dir_original}'. To speed up the computation time,
 one can set \code{parallel = TRUE}.
@@ -196,10 +255,22 @@ analyze_objects(img)
 # Enumerate the objects in the original image
 analyze_objects(img,
                 show_segmentation = FALSE,
-                marker = "text",
+                marker = "id",
                 marker_col = "white")
 }
 
+\donttest{
+library(pliman)
+
+img <- image_import(image_pliman("soy_green.jpg"))
+# Segment the foreground (grains) using the normalized blue index
+# Shows the average value of the blue index in each object
+rgb <-
+   analyze_objects(img,
+                   index = "NB", # default
+                   object_index = "B")
+plot(rgb)
+}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

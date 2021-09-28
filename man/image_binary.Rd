@@ -8,6 +8,7 @@ image_binary(
   image,
   index = NULL,
   my_index = NULL,
+  threshold = "Otsu",
   resize = 30,
   fill_hull = FALSE,
   re = NULL,
@@ -30,8 +31,14 @@ target mode for conversion to binary image. One of the following:  \code{"R"},
 \code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
 \code{"BGI"}. See \code{\link[=image_index]{image_index()}} for more details.}
 
-\item{my_index}{User can calculate a different index using the bands names,
+\item{my_index}{User can calculate a different index using the band names,
 e.g. \code{my_index = "R+B/G"}.}
+
+\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than "Otsu" to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{30}, which
 resizes the image to 30\% of the original size to speed up image processing.
