@@ -36,13 +36,18 @@ image_segment_iter(
 )
 }
 \arguments{
-\item{image}{An image object.}
+\item{image}{An image object or a list of image objects.}
 
-\item{index}{A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  \code{"R"},
-\code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"}, \code{"BIM"}, \code{"SCI"},
-\code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
-\code{"BGI"}. See \code{\link[=image_index]{image_index()}} for more details.}
+\item{index}{\itemize{
+\item For \code{image_segment()}, a character value (or a vector of characters)
+specifying the target mode for conversion to binary image. One of the
+following:  \code{"R"}, \code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"},
+\code{"BIM"}, \code{"SCI"}, \code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"},
+\code{"HUE2"}, \code{"BGI"}, \verb{"BGI", "GRAY"}. See \code{\link[=image_index]{image_index()}} for more details.
+\item For \code{image_segment_iter()} a character or a vector of characters with the
+same length of \code{nseg}. It can be either an available index (described above)
+or any operation involving the RGB values (e.g., \code{"B/R+G"}).
+}}
 
 \item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
@@ -83,25 +88,24 @@ number of parallel processes that can be active at the same time.}
 \item{...}{Additional arguments passed on to \code{image_segment()}.}
 }
 \value{
-A list containing \code{n} objects where \code{n} is the number of indexes
-used. Each objects contains:
+\itemize{
+\item \code{image_segment()} returns list containing \code{n} objects where \code{n} is the
+number of indexes used. Each objects contains:
 \itemize{
 \item \code{image} an image with the RGB bands (layers) for the segmented object.
 \item \code{mask} A mask with logical values of 0 and 1 for the segmented image.
 }
+\item \code{image_segment_iter()} returns a list with (1) a data frame with the
+proportion of pixels in the segmented images and (2) the segmented images.
+}
 }
 \description{
 \itemize{
-\item \code{image_segment()} reduces a color, color near-infrared, or grayscale images to a segmented image
-using a given color channel (red, green blue) or even color indexes (See
-\code{\link[=image_index]{image_index()}} for more details). The Otsu's thresholding method (Otsu,
-}
-\enumerate{
-\item is used to automatically perform clustering-based image thresholding.
-}
-}
-\details{
-\itemize{
+\item \code{image_segment()} reduces a color, color near-infrared, or grayscale images
+to a segmented image using a given color channel (red, green blue) or even
+color indexes (See \code{\link[=image_index]{image_index()}} for more details). The Otsu's thresholding
+method (Otsu, 1979) is used to automatically perform clustering-based image
+thresholding.
 \item \code{image_segment_iter()} Provides an iterative image segmentation, returning
 the proportions of segmented pixels.
 }

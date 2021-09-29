@@ -1613,20 +1613,25 @@ plot.image_index <- function(x,
 
 
 #' Image segmentation
-#'
-#' * `image_segment()` reduces a color, color near-infrared, or grayscale images to a segmented image
-#' using a given color channel (red, green blue) or even color indexes (See
-#' [image_index()] for more details). The Otsu's thresholding method (Otsu,
-#' 1979) is used to automatically perform clustering-based image thresholding.
+#' @description
+#' * `image_segment()` reduces a color, color near-infrared, or grayscale images
+#' to a segmented image using a given color channel (red, green blue) or even
+#' color indexes (See [image_index()] for more details). The Otsu's thresholding
+#' method (Otsu, 1979) is used to automatically perform clustering-based image
+#' thresholding.
 #'
 #' * `image_segment_iter()` Provides an iterative image segmentation, returning
 #' the proportions of segmented pixels.
-#' @param image An image object.
-#' @param index A character value (or a vector of characters) specifying the
-#'   target mode for conversion to binary image. One of the following:  `"R"`,
-#'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
-#'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
-#'   `"BGI"`. See [image_index()] for more details.
+#' @param image An image object or a list of image objects.
+#' @param index
+#'  * For `image_segment()`, a character value (or a vector of characters)
+#'  specifying the target mode for conversion to binary image. One of the
+#'  following:  `"R"`, `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`,
+#'  `"BIM"`, `"SCI"`, `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`,
+#'  `"HUE2"`, `"BGI"`, `"BGI", "GRAY"`. See [image_index()] for more details.
+#' * For `image_segment_iter()` a character or a vector of characters with the
+#' same length of `nseg`. It can be either an available index (described above)
+#' or any operation involving the RGB values (e.g., `"B/R+G"`).
 #' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
@@ -1658,10 +1663,16 @@ plot.image_index <- function(x,
 #' @export
 #' @name image_segment
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
-#' @return A list containing `n` objects where `n` is the number of indexes
-#'   used. Each objects contains:
-#' * `image` an image with the RGB bands (layers) for the segmented object.
-#' * `mask` A mask with logical values of 0 and 1 for the segmented image.
+#' @return
+#' * `image_segment()` returns list containing `n` objects where `n` is the
+#' number of indexes used. Each objects contains:
+#'    * `image` an image with the RGB bands (layers) for the segmented object.
+#'    * `mask` A mask with logical values of 0 and 1 for the segmented image.
+#'
+#' * `image_segment_iter()` returns a list with (1) a data frame with the
+#' proportion of pixels in the segmented images and (2) the segmented images.
+#'
+
 #' @examples
 #' library(pliman)
 #'img <- image_import(image_pliman("soybean_touch.jpg"))
@@ -1775,6 +1786,7 @@ image_segment <- function(image,
 image_segment_iter <- function(image,
                                nseg = 1,
                                index = NULL,
+                               invert = NULL,
                                show_image = TRUE,
                                verbose = TRUE,
                                nrow = NULL,
@@ -1810,23 +1822,38 @@ image_segment_iter <- function(image,
     return(list(results = results,
                 images = images))
   } else{
+    avali_index <- pliman_indexes()
     if(nseg == 1){
+      if(is.null(invert)){
+        invert <- FALSE
+      } else{
+        invert <- invert
+      }
       if(is.null(index)){
         image_segment(image,
+                      invert = invert[1],
                       index = "all",
                       ...)
-        avali_index <- pliman_indexes()
         index <-
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
                  "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
                  "S", "VARI", "HUE", "HUE2", "BGI", "L")
       } else{
-        index <- index
+        index <- index[1]
+        if(!index %in% avali_index){
+          my_index <- index
+          index <- NULL
+        } else{
+          my_index <- NULL
+          index <- index
+        }
       }
       segmented <-
         image_segment(image,
                       index = index,
+                      my_index = my_index,
+                      invert = invert[1],
                       show_image = FALSE,
                       ...)
       total <- length(image)
@@ -1849,7 +1876,6 @@ image_segment_iter <- function(image,
         image_segment(image,
                       index = "all",
                       ...)
-        avali_index <- pliman_indexes()
         indx <-
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
@@ -1860,12 +1886,26 @@ image_segment_iter <- function(image,
           stop("Length of 'index' must be equal 'nseg'.", call. = FALSE)
         }
         indx <- index[1]
+        if(!indx %in% avali_index){
+          my_index <- indx
+          indx <- NULL
+        } else{
+          my_index <- NULL
+          indx <- indx
+        }
+      }
+      if(is.null(invert)){
+        invert <- rep(FALSE, nseg)
+      } else{
+        invert <- invert
       }
       segmented <- list()
       total <- length(image)
       first <-
         image_segment(image,
                       index = indx,
+                      my_index = my_index,
+                      invert = invert[1],
                       show_image = FALSE,
                       ...)
       segmented[[1]] <- first
@@ -1877,7 +1917,6 @@ image_segment_iter <- function(image,
                         ncol = ncol,
                         nrow = nrow,
                         ...)
-          avali_index <- pliman_indexes()
           indx <-
             switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                    "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
@@ -1888,10 +1927,19 @@ image_segment_iter <- function(image,
           }
         } else{
           indx <- index[i]
+          if(!indx %in% avali_index){
+            my_index <- indx
+            indx <- NULL
+          } else{
+            my_index <- NULL
+            indx <- indx
+          }
         }
         second <-
           image_segment(first,
                         index = indx,
+                        my_index = my_index,
+                        invert = invert[i],
                         show_image = FALSE,
                         ...)
         segmented[[i]] <- second
@@ -1910,10 +1958,10 @@ image_segment_iter <- function(image,
       prop <- NULL
       for(i in 2:nrow(pixels)){
         prop[1] <- 100
-        prop[i] <- pixels[i] / pixels[i-1] * 100
+        prop[i] <- pixels[i] / pixels[i - 1] * 100
       }
       pixels <- data.frame(pixels)
-      pixels$prop <- prop
+      pixels$percent <- prop
       imgs <- lapply(segmented, function(x){
         x[[1]][["image"]]
       })
@@ -1933,6 +1981,7 @@ image_segment_iter <- function(image,
     }
   }
 }
+
 
 
 #' Convert an image to numerical matrices
