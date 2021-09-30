@@ -26,6 +26,7 @@ image_segment_iter(
   image,
   nseg = 1,
   index = NULL,
+  invert = NULL,
   show_image = TRUE,
   verbose = TRUE,
   nrow = NULL,
@@ -66,7 +67,8 @@ file.}
 \item{nir}{Respective position of the near-infrared band at the original
 image file.}
 
-\item{invert}{Inverts the binary image, if desired.}
+\item{invert}{Inverts the binary image, if desired. For
+\code{image_segmentation_iter()} use a vector with the same length of \code{nseg}.}
 
 \item{show_image}{Show image after processing?}
 

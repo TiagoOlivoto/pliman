@@ -1644,7 +1644,8 @@ plot.image_index <- function(x,
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
 #'   image file.
-#' @param invert Inverts the binary image, if desired.
+#' @param invert Inverts the binary image, if desired. For
+#'   `image_segmentation_iter()` use a vector with the same length of `nseg`.
 #' @param show_image Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
@@ -1807,9 +1808,9 @@ image_segment_iter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, image, prop_segmented, nseg, index, show_image, verbose, nrow, ncol,  ...)
+      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, show_image, verbose, nrow, ncol,  ...)
     } else{
-      a <- lapply(image, prop_segmented, nseg, index, show_image, verbose, nrow, ncol, ...)
+      a <- lapply(image, image_segment_iter, nseg, index, invert, show_image, verbose, nrow, ncol, ...)
     }
     results <-
       do.call(rbind, lapply(a, function(x){
@@ -1881,6 +1882,7 @@ image_segment_iter <- function(image,
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
                  "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
                  "S", "VARI", "HUE", "HUE2", "BGI", "L")
+        my_index <- NULL
       } else{
         if(length(index) != nseg){
           stop("Length of 'index' must be equal 'nseg'.", call. = FALSE)
@@ -1925,6 +1927,7 @@ image_segment_iter <- function(image,
           if(is.null(indx)){
             break
           }
+          my_index <- NULL
         } else{
           indx <- index[i]
           if(!indx %in% avali_index){
