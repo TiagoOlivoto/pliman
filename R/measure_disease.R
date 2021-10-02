@@ -449,7 +449,8 @@ measure_disease <- function(img,
           seg <- image_segment(img,
                                index = index_lb,
                                my_index = my_index_lb,
-                               show_image = FALSE)
+                               show_image = FALSE,
+                               fill_hull = FALSE)
 
           img <- seg[[1]][["image"]]
         }
@@ -468,6 +469,8 @@ measure_disease <- function(img,
                              invert = invert,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
+        img2@.Data[is.na(img2@.Data)] <- FALSE
+        # which(is.na(img2@.Data))
         res <- length(img2)
         if(!is.null(index_lb)){
           usef_area <- res - length(which(img[,,1]==1))
@@ -490,7 +493,8 @@ measure_disease <- function(img,
                nmask <- EBImage::bwlabel(img2),
                nmask <- EBImage::watershed(EBImage::distmap(img2),
                                            tolerance = tol,
-                                           ext = ext))
+                                           ext = ext)
+               )
         # return(nmask)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)

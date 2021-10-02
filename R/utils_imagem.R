@@ -1637,8 +1637,10 @@ plot.image_index <- function(x,
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
 #'   on Otsu's method is used to reduce the grayscale image to a binary image.
 #'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
+#'   Inform any non-numeric value different than `"Otsu"` to iteratively chosen
 #'   the threshold based on a raster plot showing pixel intensity of the index.
+#'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
+#'   character) type) with the same length of `nseg`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
@@ -1782,12 +1784,14 @@ image_segment <- function(image,
 }
 
 
+
 #' @export
 #' @name image_segment
 image_segment_iter <- function(image,
                                nseg = 1,
                                index = NULL,
                                invert = NULL,
+                               threshold = NULL,
                                show_image = TRUE,
                                verbose = TRUE,
                                nrow = NULL,
@@ -1830,6 +1834,11 @@ image_segment_iter <- function(image,
       } else{
         invert <- invert
       }
+      if(is.null(threshold)){
+        threshold <- "Otsu"
+      } else{
+        threshold <- threshold
+      }
       if(is.null(index)){
         image_segment(image,
                       invert = invert[1],
@@ -1850,10 +1859,14 @@ image_segment_iter <- function(image,
           index <- index
         }
       }
+      my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[1]))),
+                          as.character(threshold[1]),
+                          as.numeric(threshold[1]))
       segmented <-
         image_segment(image,
                       index = index,
                       my_index = my_index,
+                      threshold = my_thresh,
                       invert = invert[1],
                       show_image = FALSE,
                       ...)
@@ -1903,11 +1916,20 @@ image_segment_iter <- function(image,
       }
       segmented <- list()
       total <- length(image)
+      if(is.null(threshold)){
+        threshold <- rep("Otsu", nseg)
+      } else{
+        threshold <- threshold
+      }
+      my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[1]))),
+                          as.character(threshold[1]),
+                          as.numeric(threshold[1]))
       first <-
         image_segment(image,
                       index = indx,
                       my_index = my_index,
                       invert = invert[1],
+                      threshold = my_thresh[1],
                       show_image = FALSE,
                       ...)
       segmented[[1]] <- first
@@ -1938,10 +1960,14 @@ image_segment_iter <- function(image,
             indx <- indx
           }
         }
+        my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[i]))),
+                            as.character(threshold[i]),
+                            as.numeric(threshold[i]))
         second <-
           image_segment(first,
                         index = indx,
                         my_index = my_index,
+                        threshold = my_thresh,
                         invert = invert[i],
                         show_image = FALSE,
                         ...)

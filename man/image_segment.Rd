@@ -27,6 +27,7 @@ image_segment_iter(
   nseg = 1,
   index = NULL,
   invert = NULL,
+  threshold = "Otsu",
   show_image = TRUE,
   verbose = TRUE,
   nrow = NULL,
@@ -56,8 +57,10 @@ e.g. \code{my_index = "R+B/G"}.}
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
 If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.}
+Inform any non-numeric value different than \code{"Otsu"} to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.
+For \code{image_segmentation_iter()}, use a vector (allows a mixed (numeric and
+character) type) with the same length of \code{nseg}.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
