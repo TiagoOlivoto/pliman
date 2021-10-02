@@ -39,15 +39,15 @@
 #'   to fill holes in leaves, e.g., those caused by insect attack, ensuring the
 #'   hole area will be accounted for the leaf, not background.
 #' @param index_lb The index used to segment the foreground (e.g., leaf) from
-#'   the background when `img_healthy` and `img_symptoms` are not declared.
-#'   Defaults to `"NB"`. See [image_index()] for more details.
-#' @param index_dh The index used to diseased from healthy tissues when
+#'   the background. If not declared, the entire image area (pixels) will be
+#'   considered in the computation of the severity.
+#' @param index_dh The index used to segment diseased from healthy tissues when
 #'   `img_healthy` and `img_symptoms` are not declared. Defaults to `"GLI"`. See
 #'   [image_index()] for more details.
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
 #'   on Otsu's method is used to reduce the grayscale image to a binary image.
 #'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
+#'   Inform any non-numeric value different than "Otsu" to iteratively choose
 #'   the threshold based on a raster plot showing pixel intensity of the index.
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
@@ -90,7 +90,7 @@
 #'   permutations. Defaults to `TRUE`.
 #' @param show_contour Show a contour line around the lesions? Defaults
 #'   to `TRUE`.
-#' @param show_image Show image after processing?
+#' @param show_image Show image after processing? Defaults to `TRUE`.
 #' @param show_original Show the symptoms in the original image?
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
@@ -149,7 +149,7 @@ measure_disease <- function(img,
                             workers = NULL,
                             resize = FALSE,
                             fill_hull = TRUE,
-                            index_lb = "NB",
+                            index_lb = NULL,
                             index_dh = "GLI",
                             threshold = "Otsu",
                             invert = FALSE,
@@ -166,7 +166,7 @@ measure_disease <- function(img,
                             show_features = FALSE,
                             show_segmentation = FALSE,
                             show_contour = TRUE,
-                            show_image = FALSE,
+                            show_image = TRUE,
                             show_original = TRUE,
                             show_background = TRUE,
                             col_leaf = NULL,
@@ -195,7 +195,7 @@ measure_disease <- function(img,
     diretorio_processada <- paste("./", dir_processed, sep = "")
   }
   help_count <-
-    function(img, img_healthy, img_symptoms, img_background, resize, invert,
+    function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
              index_lb, index_dh, lesion_size, tolerance, extension,
              randomize, nrows, show_image, show_original, show_background,
              col_leaf, col_lesions, col_background,
@@ -437,21 +437,22 @@ measure_disease <- function(img,
       } else{
 
         ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-        # segment leaf from background
-        if(!index_lb %in% ind$Index){
-          my_index_lb <- index_lb
-          index_lb <- NULL
-        } else{
-          my_index_lb <- NULL
-          index_lb <- index_lb
+        if(!is.null(index_lb)){
+          # segment leaf from background
+          if(!index_lb %in% ind$Index){
+            my_index_lb <- index_lb
+            index_lb <- NULL
+          } else{
+            my_index_lb <- NULL
+            index_lb <- index_lb
+          }
+          seg <- image_segment(img,
+                               index = index_lb,
+                               my_index = my_index_lb,
+                               show_image = FALSE)
+
+          img <- seg[[1]][["image"]]
         }
-        seg <- image_segment(img,
-                             index = index_lb,
-                             my_index = my_index_lb,
-                             show_image = FALSE)
-
-        imgs <- seg[[1]][["image"]]
-
         # segment disease from leaf
         if(!index_dh %in% ind$Index){
           my_index_dh <- index_dh
@@ -460,7 +461,7 @@ measure_disease <- function(img,
           my_index_dh <- NULL
           index_dh <- index_dh
         }
-        img2 <- image_binary(imgs,
+        img2 <- image_binary(img,
                              index = index_dh,
                              threshold = threshold,
                              my_index = my_index_dh,
@@ -468,8 +469,12 @@ measure_disease <- function(img,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         res <- length(img2)
-        usef_area <- res - length(which(imgs[,,1]==1))
-        img2@.Data[which(imgs[,,1]==1)] <- FALSE
+        if(!is.null(index_lb)){
+          usef_area <- res - length(which(img[,,1]==1))
+          img2@.Data[which(img[,,1]==1)] <- FALSE
+        } else{
+          usef_area <- res
+        }
         pix_sympt <- length(which(img2 == TRUE))
         parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
         parms2 <- parms[parms$object_size == lesion_size,]
@@ -486,14 +491,15 @@ measure_disease <- function(img,
                nmask <- EBImage::watershed(EBImage::distmap(img2),
                                            tolerance = tol,
                                            ext = ext))
+        # return(nmask)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
         if(show_image == TRUE | save_image == TRUE){
           if(show_original == TRUE & show_segmentation == FALSE){
-            im2 <- imgs
-            im2@.Data[,,1][which(imgs[,,1]==1)] <- col_background[1]
-            im2@.Data[,,2][which(imgs[,,2]==1)] <- col_background[2]
-            im2@.Data[,,3][which(imgs[,,3]==1)] <- col_background[3]
+            im2 <- img
+            im2@.Data[,,1][which(img[,,1]==1)] <- col_background[1]
+            im2@.Data[,,2][which(img[,,2]==1)] <- col_background[2]
+            im2@.Data[,,3][which(img[,,3]==1)] <- col_background[3]
             if(isFALSE(show_contour)){
               im2@.Data[,,1][ID] <- col_lesions[1]
               im2@.Data[,,2][ID] <- col_lesions[2]
@@ -502,12 +508,14 @@ measure_disease <- function(img,
           }
           if(show_original == TRUE & show_segmentation == TRUE){
             im2 <- EBImage::colorLabels(nmask)
-            im2@.Data[,,1][which(imgs[,,1]==1)] <- col_background[1]
-            im2@.Data[,,2][which(imgs[,,2]==1)] <- col_background[2]
-            im2@.Data[,,3][which(imgs[,,3]==1)] <- col_background[3]
-            im2@.Data[,,1][ID2] <- imgs@.Data[,,1][ID2]
-            im2@.Data[,,2][ID2] <- imgs@.Data[,,2][ID2]
-            im2@.Data[,,3][ID2] <- imgs@.Data[,,3][ID2]
+            if(!is.null(index_lb)){
+              im2@.Data[,,1][which(img[,,1]==1)] <- col_background[1]
+              im2@.Data[,,2][which(img[,,2]==1)] <- col_background[2]
+              im2@.Data[,,3][which(img[,,3]==1)] <- col_background[3]
+            }
+            im2@.Data[,,1][ID2] <- img@.Data[,,1][ID2]
+            im2@.Data[,,2][ID2] <- img@.Data[,,2][ID2]
+            im2@.Data[,,3][ID2] <- img@.Data[,,3][ID2]
           }
           if(show_original == FALSE){
             if(show_segmentation == TRUE){
@@ -515,20 +523,19 @@ measure_disease <- function(img,
               im2@.Data[,,1][ID2] <- col_leaf[1]
               im2@.Data[,,2][ID2] <- col_leaf[2]
               im2@.Data[,,3][ID2] <- col_leaf[3]
-              im2@.Data[,,1][which(imgs[,,1]==1)] <- col_background[1]
-              im2@.Data[,,2][which(imgs[,,2]==1)] <- col_background[2]
-              im2@.Data[,,3][which(imgs[,,3]==1)] <- col_background[3]
             } else{
-              im2 <- imgs
+              im2 <- img
               im2@.Data[,,1][ID2] <- col_leaf[1]
               im2@.Data[,,2][ID2] <- col_leaf[2]
               im2@.Data[,,3][ID2] <- col_leaf[3]
               im2@.Data[,,1][ID] <- col_lesions[1]
               im2@.Data[,,2][ID] <- col_lesions[2]
               im2@.Data[,,3][ID] <- col_lesions[3]
-              im2@.Data[,,1][which(imgs[,,1]==1)] <- col_background[1]
-              im2@.Data[,,2][which(imgs[,,2]==1)] <- col_background[2]
-              im2@.Data[,,3][which(imgs[,,3]==1)] <- col_background[3]
+            }
+            if(!is.null(index_lb)){
+              im2@.Data[,,1][which(img[,,1]==1)] <- col_background[1]
+              im2@.Data[,,2][which(img[,,2]==1)] <- col_background[2]
+              im2@.Data[,,3][which(img[,,3]==1)] <- col_background[3]
             }
           }
         }
@@ -622,11 +629,11 @@ measure_disease <- function(img,
           dir.create(diretorio_processada)
         }
         jpeg(paste0(diretorio_processada, "/",
-                   prefix,
-                   name_ori, ".",
-                   extens_ori),
-            width = dim(im2@.Data)[1],
-            height = dim(im2@.Data)[2])
+                    prefix,
+                    name_ori, ".",
+                    extens_ori),
+             width = dim(im2@.Data)[1],
+             height = dim(im2@.Data)[2])
         if(marker != "point"){
           plot(im2)
           if(show_features & show_mark){
@@ -658,14 +665,11 @@ measure_disease <- function(img,
                       shape = shape,
                       statistics = stats)
       class(results) <- "plm_disease"
-      if(verbose == TRUE){
-        print(results$severity, row.names = FALSE)
-      }
       return(results)
     }
 
   if(missing(pattern)){
-    help_count(img, img_healthy, img_symptoms, img_background, resize, invert,
+    help_count(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                index_lb, index_dh, lesion_size, tolerance, extension, randomize,
                nrows, show_image, show_original, show_background, col_leaf,
                col_lesions, col_background, save_image, dir_original, dir_processed)
@@ -698,7 +702,7 @@ measure_disease <- function(img,
         parLapply(clust, names_plant,
                   function(x){
                     help_count(x,
-                               img_healthy, img_symptoms, img_background, resize, invert,
+                               img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                                index_lb, index_dh, lesion_size, tolerance, extension, randomize,
                                nrows, show_image, show_original, show_background, col_leaf,
                                col_lesions, col_background, save_image, dir_original, dir_processed)
@@ -714,7 +718,7 @@ measure_disease <- function(img,
         }
         results[[i]] <-
           help_count(img  = names_plant[i],
-                     img_healthy, img_symptoms, img_background, resize, invert,
+                     img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                      index_lb, index_dh, lesion_size, tolerance, extension, randomize,
                      nrows, show_image, show_original, show_background, col_leaf,
                      col_lesions, col_background, save_image, dir_original, dir_processed)

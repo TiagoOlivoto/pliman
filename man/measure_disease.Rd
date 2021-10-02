@@ -14,7 +14,7 @@ measure_disease(
   workers = NULL,
   resize = FALSE,
   fill_hull = TRUE,
-  index_lb = "NB",
+  index_lb = NULL,
   index_dh = "GLI",
   threshold = "Otsu",
   invert = FALSE,
@@ -31,7 +31,7 @@ measure_disease(
   show_features = FALSE,
   show_segmentation = FALSE,
   show_contour = TRUE,
-  show_image = FALSE,
+  show_image = TRUE,
   show_original = TRUE,
   show_background = TRUE,
   col_leaf = NULL,
@@ -79,17 +79,17 @@ to fill holes in leaves, e.g., those caused by insect attack, ensuring the
 hole area will be accounted for the leaf, not background.}
 
 \item{index_lb}{The index used to segment the foreground (e.g., leaf) from
-the background when \code{img_healthy} and \code{img_symptoms} are not declared.
-Defaults to \code{"NB"}. See \code{\link[=image_index]{image_index()}} for more details.}
+the background. If not declared, the entire image area (pixels) will be
+considered in the computation of the severity.}
 
-\item{index_dh}{The index used to diseased from healthy tissues when
+\item{index_dh}{The index used to segment diseased from healthy tissues when
 \code{img_healthy} and \code{img_symptoms} are not declared. Defaults to \code{"GLI"}. See
 \code{\link[=image_index]{image_index()}} for more details.}
 
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
 If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
+Inform any non-numeric value different than "Otsu" to iteratively choose
 the threshold based on a raster plot showing pixel intensity of the index.}
 
 \item{invert}{Inverts the binary image, if desired. This is useful to process
@@ -146,7 +146,7 @@ permutations. Defaults to \code{TRUE}.}
 \item{show_contour}{Show a contour line around the lesions? Defaults
 to \code{TRUE}.}
 
-\item{show_image}{Show image after processing?}
+\item{show_image}{Show image after processing? Defaults to \code{TRUE}.}
 
 \item{show_original}{Show the symptoms in the original image?}
 
