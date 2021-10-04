@@ -27,7 +27,7 @@ image_segment_iter(
   nseg = 1,
   index = NULL,
   invert = NULL,
-  threshold = "Otsu",
+  threshold = NULL,
   show_image = TRUE,
   verbose = TRUE,
   nrow = NULL,
@@ -117,9 +117,9 @@ the proportions of segmented pixels.
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("soybean_touch.jpg"))
-plot(img)
+img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
 image_segment(img, index = c("R, G, B"))
+
 }
 \references{
 Nobuyuki Otsu, "A threshold selection method from gray-level

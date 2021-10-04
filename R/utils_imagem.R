@@ -1678,9 +1678,9 @@ plot.image_index <- function(x,
 
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("soybean_touch.jpg"))
-#'plot(img)
+#'img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
 #'image_segment(img, index = c("R, G, B"))
+#'
 image_segment <- function(image,
                           index = NULL,
                           my_index = NULL,
