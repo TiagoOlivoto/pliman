@@ -123,7 +123,7 @@ in the current working directory or in the subdirectory informed in
 
 library(pliman)
 img <- image_import(image_pliman("la_leaves.JPG"))
-lef_area <- analyze_objects(img, marker = "text")
+lef_area <- analyze_objects(img, marker = "id")
 
 # correct pixel to metric units using the image dpi (~84)
 # the object 6 (leaf square) has a known area of ~ 4 cm2.

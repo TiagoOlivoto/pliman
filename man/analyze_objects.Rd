@@ -29,6 +29,8 @@ analyze_objects(
   upper_size = NULL,
   topn_lower = NULL,
   topn_upper = NULL,
+  lower_eccent = NULL,
+  upper_eccent = NULL,
   randomize = TRUE,
   nrows = 2000,
   show_image = TRUE,
@@ -140,6 +142,12 @@ or equal 120 and less than or equal 140 will be considered.}
 \item{topn_lower, topn_upper}{Select the top \code{n} objects based on its area.
 \code{topn_lower} selects the \code{n} elements with the smallest area whereas
 \code{topn_upper} selects the \code{n} objects with the largest area.}
+
+\item{lower_eccent, upper_eccent}{Lower and upper limit for object
+eccentricity for the image analysis. Users may use these arguments to
+remove objects such as square papers for scale (low eccentricity) or cut
+petioles (high eccentricity) from the images. Defaults to \code{NULL} (i.e., no
+lower and upper limits).}
 
 \item{randomize}{Randomize the lines before training the model?}
 

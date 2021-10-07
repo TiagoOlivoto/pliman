@@ -16,7 +16,7 @@ object_coord(
   edge = 2,
   extension = NULL,
   tolerance = NULL,
-  object_size = "large",
+  object_size = "medium",
   show_image = TRUE
 )
 

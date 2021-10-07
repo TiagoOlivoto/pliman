@@ -95,6 +95,11 @@
 #' @param topn_lower,topn_upper Select the top `n` objects based on its area.
 #'   `topn_lower` selects the `n` elements with the smallest area whereas
 #'   `topn_upper` selects the `n` objects with the largest area.
+#' @param lower_eccent,upper_eccent Lower and upper limit for object
+#'   eccentricity for the image analysis. Users may use these arguments to
+#'   remove objects such as square papers for scale (low eccentricity) or cut
+#'   petioles (high eccentricity) from the images. Defaults to `NULL` (i.e., no
+#'   lower and upper limits).
 #' @param randomize Randomize the lines before training the model?
 #' @param nrows The number of lines to be used in training step. Defaults to
 #'   2000.
@@ -187,6 +192,8 @@ analyze_objects <- function(img,
                             upper_size = NULL,
                             topn_lower = NULL,
                             topn_upper = NULL,
+                            lower_eccent = NULL,
+                            upper_eccent = NULL,
                             randomize = TRUE,
                             nrows = 2000,
                             show_image = TRUE,
@@ -241,13 +248,22 @@ analyze_objects <- function(img,
         name_ori <- match.call()[[2]]
         extens_ori <- "png"
       }
-      if(trim != TRUE){
+      if(trim != FALSE){
+        if(!is.numeric(trim)){
+          stop("Argument `trim` must be numeric.", call. = FALSE)
+        }
         img <- image_trim(img, trim)
       }
       if(resize != FALSE){
+        if(!is.numeric(resize)){
+          stop("Argument `resize` must be numeric.", call. = FALSE)
+        }
         img <- image_resize(img, resize)
       }
       if(filter != FALSE){
+        if(!is.numeric(filter)){
+          stop("Argument `filter` must be numeric.", call. = FALSE)
+        }
         img <- image_filter(img, size = filter)
       }
       if(!is.null(foreground) && !is.null(background)){
@@ -345,6 +361,12 @@ analyze_objects <- function(img,
       if(!is.null(topn_upper)){
         shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
       }
+      if(!is.null(lower_eccent)){
+        shape <- shape[shape$m.eccentricity > lower_eccent, ]
+      }
+      if(!is.null(upper_eccent)){
+        shape <- shape[shape$m.eccentricity < upper_eccent, ]
+      }
       shape <- transform(shape,
                          id = 1:nrow(shape),
                          radius_ratio = s.radius.max / s.radius.min)
@@ -406,6 +428,8 @@ analyze_objects <- function(img,
       if(show_image == TRUE | save_image == TRUE){
         if(isTRUE(show_contour)){
           object_contour <- EBImage::ocontour(nmask)
+          per <- as.numeric(do.call(rbind, lapply(object_contour, function(x)dim(x)))[,1])
+          object_contour <- object_contour[per %in% shape$perimeter]
         }
         backg <- !is.null(col_background)
         col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
@@ -478,7 +502,7 @@ analyze_objects <- function(img,
                      pch = 16,
                      cex = marker_size)
             }
-            if(object_contour){
+            if(isTRUE(show_contour)){
               plot_contour(object_contour, col = marker_col, lwd = 1)
             }
           }
@@ -502,7 +526,7 @@ analyze_objects <- function(img,
                    col = marker_col,
                    cex = marker_size)
             }
-            if(object_contour){
+            if(isTRUE(show_contour)){
               plot_contour(object_contour, col = marker_col, lwd = 1)
             }
           } else{
@@ -514,7 +538,7 @@ analyze_objects <- function(img,
                    pch = 16,
                    cex = marker_size)
             }
-            if(object_contour){
+            if(isTRUE(show_contour)){
               plot_contour(object_contour, col = marker_col, lwd = 1)
             }
           }

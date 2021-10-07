@@ -56,7 +56,7 @@ object_coord <- function(image,
                          edge = 2,
                          extension = NULL,
                          tolerance = NULL,
-                         object_size = "large",
+                         object_size = "medium",
                          show_image = TRUE){
   check_ebi()
   # helper function to get coordinates from a mask
@@ -108,8 +108,8 @@ object_coord <- function(image,
     ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
     tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
     nmask <- EBImage::watershed(EBImage::distmap(img2),
-                       tolerance = tol,
-                       ext = ext)
+                                tolerance = tol,
+                                ext = ext)
     data_mask <- nmask@.Data
     ifelse(id == "all",
            ids <- 1:max(data_mask),
@@ -157,6 +157,6 @@ object_isolate <- function(image,
 #' @name utils_objects
 #' @export
 object_id <- function(image, ...){
-  analyze_objects(image, verbose = FALSE, marker = "text", ...)
+  analyze_objects(image, verbose = FALSE, marker = "id", ...)
 }
 

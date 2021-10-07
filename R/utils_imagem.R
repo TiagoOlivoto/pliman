@@ -477,11 +477,14 @@ image_dimension <- function(image,
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
     } else{
       res <-
-        as.data.frame(
-          do.call(rbind,
-                  lapply(image, image_dimension, verbose =  FALSE))
-        )
+        do.call(rbind,
+                lapply(image, function(x){
+                  dim <- image_dimension(x, verbose = FALSE)
+                  data.frame(width = dim[[1]],
+                             heiht = dim[[2]])
+                }))
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
+      rownames(res) <- NULL
     }
     if(verbose == TRUE){
       cat("\n----------------------\n")
