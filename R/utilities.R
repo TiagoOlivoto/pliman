@@ -117,9 +117,3 @@ get_rgb <- function(img, data_mask, index){
              B = img@.Data[,,3][which(data_mask == index)])
 }
 
-# plot contours obtained with with EBImage::ocontour()
-plot_contour <- function(contours, col = "white", lwd = 1){
-  for(i in 1:length(contours)){
-    lines(contours[[i]][,1], contours[[i]][,2], col = "white", lwd = lwd)
-  }
-}

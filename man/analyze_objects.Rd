@@ -13,6 +13,7 @@ analyze_objects(
   img_pattern = NULL,
   parallel = FALSE,
   workers = NULL,
+  watershed = TRUE,
   resize = FALSE,
   trim = FALSE,
   fill_hull = FALSE,
@@ -35,7 +36,10 @@ analyze_objects(
   nrows = 2000,
   show_image = TRUE,
   show_original = TRUE,
+  show_chull = FALSE,
   show_contour = TRUE,
+  contour_col = "red",
+  contour_size = 1,
   show_background = TRUE,
   show_segmentation = FALSE,
   col_foreground = NULL,
@@ -79,6 +83,12 @@ significantly speed up processing time when an image has lots of objects
 \item{workers}{A positive numeric scalar or a function specifying the number
 of parallel processes that can be active at the same time. By default, the
 number of sections is set up to 50\% of available cores.}
+
+\item{watershed}{If \code{TRUE} (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If \code{FALSE}, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -158,8 +168,14 @@ lower and upper limits).}
 
 \item{show_original}{Show the count objects in the original image?}
 
+\item{show_chull}{Show the convex hull around the objects? Defaults to
+\code{FALSE}.}
+
 \item{show_contour}{Show a contour line around the objects? Defaults
-to \code{FALSE}.}
+to \code{TRUE}.}
+
+\item{contour_col, contour_size}{The color and size for the contour line
+around objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
 
 \item{show_background}{Show the background? Defaults to \code{TRUE}. A white
 background is shown by default when \code{show_original = FALSE}.}

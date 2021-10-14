@@ -89,7 +89,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -110,19 +110,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -220,7 +220,7 @@
         <td>
           <p><code><a href="utils_image.html">image_import()</a></code> <code><a href="utils_image.html">image_export()</a></code> <code><a href="utils_image.html">image_show()</a></code> <code><a href="utils_image.html">image_pliman()</a></code> </p>
         </td>
-        <td><p>Import, display and export images</p></td>
+        <td><p>Import and export images</p></td>
       </tr><tr>
         
         <td>
@@ -243,9 +243,15 @@
       <tr>
         
         <td>
-          <p><code><a href="utils_transform.html">image_autocrop()</a></code> <code><a href="utils_transform.html">image_dimension()</a></code> <code><a href="utils_transform.html">image_rotate()</a></code> <code><a href="utils_transform.html">image_horizontal()</a></code> <code><a href="utils_transform.html">image_vertical()</a></code> <code><a href="utils_transform.html">image_hreflect()</a></code> <code><a href="utils_transform.html">image_vreflect()</a></code> <code><a href="utils_transform.html">image_resize()</a></code> <code><a href="utils_transform.html">image_filter()</a></code> <code><a href="utils_transform.html">image_blur()</a></code> <code><a href="utils_transform.html">image_contrast()</a></code> </p>
+          <p><code><a href="utils_transform.html">image_autocrop()</a></code> <code><a href="utils_transform.html">image_crop()</a></code> <code><a href="utils_transform.html">image_dimension()</a></code> <code><a href="utils_transform.html">image_rotate()</a></code> <code><a href="utils_transform.html">image_horizontal()</a></code> <code><a href="utils_transform.html">image_vertical()</a></code> <code><a href="utils_transform.html">image_hreflect()</a></code> <code><a href="utils_transform.html">image_vreflect()</a></code> <code><a href="utils_transform.html">image_resize()</a></code> <code><a href="utils_transform.html">image_trim()</a></code> <code><a href="utils_transform.html">image_dilate()</a></code> <code><a href="utils_transform.html">image_erode()</a></code> <code><a href="utils_transform.html">image_skeleton()</a></code> <code><a href="utils_transform.html">image_filter()</a></code> <code><a href="utils_transform.html">image_blur()</a></code> <code><a href="utils_transform.html">image_contrast()</a></code> </p>
         </td>
         <td><p>Spatial transformations</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="rgb_to_hsv.html">rgb_to_hsv()</a></code> </p>
+        </td>
+        <td><p>Color spaces</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -281,7 +287,7 @@
       <tr>
         
         <td>
-          <p><code><a href="utils_dpi.html">dpi_to_cm()</a></code> <code><a href="utils_dpi.html">cm_to_dpi()</a></code> <code><a href="utils_dpi.html">pixels_to_cm()</a></code> <code><a href="utils_dpi.html">cm_to_pixels()</a></code> </p>
+          <p><code><a href="utils_dpi.html">dpi_to_cm()</a></code> <code><a href="utils_dpi.html">cm_to_dpi()</a></code> <code><a href="utils_dpi.html">pixels_to_cm()</a></code> <code><a href="utils_dpi.html">cm_to_pixels()</a></code> <code><a href="utils_dpi.html">npixels()</a></code> <code><a href="utils_dpi.html">dpi()</a></code> </p>
         </td>
         <td><p>Utilities for image resolution</p></td>
       </tr>
@@ -318,7 +324,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="image_segment.html">image_segment()</a></code> </p>
+          <p><code><a href="image_segment.html">image_segment()</a></code> <code><a href="image_segment.html">image_segment_iter()</a></code> </p>
         </td>
         <td><p>Image segmentation</p></td>
       </tr><tr>
@@ -337,8 +343,8 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-count-objects" class="hasAnchor"><a href="#section-count-objects" class="anchor"></a>Count objects</h2>
-          <p class="section-desc"><p>Count objects in an image</p></p>
+          <h2 id="section-analyze-objects" class="hasAnchor"><a href="#section-analyze-objects" class="anchor"></a>Analyze objects</h2>
+          <p class="section-desc"><p>Analyze objects in an image</p></p>
         </th>
       </tr>
       
@@ -347,6 +353,12 @@
       
       
       <tr>
+        
+        <td>
+          <p><code><a href="analyze_objects.html">analyze_objects()</a></code> <code><a href="analyze_objects.html">plot(<i>&lt;anal_obj&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Analyzes objects in an image</p></td>
+      </tr><tr>
         
         <td>
           <p><code><a href="count_lesions.html">count_lesions()</a></code> </p>
@@ -367,7 +379,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="objects_rgb.html">objects_rgb()</a></code> <code><a href="objects_rgb.html">plot(<i>&lt;objects_rgb&gt;</i>)</a></code> </p>
+          <p><code><a href="objects_rgb.html">objects_rgb()</a></code> </p>
         </td>
         <td><p>Get Red Green and Blue for image objects</p></td>
       </tr><tr>
@@ -379,9 +391,21 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="utils_objects.html">object_coord()</a></code> <code><a href="utils_objects.html">object_isolate()</a></code> <code><a href="utils_objects.html">object_id()</a></code> </p>
+          <p><code><a href="utils_objects.html">object_coord()</a></code> <code><a href="utils_objects.html">object_contour()</a></code> <code><a href="utils_objects.html">object_isolate()</a></code> <code><a href="utils_objects.html">object_id()</a></code> </p>
         </td>
         <td><p>Utilities for working with image objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="tune_tolerance.html">tune_tolerance()</a></code> </p>
+        </td>
+        <td><p>Title here</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="utils_polygon.html">conv_hull()</a></code> <code><a href="utils_polygon.html">poly_area()</a></code> <code><a href="utils_polygon.html">plot_contour()</a></code> </p>
+        </td>
+        <td><p>Utilities for Polygons</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -415,6 +439,12 @@
       
       
       <tr>
+        
+        <td>
+          <p><code><a href="measure_disease.html">measure_disease()</a></code> </p>
+        </td>
+        <td><p>Performs plant disease measurements</p></td>
+      </tr><tr>
         
         <td>
           <p><code><a href="symptomatic_area.html">symptomatic_area()</a></code> </p>

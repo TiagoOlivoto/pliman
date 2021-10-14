@@ -73,7 +73,7 @@ image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
 ```{r}
-symptomatic_area(img = img,
+measure_disease(img = img,
                  img_healthy = healthy,
                  img_symptoms = symptoms,
                  img_background = background,
@@ -84,9 +84,8 @@ symptomatic_area(img = img,
 The function `count_objects()` can be used to count the objects such as leaves, grains, pods, pollen in an image. In the following example, we will count the number of soybean grains of an image with 30 grains.
 
 ```{r}
-img <- image_import(image_pliman("soybean_touch.jpg"))
-image_show(img)
-count_objects(img, marker = "text")
+img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+analyze_objects(img, marker = "id")
 
 ```
 

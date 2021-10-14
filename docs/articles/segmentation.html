@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -52,7 +52,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -65,19 +65,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -144,13 +144,13 @@
 
       
 
-      </header><script src="segmentation_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="segmentation_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Image segmentation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-06-10</h4>
+            <h4 class="date">2021-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/segmentation.Rmd"><code>vignettes/segmentation.Rmd</code></a></small>
       <div class="hidden name"><code>segmentation.Rmd</code></div>
@@ -163,68 +163,241 @@
 <h1 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
 <p>Image segmentation is the process of partitioning a digital image into multiple segments (sets of pixels or image objects). In the context of plant image analysis, segmentation is used to simplify the representation of an image into something easier to analyze. For example, when using <code><a href="../reference/count_objects.html">count_objects()</a></code> to count crop grains, first the grains need to be isolated (segmented) from the background. In <code>pliman</code> the following functions can be used to segment an image.</p>
+<p>In <code>pliman</code> the following functions can be used to segment an image.</p>
 <ul>
 <li>
-<code><a href="../reference/image_binary.html">image_binary()</a></code> to produce a binary (back and white) image</li>
+<code><a href="../reference/image_binary.html">image_binary()</a></code> to produce a binary (black and white) image</li>
 <li>
 <code><a href="../reference/image_segment.html">image_segment()</a></code> to produce a segmented image (image objects and a white background).</li>
+<li>
+<code><a href="../reference/image_segment.html">image_segment_iter()</a></code> to segment an image iteratively.</li>
 </ul>
-<p>Both functions segment the image based on the value of some image index, which may be one of the RGB bands or any operation with these bands. Internally, these functions call <code><a href="../reference/image_index.html">image_index()</a></code> to compute these indexes.</p>
-</div>
-<div id="getting-image-indexes" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-image-indexes" class="anchor"></a>Getting image indexes</h1>
-<p><code>pliman</code> provides a set of indexes that can be used to segment images. For a list of supported indexes consult the documentation of <code><a href="../reference/image_index.html">image_index()</a></code> function. Here, we use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. The results are shown in the plot according to the order of the indexes in the <code>index</code> argument, filled ‘by row’. Users can also provide your index with the argument <code>my_index</code>.</p>
+<p>Both functions segment the image based on the value of some image index, which may be one of the RGB bands or any operation with these bands. Internally, these functions call <code><a href="../reference/image_index.html">image_index()</a></code> to compute these indexes. The following indexes are currently available.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Index</th>
+<th align="center">Equation</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>R</td>
+<td align="center">R</td>
+</tr>
+<tr class="even">
+<td>G</td>
+<td align="center">G</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td align="center">B</td>
+</tr>
+<tr class="even">
+<td>NR</td>
+<td align="center">R/(R+G+B)</td>
+</tr>
+<tr class="odd">
+<td>NG</td>
+<td align="center">G/(R+G+B)</td>
+</tr>
+<tr class="even">
+<td>NB</td>
+<td align="center">B/(R+G+B)</td>
+</tr>
+<tr class="odd">
+<td>GB</td>
+<td align="center">G/B</td>
+</tr>
+<tr class="even">
+<td>RB</td>
+<td align="center">R/B</td>
+</tr>
+<tr class="odd">
+<td>GR</td>
+<td align="center">G/R</td>
+</tr>
+<tr class="even">
+<td>BI</td>
+<td align="center">sqrt((R^2+G^2+B^2)/3)</td>
+</tr>
+<tr class="odd">
+<td>BIM</td>
+<td align="center">sqrt((R*2+G*2+B*2)/3)</td>
+</tr>
+<tr class="even">
+<td>SCI</td>
+<td align="center">(R-G)/(R+G)</td>
+</tr>
+<tr class="odd">
+<td>GLI</td>
+<td align="center">(2*G-R-B)/(2*G+R+B)</td>
+</tr>
+<tr class="even">
+<td>HI</td>
+<td align="center">(2*R-G-B)/(G-B)</td>
+</tr>
+<tr class="odd">
+<td>NGRDI</td>
+<td align="center">(G-R)/(G+R)</td>
+</tr>
+<tr class="even">
+<td>NDGBI</td>
+<td align="center">(G-B)/(G+B)</td>
+</tr>
+<tr class="odd">
+<td>NDRBI</td>
+<td align="center">(R-B)/(R+B)</td>
+</tr>
+<tr class="even">
+<td>I</td>
+<td align="center">R+G+B</td>
+</tr>
+<tr class="odd">
+<td>S</td>
+<td align="center">((R+G+B)-3*B)/(R+G+B)</td>
+</tr>
+<tr class="even">
+<td>VARI</td>
+<td align="center">(G-R)/(G+R-B)</td>
+</tr>
+<tr class="odd">
+<td>HUE</td>
+<td align="center">atan(2*(B-G-R)/30.5*(G-R))</td>
+</tr>
+<tr class="even">
+<td>HUE2</td>
+<td align="center">atan(2*(R-G-R)/30.5*(G-B))</td>
+</tr>
+<tr class="odd">
+<td>BGI</td>
+<td align="center">B/G</td>
+</tr>
+<tr class="even">
+<td>L</td>
+<td align="center">R+G+B/3</td>
+</tr>
+<tr class="odd">
+<td>GRAY</td>
+<td align="center">0.299*R + 0.587*G + 0.114*B</td>
+</tr>
+</tbody>
+</table>
+<p>Here, I use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. Users can also provide their own index with the argument <code>my_index</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)          |</span>
-<span class="co">#&gt; | Author: Tiago Olivoto                                  |</span>
-<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial   |</span>
-<span class="co">#&gt; | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
+<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
+<span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Compute the indexes</span>
 <span class="va">indexes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
+<p><img src="segmentation_files/figure-html/segmentation2-1.png" width="960"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># Create a histogram with the RGB values</span>
+<code class="sourceCode R"><span class="co"># Create a raster plot with the RGB values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-3-2.png" width="960"></p>
-<p>In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.</p>
-</div>
-<div id="producing-a-segmented-image" class="section level1">
-<h1 class="hasAnchor">
-<a href="#producing-a-segmented-image" class="anchor"></a>Producing a segmented image</h1>
-<p>The function <code>image_segmentation()</code> is used to segment images using image indexes. In our example, we will use the same indexes computed below to see how the image is segmented. The output of this function can be used as input in the function <code>count_objets()</code>.</p>
+<p><img src="segmentation_files/figure-html/segmentation2-2.png" width="960"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">segmented</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
-<p>It seems that the “NB” index provided better segmentation. “R” and “NR” resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as ‘selected’ image. To circumvent this problem, we can use the argument <code>invert</code> in those functions.</p>
+<code class="sourceCode R"><span class="co"># Create a histogram with the RGB values</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span>, type <span class="op">=</span> <span class="st">"hist"</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation2-3.png" width="960"></p>
+<p>In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.</p>
+<div id="segment-an-image" class="section level2">
+<h2 class="hasAnchor">
+<a href="#segment-an-image" class="anchor"></a>Segment an image</h2>
+<p>The function <code>image_segmentation()</code> is used to segment images using image indexes. In this example, I will use the same indexes computed below to see how the image is segmented. The output of this function can be used as input in the function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">segmented</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation3-1.png" width="960"></p>
+<p>It seems that the <code>"NB"</code> index provided better segmentation. <code>"R"</code> and <code>"NR"</code> resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as ‘selected’ image. To circumvent this problem, we can use the argument <code>invert</code> in those functions.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">soy</span>,
               index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NR"</span><span class="op">)</span>,
               invert <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
+<p><img src="segmentation_files/figure-html/segmentation4-1.png" width="960"></p>
+</div>
+<div id="iterative-segmentation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#iterative-segmentation" class="anchor"></a>Iterative segmentation</h2>
+<p>The function <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> provides an iterative image segmentation, returning the proportions of segmented pixels. This is useful when more than one segmentation procedure is needed. Users can choose how many segmentation perform, using the argument <code>nseg</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seg_iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf_nb.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation5-1.png" width="700"></p>
+<p>Using a soybean sample leaf (above), I will use the function <code>image_segment_iter</code> to segment the diseased tissue from healthy tissue. The aim is to segment the symptoms into two classes, namely, necrosis (brown areas) and chlorosis (yellow areas), and compute the percentage of each symptom class.</p>
+<p>First, we need to find a suitable index for segmentation.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># First segmentation</span>
+<span class="va">seg</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">seg_iter</span>,
+                index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation6-1.png" width="960"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># second segmentation</span>
+<span class="va">seg2</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">seg</span><span class="op">$</span><span class="va">VARI</span><span class="op">$</span><span class="va">image</span>,
+                index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation6-2.png" width="960"></p>
+<p>Note that the same results can be obtainet with <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> using an iterative section.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Only run iteratively</span>
+<span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>, nseg <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<p>The <code>"VARI"</code> seems to be a suitable index to segment symptoms (necrosis and chlorosis) from healthy tissues. The <code>"GLI"</code> can be used to segment necrosis from chlorosis. Knowing this, we can now use <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> explicitly indicating these indexes, as follows</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>,
+                   nseg <span class="op">=</span> <span class="fl">2</span>, <span class="co"># two segmentations</span>
+                   index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"VARI"</span>, <span class="st">"GLI"</span><span class="op">)</span>,
+                   ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="co">#&gt;      image  pixels   percent</span>
+<span class="co">#&gt; 1 original 1317600 100.00000</span>
+<span class="co">#&gt; 2     seg1  399075  30.28802</span>
+<span class="co">#&gt; 3     seg2  103464  25.92595</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation8-1.png" width="960"></p>
+<p>It can be observed that 30.28% of the original image were characterized as symptoms (both necrosis and chlorosis). Of out this (symptomatic area), 25.92% are necrotic areas. So 7.85% of the total area were considered as necrotic areas (30.288 <span class="math inline">\(\times\)</span> 0.2592 or 103464/1317600 <span class="math inline">\(\times\)</span> 100) and 22.43% (30.28 - 7.85 or (399075 - 103464) / 1317600 <span class="math inline">\(\times\)</span> 100) were considered as chlorotic areas.</p>
+<p>Users can use the argument <code>threshold</code> to controls how segmentation is made. By default (<code>threshold = "Otsu"</code>), a threshold value based on Otsu’s method is used to reduce the grayscale image to a binary image. If a numeric value is informed, this value will be used as a threshold. Inform any non-numeric value different than <code>"Otsu"</code> to iteratively chosen the threshold based on a raster plot showing pixel intensity of the index. For <code>image_segmentation_iter()</code>, a vector (allows a mixed (numeric and character) type) with the same length of <code>nseg</code> can be used.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seg_iter1</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>,
+                     nseg <span class="op">=</span> <span class="fl">2</span>, <span class="co"># two segmentations</span>
+                     index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"VARI"</span>, <span class="st">"GLI"</span><span class="op">)</span>,
+                     threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="st">"Otsu"</span><span class="op">)</span>,
+                     ncol <span class="op">=</span> <span class="fl">3</span>,
+                     show_image <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt;      image  pixels   percent</span>
+<span class="co">#&gt; 1 original 1317600 100.00000</span>
+<span class="co">#&gt; 2     seg1  195288  14.82149</span>
+<span class="co">#&gt; 3     seg2   95151  48.72342</span>
+<span class="va">seg_iter2</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>,
+                     nseg <span class="op">=</span> <span class="fl">2</span>, <span class="co"># two segmentations</span>
+                     index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"VARI"</span>, <span class="st">"GLI"</span><span class="op">)</span>,
+                     threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="st">"Otsu"</span><span class="op">)</span>,
+                     ncol <span class="op">=</span> <span class="fl">3</span>,
+                     show_image <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt;      image  pixels   percent</span>
+<span class="co">#&gt; 1 original 1317600 100.00000</span>
+<span class="co">#&gt; 2     seg1  321729  24.41781</span>
+<span class="co">#&gt; 3     seg2  101883  31.66733</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">seg_iter1</span><span class="op">$</span><span class="va">images</span><span class="op">$</span><span class="va">seg1</span>,
+              <span class="va">seg_iter2</span><span class="op">$</span><span class="va">images</span><span class="op">$</span><span class="va">seg1</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/segmentation9-1.png" width="960"></p>
+<p>Users can then set the argument <code>threshold</code> for their specific case, depending on the aims of the segmentation.</p>
+</div>
 </div>
 <div id="producing-a-binary-image" class="section level1">
 <h1 class="hasAnchor">
 <a href="#producing-a-binary-image" class="anchor"></a>Producing a binary image</h1>
-<p>We can also produce a binary image with <code><a href="../reference/image_binary.html">image_binary()</a></code>. Just for curiosity, we will use the indexes <code>"R"</code> and <code>"NB"</code>. By default, <code><a href="../reference/image_binary.html">image_binary()</a></code> rescales the image to 30% of the size of the original image to speed up the computation time. Use the argument <code>resize = FALSE</code> to produce a binary image with the original size.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># original image size</span>
+<p>We can also produce a binary image with <code><a href="../reference/image_binary.html">image_binary()</a></code>. Just for curiosity, we will use the indexes <code>"B"</code> (blue) and <code>"NB"</code> (normalized blue). By default, <code><a href="../reference/image_binary.html">image_binary()</a></code> rescales the image to 30% of the size of the original image to speed up the computation time. Use the argument <code>resize = FALSE</code> to produce a binary image with the original size.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span></code></pre></div>
+<p><img src="segmentation_files/figure-html/binary1-1.png" width="960"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># original image size</span>
 <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>,
-             index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, NB"</span><span class="op">)</span>,
+             index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"B, NB"</span><span class="op">)</span>,
              resize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="segmentation_files/figure-html/unnamed-chunk-6-2.png" width="960"></p>
+<p><img src="segmentation_files/figure-html/binary1-2.png" width="960"></p>
 </div>
   </div>
 

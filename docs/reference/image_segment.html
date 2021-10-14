@@ -47,10 +47,17 @@
 
 
 <meta property="og:title" content="Image segmentation — image_segment" />
-<meta property="og:description" content="Reduce a color, color near-infrared, or grayscale images to a segmented image
-using a given color channel (red, green blue) or even color indexes (See
-image_index() for more details). The Otsu's thresholding method (Otsu,
-1979) is used to automatically perform clustering-based image thresholding." />
+<meta property="og:description" content="
+
+image_segment() reduces a color, color near-infrared, or grayscale images
+to a segmented image using a given color channel (red, green blue) or even
+color indexes (See image_index() for more details). The Otsu's thresholding
+method (Otsu, 1979) is used to automatically perform clustering-based image
+thresholding.
+image_segment_iter() Provides an iterative image segmentation, returning
+the proportions of segmented pixels.
+
+" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -93,7 +100,7 @@ image_index() for more details). The Otsu's thresholding method (Otsu,
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -101,7 +108,7 @@ image_index() for more details). The Otsu's thresholding method (Otsu,
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -114,19 +121,19 @@ image_index() for more details). The Otsu's thresholding method (Otsu,
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -202,16 +209,24 @@ image_index() for more details). The Otsu's thresholding method (Otsu,
     </div>
 
     <div class="ref-description">
-    <p>Reduce a color, color near-infrared, or grayscale images to a segmented image
-using a given color channel (red, green blue) or even color indexes (See
-<code><a href='image_index.html'>image_index()</a></code> for more details). The Otsu's thresholding method (Otsu,
-1979) is used to automatically perform clustering-based image thresholding.</p>
+    
+<ul>
+<li><p><code>image_segment()</code> reduces a color, color near-infrared, or grayscale images
+to a segmented image using a given color channel (red, green blue) or even
+color indexes (See <code><a href='image_index.html'>image_index()</a></code> for more details). The Otsu's thresholding
+method (Otsu, 1979) is used to automatically perform clustering-based image
+thresholding.</p></li>
+<li><p><code>image_segment_iter()</code> Provides an iterative image segmentation, returning
+the proportions of segmented pixels.</p></li>
+</ul>
+
     </div>
 
     <pre class="usage"><span class='fu'>image_segment</span><span class='op'>(</span>
   <span class='va'>image</span>,
   index <span class='op'>=</span> <span class='cn'>NULL</span>,
   my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
+  threshold <span class='op'>=</span> <span class='st'>"Otsu"</span>,
   fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
   re <span class='op'>=</span> <span class='cn'>NULL</span>,
   nir <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -222,6 +237,21 @@ using a given color channel (red, green blue) or even color indexes (See
   parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
   workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>image_segment_iter</span><span class='op'>(</span>
+  <span class='va'>image</span>,
+  nseg <span class='op'>=</span> <span class='fl'>1</span>,
+  index <span class='op'>=</span> <span class='cn'>NULL</span>,
+  invert <span class='op'>=</span> <span class='cn'>NULL</span>,
+  threshold <span class='op'>=</span> <span class='cn'>NULL</span>,
+  show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  nrow <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ncol <span class='op'>=</span> <span class='cn'>NULL</span>,
+  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -229,20 +259,35 @@ using a given color channel (red, green blue) or even color indexes (See
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>image</th>
-      <td><p>An image object.</p></td>
+      <td><p>An image object or a list of image objects.</p></td>
     </tr>
     <tr>
       <th>index</th>
-      <td><p>A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  <code>"R"</code>,
-<code>"G"</code>, <code>"B"</code> <code>"GR"</code>, <code>"NR"</code>, <code>"NG"</code>, <code>"NB"</code>, <code>"BI"</code>, <code>"BIM"</code>, <code>"SCI"</code>,
-<code>"GLI"</code>, <code>"HI"</code>, <code>"NGRDI"</code>, <code>"SI"</code>, <code>"VARI"</code>, <code>"HUE"</code>, <code>"HUE2"</code>, <code>"BGI"</code>,
-<code>"BGI"</code>. See <code><a href='image_index.html'>image_index()</a></code> for more details.</p></td>
+      <td><ul>
+<li><p>For <code>image_segment()</code>, a character value (or a vector of characters)
+specifying the target mode for conversion to binary image. One of the
+following:  <code>"R"</code>, <code>"G"</code>, <code>"B"</code> <code>"GR"</code>, <code>"NR"</code>, <code>"NG"</code>, <code>"NB"</code>, <code>"BI"</code>,
+<code>"BIM"</code>, <code>"SCI"</code>, <code>"GLI"</code>, <code>"HI"</code>, <code>"NGRDI"</code>, <code>"SI"</code>, <code>"VARI"</code>, <code>"HUE"</code>,
+<code>"HUE2"</code>, <code>"BGI"</code>, <code>"BGI", "GRAY"</code>. See <code><a href='image_index.html'>image_index()</a></code> for more details.</p></li>
+<li><p>For <code>image_segment_iter()</code> a character or a vector of characters with the
+same length of <code>nseg</code>. It can be either an available index (described above)
+or any operation involving the RGB values (e.g., <code>"B/R+G"</code>).</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>my_index</th>
       <td><p>User can calculate a different index using the bands names,
 e.g. <code>my_index = "R+B/G"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>threshold</th>
+      <td><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than <code>"Otsu"</code> to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.
+For <code>image_segmentation_iter()</code>, use a vector (allows a mixed (numeric and
+character) type) with the same length of <code>nseg</code>.</p></td>
     </tr>
     <tr>
       <th>fill_hull</th>
@@ -260,7 +305,8 @@ image file.</p></td>
     </tr>
     <tr>
       <th>invert</th>
-      <td><p>Inverts the binary image, if desired.</p></td>
+      <td><p>Inverts the binary image, if desired. For
+<code>image_segmentation_iter()</code> use a vector with the same length of <code>nseg</code>.</p></td>
     </tr>
     <tr>
       <th>show_image</th>
@@ -276,7 +322,7 @@ image file.</p></td>
       <td><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when <code>image</code> is a list. The number of sections is set
-up to 90% of available cores.</p></td>
+up to 70% of available cores.</p></td>
     </tr>
     <tr>
       <th>workers</th>
@@ -287,14 +333,27 @@ number of parallel processes that can be active at the same time.</p></td>
       <th>verbose</th>
       <td><p>If <code>TRUE</code> (default) a summary is shown in the console.</p></td>
     </tr>
+    <tr>
+      <th>nseg</th>
+      <td><p>The number of iterative segmentation steps to be performed.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments passed on to <code>image_segment()</code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list containing <code>n</code> objects where <code>n</code> is the number of indexes
-used. Each objects contains:</p><ul>
+    
+<ul>
+<li><p><code>image_segment()</code> returns list containing <code>n</code> objects where <code>n</code> is the
+number of indexes used. Each objects contains:</p><ul>
 <li><p><code>image</code> an image with the RGB bands (layers) for the segmented object.</p></li>
 <li><p><code>mask</code> A mask with logical values of 0 and 1 for the segmented image.</p></li>
+</ul></li>
+<li><p><code>image_segment_iter()</code> returns a list with (1) a data frame with the
+proportion of pixels in the segmented images and (2) the segmented images.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -308,10 +367,10 @@ doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.43100
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span>, plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='img'><img src='image_segment-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>image_segment</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, G, B"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='image_segment-2.png' alt='' width='700' height='433' /></div></pre>
+</div><div class='img'><img src='image_segment-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

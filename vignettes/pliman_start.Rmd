@@ -36,7 +36,7 @@ To show the first approach, first we count the number of objects and plot an obj
 library(pliman)
 leaves <- image_import(image_pliman("la_leaves.JPG"))
 plot(leaves)
-count <- analyze_objects(leaves, marker = "text")
+count <- analyze_objects(leaves, marker = "id")
 ```
 
 

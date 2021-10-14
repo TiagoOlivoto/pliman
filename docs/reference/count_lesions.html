@@ -97,7 +97,7 @@ dir_original." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -105,7 +105,7 @@ dir_original." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -118,19 +118,19 @@ dir_original." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -225,13 +225,14 @@ stored in the current working directory or in the subdirectory informed in
   parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
   workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   resize <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fill_hull <span class='op'>=</span> <span class='cn'>TRUE</span>,
   invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
   index <span class='op'>=</span> <span class='st'>"NB"</span>,
   my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
   lower_size <span class='op'>=</span> <span class='cn'>NULL</span>,
   upper_size <span class='op'>=</span> <span class='cn'>NULL</span>,
   randomize <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  nrows <span class='op'>=</span> <span class='fl'>10000</span>,
+  nrows <span class='op'>=</span> <span class='fl'>3000</span>,
   lesion_size <span class='op'>=</span> <span class='st'>"medium"</span>,
   segment <span class='op'>=</span> <span class='cn'>TRUE</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -285,7 +286,7 @@ images that are named as 1.-, 2.-, and so on.</p></td>
       <td><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, especially when <code>img_pattern</code> is used is informed. The
-number of sections is set up to 90% of available cores.</p></td>
+number of sections is set up to 70% of available cores.</p></td>
     </tr>
     <tr>
       <th>workers</th>
@@ -297,6 +298,12 @@ number of parallel processes that can be active at the same time.</p></td>
       <td><p>Resize the image before processing? Defaults to <code>FALSE</code>. Use a
 numeric value of range 0-100 (proportion of the size of the original
 image).</p></td>
+    </tr>
+    <tr>
+      <th>fill_hull</th>
+      <td><p>Fill holes in the image? Defaults to <code>TRUE</code>. This is useful
+to fill holes in leaves, e.g., those caused by insect attack, ensuring the
+hole area will be accounted for the leaf, not background.</p></td>
     </tr>
     <tr>
       <th>invert</th>
@@ -453,14 +460,14 @@ image.</p></li>
               show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
               show_segmentation <span class='op'>=</span> <span class='cn'>FALSE</span>,
               marker <span class='op'>=</span> <span class='st'>"text"</span><span class='op'>)</span>
-</div><div class='img'><img src='count_lesions-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  statistics       area perimeter
-#&gt;           n    14.0000        NA
-#&gt;         min   277.0000   56.0000
-#&gt;        mean  3235.4286  202.3571
-#&gt;         max 11734.0000  573.0000
-#&gt;          sd  3944.7526  161.3589
-#&gt;         sum 45296.0000 2833.0000
-#&gt;        prop    10.3133        NA</div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='count_lesions-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  statistics        area perimeter
+#&gt;           n    14.00000        NA
+#&gt;         min   268.00000   55.0000
+#&gt;        mean  3201.78571  201.5714
+#&gt;         max 11735.00000  574.0000
+#&gt;          sd  3945.40933  161.8588
+#&gt;         sum 44825.00000 2822.0000
+#&gt;        prop    10.20606        NA</div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -111,19 +111,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -268,7 +268,7 @@ images that are named as 1.-, 2.-, and so on.</p></td>
       <td><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, especially when <code>img_pattern</code> is used is informed. The
-number of sections is set up to 90% of available cores.</p></td>
+number of sections is set up to 70% of available cores.</p></td>
     </tr>
     <tr>
       <th>workers</th>
@@ -441,35 +441,12 @@ one can set <code>parallel = TRUE</code>.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
+<span class='co'>###### deprecated use analyze_objects() instead ############</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>count_objects</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
-</div><div class='img'><img src='count_objects-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; 
-#&gt; --------------------------------------------
-#&gt; Number of objects: 30 
-#&gt; --------------------------------------------
-#&gt;  statistics       area   perimeter
-#&gt;         min  1366.0000  117.000000
-#&gt;        mean  2057.3667  146.600000
-#&gt;         max  2445.0000  158.000000
-#&gt;          sd   230.5574    8.406073
-#&gt;         sum 61721.0000 4398.000000
-#&gt; </div><div class='input'>
-<span class='co'># Enumerate the objects in the original image</span>
-<span class='fu'>count_objects</span><span class='op'>(</span><span class='va'>img</span>,
-              show_segmentation <span class='op'>=</span> <span class='cn'>FALSE</span>,
-              marker <span class='op'>=</span> <span class='st'>"text"</span>,
-              marker_col <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span>
-</div><div class='img'><img src='count_objects-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; 
-#&gt; --------------------------------------------
-#&gt; Number of objects: 30 
-#&gt; --------------------------------------------
-#&gt;  statistics       area   perimeter
-#&gt;         min  1366.0000  117.000000
-#&gt;        mean  2057.3667  146.600000
-#&gt;         max  2445.0000  158.000000
-#&gt;          sd   230.5574    8.406073
-#&gt;         sum 61721.0000 4398.000000
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='fu'><a href='analyze_objects.html'>analyze_objects</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+</div><div class='img'><img src='count_objects-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># }</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

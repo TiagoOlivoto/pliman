@@ -4,6 +4,9 @@
     <loc>https://tiagoolivoto.github.io/pliman//index.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/analyze_objects.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/count_lesions.html</loc>
   </url>
   <url>
@@ -31,6 +34,9 @@
     <loc>https://tiagoolivoto.github.io/pliman//reference/leaf_area.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/measure_disease.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/objects_rgb.html</loc>
   </url>
   <url>
@@ -40,7 +46,13 @@
     <loc>https://tiagoolivoto.github.io/pliman//reference/prop_segmented.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/rgb_to_hsv.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/symptomatic_area.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/tune_tolerance.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/utils_dpi.html</loc>
@@ -58,10 +70,13 @@
     <loc>https://tiagoolivoto.github.io/pliman//reference/utils_objects.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_polygon.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman//reference/utils_transform.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/count_objects.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman//articles/analyze_objects.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman//articles/leaf_area.html</loc>
@@ -70,7 +85,7 @@
     <loc>https://tiagoolivoto.github.io/pliman//articles/manipulation.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/operations.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman//articles/phytopatometry.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman//articles/pliman_start.html</loc>

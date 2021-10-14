@@ -97,7 +97,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -105,7 +105,7 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -118,19 +118,19 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -239,7 +239,7 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>An object computed with <code><a href='count_objects.html'>count_objects()</a></code> or <code><a href='leaf_area.html'>leaf_area()</a></code>.</p></td>
+      <td><p>An object computed with <code><a href='analyze_objects.html'>analyze_objects()</a></code>.</p></td>
     </tr>
     <tr>
       <th>id</th>
@@ -292,11 +292,21 @@ theorem will be <code>L x sqrt(2) / 2</code> where <code>L</code> is the length 
 
     
 <ul>
-<li><p><code>get_measures()</code> returns a data frame with the object <code>id</code> and the
-measures. If <code>measure</code> is informed, the pixel values will be corrected by the
-value of the known object, given in the unit of the right-hand side of
-<code>measure</code>. If <code>dpi</code> is informed, then all the measures will be adjusted to
-the known <code>dpi</code>.</p></li>
+<li><p>For <code>get_measures()</code>, if <code>measure</code> is informed, the pixel values will be
+corrected by the value of the known object, given in the unit of the
+right-hand side of <code>measure</code>. If <code>dpi</code> is informed, then all the measures
+will be adjusted to the known <code>dpi</code>.</p><ul>
+<li><p>If applied to an object of class <code>anal_obj</code>, returns a data frame with the
+object <code>id</code> and the (corrected) measures.</p></li>
+<li><p>If applied to an object of class <code>anal_obj_ls</code>, returns a list of class
+<code>measures_ls</code>, with two objects: (i) <code>results</code>, a data frame containing
+the identification of each image (img) and object within each image (id);
+and (ii) <code>summary</code> a data frame containing the values for each image. If
+more than one object is detected in a given image, the number of objects
+(<code>n</code>), total area (<code>area_sum</code>), mean area (<code>area_mean</code>) and the standard
+deviation of the area (<code>area_sd</code>) will be computed. For the other measures
+(perimeter and radius), the mean values are presented.</p></li>
+</ul></li>
 <li><p><code>plot_measures()</code> returns a <code>NULL</code> object, drawing the text according to
 the x and y coordinates of the objects in <code>object</code>.</p></li>
 </ul>
@@ -306,8 +316,8 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"objects_300dpi.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
-</div><div class='img'><img src='utils_measures-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Image with four objects with a known resolution of 300 dpi</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+</div><div class='input'><span class='co'># Image with four objects with a known resolution of 300 dpi</span>
 <span class='co'># Higher square: 10 x 10 cm</span>
 <span class='co'># Lower square: 5 x 5 cm</span>
 <span class='co'># Rectangle: 4 x 2 cm</span>
@@ -315,32 +325,27 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 
 <span class='co'># Count the objects using the blue band to segment the image</span>
 <span class='va'>results</span> <span class='op'>&lt;-</span>
-   <span class='fu'><a href='count_objects.html'>count_objects</a></span><span class='op'>(</span><span class='va'>img</span>,
+   <span class='fu'><a href='analyze_objects.html'>analyze_objects</a></span><span class='op'>(</span><span class='va'>img</span>,
                  index <span class='op'>=</span> <span class='st'>"B"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 
-#&gt; --------------------------------------------
-#&gt; Number of objects: 4 
-#&gt; --------------------------------------------
-#&gt;  statistics      area perimeter
-#&gt;         min   98363.0  1030.000
-#&gt;        mean  488297.5  2378.000
-#&gt;         max 1394754.0  4715.000
-#&gt;          sd  615160.4  1655.097
-#&gt;         sum 1953190.0  9512.000
-#&gt; </div><div class='input'><span class='fu'>plot_measures</span><span class='op'>(</span><span class='va'>results</span>, measure <span class='op'>=</span> <span class='st'>"id"</span><span class='op'>)</span>
-</div><div class='img'><img src='utils_measures-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div><div class='input'><span class='fu'>plot_measures</span><span class='op'>(</span><span class='va'>results</span>, measure <span class='op'>=</span> <span class='st'>"id"</span><span class='op'>)</span>
+</div><div class='img'><img src='utils_measures-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Get object measures by declaring the known resolution in dots per inch</span>
 <span class='op'>(</span><span class='va'>measures</span> <span class='op'>&lt;-</span> <span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>results</span>, dpi <span class='op'>=</span> <span class='fl'>300</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   id        x        y   area perimeter radius_mean radius_min radius_max
-#&gt; 1  1  669.000  798.000 99.982    39.920       5.732      4.994      7.058
-#&gt; 2  2 1737.500  453.000 24.996    19.964       2.864      2.493      3.529
-#&gt; 3  3 1737.548 1296.345  7.051     8.721       1.494      1.481      1.506
-#&gt; 4  4 1737.498  939.493  7.984    11.930       1.672      0.994      2.227
-#&gt;   radius_sd radius_ratio
-#&gt; 1    74.267        1.413
-#&gt; 2    37.171        1.415
-#&gt; 3     0.501        1.017
-#&gt; 4    49.911        2.240</div><div class='input'>
+</div><div class='output co'>#&gt;   id        x        y   area area_ch perimeter radius_mean radius_min
+#&gt; 1  1  669.000  798.000 99.982  99.813    39.920       5.732      4.994
+#&gt; 2  2 1737.500  453.000 24.996  24.911    19.964       2.864      2.493
+#&gt; 3  3 1737.548 1296.345  7.051   7.049     8.721       1.494      1.481
+#&gt; 4  4 1737.498  939.493  7.984   7.934    11.930       1.672      0.994
+#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity
+#&gt; 1      7.058    74.267        1.413     11.546        0.004 -0.785    1.002
+#&gt; 2      3.529    37.171        1.415      5.778        0.058  1.571    1.003
+#&gt; 3      1.506     0.501        1.017      2.997        0.038  0.109    1.000
+#&gt; 4      2.227    49.911        2.240      4.614        0.866  0.000    1.006
+#&gt;   circularity
+#&gt; 1       0.788
+#&gt; 2       0.788
+#&gt; 3       1.165
+#&gt; 4       0.705</div><div class='input'>
 <span class='co'># Calculated diagonal of the object 1</span>
 <span class='co'># 10 * sqrt(2) = 14.14</span>
 
@@ -359,16 +364,21 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 #&gt; -----------------------------------------
 #&gt; Total    : 140.038 
 #&gt; Average  : 35.01 
-#&gt; -----------------------------------------</div><div class='output co'>#&gt;   id        x        y    area perimeter radius_mean radius_min radius_max
-#&gt; 1  1  669.000  798.000 100.000    39.924       5.733      4.995      7.059
-#&gt; 2  2 1737.500  453.000  25.000    19.966       2.865      2.494      3.530
-#&gt; 3  3 1737.548 1296.345   7.052     8.721       1.494      1.481      1.506
-#&gt; 4  4 1737.498  939.493   7.986    11.931       1.672      0.994      2.227
-#&gt;   radius_sd radius_ratio
-#&gt; 1    74.267        1.413
-#&gt; 2    37.171        1.415
-#&gt; 3     0.501        1.017
-#&gt; 4    49.911        2.240</div><div class='input'><span class='co'># }</span>
+#&gt; -----------------------------------------</div><div class='output co'>#&gt;   id        x        y    area area_ch perimeter radius_mean radius_min
+#&gt; 1  1  669.000  798.000 100.000  99.831    39.924       5.733      4.995
+#&gt; 2  2 1737.500  453.000  25.000  24.916    19.966       2.865      2.494
+#&gt; 3  3 1737.548 1296.345   7.052   7.050     8.721       1.494      1.481
+#&gt; 4  4 1737.498  939.493   7.986   7.935    11.931       1.672      0.994
+#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity
+#&gt; 1      7.059    74.267        1.413     11.547        0.004 -0.785    1.002
+#&gt; 2      3.530    37.171        1.415      5.778        0.058  1.571    1.003
+#&gt; 3      1.506     0.501        1.017      2.998        0.038  0.109    1.000
+#&gt; 4      2.227    49.911        2.240      4.615        0.866  0.000    1.006
+#&gt;   circularity
+#&gt; 1       0.788
+#&gt; 2       0.788
+#&gt; 3       1.165
+#&gt; 4       0.705</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

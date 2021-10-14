@@ -93,7 +93,7 @@ clustering-based image thresholding." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@ clustering-based image thresholding." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -114,19 +114,19 @@ clustering-based image thresholding." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -212,6 +212,7 @@ clustering-based image thresholding.</p>
   <span class='va'>image</span>,
   index <span class='op'>=</span> <span class='cn'>NULL</span>,
   my_index <span class='op'>=</span> <span class='cn'>NULL</span>,
+  threshold <span class='op'>=</span> <span class='st'>"Otsu"</span>,
   resize <span class='op'>=</span> <span class='fl'>30</span>,
   fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
   re <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -242,8 +243,16 @@ target mode for conversion to binary image. One of the following:  <code>"R"</co
     </tr>
     <tr>
       <th>my_index</th>
-      <td><p>User can calculate a different index using the bands names,
+      <td><p>User can calculate a different index using the band names,
 e.g. <code>my_index = "R+B/G"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>threshold</th>
+      <td><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than "Otsu" to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.</p></td>
     </tr>
     <tr>
       <th>resize</th>
@@ -283,7 +292,7 @@ image file.</p></td>
       <td><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time when <code>image</code> is a list. The number of sections is set
-up to 90% of available cores.</p></td>
+up to 70% of available cores.</p></td>
     </tr>
     <tr>
       <th>workers</th>

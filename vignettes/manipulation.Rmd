@@ -3,7 +3,6 @@ title: "Image manipulation with pliman"
 author: "Tiago Olivoto"
 date: "`r Sys.Date()`"
 always_allow_html: yes
-output: rmarkdown::html_vignette
 fig_caption: yes
 vignette: >
   %\VignetteIndexEntry{Image manipulation with pliman}
@@ -20,54 +19,190 @@ knitr::opts_chunk$set(
 ```
 
 
-`pliman` provides useful functions to perform image transformation of unique images or list of images based on the [EBImage package](https://www.bioconductor.org/packages/release/bioc/vignettes/EBImage/inst/doc/EBImage-introduction.html).
+# Image manipulation
 
-```{r fig.width=10}
+## Importing images 
+
+```{r import1 }
 library(pliman)
-img <- image_import(image_pliman("sev_leaf_nb.jpg"))
-img_neg <- max(img) - img
+soy <- image_import(image_pliman("soybean_touch.jpg"))
+```
 
-img_list <- list(img = img, img_neg = img_neg)
-image_dimension(img_list)
-image_combine(img_list)
+
+To import a list of images, the argument `pattern` of the function `image_import()` is used. All images that match the pattern name are imported into a list.
+
+```{r import2 }
+soy_list <- 
+  image_import(pattern = "sev_",
+               path = image_pliman()) # choose path directory
+names(soy_list)
+```
+
+
+
+
+## Displaying images 
+Single images are displayed with `plot()`. For combining images, the function `image_combine()` is used. Users can inform either a comma-separated list of objects or a list of objects of class `Image`.
+
+```{r display1, fig.width=12, fig.height=6}
+# Single images
+plot(soy)
+
 
 ```
 
-# Rezise an image
-`image_resize()` is used to resize an image. The argument `rel_size` can be used to resize the image by relative size. For example, setting `rel_size = 50` to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with `count_objects` and `symptomatic_area()`.
 
-```{r}
-resized <- image_resize(img_list, rel_size = 50)
-image_dimension(resized)
+
+```{r display2, fig.width=12, fig.height=6}
+# Combine images
+image_combine(soy, soy)
+
+# Combine images
+image_combine(soy_list, ncol = 5)
+
 ```
 
-# Rotate an image
+
+## Manipulating images
+
+
+`pliman` provides a set of `image_*()` functions to perform image manipulation and transformation of unique images or a list of images based on the [EBImage package](https://www.bioconductor.org/packages/release/bioc/vignettes/EBImage/inst/doc/EBImage-introduction.html).
+
+### Resize an image
+Sometimes resizing of high-resolution images is needed to reduce the processing time. The function `image_resize()` is used to resize an image. The argument `rel_size` can be used to resize the image by relative size. For example, by setting `rel_size = 50` to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with `analyze_objects()` and `measure_disease()`.
+
+```{r manipulate1, fig.width=10, fig.height=8}
+image_dimension(soy)
+soy_resized <- image_resize(soy, rel_size = 50)
+image_dimension(soy_resized)
+```
+
+
+### Crop an image
+Cropping images is useful to remove noises from the image edge, as well as to reduce the size of images before processing. To crop an image, the function `image_crop()` is used. Users need to inform a numeric vector indicating the pixel range (`width` and `height`) that will be maintained in the cropped image.
+
+```{r, fig.width=10, fig.height=8}
+crop1 <-
+  image_crop(soy,
+             width = 55:750,
+             height = 20:623,
+             plot = TRUE)
+```
+
+If only `width` or `height` are informed, the image will be cropped vertically or horizontally.
+
+```{r, fig.width=10, fig.height=8}
+crop2 <-
+  image_crop(soy,
+             width = 55:750,
+             plot = TRUE)
+```
+
+If both `width` and `height` are missing, an iterative process of image cropping is performed.
+
+```{r eval=FALSE, fig.width=10, fig.height=8}
+# only run in an iterative section
+image_crop(soy)
+```
+
+
+Additionally, an automated cropping process can be performed. In this case, the image will be automatically cropped to the area of objects with an edge of five pixels by default.
+
+```{r, fig.width=10, fig.height=8}
+auto_crop <- image_autocrop(soy, plot = TRUE)
+```
+
+
+The function `image_trim()` is used to trim pixels from image edges.
+
+
+```{r manipulate2, fig.width=10, fig.height=8}
+# trim 50 pixels from all edges
+soy_trim <- image_trim(soy, edge = 50, plot = TRUE)
+
+# The same is achieved with
+soy_trim2 <-
+  image_trim(soy,
+             top = 50,
+             bottom = 50,
+             left = 50,
+             right = 50,
+             plot = TRUE)
+
+# trim 100 pixels from top and bottom
+soy_trim3 <-
+  image_trim(soy,
+             top = 100,
+             bottom = 100,
+             plot = TRUE)
+# trim to 5 pixels around objects' area
+
+```
+
+
+
+
+### Image resolution (DPI) {#dpi}
+The function `dpi()` runs an interactive function to compute the image resolution given a known distance informed by the user. To compute the image resolution (dpi) the user must use the left button mouse to create a line of known distance. This can be done, for example, using a template with known distance in the image (e.g., `leaves.JPG`).
+
+```{r eval=FALSE}
+# only run in an interactive section
+leaves <- image_import("./data/leaf_area/leaves.JPG")
+dpi(leaves)
+```
+
+
+<iframe width="760" height="430" src="https://www.youtube.com/embed/Rh10_pLgeng" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+
+### Rotate an image
 `image_rotate()` is used to rotates the image clockwise by the given angle.
 
-```{r fig.width=10}
-rotated <- image_rotate(img_list, angle = 45)
-image_combine(rotated)
+```{r manipulate3, fig.width=10, fig.height=8}
+soy_rotated <- image_rotate(soy, angle = 45, plot = TRUE)
 ```
 
-# Horizontal and vertical reflection
+
+### Horizontal and vertical reflection
 `image_hreflect()` and `image_vreflect()` performs vertical and horizontal reflection of images, respectively.
 
-```{r fig.width=10}
-img_hrefl <- image_hreflect(img)
-img_vrefl <- image_vreflect(img)
-image_combine(img, img_hrefl, img_vrefl, ncol = 3)
+```{r manipulate4, fig.width=20}
+soy_hrefl <- image_hreflect(soy)
+soy_vrefl <- image_vreflect(soy)
+image_combine(soy, soy_hrefl, soy_vrefl, ncol = 3)
 ```
 
 
 
-# Horizontal and horizontal conversion
+### Horizontal and vertical conversion
 `image_horizontal()` and `image_vertical()` converts (if needed) an image to a horizontal or vertical image, respectively.
 
-```{r fig.width=10}
-img_h <- image_horizontal(img)
-img_v <- image_vertical(img)
-image_combine(img, img_h, img_v, ncol = 3)
+```{r manipulate5, fig.width=20}
+soy_h <- image_horizontal(soy)
+soy_v <- image_vertical(soy)
+image_combine(soy, soy_h, soy_v, ncol = 3)
 
 ```
 
+
+### Filter, blur, contrast, dilatation, and erosion
+
+```{r manipulate6, fig.width=10, fig.height=8, fig.height=6}
+soy_filter <- image_filter(soy)
+soy_blur <- image_blur(soy)
+soy_contrast <- image_contrast(soy)
+soy_dilatation <- image_dilate(soy)
+soy_erosion <- image_erode(soy)
+image_combine(soy, soy_filter, soy_blur, soy_contrast, soy_dilatation, soy_erosion)
+```
+
+
+
+### Exporting images
+To export images to the current directory, use the function `image_export()`. If a list of images is exported, the images will be saved considering the name and extension present in the list. If no extension is present, the images will be saved as `*.jpg` files.
+
+```{r export, eval=FALSE}
+image_export(soy, "exported.jpg")
+```
 

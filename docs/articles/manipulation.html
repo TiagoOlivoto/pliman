@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -52,7 +52,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -65,19 +65,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -144,13 +144,13 @@
 
       
 
-      </header><script src="manipulation_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="manipulation_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Image manipulation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-06-10</h4>
+            <h4 class="date">2021-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/manipulation.Rmd"><code>vignettes/manipulation.Rmd</code></a></small>
       <div class="hidden name"><code>manipulation.Rmd</code></div>
@@ -159,72 +159,182 @@
 
     
     
-<p><code>pliman</code> provides useful functions to perform image transformation of unique images or list of images based on the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/EBImage/inst/doc/EBImage-introduction.html">EBImage package</a>.</p>
+<div id="image-manipulation" class="section level1">
+<h1 class="hasAnchor">
+<a href="#image-manipulation" class="anchor"></a>Image manipulation</h1>
+<div id="importing-images" class="section level2">
+<h2 class="hasAnchor">
+<a href="#importing-images" class="anchor"></a>Importing images</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)          |</span>
-<span class="co">#&gt; | Author: Tiago Olivoto                                  |</span>
-<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial   |</span>
-<span class="co">#&gt; | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf_nb.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">img_neg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span> <span class="op">-</span> <span class="va">img</span>
-
-<span class="va">img_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>, img_neg <span class="op">=</span> <span class="va">img_neg</span><span class="op">)</span>
-<span class="fu"><a href="../reference/utils_transform.html">image_dimension</a></span><span class="op">(</span><span class="va">img_list</span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ----------------------</span>
-<span class="co">#&gt; Image dimension</span>
-<span class="co">#&gt; ----------------------</span>
-<span class="co">#&gt;    image width height</span>
-<span class="co">#&gt;      img   720    610</span>
-<span class="co">#&gt;  img_neg   720    610</span>
-<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img_list</span><span class="op">)</span></code></pre></div>
-<p><img src="manipulation_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
-<div id="rezise-an-image" class="section level1">
-<h1 class="hasAnchor">
-<a href="#rezise-an-image" class="anchor"></a>Rezise an image</h1>
-<p><code><a href="../reference/utils_transform.html">image_resize()</a></code> is used to resize an image. The argument <code>rel_size</code> can be used to resize the image by relative size. For example, setting <code>rel_size = 50</code> to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with <code>count_objects</code> and <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</p>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
+<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
+<span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>To import a list of images, the argument <code>pattern</code> of the function <code><a href="../reference/utils_image.html">image_import()</a></code> is used. All images that match the pattern name are imported into a list.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">resized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_resize</a></span><span class="op">(</span><span class="va">img_list</span>, rel_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
-<span class="fu"><a href="../reference/utils_transform.html">image_dimension</a></span><span class="op">(</span><span class="va">resized</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">soy_list</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"sev_"</span>,
+               path <span class="op">=</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># choose path directory</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">soy_list</span><span class="op">)</span>
+<span class="co">#&gt; [1] "sev_back.jpg"    "sev_healthy.jpg" "sev_leaf.jpg"    "sev_leaf_nb.jpg"</span>
+<span class="co">#&gt; [5] "sev_sympt.jpg"</span></code></pre></div>
+</div>
+<div id="displaying-images" class="section level2">
+<h2 class="hasAnchor">
+<a href="#displaying-images" class="anchor"></a>Displaying images</h2>
+<p>Single images are displayed with <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>. For combining images, the function <code><a href="../reference/image_combine.html">image_combine()</a></code> is used. Users can inform either a comma-separated list of objects or a list of objects of class <code>Image</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Single images</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/display1-1.png" width="1152"></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Combine images</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">soy</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/display2-1.png" width="1152"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Combine images</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy_list</span>, ncol <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/display2-2.png" width="1152"></p>
+</div>
+<div id="manipulating-images" class="section level2">
+<h2 class="hasAnchor">
+<a href="#manipulating-images" class="anchor"></a>Manipulating images</h2>
+<p><code>pliman</code> provides a set of <code>image_*()</code> functions to perform image manipulation and transformation of unique images or a list of images based on the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/EBImage/inst/doc/EBImage-introduction.html">EBImage package</a>.</p>
+<div id="resize-an-image" class="section level3">
+<h3 class="hasAnchor">
+<a href="#resize-an-image" class="anchor"></a>Resize an image</h3>
+<p>Sometimes resizing of high-resolution images is needed to reduce the processing time. The function <code><a href="../reference/utils_transform.html">image_resize()</a></code> is used to resize an image. The argument <code>rel_size</code> can be used to resize the image by relative size. For example, by setting <code>rel_size = 50</code> to an image of width 1280 x 720, the new image will have a size of 640 x 360. This is useful to speed up the time of analysis such as those computed with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> and <code><a href="../reference/measure_disease.html">measure_disease()</a></code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/utils_transform.html">image_dimension</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ----------------------</span>
 <span class="co">#&gt; Image dimension</span>
 <span class="co">#&gt; ----------------------</span>
-<span class="co">#&gt;    image width height</span>
-<span class="co">#&gt;      img   360    305</span>
-<span class="co">#&gt;  img_neg   360    305</span></code></pre></div>
+<span class="co">#&gt; Width :  825 </span>
+<span class="co">#&gt; Height:  648</span>
+<span class="va">soy_resized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_resize</a></span><span class="op">(</span><span class="va">soy</span>, rel_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="fu"><a href="../reference/utils_transform.html">image_dimension</a></span><span class="op">(</span><span class="va">soy_resized</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ----------------------</span>
+<span class="co">#&gt; Image dimension</span>
+<span class="co">#&gt; ----------------------</span>
+<span class="co">#&gt; Width :  412 </span>
+<span class="co">#&gt; Height:  324</span></code></pre></div>
 </div>
-<div id="rotate-an-image" class="section level1">
-<h1 class="hasAnchor">
-<a href="#rotate-an-image" class="anchor"></a>Rotate an image</h1>
-<p><code><a href="../reference/utils_transform.html">image_rotate()</a></code> is used to rotates the image clockwise by the given angle.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_rotate</a></span><span class="op">(</span><span class="va">img_list</span>, angle <span class="op">=</span> <span class="fl">45</span><span class="op">)</span>
-<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">rotated</span><span class="op">)</span></code></pre></div>
-<p><img src="manipulation_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
-</div>
-<div id="horizontal-and-vertical-reflection" class="section level1">
-<h1 class="hasAnchor">
-<a href="#horizontal-and-vertical-reflection" class="anchor"></a>Horizontal and vertical reflection</h1>
-<p><code><a href="../reference/utils_transform.html">image_hreflect()</a></code> and <code><a href="../reference/utils_transform.html">image_vreflect()</a></code> performs vertical and horizontal reflection of images, respectively.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img_hrefl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_hreflect</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
-<span class="va">img_vrefl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_vreflect</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
-<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">img_hrefl</span>, <span class="va">img_vrefl</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<div id="crop-an-image" class="section level3">
+<h3 class="hasAnchor">
+<a href="#crop-an-image" class="anchor"></a>Crop an image</h3>
+<p>Cropping images is useful to remove noises from the image edge, as well as to reduce the size of images before processing. To crop an image, the function <code><a href="../reference/utils_transform.html">image_crop()</a></code> is used. Users need to inform a numeric vector indicating the pixel range (<code>width</code> and <code>height</code>) that will be maintained in the cropped image.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">crop1</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/utils_transform.html">image_crop</a></span><span class="op">(</span><span class="va">soy</span>,
+             width <span class="op">=</span> <span class="fl">55</span><span class="op">:</span><span class="fl">750</span>,
+             height <span class="op">=</span> <span class="fl">20</span><span class="op">:</span><span class="fl">623</span>,
+             plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
+<p>If only <code>width</code> or <code>height</code> are informed, the image will be cropped vertically or horizontally.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">crop2</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/utils_transform.html">image_crop</a></span><span class="op">(</span><span class="va">soy</span>,
+             width <span class="op">=</span> <span class="fl">55</span><span class="op">:</span><span class="fl">750</span>,
+             plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
+<p>If both <code>width</code> and <code>height</code> are missing, an iterative process of image cropping is performed.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># only run in an iterative section</span>
+<span class="fu"><a href="../reference/utils_transform.html">image_crop</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span></code></pre></div>
+<p>Additionally, an automated cropping process can be performed. In this case, the image will be automatically cropped to the area of objects with an edge of five pixels by default.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">auto_crop</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_autocrop</a></span><span class="op">(</span><span class="va">soy</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="manipulation_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
+<p>The function <code><a href="../reference/utils_transform.html">image_trim()</a></code> is used to trim pixels from image edges.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># trim 50 pixels from all edges</span>
+<span class="va">soy_trim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_trim</a></span><span class="op">(</span><span class="va">soy</span>, edge <span class="op">=</span> <span class="fl">50</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co"># The same is achieved with</span>
+<span class="va">soy_trim2</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/utils_transform.html">image_trim</a></span><span class="op">(</span><span class="va">soy</span>,
+             top <span class="op">=</span> <span class="fl">50</span>,
+             bottom <span class="op">=</span> <span class="fl">50</span>,
+             left <span class="op">=</span> <span class="fl">50</span>,
+             right <span class="op">=</span> <span class="fl">50</span>,
+             plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate2-1.png" width="960"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># trim 100 pixels from top and bottom</span>
+<span class="va">soy_trim3</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/utils_transform.html">image_trim</a></span><span class="op">(</span><span class="va">soy</span>,
+             top <span class="op">=</span> <span class="fl">100</span>,
+             bottom <span class="op">=</span> <span class="fl">100</span>,
+             plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate2-2.png" width="960"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># trim to 5 pixels around objects' area</span></code></pre></div>
 </div>
-<div id="horizontal-and-horizontal-conversion" class="section level1">
-<h1 class="hasAnchor">
-<a href="#horizontal-and-horizontal-conversion" class="anchor"></a>Horizontal and horizontal conversion</h1>
+<div id="dpi" class="section level3">
+<h3 class="hasAnchor">
+<a href="#dpi" class="anchor"></a>Image resolution (DPI)</h3>
+<p>The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> runs an interactive function to compute the image resolution given a known distance informed by the user. To compute the image resolution (dpi) the user must use the left button mouse to create a line of known distance. This can be done, for example, using a template with known distance in the image (e.g., <code>leaves.JPG</code>).</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># only run in an interactive section</span>
+<span class="va">leaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="st">"./data/leaf_area/leaves.JPG"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/utils_dpi.html">dpi</a></span><span class="op">(</span><span class="va">leaves</span><span class="op">)</span></code></pre></div>
+<iframe width="760" height="430" src="https://www.youtube.com/embed/Rh10_pLgeng" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>
+</div>
+<div id="rotate-an-image" class="section level3">
+<h3 class="hasAnchor">
+<a href="#rotate-an-image" class="anchor"></a>Rotate an image</h3>
+<p><code><a href="../reference/utils_transform.html">image_rotate()</a></code> is used to rotates the image clockwise by the given angle.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">soy_rotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_rotate</a></span><span class="op">(</span><span class="va">soy</span>, angle <span class="op">=</span> <span class="fl">45</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate3-1.png" width="960"></p>
+</div>
+<div id="horizontal-and-vertical-reflection" class="section level3">
+<h3 class="hasAnchor">
+<a href="#horizontal-and-vertical-reflection" class="anchor"></a>Horizontal and vertical reflection</h3>
+<p><code><a href="../reference/utils_transform.html">image_hreflect()</a></code> and <code><a href="../reference/utils_transform.html">image_vreflect()</a></code> performs vertical and horizontal reflection of images, respectively.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">soy_hrefl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_hreflect</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_vrefl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_vreflect</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">soy_hrefl</span>, <span class="va">soy_vrefl</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate4-1.png" width="1920"></p>
+</div>
+<div id="horizontal-and-vertical-conversion" class="section level3">
+<h3 class="hasAnchor">
+<a href="#horizontal-and-vertical-conversion" class="anchor"></a>Horizontal and vertical conversion</h3>
 <p><code><a href="../reference/utils_transform.html">image_horizontal()</a></code> and <code><a href="../reference/utils_transform.html">image_vertical()</a></code> converts (if needed) an image to a horizontal or vertical image, respectively.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img_h</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_horizontal</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
-<span class="va">img_v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_vertical</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
-<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">img_h</span>, <span class="va">img_v</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
-<p><img src="manipulation_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">soy_h</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_horizontal</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_vertical</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">soy_h</span>, <span class="va">soy_v</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate5-1.png" width="1920"></p>
+</div>
+<div id="filter-blur-contrast-dilatation-and-erosion" class="section level3">
+<h3 class="hasAnchor">
+<a href="#filter-blur-contrast-dilatation-and-erosion" class="anchor"></a>Filter, blur, contrast, dilatation, and erosion</h3>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">soy_filter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_filter</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_blur</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_blur</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_contrast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_contrast</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_dilatation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_dilate</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="va">soy_erosion</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_transform.html">image_erode</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
+<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">soy_filter</span>, <span class="va">soy_blur</span>, <span class="va">soy_contrast</span>, <span class="va">soy_dilatation</span>, <span class="va">soy_erosion</span><span class="op">)</span></code></pre></div>
+<p><img src="manipulation_files/figure-html/manipulate6-1.png" width="960"></p>
+</div>
+<div id="exporting-images" class="section level3">
+<h3 class="hasAnchor">
+<a href="#exporting-images" class="anchor"></a>Exporting images</h3>
+<p>To export images to the current directory, use the function <code><a href="../reference/utils_image.html">image_export()</a></code>. If a list of images is exported, the images will be saved considering the name and extension present in the list. If no extension is present, the images will be saved as <code>*.jpg</code> files.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/utils_image.html">image_export</a></span><span class="op">(</span><span class="va">soy</span>, <span class="st">"exported.jpg"</span><span class="op">)</span></code></pre></div>
+</div>
+</div>
 </div>
   </div>
 

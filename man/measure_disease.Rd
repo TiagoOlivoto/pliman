@@ -30,10 +30,12 @@ measure_disease(
   extension = NULL,
   show_features = FALSE,
   show_segmentation = FALSE,
-  show_contour = TRUE,
   show_image = TRUE,
   show_original = TRUE,
   show_background = TRUE,
+  show_contour = TRUE,
+  contour_col = "red",
+  contour_size = 1,
   col_leaf = NULL,
   col_lesions = NULL,
   col_background = NULL,
@@ -143,15 +145,18 @@ area, perimeter, and radius. Defaults to \code{FALSE}.}
 \item{show_segmentation}{Shows the object segmentation colored with random
 permutations. Defaults to \code{TRUE}.}
 
-\item{show_contour}{Show a contour line around the lesions? Defaults
-to \code{TRUE}.}
-
 \item{show_image}{Show image after processing? Defaults to \code{TRUE}.}
 
 \item{show_original}{Show the symptoms in the original image?}
 
 \item{show_background}{Show the background? Defaults to \code{TRUE}. A white
 background is shown by default when \code{show_original = FALSE}.}
+
+\item{show_contour}{Show a contour line around the lesions? Defaults
+to \code{TRUE}.}
+
+\item{contour_col, contour_size}{The color and size for the contour line
+around objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
 
 \item{col_leaf}{Leaf color after image processing. Defaults to \code{"green"}}
 
@@ -184,11 +189,10 @@ saved in such a directory.}
 \value{
 A list with the following objects:
 \itemize{
-\item \code{results} A data frame with the results (area, perimeter, radius) for
-object.
-\item \code{statistics} A data frame with the summary statistics for the image.
-\item \code{count} (If \code{pattern} is used), summarizing the count number for each
-image.
+\item \code{severity} A data frame with the percentage of healthy and symptomatic
+areas.
+\item \code{shape},\code{statistics} If \code{show_features = TRUE} is used, returns the shape
+(area, perimeter, etc.) for each lesion and a summary of the results.
 }
 }
 \description{

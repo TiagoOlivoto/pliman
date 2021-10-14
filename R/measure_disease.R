@@ -88,12 +88,14 @@
 #'   area, perimeter, and radius. Defaults to `FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
 #'   permutations. Defaults to `TRUE`.
-#' @param show_contour Show a contour line around the lesions? Defaults
-#'   to `TRUE`.
 #' @param show_image Show image after processing? Defaults to `TRUE`.
 #' @param show_original Show the symptoms in the original image?
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
+#' @param show_contour Show a contour line around the lesions? Defaults
+#'   to `TRUE`.
+#' @param contour_col,contour_size The color and size for the contour line
+#'   around objects. Defaults to `contour_col = "red"` and `contour_size = 1`.
 #' @param col_leaf Leaf color after image processing. Defaults to `"green"`
 #' @param col_lesions Symptoms color after image processing. Defaults to
 #'   `"red"`.
@@ -115,11 +117,10 @@
 #'   saved in such a directory.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return A list with the following objects:
-#'  * `results` A data frame with the results (area, perimeter, radius) for
-#'  object.
-#'  * `statistics` A data frame with the summary statistics for the image.
-#'  * `count` (If `pattern` is used), summarizing the count number for each
-#'  image.
+#'  * `severity` A data frame with the percentage of healthy and symptomatic
+#'  areas.
+#'  * `shape`,`statistics` If `show_features = TRUE` is used, returns the shape
+#'  (area, perimeter, etc.) for each lesion and a summary of the results.
 #' @export
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -165,10 +166,12 @@ measure_disease <- function(img,
                             extension = NULL,
                             show_features = FALSE,
                             show_segmentation = FALSE,
-                            show_contour = TRUE,
                             show_image = TRUE,
                             show_original = TRUE,
                             show_background = TRUE,
+                            show_contour = TRUE,
+                            contour_col = "red",
+                            contour_size = 1,
                             col_leaf = NULL,
                             col_lesions = NULL,
                             col_background = NULL,
@@ -180,7 +183,7 @@ measure_disease <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  # check_ebi()
+  check_ebi()
   if(!missing(img) & !missing(pattern)){
     stop("Only one of `img` or `pattern` arguments can be used.", call. = FALSE)
   }
@@ -494,7 +497,7 @@ measure_disease <- function(img,
                nmask <- EBImage::watershed(EBImage::distmap(img2),
                                            tolerance = tol,
                                            ext = ext)
-               )
+        )
         # return(nmask)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
@@ -599,7 +602,7 @@ measure_disease <- function(img,
         show_mark <- FALSE
       }
       if(isTRUE(show_contour)){
-        object_contour <- EBImage::ocontour(nmask)
+        ocont <- EBImage::ocontour(nmask)
       }
       if(show_image == TRUE){
         if(marker != "point"){
@@ -612,7 +615,7 @@ measure_disease <- function(img,
                  cex = marker_size)
           }
           if(isTRUE(show_contour)){
-            plot_contour(object_contour, col = marker_col, lwd = 1)
+            plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         } else{
           plot(im2)
@@ -624,7 +627,7 @@ measure_disease <- function(img,
                    cex = marker_size)
           }
           if(isTRUE(show_contour)){
-            plot_contour(object_contour, col = marker_col, lwd = 1)
+            plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         }
       }
@@ -648,7 +651,7 @@ measure_disease <- function(img,
                  cex = marker_size)
           }
           if(isTRUE(show_contour)){
-            plot_contour(object_contour, col = marker_col, lwd = 1)
+            plot_contour(ocont, col = "white", lwd = contour_size)
           }
         } else{
           plot(im2)
@@ -660,7 +663,7 @@ measure_disease <- function(img,
                    cex = marker_size)
           }
           if(isTRUE(show_contour)){
-            plot_contour(object_contour, col = marker_col, lwd = 1)
+            plot_contour(ocont, col = "white", lwd = contour_size)
           }
         }
         dev.off()

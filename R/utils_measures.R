@@ -133,6 +133,7 @@ get_measures <- function(object,
       values <- res[, var]
       corrected <- values * value / id_val
       res$area <- corrected
+      res$area_ch <- res$area_ch * px_side^2
       res$perimeter <- res$perimeter * px_side
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
@@ -143,6 +144,7 @@ get_measures <- function(object,
       id_val <- res[which(res$id == id), var]
       px_side <- value / id_val
       res$area <- res$area * px_side^2
+      res$area_ch <- res$area_ch * px_side^2
       res$perimeter <- res$perimeter * px_side
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
@@ -162,6 +164,7 @@ get_measures <- function(object,
   if(!is.null(dpi)){
     dpc <- dpi * 1 / 2.54
     res$area <- res$area * 1/dpc^2
+    res$area_ch <- res$area_ch * 1/dpc^2
     res$perimeter <- res$perimeter / dpc
     res$radius_mean <- res$radius_mean / dpc
     res$radius_min <- res$radius_min / dpc
@@ -187,6 +190,7 @@ get_measures <- function(object,
     smr$img <- unique(res$img)
     smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
     smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
+    res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
     out <-
       list(results = res,
            summary = smr)

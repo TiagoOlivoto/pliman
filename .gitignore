@@ -5,3 +5,5 @@ package_release.R
 .gitignore
 inst/doc
 .RData
+/doc/
+/Meta/

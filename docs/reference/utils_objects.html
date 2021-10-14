@@ -52,6 +52,8 @@
 object_id() get the object identification in an image.
 object_coord() get the object coordinates and (optionally) draw a
 bounding rectangle around multiple objects in an image.
+object_contour() returns the coordinates (x and y) for the contours
+of each object in the image.
 object_isolate() isolates an object from an image.
 
 " />
@@ -97,7 +99,7 @@ object_isolate() isolates an object from an image.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -105,7 +107,7 @@ object_isolate() isolates an object from an image.
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -118,19 +120,19 @@ object_isolate() isolates an object from an image.
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -211,6 +213,8 @@ object_isolate() isolates an object from an image.
 <li><p><code>object_id()</code> get the object identification in an image.</p></li>
 <li><p><code>object_coord()</code> get the object coordinates and (optionally) draw a
 bounding rectangle around multiple objects in an image.</p></li>
+<li><p><code>object_contour()</code> returns the coordinates (<code>x</code> and <code>y</code>) for the contours
+of each object in the image.</p></li>
 <li><p><code>object_isolate()</code> isolates an object from an image.</p></li>
 </ul>
 
@@ -225,7 +229,19 @@ bounding rectangle around multiple objects in an image.</p></li>
   edge <span class='op'>=</span> <span class='fl'>2</span>,
   extension <span class='op'>=</span> <span class='cn'>NULL</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
-  object_size <span class='op'>=</span> <span class='st'>"large"</span>,
+  object_size <span class='op'>=</span> <span class='st'>"medium"</span>,
+  show_image <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>object_contour</span><span class='op'>(</span>
+  <span class='va'>image</span>,
+  index <span class='op'>=</span> <span class='st'>"NB"</span>,
+  invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  watershed <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  extension <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
+  object_size <span class='op'>=</span> <span class='st'>"medium"</span>,
   show_image <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
@@ -269,7 +285,7 @@ Defaults to <code>2</code>.</p></td>
     <tr>
       <th>extension, tolerance, object_size</th>
       <td><p>Controls the watershed segmentation of
-objects in the image. See <code><a href='count_objects.html'>count_objects()</a></code> for more details.</p></td>
+objects in the image. See <code><a href='analyze_objects.html'>analyze_objects()</a></code> for more details.</p></td>
     </tr>
     <tr>
       <th>show_image</th>
@@ -277,10 +293,18 @@ objects in the image. See <code><a href='count_objects.html'>count_objects()</a>
 <code>TRUE</code>.</p></td>
     </tr>
     <tr>
+      <th>watershed</th>
+      <td><p>If <code>TRUE</code> (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If <code>FALSE</code>, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><ul>
 <li><p>For <code>object_isolate()</code>, further arguments passed on to <code>object_coord()</code>.</p></li>
-<li><p>For <code>object_id()</code>, further arguments passed on to <code><a href='count_objects.html'>count_objects()</a></code>.</p></li>
+<li><p>For <code>object_id()</code>, further arguments passed on to <code><a href='analyze_objects.html'>analyze_objects()</a></code>.</p></li>
 </ul></td>
     </tr>
     </table>
@@ -322,8 +346,9 @@ object.</p></li>
 #&gt; </div><div class='input'>
 <span class='co'># Isolate leaf 3</span>
 <span class='va'>isolated</span> <span class='op'>&lt;-</span> <span class='fu'>object_isolate</span><span class='op'>(</span><span class='va'>img</span>, id <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-<span class='fu'><a href='utils_image.html'>image_show</a></span><span class='op'>(</span><span class='va'>isolated</span><span class='op'>)</span>
-</div><div class='img'><img src='utils_objects-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>isolated</span><span class='op'>)</span>
+</div><div class='img'><img src='utils_objects-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

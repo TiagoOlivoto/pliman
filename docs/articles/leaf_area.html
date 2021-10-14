@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -52,7 +52,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -65,19 +65,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -144,13 +144,13 @@
 
       
 
-      </header><script src="leaf_area_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="leaf_area_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Measure leaf area using leaf images</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-06-10</h4>
+            <h4 class="date">2021-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/leaf_area.Rmd"><code>vignettes/leaf_area.Rmd</code></a></small>
       <div class="hidden name"><code>leaf_area.Rmd</code></div>
@@ -162,126 +162,162 @@
 <div id="getting-started" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
-<p>Measuring leaf area is a very common task for breeders and agronomists. The leaf area is used as a key trait for computing several indexes, such as the Leaf Area Index (LAI), which quantifies the amount of leaf material in a canopy. In <code>pliman</code> researchers can measure the leaf area using leaf images in two main ways. The first, using <code><a href="../reference/leaf_area.html">leaf_area()</a></code> uses a sample of leaves along with a template with a known area. Background, leaf, and template color palettes must be declared.</p>
-<div id="leaf-area-using-leaf_area" class="section level2">
-<h2 class="hasAnchor">
-<a href="#leaf-area-using-leaf_area" class="anchor"></a>Leaf area using leaf_area()</h2>
-<p>In this example, an image with five tree leaves and a yellow template with a know area of 4 cm<span class="math inline">\(^2\)</span> is used.</p>
+<p>We can use <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to compute object features such as area, perimeter, radius, etc. This can be used, for example, to compute leaf area. Let’s compute the leaf area of <code>leaves</code> with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. First, we use <code>image_segmentation()</code> to identify candidate indexes to segment foreground (leaves) from background.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)          |</span>
-<span class="co">#&gt; | Author: Tiago Olivoto                                  |</span>
-<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial   |</span>
-<span class="co">#&gt; | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |</span>
-<span class="co">#&gt; |========================================================|</span>
-<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_pattern.JPG"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">leaf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">tmpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_temp.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_back.jpg"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># Combine the images</span>
-<span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">leaf</span>, <span class="va">tmpl</span>, <span class="va">background</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
-<p>To compute the leaf area in the image, the following function is used. Then, <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to get the values given in the scale of <code>area_template</code> argument. The other measures (namely, perimeter, radius_mean, radius_min, and radius_max) are given as pixels.</p>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
+<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
+<span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
+<span class="co">#&gt; |=======================================================|</span>
+<span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/TiagoOlivoto/pliman/master/vignettes/imgs"</span>
+<span class="va">leaves</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="st">"leaves2.jpg"</span>,
+               path <span class="op">=</span> <span class="va">path</span>,
+               plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf3-1.png" width="960"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">area</span> <span class="op">&lt;-</span> 
-<span class="fu"><a href="../reference/leaf_area.html">leaf_area</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
-          img_leaf <span class="op">=</span> <span class="va">leaf</span>,
-          img_template <span class="op">=</span> <span class="va">tmpl</span>,
-          img_background <span class="op">=</span> <span class="va">background</span>,
-          area_template <span class="op">=</span> <span class="fl">4</span>,
-          text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
-<span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total leaf area  : 141.934 </span>
-<span class="co">#&gt; Average leaf area: 23.656 </span>
-<span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt;   id       x       y   area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1 510.869 194.814 33.440       752     131.020    113.146    175.025</span>
-<span class="co">#&gt; 2  2 206.680 201.340 26.872       710     119.471     93.224    170.499</span>
-<span class="co">#&gt; 3  3 123.393 557.365 30.470       787     128.754     95.724    189.305</span>
-<span class="co">#&gt; 4  4 623.003 585.411 39.106       860     143.374    108.134    203.006</span>
-<span class="co">#&gt; 5  5 364.744 508.600  8.045       373      64.329     51.706     86.535</span>
-<span class="co">#&gt;   radius_sd radius_ratio</span>
-<span class="co">#&gt; 1    15.314        1.547</span>
-<span class="co">#&gt; 2    19.224        1.829</span>
-<span class="co">#&gt; 3    24.556        1.978</span>
-<span class="co">#&gt; 4    25.144        1.877</span>
-<span class="co">#&gt; 5     9.695        1.674</span></code></pre></div>
-</div>
-<div id="leaf-area-using-count_objects" class="section level2">
-<h2 class="hasAnchor">
-<a href="#leaf-area-using-count_objects" class="anchor"></a>Leaf area using count_objects()</h2>
-<p>An alternative way to compute leaf area in <code>pliman</code> is by using <code><a href="../reference/count_objects.html">count_objects()</a></code>. This function has the advantage of using image segmentation based on several indexes (e.g., red, green, and blue values). So, sample palettes don’t need to be informed. Let us compute the leaf area of <code>leaves</code> with this approach. First, we use <code>image_segmentation()</code> to identify candidate indexes to segment the image.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">leaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaves.JPG"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/utils_image.html">image_show</a></span><span class="op">(</span><span class="va">leaves</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
-<p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the <code>NB</code> index here (default option in <code><a href="../reference/count_objects.html">count_objects()</a></code>). The measurement of the leaf area in this approach is given with the following two steps.</p>
-<ol style="list-style-type: decimal">
+<p><img src="leaf_area_files/figure-html/leaf4-1.png" width="768"></p>
+<p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the <code>NB</code> index here (default option in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>). The measurement of the leaf area in this approach can be done in two main ways: 1) using an object of known area, and 2) knowing the image resolution in dpi (dots per inch).</p>
+<div id="using-an-object-of-known-area" class="section level3">
+<h3 class="hasAnchor">
+<a href="#using-an-object-of-known-area" class="anchor"></a>Using an object of known area</h3>
+<ul>
 <li>Count the number of objects (leaves in this case)</li>
-</ol>
-<p>Here, we need to combine <code><a href="../reference/count_objects.html">count_objects()</a></code> and <code><a href="../reference/utils_measures.html">plot_measures()</a></code> to obtain the identification of each leaf, allowing the further adjustment of the leaf area.</p>
+</ul>
+<p>Here, we use the argument <code>marker = "id"</code> of the function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to obtain the identification of each object (leaf), allowing for further adjustment of the leaf area.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf5-1.png" width="960"></p>
+<p>Note that “holes” in some leaves resulted in the segmentation of one leaf in more than one object (e.g., 5, 8, 22, 25, 18, 28). This will not affect the total leaf area, but the area of individual leaves and the average leaf area. This can be solved by either setting the argument <code>fill_hull = TRUE</code> or <code>watershed = FALSE</code> (To don’t implement the watershed-based object segmentation). Let’s see how much better we can go.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
+                  marker <span class="op">=</span> <span class="st">"id"</span>,
+                  fill_hull <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf6-1.png" width="960"></p>
+<p>Almost there! Due to the morphology of the leaf composed by objects 2 and 23, it was segmented into two objects. This can be solved by setting the argument <code>object_size = "large"</code> that will change the default (medium) values for <code>tolerance</code> and <code>extension</code> arguments.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
+                  marker <span class="op">=</span> <span class="st">"id"</span>,
+                  fill_hull <span class="op">=</span> <span class="cn">TRUE</span>,
+                  object_size <span class="op">=</span> <span class="st">"large"</span><span class="op">)</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf7-1.png" width="960"></p>
+<p>When the objects are not touching each other, the argument <code>watershed = FALSE</code> would be a better option.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_objects.html">count_objects</a></span><span class="op">(</span><span class="va">leaves</span>, marker <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
-<pre><code>#&gt; 
-#&gt; --------------------------------------------
-#&gt; Number of objects: 6 
-#&gt; --------------------------------------------
-#&gt;  statistics      area perimeter
-#&gt;         min   4332.00  253.0000
-#&gt;        mean  26704.17  533.5000
-#&gt;         max  44763.00  727.0000
-#&gt;          sd  16286.76  197.2265
-#&gt;         sum 160225.00 3201.0000</code></pre>
-<ol start="2" style="list-style-type: decimal">
-<li>Adjust the leaf area by the area of the known object</li>
-</ol>
-<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf area using the object 6.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">area</span> <span class="op">&lt;-</span> 
-<span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>,
-             id <span class="op">=</span> <span class="fl">6</span>,
-             <span class="va">area</span> <span class="op">~</span> <span class="fl">4</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
+                watershed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf8-1.png" width="960"></p>
+<p>And here we are! Now, all leaves were identified correctly, but all measures were given in pixel units. The next step is to convert these measures to metric units.</p>
+<ul>
+<li>Convert the leaf area by the area of the known object</li>
+</ul>
+<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf area using object 10, a square with a side of 5 cm (25 cm<span class="math inline">\(^2\)</span>).</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">area</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>,
+               id <span class="op">=</span> <span class="fl">10</span>,
+               <span class="va">area</span> <span class="op">~</span> <span class="fl">25</span><span class="op">)</span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="co">#&gt; measures corrected with:</span>
-<span class="co">#&gt; object id: 6</span>
-<span class="co">#&gt; area     : 4</span>
+<span class="co">#&gt; object id: 10</span>
+<span class="co">#&gt; area     : 25</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total    : 147.946 </span>
-<span class="co">#&gt; Average  : 24.658 </span>
+<span class="co">#&gt; Total    : 822.014 </span>
+<span class="co">#&gt; Average  : 35.74 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="va">area</span>
-<span class="co">#&gt;   id       x       y   area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1  1 537.383 498.991 41.332    22.091       3.678      2.756      5.259</span>
-<span class="co">#&gt; 2  2 438.651 165.238 35.363    19.478       3.371      2.875      4.547</span>
-<span class="co">#&gt; 3  3 110.879 477.028 31.269    20.116       3.269      2.375      4.857</span>
-<span class="co">#&gt; 4  4 178.420 174.235 27.446    18.202       3.027      2.307      4.395</span>
-<span class="co">#&gt; 5  5 315.236 434.611  8.536     9.693       1.656      1.312      2.253</span>
-<span class="co">#&gt; 6  6 313.491 655.205  4.000     7.688       1.125      0.926      1.379</span>
-<span class="co">#&gt;   radius_sd radius_ratio</span>
-<span class="co">#&gt; 1    21.470        1.908</span>
-<span class="co">#&gt; 2    13.686        1.582</span>
-<span class="co">#&gt; 3    21.497        2.045</span>
-<span class="co">#&gt; 4    17.013        1.904</span>
-<span class="co">#&gt; 5     8.583        1.718</span>
-<span class="co">#&gt; 6     3.958        1.488</span>
-<span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span><span class="op">)</span>
-<span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>, measure <span class="op">=</span> <span class="st">"area"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<p><img src="leaf_area_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
+<span class="co">#&gt;    id        x       y    area area_ch perimeter radius_mean radius_min</span>
+<span class="co">#&gt; 1   1  276.129 221.430 117.823 118.100    38.381       6.256      4.469</span>
+<span class="co">#&gt; 2   2  912.046 191.121 112.962 143.620    55.562       5.959      3.425</span>
+<span class="co">#&gt; 3   3  117.277 501.002  94.569 100.538    46.218       6.267      2.653</span>
+<span class="co">#&gt; 4   4  533.671 164.067  57.425  58.129    27.078       4.360      3.140</span>
+<span class="co">#&gt; 5   5  690.167 172.731  52.138  54.020    26.475       4.231      3.103</span>
+<span class="co">#&gt; 6   6  224.914 751.209  50.626  53.551    25.872       4.051      2.918</span>
+<span class="co">#&gt; 7   7 1047.062 424.418  61.884  62.790    28.987       4.626      2.986</span>
+<span class="co">#&gt; 8   8  865.070 761.262  39.607  40.831    23.159       3.664      2.631</span>
+<span class="co">#&gt; 9   9  871.498 486.609  37.911  40.834    23.963       3.574      2.419</span>
+<span class="co">#&gt; 10 10  605.991 664.123  25.000  24.876    19.592       2.835      2.411</span>
+<span class="co">#&gt; 11 11  967.756 628.918  30.204  30.613    19.341       3.189      2.378</span>
+<span class="co">#&gt; 12 12  597.344 378.935  28.379  32.082    21.752       3.144      1.962</span>
+<span class="co">#&gt; 13 13  503.668 584.456  25.792  27.186    22.707       3.447      1.585</span>
+<span class="co">#&gt; 14 14  385.436 423.892  20.684  21.997    20.346       2.974      1.402</span>
+<span class="co">#&gt; 15 15  423.393 176.371  15.518  16.028    16.578       2.455      1.170</span>
+<span class="co">#&gt; 16 16  847.125 626.891  10.441  10.837    12.258       1.924      1.256</span>
+<span class="co">#&gt; 17 17  712.599 457.976   9.118   9.131    13.463       1.950      0.777</span>
+<span class="co">#&gt; 18 18  353.365 740.398   5.830   6.231     9.897       1.533      0.872</span>
+<span class="co">#&gt; 19 19  641.395 535.291   4.603   4.505     7.485       1.213      0.839</span>
+<span class="co">#&gt; 20 20  738.920 711.817   8.089   8.646    15.171       1.900      0.492</span>
+<span class="co">#&gt; 21 21  344.537 602.703   5.370   5.946    11.806       1.621      0.344</span>
+<span class="co">#&gt; 22 22  714.360 576.056   3.788   3.690     7.134       1.120      0.645</span>
+<span class="co">#&gt; 23 23  473.760 785.686   4.252   4.661    27.781       3.482      0.137</span>
+<span class="co">#&gt;    radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity</span>
+<span class="co">#&gt; 1       9.246    27.138        2.069     16.615        0.837  1.529    0.998</span>
+<span class="co">#&gt; 2       8.575    20.758        2.504     13.672        0.548 -1.558    0.787</span>
+<span class="co">#&gt; 3      10.691    46.500        4.030     18.979        0.936 -1.510    0.941</span>
+<span class="co">#&gt; 4       6.364    16.271        2.027     10.962        0.788 -1.487    0.988</span>
+<span class="co">#&gt; 5       6.413    16.586        2.066     10.207        0.760 -1.392    0.965</span>
+<span class="co">#&gt; 6       5.930    11.935        2.032      9.086        0.572 -1.471    0.945</span>
+<span class="co">#&gt; 7       7.148    23.705        2.394     12.675        0.868  1.404    0.986</span>
+<span class="co">#&gt; 8       5.519    14.081        2.097      8.835        0.740 -1.329    0.970</span>
+<span class="co">#&gt; 9       5.417    14.594        2.239      8.419        0.633 -1.476    0.928</span>
+<span class="co">#&gt; 10      3.475     6.134        1.441      5.869        0.254 -1.563    1.005</span>
+<span class="co">#&gt; 11      4.727    13.566        1.988      8.160        0.812  1.568    0.987</span>
+<span class="co">#&gt; 12      4.982    15.198        2.539      7.543        0.635 -1.417    0.885</span>
+<span class="co">#&gt; 13      5.942    26.280        3.748      9.993        0.939 -1.103    0.949</span>
+<span class="co">#&gt; 14      5.099    22.338        3.636      8.773        0.934 -1.382    0.940</span>
+<span class="co">#&gt; 15      4.095    16.808        3.500      7.356        0.926  1.554    0.968</span>
+<span class="co">#&gt; 16      3.026    10.113        2.409      5.006        0.842  0.235    0.963</span>
+<span class="co">#&gt; 17      3.415    14.864        4.394      6.087        0.945  1.424    0.999</span>
+<span class="co">#&gt; 18      2.624     9.952        3.009      4.024        0.878 -0.519    0.936</span>
+<span class="co">#&gt; 19      1.754     5.726        2.089      3.384        0.859 -1.546    1.022</span>
+<span class="co">#&gt; 20      3.533    16.478        7.179      6.118        0.955  1.557    0.935</span>
+<span class="co">#&gt; 21      2.997    14.938        8.712      5.516        0.969 -1.429    0.903</span>
+<span class="co">#&gt; 22      1.719     6.426        2.666      3.312        0.896  1.421    1.027</span>
+<span class="co">#&gt; 23      6.947    39.753       50.583     14.308        1.000 -0.037    0.912</span>
+<span class="co">#&gt;    circularity</span>
+<span class="co">#&gt; 1        1.005</span>
+<span class="co">#&gt; 2        0.460</span>
+<span class="co">#&gt; 3        0.556</span>
+<span class="co">#&gt; 4        0.984</span>
+<span class="co">#&gt; 5        0.935</span>
+<span class="co">#&gt; 6        0.950</span>
+<span class="co">#&gt; 7        0.926</span>
+<span class="co">#&gt; 8        0.928</span>
+<span class="co">#&gt; 9        0.830</span>
+<span class="co">#&gt; 10       0.818</span>
+<span class="co">#&gt; 11       1.015</span>
+<span class="co">#&gt; 12       0.754</span>
+<span class="co">#&gt; 13       0.629</span>
+<span class="co">#&gt; 14       0.628</span>
+<span class="co">#&gt; 15       0.710</span>
+<span class="co">#&gt; 16       0.873</span>
+<span class="co">#&gt; 17       0.632</span>
+<span class="co">#&gt; 18       0.748</span>
+<span class="co">#&gt; 19       1.032</span>
+<span class="co">#&gt; 20       0.442</span>
+<span class="co">#&gt; 21       0.484</span>
+<span class="co">#&gt; 22       0.935</span>
+<span class="co">#&gt; 23       0.069</span>
+<span class="co"># plot the area to the segmented image</span>
+<span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>,
+              measure <span class="op">=</span> <span class="st">"area"</span>,
+              col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="co"># default is "white"</span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf9-1.png" width="960"></p>
+</div>
+<div id="knowing-the-image-resolution-in-dpi-dots-per-inch" class="section level3">
+<h3 class="hasAnchor">
+<a href="#knowing-the-image-resolution-in-dpi-dots-per-inch" class="anchor"></a>knowing the image resolution in dpi (dots per inch)</h3>
+<p>When the image resolution is known, the measures in pixels obtained with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See the <a href="#dpi">dpi</a> section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the <code>dpi</code> argument of <code>get_measures9)</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.8</span><span class="op">)</span>
 <span class="co"># compute the difference between the two methods</span>
-<span class="fl">142.9</span> <span class="op">-</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">)</span>
-<span class="co">#&gt; [1] -1.046</span></code></pre></div>
-<p>The weakness of computing leaf area with <code><a href="../reference/count_objects.html">count_objects()</a></code> is that it is needed to first obtain the object identification to know which object (leaf) is the sample with a known area. This object id may change from image to image, especially from images with a different number of leaves. Thus, batch computing is difficult in this case.</p>
+<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span> <span class="op">-</span> <span class="va">area2</span><span class="op">$</span><span class="va">area</span><span class="op">)</span>
+<span class="co">#&gt; [1] 7.724</span></code></pre></div>
 </div>
 </div>
   </div>

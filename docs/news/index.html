@@ -89,7 +89,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -110,19 +110,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -196,6 +196,21 @@
       <small>Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="pliman-development-version" class="section level1">
+<h1 class="page-header" data-toc-text="development version">
+<a href="#pliman-development-version" class="anchor"></a>pliman (development version)<small> Unreleased </small>
+</h1>
+<div id="minor-improvements" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<ul>
+<li>Include <code>fill_hull</code> argument in <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code> and <code><a href="../reference/count_lesions.html">count_lesions()</a></code>
+</li>
+<li>Improve <code><a href="../reference/utils_transform.html">image_contrast()</a></code> function to avoid error regarding image resolution.</li>
+<li>New argument <code>subfolder</code> in <code><a href="../reference/utils_image.html">image_export()</a></code> to export an image to a subfolder.</li>
+</ul>
+</div>
+</div>
     <div id="pliman-030" class="section level1">
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#pliman-030" class="anchor"></a>pliman 0.3.0<small> 2021-06-10 </small>
@@ -220,9 +235,9 @@
 <code><a href="../reference/prop_segmented.html">prop_segmented()</a></code> to perform (iterative) image segmentation with pixels proportion.</li>
 </ul>
 </div>
-<div id="minor-improvements" class="section level2">
+<div id="minor-improvements-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-1" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>New argument <code>filter</code> in <code><a href="../reference/count_objects.html">count_objects()</a></code> and <code><a href="../reference/prop_segmented.html">prop_segmented()</a></code>.</li>
 </ul>

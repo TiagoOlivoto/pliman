@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -111,19 +111,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -202,7 +202,7 @@
     <p>Combines several images to a grid</p>
     </div>
 
-    <pre class="usage"><span class='fu'>image_combine</span><span class='op'>(</span><span class='va'>...</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>image_combine</span><span class='op'>(</span><span class='va'>...</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -216,6 +216,12 @@ objects.</p></td>
       <th>nrow, ncol</th>
       <td><p>The number of rows or columns in the plot grid. Defaults to
 <code>NULL</code>, i.e., a square grid is produced.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Shows the name of objects declared in <code>...</code> or a numeric
+sequence if a list with no names is provided. Set to <code>FALSE</code> to supress the
+text.</p></td>
     </tr>
     </table>
 

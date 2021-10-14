@@ -241,11 +241,16 @@ image_show <- function(image){
 #' @export
 #' @name utils_image
 image_pliman <- function(image){
-  files <- list.files(system.file("tmp_images", package = "pliman"))
-  if(!image %in% files){
-    stop("Image not available in pliman.\nAvaliable images: ", paste(files, collapse = ", "), call. = FALSE)
+  path <- system.file("tmp_images", package = "pliman")
+  files <- list.files(path)
+  if(!missing(image)){
+    if(!image %in% files){
+      stop("Image not available in pliman.\nAvaliable images: ", paste(files, collapse = ", "), call. = FALSE)
+    }
+    system.file(paste0("tmp_images/", image), package = "pliman")
+  } else{
+    path
   }
-  system.file(paste0("tmp_images/", image), package = "pliman")
 }
 
 ##### Spatial transformations

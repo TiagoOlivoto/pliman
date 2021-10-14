@@ -66,12 +66,12 @@ install the latest version of
 
 ``` r
 library(pliman)
-# |========================================================|
-# | Tools for Plant Image Analysis (pliman 0.3.0)          |
-# | Author: Tiago Olivoto                                  |
-# | Type 'vignette('pliman_start')' for a short tutorial   |
-# | Visit 'https://bit.ly/3eL0dF3' for a complete tutorial |
-# |========================================================|
+# |=======================================================|
+# | Tools for Plant Image Analysis (pliman 0.3.0)         |
+# | Author: Tiago Olivoto                                 |
+# | Type 'vignette('pliman_start')' for a short tutorial  |
+# | Visit 'https://bit.ly/pliman' for a complete tutorial |
+# |=======================================================|
 img <- image_import(image_pliman("sev_leaf.jpg"))
 healthy <- image_import(image_pliman("sev_healthy.jpg"))
 symptoms <- image_import(image_pliman("sev_sympt.jpg"))
@@ -82,7 +82,7 @@ image_combine(img, healthy, symptoms, background, ncol = 4)
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-symptomatic_area(img = img,
+measure_disease(img = img,
                  img_healthy = healthy,
                  img_symptoms = symptoms,
                  img_background = background,
@@ -91,8 +91,18 @@ symptomatic_area(img = img,
 
 ![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
+    # $severity
     #    healthy symptomatic
-    # 1 89.04069    10.95931
+    # 1 89.31109    10.68891
+    # 
+    # $shape
+    # NULL
+    # 
+    # $statistics
+    # NULL
+    # 
+    # attr(,"class")
+    # [1] "plm_disease"
 
 # Count objects
 
@@ -101,28 +111,11 @@ leaves, grains, pods, pollen in an image. In the following example, we
 will count the number of soybean grains of an image with 30 grains.
 
 ``` r
-img <- image_import(image_pliman("soybean_touch.jpg"))
-image_show(img)
+img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+analyze_objects(img, marker = "id")
 ```
 
 ![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
-
-``` r
-count_objects(img, marker = "text")
-```
-
-![](man/figures/README-unnamed-chunk-6-2.png)<!-- -->
-
-    # 
-    # --------------------------------------------
-    # Number of objects: 30 
-    # --------------------------------------------
-    #  statistics       area   perimeter
-    #         min  1366.0000  117.000000
-    #        mean  2057.3667  146.600000
-    #         max  2445.0000  158.000000
-    #          sd   230.5574    8.406073
-    #         sum 61721.0000 4398.000000
 
 `pliman` takes the advantage of several powerful functions from [EBImage
 package](https://bioconductor.org/packages/release/bioc/html/EBImage.html).

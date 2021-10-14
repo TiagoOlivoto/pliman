@@ -48,7 +48,19 @@
 
 <meta property="og:title" content="Utilities for image resolution — utils_dpi" />
 <meta property="og:description" content="Provides useful conversions between size (cm), number of pixels (px) and
-resolution (dpi)" />
+dots per inch (dpi).
+dpi_to_cm() converts a known dpi value to centimeters.
+cm_to_dpi() converts a known centimeter values to dpi.
+pixels_to_cm() converts the number of pixels to centimeters, given a
+known resolution (dpi).
+cm_to_pixels() converts a distance (cm) to number of pixels, given a
+known resolution (dpi).
+dpi() An interactive function to compute the image resolution given a
+known distance informed by the user. See more information in the Details
+section.
+npixels() returns the number of pixels of an image.
+
+" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -91,7 +103,7 @@ resolution (dpi)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -99,7 +111,7 @@ resolution (dpi)" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
     Home
   </a>
@@ -112,19 +124,19 @@ resolution (dpi)" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/operations.html">Image Operations</a>
-    </li>
-    <li>
       <a href="../articles/manipulation.html">Image manipulation</a>
     </li>
     <li>
       <a href="../articles/segmentation.html">Image segmentation</a>
     </li>
     <li>
-      <a href="../articles/count_objects.html">Count objects in an image</a>
+      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
     </li>
     <li>
       <a href="../articles/leaf_area.html">Measure leaf area</a>
+    </li>
+    <li>
+      <a href="../articles/phytopatometry.html">Phytopatometry</a>
     </li>
   </ul>
 </li>
@@ -201,7 +213,19 @@ resolution (dpi)" />
 
     <div class="ref-description">
     <p>Provides useful conversions between size (cm), number of pixels (px) and
-resolution (dpi)</p>
+dots per inch (dpi).</p><ul>
+<li><p><code>dpi_to_cm()</code> converts a known dpi value to centimeters.</p></li>
+<li><p><code>cm_to_dpi()</code> converts a known centimeter values to dpi.</p></li>
+<li><p><code>pixels_to_cm()</code> converts the number of pixels to centimeters, given a
+known resolution (dpi).</p></li>
+<li><p><code>cm_to_pixels()</code> converts a distance (cm) to number of pixels, given a
+known resolution (dpi).</p></li>
+<li><p><code>dpi()</code> An interactive function to compute the image resolution given a
+known distance informed by the user. See more information in the <strong>Details</strong>
+section.</p></li>
+<li><p><code>npixels()</code> returns the number of pixels of an image.</p></li>
+</ul>
+
     </div>
 
     <pre class="usage"><span class='fu'>dpi_to_cm</span><span class='op'>(</span><span class='va'>dpi</span><span class='op'>)</span>
@@ -210,7 +234,11 @@ resolution (dpi)</p>
 
 <span class='fu'>pixels_to_cm</span><span class='op'>(</span><span class='va'>px</span>, <span class='va'>dpi</span><span class='op'>)</span>
 
-<span class='fu'>cm_to_pixels</span><span class='op'>(</span><span class='va'>cm</span>, <span class='va'>dpi</span><span class='op'>)</span></pre>
+<span class='fu'>cm_to_pixels</span><span class='op'>(</span><span class='va'>cm</span>, <span class='va'>dpi</span><span class='op'>)</span>
+
+<span class='fu'>npixels</span><span class='op'>(</span><span class='va'>image</span><span class='op'>)</span>
+
+<span class='fu'>dpi</span><span class='op'>(</span><span class='va'>image</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -227,12 +255,28 @@ resolution (dpi)</p>
       <th>px</th>
       <td><p>The number of pixels.</p></td>
     </tr>
+    <tr>
+      <th>image</th>
+      <td><p>An image object.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A numeric value or a vector of numeric values if the input data is a
-vector</p>
+    
+<ul>
+<li><p><code>dpi_to_cm()</code>, <code>cm_to_dpi()</code>, <code>pixels_to_cm()</code>, and <code>cm_to_pixels()</code> return
+a numeric value or a vector of numeric values if the input data is a vector.</p></li>
+<li><p><code>dpi()</code> returns the computed dpi (dots per inch) given the known distance
+informed in the plot.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>dpi()</code> only run in an interactive section. To compute the image
+resolution (dpi) the user must use the left button mouse to create a line
+of known distance. This can be done, for example, using a template with
+known distance in the image (e.g., <code>la_leaves.JPG</code>).</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
@@ -250,7 +294,25 @@ vector</p>
 </div><div class='output co'>#&gt; [1]  37.79528  75.59055 113.38583</div><div class='input'>
 <span class='co'># Convert number of pixels to cm with resolution of 96 dpi.</span>
 <span class='fu'>pixels_to_cm</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='fl'>96</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.02645833 0.05291667 0.07937500</div></pre>
+</div><div class='output co'>#&gt; [1] 0.02645833 0.05291667 0.07937500</div><div class='input'>
+<span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Logic.html'>isTRUE</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+<span class='co'>#### compute the dpi (dots per inch) resolution ####</span>
+<span class='co'># only works in an interactive section</span>
+<span class='co'># objects_300dpi.jpg has a known resolution of 300 dpi</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"objects_300dpi.jpg"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># Higher square: 10 x 10 cm</span>
+<span class='co'># 1) Run the function dpi()</span>
+<span class='co'># 2) Use the left mouse button to create a line in the higher square</span>
+<span class='co'># 3) Declare a known distance (10 cm)</span>
+<span class='co'># 4) See the computed dpi</span>
+<span class='fu'>dpi</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
+
+
+<span class='va'>img2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"la_leaves.JPG"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># square leaf sample (2 x 2 cm)</span>
+<span class='fu'>dpi</span><span class='op'>(</span><span class='va'>img2</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

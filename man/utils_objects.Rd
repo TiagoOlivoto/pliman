@@ -3,6 +3,7 @@
 \name{utils_objects}
 \alias{utils_objects}
 \alias{object_coord}
+\alias{object_contour}
 \alias{object_isolate}
 \alias{object_id}
 \title{Utilities for working with image objects}
@@ -14,6 +15,18 @@ object_coord(
   invert = FALSE,
   fill_hull = FALSE,
   edge = 2,
+  extension = NULL,
+  tolerance = NULL,
+  object_size = "medium",
+  show_image = TRUE
+)
+
+object_contour(
+  image,
+  index = "NB",
+  invert = FALSE,
+  fill_hull = FALSE,
+  watershed = TRUE,
   extension = NULL,
   tolerance = NULL,
   object_size = "medium",
@@ -49,6 +62,12 @@ objects in the image. See \code{\link[=analyze_objects]{analyze_objects()}} for 
 \item{show_image}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
 
+\item{watershed}{If \code{TRUE} (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If \code{FALSE}, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.}
+
 \item{...}{\itemize{
 \item For \code{object_isolate()}, further arguments passed on to \code{\link[=object_coord]{object_coord()}}.
 \item For \code{object_id()}, further arguments passed on to \code{\link[=analyze_objects]{analyze_objects()}}.
@@ -70,6 +89,8 @@ object.
 \item \code{object_id()} get the object identification in an image.
 \item \code{object_coord()} get the object coordinates and (optionally) draw a
 bounding rectangle around multiple objects in an image.
+\item \code{object_contour()} returns the coordinates (\code{x} and \code{y}) for the contours
+of each object in the image.
 \item \code{object_isolate()} isolates an object from an image.
 }
 }
@@ -86,5 +107,6 @@ object_coord(img, id = c(1, 3))
 # Isolate leaf 3
 isolated <- object_isolate(img, id = 3)
 plot(isolated)
+
 }
 }

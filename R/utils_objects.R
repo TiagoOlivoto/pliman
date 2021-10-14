@@ -3,6 +3,8 @@
 #' * `object_id()` get the object identification in an image.
 #' * `object_coord()` get the object coordinates and (optionally) draw a
 #' bounding rectangle around multiple objects in an image.
+#' * `object_contour()` returns the coordinates (`x` and `y`) for the contours
+#' of each object in the image.
 #' * `object_isolate()` isolates an object from an image.
 #' @name utils_objects
 #' @param image An image of class `Image`.
@@ -16,6 +18,11 @@
 #'   rectangle coordinates. See [image_binary()] for more details.
 #' @param invert Inverts the binary image, if desired. Defaults to `FALSE`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
+#' @param watershed If `TRUE` (default) performs watershed-based object
+#'   detection. This will detect objects even when they are touching one other.
+#'   If `FALSE`, all pixels for each connected set of foreground pixels are set
+#'   to a unique object. This is faster but is not able to segment touching
+#'   objects.
 #' @param edge The number of pixels in the edge of the bounding rectangle.
 #'   Defaults to `2`.
 #' @param extension,tolerance,object_size Controls the watershed segmentation of
@@ -47,6 +54,7 @@
 #' # Isolate leaf 3
 #' isolated <- object_isolate(img, id = 3)
 #' plot(isolated)
+#'
 #' }
 object_coord <- function(image,
                          id =  NULL,
@@ -139,6 +147,49 @@ object_coord <- function(image,
               row_min = coord$row_min,
               row_max = coord$row_max))
 
+}
+#' @name utils_objects
+#' @export
+#'
+object_contour <- function(image,
+                           index = "NB",
+                           invert = FALSE,
+                           fill_hull = FALSE,
+                           watershed = TRUE,
+                           extension = NULL,
+                           tolerance = NULL,
+                           object_size = "medium",
+                           show_image = TRUE){
+  check_ebi()
+  img2 <- image_binary(image,
+                       index = index,
+                       invert = invert,
+                       fill_hull = fill_hull,
+                       show_image = FALSE,
+                       resize = FALSE)[[1]]
+  if(isTRUE(watershed)){
+    res <- length(img2)
+    parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+    parms2 <- parms[parms$object_size == object_size,]
+    rowid <-
+      which(sapply(as.character(parms2$resolution), function(x) {
+        eval(parse(text=x))}))
+    ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+    tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+    nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                tolerance = tol,
+                                ext = ext)
+  } else{
+    nmask <- EBImage::bwlabel(img2)
+  }
+  contour <- EBImage::ocontour(nmask)
+  dims <- sapply(contour, function(x){dim(x)[1]})
+  contour <- contour[which(dims > mean(dims * 0.1))]
+  if(isTRUE(show_image)){
+    plot(image)
+    plot_contour(contour, col = "red")
+  }
+  return(lapply(contour, function(x){data.frame(x)}))
 }
 #' @name utils_objects
 #' @export

@@ -25,16 +25,16 @@ navbar:
       href: index.html
     - text: "Examples"
       menu:
-      - text: "Image Operations"
-        href: articles/operations.html
       - text: "Image manipulation"
         href: articles/manipulation.html
       - text: "Image segmentation"
         href: articles/segmentation.html
-      - text: "Count objects in an image"
-        href: articles/count_objects.html
+      - text: "Analyze objects in an image"
+        href: articles/analyze_objects.html
       - text: "Measure leaf area"
         href: articles/leaf_area.html
+      - text: "Phytopatometry"
+        href: articles/phytopatometry.html
     - text: "Functions"
       href: reference/index.html
     - text: News
@@ -73,6 +73,7 @@ reference:
     desc: "Performs spatial transformations such as rotation, reflection, and resizing"
     contents:
       - utils_transform
+      - rgb_to_hsv
 
   - title: "Utilities for files"
     desc: "Provides utilities for manipulating files"
@@ -98,16 +99,19 @@ reference:
       - plot.image_index
 
 
-  - title: "Count objects"
-    desc: "Count objects in an image"
+  - title: "Analyze objects"
+    desc: "Analyze objects in an image"
     contents:
+      - analyze_objects
       - count_lesions
       - count_objects
       - utils_measures
       - objects_rgb
       - pliman_images
       - utils_objects
-      - plot.objects_rgb
+      - tune_tolerance
+      - plot.anal_obj
+      - utils_polygon
 
 
   - title: "Leaf area"
@@ -119,4 +123,5 @@ reference:
   - title: "Symptomatic area"
     desc: "Calculates the percentage of symptomatic leaf area based in a sample or entire leaf based on provided color palettes samples"
     contents:
+      - measure_disease
       - symptomatic_area

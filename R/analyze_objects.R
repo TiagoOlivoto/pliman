@@ -45,6 +45,11 @@
 #' @param workers A positive numeric scalar or a function specifying the number
 #'   of parallel processes that can be active at the same time. By default, the
 #'   number of sections is set up to 50% of available cores.
+#' @param watershed If `TRUE` (default) performs watershed-based object
+#'   detection. This will detect objects even when they are touching one other.
+#'   If `FALSE`, all pixels for each connected set of foreground pixels are set
+#'   to a unique object. This is faster but is not able to segment touching
+#'   objects.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
@@ -105,8 +110,12 @@
 #'   2000.
 #' @param show_image Show image after processing?
 #' @param show_original Show the count objects in the original image?
+#' @param show_chull Show the convex hull around the objects? Defaults to
+#'   `FALSE`.
 #' @param show_contour Show a contour line around the objects? Defaults
-#'   to `FALSE`.
+#'   to `TRUE`.
+#' @param contour_col,contour_size The color and size for the contour line
+#'   around objects. Defaults to `contour_col = "red"` and `contour_size = 1`.
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
@@ -176,6 +185,7 @@ analyze_objects <- function(img,
                             img_pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
+                            watershed = TRUE,
                             resize = FALSE,
                             trim = FALSE,
                             fill_hull = FALSE,
@@ -198,7 +208,10 @@ analyze_objects <- function(img,
                             nrows = 2000,
                             show_image = TRUE,
                             show_original = TRUE,
+                            show_chull = FALSE,
                             show_contour = TRUE,
+                            contour_col = "red",
+                            contour_size = 1,
                             show_background = TRUE,
                             show_segmentation = FALSE,
                             col_foreground = NULL,
@@ -308,17 +321,21 @@ analyze_objects <- function(img,
         foreground_background <- image_correct(foreground_background, perc = 0.02)
         ID <- c(foreground_background == 1)
         ID2 <- c(foreground_background == 0)
-        parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-        res <- length(foreground_background)
-        parms2 <- parms[parms$object_size == object_size,]
-        rowid <-
-          which(sapply(as.character(parms2$resolution), function(x) {
-            eval(parse(text=x))}))
-        ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-        tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
-                                    tolerance = tol,
-                                    ext = ext)
+        if(isTRUE(watershed)){
+          parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+          res <- length(foreground_background)
+          parms2 <- parms[parms$object_size == object_size,]
+          rowid <-
+            which(sapply(as.character(parms2$resolution), function(x) {
+              eval(parse(text=x))}))
+          ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+          tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+          nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
+                                      tolerance = tol,
+                                      ext = ext)
+        } else{
+          nmask <- EBImage::bwlabel(foreground_background)
+        }
       } else{
         img2 <- image_binary(img,
                              index = index,
@@ -328,17 +345,21 @@ analyze_objects <- function(img,
                              threshold = threshold,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
-        parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-        res <- length(img2)
-        parms2 <- parms[parms$object_size == object_size,]
-        rowid <-
-          which(sapply(as.character(parms2$resolution), function(x) {
-            eval(parse(text=x))}))
-        ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-        tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-        nmask <- EBImage::watershed(EBImage::distmap(img2),
-                                    tolerance = tol,
-                                    ext = ext)
+        if(isTRUE(watershed)){
+          parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+          res <- length(img2)
+          parms2 <- parms[parms$object_size == object_size,]
+          rowid <-
+            which(sapply(as.character(parms2$resolution), function(x) {
+              eval(parse(text=x))}))
+          ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+          tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+          nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                      tolerance = tol,
+                                      ext = ext)
+        } else{
+          nmask <- EBImage::bwlabel(img2)
+        }
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
       }
@@ -346,34 +367,42 @@ analyze_objects <- function(img,
         cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
               data.frame(EBImage::computeFeatures.moment(nmask))
         )
+      object_contour <- EBImage::ocontour(nmask)
+      ch <- conv_hull(object_contour)
+      area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
+      shape <- transform(shape,
+                         id = 1:nrow(shape),
+                         radius_ratio = s.radius.max / s.radius.min,
+                         area_ch =   area_ch,
+                         solidity = s.area / area_ch,
+                         circularity = 4*pi*(s.area / s.perimeter^2))
+      shape <- shape[, c(12, 7, 8, 1, 14, 2, 3, 5:6, 4, 13, 9:11, 15, 16)]
+      colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter",
+                           "radius_mean",
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio",
+                           "major_axis", "eccentricity", "theta", "solidity", "circularity")
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
       }
       ifelse(!is.null(lower_size),
-             shape <- shape[shape$s.area > lower_size, ],
-             shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
+             shape <- shape[shape$area > lower_size, ],
+             shape <- shape[shape$area > mean(shape$area) * 0.1, ])
       if(!is.null(upper_size)){
-        shape <- shape[shape$s.area < upper_size, ]
+        shape <- shape[shape$area < upper_size, ]
       }
       if(!is.null(topn_lower)){
-        shape <- shape[order(shape$s.area),][1:topn_lower,]
+        shape <- shape[order(shape$area),][1:topn_lower,]
       }
       if(!is.null(topn_upper)){
-        shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
+        shape <- shape[order(shape$area, decreasing = TRUE),][1:topn_upper,]
       }
       if(!is.null(lower_eccent)){
-        shape <- shape[shape$m.eccentricity > lower_eccent, ]
+        shape <- shape[shape$eccentricity > lower_eccent, ]
       }
       if(!is.null(upper_eccent)){
-        shape <- shape[shape$m.eccentricity < upper_eccent, ]
+        shape <- shape[shape$eccentricity < upper_eccent, ]
       }
-      shape <- transform(shape,
-                         id = 1:nrow(shape),
-                         radius_ratio = s.radius.max / s.radius.min)
-      shape <- shape[, c(12, 7, 8, 1:3, 5:6, 4, 13, 9:11)]
-      colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd", "radius_ratio",
-                           "major_axis", "eccentricity", "theta")
+      object_contour <- object_contour[shape$id]
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
@@ -426,11 +455,6 @@ analyze_objects <- function(img,
                       object_rgb = object_rgb)
       class(results) <- "anal_obj"
       if(show_image == TRUE | save_image == TRUE){
-        if(isTRUE(show_contour)){
-          object_contour <- EBImage::ocontour(nmask)
-          per <- as.numeric(do.call(rbind, lapply(object_contour, function(x)dim(x)))[,1])
-          object_contour <- object_contour[per %in% shape$perimeter]
-        }
         backg <- !is.null(col_background)
         col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
         col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
@@ -491,7 +515,10 @@ analyze_objects <- function(img,
                    cex = marker_size)
             }
             if(isTRUE(show_contour)){
-              plot_contour(object_contour, col = marker_col, lwd = 1)
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
+            }
+            if(isTRUE(show_chull)){
+              plot_contour(ch, col = "black")
             }
           } else{
             plot(im2)
@@ -503,7 +530,7 @@ analyze_objects <- function(img,
                      cex = marker_size)
             }
             if(isTRUE(show_contour)){
-              plot_contour(object_contour, col = marker_col, lwd = 1)
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
         }
@@ -527,7 +554,7 @@ analyze_objects <- function(img,
                    cex = marker_size)
             }
             if(isTRUE(show_contour)){
-              plot_contour(object_contour, col = marker_col, lwd = 1)
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           } else{
             plot(im2)
@@ -539,7 +566,7 @@ analyze_objects <- function(img,
                    cex = marker_size)
             }
             if(isTRUE(show_contour)){
-              plot_contour(object_contour, col = marker_col, lwd = 1)
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
           dev.off()
