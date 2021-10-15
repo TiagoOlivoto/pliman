@@ -20,20 +20,27 @@ tell `pliman` what each one represents, and it takes care of the
 details. Image indexes can also be used to segment images. The package
 will help you to:
 
--   Measure leaf area with `leaf_area()`
--   Measure disease severity with `symptomatic_area()`
--   Count the number of lesions with `count_lesions()`
--   Count objects in an image with `count_objects()`
--   Get the RGB values for each object in an image with `objects_rgb()`
--   Get object measures with `get_measures()`
--   Plot object measures with `plot_measures()`
+-   Measure leaf area;
+-   Measure disease severity;
+-   Count the number of lesions;
+-   Obtain the shape of lesions;
+-   Count objects in an image;
+-   Get object features (area, perimeter, radius, circularity,
+    eccentricity, solidity);
+-   Get the RGB values for each object in an image;
+-   Get the object coordinates;
+-   Get the object contours;
+-   Get convex hulls;
+-   Isolate objects;
+-   Plot object measures.
 
-`pliman` also provides useful functions for
-[operation](https://tiagoolivoto.github.io/pliman/reference/image_combine.html),
+`pliman` also provides useful functions for image
 [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html),
+[binarization](https://tiagoolivoto.github.io/pliman/reference/image_binary.html),
+[segmentation](https://tiagoolivoto.github.io/pliman/reference/image_segment.html),
 and
-[segmentation](https://tiagoolivoto.github.io/pliman/reference/image_binary.html)
-of images. Please, visit the
+[resolution](https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html).
+Please, visit the
 [Examples](https://tiagoolivoto.github.io/pliman/index.html) page in
 `pliman` website for a detailed documentation of each function.
 
@@ -82,27 +89,20 @@ image_combine(img, healthy, symptoms, background, ncol = 4)
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-measure_disease(img = img,
-                 img_healthy = healthy,
-                 img_symptoms = symptoms,
-                 img_background = background,
-                 show_image = TRUE)
+sev <- 
+  measure_disease(img = img,
+                  img_healthy = healthy,
+                  img_symptoms = symptoms,
+                  img_background = background)
 ```
 
 ![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
-    # $severity
-    #    healthy symptomatic
-    # 1 89.31109    10.68891
-    # 
-    # $shape
-    # NULL
-    # 
-    # $statistics
-    # NULL
-    # 
-    # attr(,"class")
-    # [1] "plm_disease"
+``` r
+sev$severity
+#    healthy symptomatic
+# 1 88.82171    11.17829
+```
 
 # Count objects
 
@@ -125,7 +125,9 @@ with EBImage!
 # Getting help
 
 -   If you encounter a clear bug, please file a minimal reproducible
-    example on [github](https://github.com/TiagoOlivoto/pliman/issues)
+    example on [github](https://github.com/TiagoOlivoto/pliman/issues).
+    The package [reprex](https://reprex.tidyverse.org/) may help you
+    with that.
 
 -   Suggestions and criticisms to improve the quality and usability of
     the package are welcome!
