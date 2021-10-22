@@ -35,7 +35,7 @@
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
-#' img <- image_import(image_pliman("sev_leaf.jpg"))
+#' img <- image_pliman("sev_leaf.jpg")
 #' plot(img)
 #'
 #' # prop_segmented() will be deprecated in the future. Use image_segment_iter() instead.

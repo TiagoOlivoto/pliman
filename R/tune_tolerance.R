@@ -1,16 +1,26 @@
-#' Title here
+#' Tune tolerance parameter
+#' @description
+#' Provides options for tunning `tolerance` parameter utilized in
+#' `[analyze_objects()]` in two ways:
+#'  * Declaring the `actual` argument, an iterative algorithm will compute the
+#'  first analysis and sequentially increase the parameter `tolerance` if the
+#'  computed number of objects is greater than `actual` or reduce the parameter
+#'  `tolerance` if the computed number of objects is less than `actual`. If the
+#'  algorithm did not converge up to `maxiter` is reached, users can change the
+#'  default `extension` value.
 #'
-#' Provides tools for counting and extracting objects' features (e.g., area,
-#' perimeter, radius) in an image. See more at **Details** section.
+#'  * The second way is to create a `grid` with `tolerance` and `extension`
+#'  values. When `grid` is informed, all combinations (made by
+#'  [base::expand.grid()]) are tested and the residual from `actual` value is
+#'  plotted. Users can than find a better combination of parameters to use in
+#'  `analyze_objects()`.
 #'
-#'A binary image is first generated to segment the foreground and background.
-#'The argument index is useful to choose a proper index to segment the image.
 #'
 #' @param img The image to be analyzed.
 #' @param actual The actual number of objects.
-#' @param start_tol An starting value for tolerance.
-#' @param extension The extension value. Defaults to 1.
-#' @param grid A list with a numeric sequence for'tolerance' and 'extension'
+#' @param start_tol An starting value for tolerance. Defaults to `1`.
+#' @param extension The extension value. Defaults to `1`.
+#' @param grid A list with a numeric sequence for `tolerance` and `extension`
 #'   values. When grid is informed, all combinations are tested and the residual
 #'   from `actual` value is plotted.
 #' @param maxiter The maximum number of iterations. Default to 200.
@@ -32,13 +42,24 @@
 #' @param workers The number of multiple sections to be used in the computation.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @export
+#' @importFrom grDevices terrain.colors
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
-#' \donttest{
 #' library(pliman)
-#' }
+#' if(FALSE){
+#'  img <- image_pliman("soybean_touch.jpg")
 #'
+#'  # starts with tolerance = 1
+#'  tune_tolerance(img, actual = 30)
+#'
+#'  # Using a grid of tolerance and extension values
+#'  tune2 <-
+#'    tune_tolerance(img,
+#'                   actual = 30,
+#'                   grid = list(tolerance = seq(0, 5, by = 0.1),
+#'                               extension = 1:4), plot = TRUE)
+#'}
 tune_tolerance <- function(img,
                            actual,
                            start_tol = NULL,
@@ -53,7 +74,7 @@ tune_tolerance <- function(img,
                            invert = FALSE,
                            workers = NULL,
                            verbose = TRUE){
-  # check_ebi()
+  check_ebi()
   get_num <- function(tolerance, extension){
     bin <-
       image_binary(img,
@@ -106,11 +127,11 @@ tune_tolerance <- function(img,
       cat("Extension: ", round(extension, 4),"\n")
     }
     invisible(list(tolerance = tolerance,
-                extension = extension))
+                   extension = extension))
   } else{
     comb <- expand.grid(grid[["tolerance"]], grid[["extension"]])
     names(comb) <- c("tolerance", "extension")
-    nworkers <- ifelse(is.null(workers), trunc(detectCores()*.9), workers)
+    nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
     clust <- makeCluster(nworkers)
     clusterExport(clust,
                   varlist = c("img", "index",
@@ -135,22 +156,13 @@ tune_tolerance <- function(img,
       candidate <- comb[which.min(abs(comb$n - actual)),]
     }
     if(isTRUE(plot)){
-      # gg <-
-      ggplot(comb, aes(tolerance, extension, z = diff)) +
-        geom_raster(aes(fill = diff), interpolate = F) +
-        scale_x_continuous(expand = expansion(mult = 0))+
-        scale_y_continuous(expand = expansion(mult = 0)) +
-        scale_fill_gradient2(low = "red", mid = "green", high = "blue") +
-        guides(fill = guide_colourbar(label = TRUE,
-                                      draw.ulim = TRUE,
-                                      draw.llim = TRUE,
-                                      frame.colour = "black",
-                                      ticks = TRUE,
-                                      title = NULL,
-                                      label.position = "right",
-                                      barwidth = 1.3,
-                                      barheight = 20,
-                                      direction = 'vertical'))
+      gg <-
+        levelplot(diff ~ tolerance * extension,
+                           data = comb,
+                           col.regions = terrain.colors(300),
+                           colorkey = list(title = "Difference",
+                                           interpolate = TRUE,
+                                           raster = TRUE))
       plot(gg)
     } else{
       gg <- NULL
@@ -160,13 +172,3 @@ tune_tolerance <- function(img,
                 plot =  gg))
   }
 }
-#
-# # # library(pliman)
-# img <- image_import("trigo.jpg")
-# # img <- image_autocrop(img)
-# # plot(img)
-# # # df <-
-# tune_tolerance(img |> image_resize(100) ,
-#                actual = 12)
-#
-

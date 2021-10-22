@@ -3,7 +3,7 @@
 #' @description
 #'Computes the percentage of symptomatic leaf area and (optionally) counts and
 #'compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-#'entire leaf . See more at **Details**.
+#'entire leaf. See more at **Details**.
 #'
 #' @details
 #'A general linear model (binomial family) fitted to the RGB values is used to
@@ -49,7 +49,7 @@
 #'   If a numeric value is informed, this value will be used as a threshold.
 #'   Inform any non-numeric value different than "Otsu" to iteratively choose
 #'   the threshold based on a raster plot showing pixel intensity of the index.
-#' @param invert Inverts the binary image, if desired. This is useful to process
+#' @param invert Inverts the binary image if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
 #'   often contain dirt and dust. To prevent dust from affecting the image
@@ -65,7 +65,7 @@
 #'   `TRUE`.
 #' @param nrows The number of lines to be used in training step. Defaults to
 #'   `3000`.
-#' @param segment If `TRUE` (Default) implements the Watershed Algorithm to
+#' @param watershed If `TRUE` (Default) implements the Watershed Algorithm to
 #'   segment lesions connected by a fairly few pixels that could be considered
 #'   as two distinct lesions. If `FALSE`, lesions that are connected by any
 #'   pixel are considered unique lesions. For more details see
@@ -95,7 +95,7 @@
 #' @param show_contour Show a contour line around the lesions? Defaults
 #'   to `TRUE`.
 #' @param contour_col,contour_size The color and size for the contour line
-#'   around objects. Defaults to `contour_col = "red"` and `contour_size = 1`.
+#'   around objects. Defaults to `contour_col = "white"` and `contour_size = 1`.
 #' @param col_leaf Leaf color after image processing. Defaults to `"green"`
 #' @param col_lesions Symptoms color after image processing. Defaults to
 #'   `"red"`.
@@ -120,25 +120,25 @@
 #'  * `severity` A data frame with the percentage of healthy and symptomatic
 #'  areas.
 #'  * `shape`,`statistics` If `show_features = TRUE` is used, returns the shape
-#'  (area, perimeter, etc.) for each lesion and a summary of the results.
+#'  (area, perimeter, etc.) for each lesion and a summary statistic of the
+#'  results.
 #' @export
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(image_pliman("sev_leaf_nb.jpg"))
-#' healthy <- image_import(image_pliman("sev_healthy.jpg"))
-#' lesions <- image_import(image_pliman("sev_sympt.jpg"))
+#' img <- image_pliman("sev_leaf_nb.jpg")
+#' healthy <- image_pliman("sev_healthy.jpg")
+#' lesions <- image_pliman("sev_sympt.jpg")
 #' image_combine(img, healthy, lesions, ncol = 3)
-#' a <-
-#' measure_disease(img = img,
-#'                 img_healthy = healthy,
-#'                 img_symptoms = lesions,
-#'                 lesion_size = "large",
-#'                 show_image = TRUE,
-#'                 segment = TRUE,
-#'                 marker = "id")
+#'
+#' sev <-
+#'  measure_disease(img = img,
+#'                  img_healthy = healthy,
+#'                  img_symptoms = lesions,
+#'                  lesion_size = "large",
+#'                  show_image = TRUE)
 #' }
 #'
 measure_disease <- function(img,
@@ -160,7 +160,7 @@ measure_disease <- function(img,
                             topn_upper = NULL,
                             randomize = TRUE,
                             nrows = 3000,
-                            segment = FALSE,
+                            watershed = FALSE,
                             lesion_size = "medium",
                             tolerance = NULL,
                             extension = NULL,
@@ -170,7 +170,7 @@ measure_disease <- function(img,
                             show_original = TRUE,
                             show_background = TRUE,
                             show_contour = TRUE,
-                            contour_col = "red",
+                            contour_col = "white",
                             contour_size = 1,
                             col_leaf = NULL,
                             col_lesions = NULL,
@@ -216,7 +216,7 @@ measure_disease <- function(img,
       }
       backg <- !is.null(col_background)
       col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
-      col_lesions <- col2rgb(ifelse(is.null(col_lesions), "red", col_lesions))
+      col_lesions <- col2rgb(ifelse(is.null(col_lesions), "black", col_lesions))
       col_leaf <- col2rgb(ifelse(is.null(col_leaf), "green", col_leaf))
       if(!is.null(img_healthy) && !is.null(img_symptoms)){
         if(is.character(img_healthy)){
@@ -275,7 +275,7 @@ measure_disease <- function(img,
               eval(parse(text=x))}))
           ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
           tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-          ifelse(segment == FALSE,
+          ifelse(watershed == FALSE,
                  nmask <- EBImage::bwlabel(plant_symp),
                  nmask <- EBImage::watershed(EBImage::distmap(plant_symp),
                                              tolerance = tol,
@@ -379,7 +379,7 @@ measure_disease <- function(img,
           if(isTRUE(fill_hull)){
             leaf_sympts <- EBImage::fillHull(leaf_sympts)
           }
-          ifelse(segment == FALSE,
+          ifelse(watershed == FALSE,
                  nmask <- EBImage::bwlabel(leaf_sympts),
                  nmask <- EBImage::watershed(EBImage::distmap(leaf_sympts),
                                              tolerance = tol,
@@ -492,7 +492,7 @@ measure_disease <- function(img,
         if(isTRUE(fill_hull)){
           img2 <- EBImage::fillHull(img2)
         }
-        ifelse(segment == FALSE,
+        ifelse(watershed == FALSE,
                nmask <- EBImage::bwlabel(img2),
                nmask <- EBImage::watershed(EBImage::distmap(img2),
                                            tolerance = tol,
@@ -601,7 +601,7 @@ measure_disease <- function(img,
       } else{
         show_mark <- FALSE
       }
-      if(isTRUE(show_contour)){
+      if(isTRUE(show_contour) & show_original == TRUE){
         ocont <- EBImage::ocontour(nmask)
       }
       if(show_image == TRUE){
@@ -614,7 +614,7 @@ measure_disease <- function(img,
                  col = marker_col,
                  cex = marker_size)
           }
-          if(isTRUE(show_contour)){
+          if(isTRUE(show_contour) & show_original == TRUE){
             plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         } else{
@@ -626,7 +626,7 @@ measure_disease <- function(img,
                    pch = 16,
                    cex = marker_size)
           }
-          if(isTRUE(show_contour)){
+          if(isTRUE(show_contour) & show_original == TRUE){
             plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         }
@@ -650,8 +650,8 @@ measure_disease <- function(img,
                  col = marker_col,
                  cex = marker_size)
           }
-          if(isTRUE(show_contour)){
-            plot_contour(ocont, col = "white", lwd = contour_size)
+          if(isTRUE(show_contour) & show_original == TRUE){
+            plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         } else{
           plot(im2)
@@ -662,8 +662,8 @@ measure_disease <- function(img,
                    pch = 16,
                    cex = marker_size)
           }
-          if(isTRUE(show_contour)){
-            plot_contour(ocont, col = "white", lwd = contour_size)
+          if(isTRUE(show_contour) & show_original == TRUE){
+            plot_contour(ocont, col = contour_col, lwd = contour_size)
           }
         }
         dev.off()

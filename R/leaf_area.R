@@ -1,13 +1,6 @@
 #'Calculates the leaf area
 #'
-#'* `leaf_area ()` Calculates the leaf area using an image with leaves and a
-#'template with a known area. A general linear model (binomial family) fitted to
-#'the RGB values is used to first separate the leaves and template from the
-#'background and then the leaves from the template. The leaf area is then
-#'calculated for each leaf based on the pixel area. By using `img_pattern` it is
-#'possible to process several images with common pattern names that are stored
-#'in the current working directory or in the subdirectory informed in
-#'`dir_originals`.
+#'* `leaf_area ()` is deprecated. use [analyze_objects()] instead.
 #' @name leaf_area
 #' @param img The image to be analyzed.
 #' @param img_pattern A pattern of file name used to identify images to be
@@ -66,7 +59,7 @@
 #' # use analyze_objects() to compute the leaf area.
 #'
 #' library(pliman)
-#' img <- image_import(image_pliman("la_leaves.JPG"))
+#' img <- image_pliman("la_leaves.jpg")
 #' lef_area <- analyze_objects(img, marker = "id")
 #'
 #' # correct pixel to metric units using the image dpi (~84)

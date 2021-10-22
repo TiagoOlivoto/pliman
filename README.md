@@ -69,7 +69,12 @@ install the latest version of
 
 # Basic usage
 
-# Disease severity
+# Analyze objects
+
+The function `analyze_objects()` can be used to count the objects such
+as leaves, grains, pods, and pollen in an image. The following example
+counts and compute the features of soybean grains of an image with 30
+grains.
 
 ``` r
 library(pliman)
@@ -79,6 +84,26 @@ library(pliman)
 # | Type 'vignette('pliman_start')' for a short tutorial  |
 # | Visit 'https://bit.ly/pliman' for a complete tutorial |
 # |=======================================================|
+img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+soy <- analyze_objects(img, marker = "id")
+```
+
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+soy$statistics
+#        stat      value
+# 1         n    30.0000
+# 2  min_area  1366.0000
+# 3 mean_area  2057.3667
+# 4  max_area  2445.0000
+# 5   sd_area   230.5574
+# 6  sum_area 61721.0000
+```
+
+# Disease severity
+
+``` r
 img <- image_import(image_pliman("sev_leaf.jpg"))
 healthy <- image_import(image_pliman("sev_healthy.jpg"))
 symptoms <- image_import(image_pliman("sev_sympt.jpg"))
@@ -86,7 +111,7 @@ background <- image_import(image_pliman("sev_back.jpg"))
 image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 sev <- 
@@ -96,26 +121,13 @@ sev <-
                   img_background = background)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 sev$severity
 #    healthy symptomatic
-# 1 88.82171    11.17829
+# 1 89.21025    10.78975
 ```
-
-# Count objects
-
-The function `count_objects()` can be used to count the objects such as
-leaves, grains, pods, pollen in an image. In the following example, we
-will count the number of soybean grains of an image with 30 grains.
-
-``` r
-img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
-analyze_objects(img, marker = "id")
-```
-
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
 
 `pliman` takes the advantage of several powerful functions from [EBImage
 package](https://bioconductor.org/packages/release/bioc/html/EBImage.html).

@@ -8,15 +8,14 @@
 #' @param verbose Shows the name of objects declared in `...` or a numeric
 #'   sequence if a list with no names is provided. Set to `FALSE` to supress the
 #'   text.
-#' @import ggplot2
 #' @importFrom stats reshape
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return A grid with the images in `...`
 #' @examples
 #' library(pliman)
-#'img1 <- image_import(image_pliman("sev_leaf.jpg"))
-#'img2 <- image_import(image_pliman("sev_leaf_nb.jpg"))
+#'img1 <- image_pliman("sev_leaf.jpg")
+#'img2 <- image_pliman("sev_leaf_nb.jpg")
 #'image_combine(img1, img2)
 image_combine <- function(...,
                           nrow = NULL,
@@ -38,7 +37,7 @@ image_combine <- function(...,
     nrow <- ceiling(num_plots/ncol)
   }
   if (is.null(ncol)){
-    nrow <- ceiling(num_plots/ncol)
+    ncol <- ceiling(num_plots/nrow)
   }
   if (is.null(nrow)){
     nrow <- ceiling(num_plots/ncol)
@@ -50,7 +49,7 @@ image_combine <- function(...,
     plot(plots[[i]])
     if(verbose == TRUE){
       dim <- image_dimension(plots[[i]], verbose = FALSE)
-      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
     }
   }
 }
@@ -63,8 +62,10 @@ image_combine <- function(...,
 #' @param image
 #' * For `image_import()`, a character vector of file names or URLs.
 #' * For `image_export()`, an Image object, an array or a list of images.
+#' * For `image_pliman()`, a charactere value specifying the image example. See
+#' `?pliman_images` for more details.
 #' @param name An string specifying the name of the image. It can be either a
-#'   charactere with the image name (e.g., "img1") or name and extension (e.g.,
+#'   character with the image name (e.g., "img1") or name and extension (e.g.,
 #'   "img1.jpg"). If none file extension is provided, the image will be saved as
 #'   a *.jpg file.
 #' @param extension When `image` is a list, `extension` can be used to define
@@ -85,6 +86,8 @@ image_combine <- function(...,
 #'   the working directory, [getwd()]. It will overwrite (if given) the path
 #'   informed in `image` argument.
 #' @param plot Plots the image after importing? Defaults to `FALSE`.
+#' @param nrow,ncol Passed on to [image_combine()]. The number of rows and
+#'   columns to use in the composite image when `plot = TRUE`.
 #' @param ... Alternative arguments passed to the corresponding functions from
 #'   the `jpeg`, `png`, and `tiff` packages.
 #' @md
@@ -93,11 +96,13 @@ image_combine <- function(...,
 #' @return
 #' * `image_import()` returns a new `Image` object.
 #' * `image_export()` returns an invisible vector of file names.
-#' * `image_pliman()` returns a character string with the path to the example
-#' image installed with the package.
+#' * `image_pliman()` returns a new `Image` object with the example image
+#' required. If an empty call is used, the path to the `tmp_images` directory
+#' installed with the package is returned.
 #' @examples
 #' library(pliman)
-#' (full_path <- image_pliman("sev_leaf.jpg"))
+#' folder <- image_pliman()
+#' full_path <- paste0(folder, "/sev_leaf.jpg")
 #' (path <- file_dir(full_path))
 #' (file <- basename(full_path))
 #' image_import(image = full_path)
@@ -107,6 +112,8 @@ image_import <- function(image,
                          pattern = NULL,
                          path = NULL,
                          plot = FALSE,
+                         nrow = NULL,
+                         ncol = NULL,
                          img_pattern = NULL){
   if(!missing(img_pattern)){
     warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.",
@@ -138,6 +145,9 @@ image_import <- function(image,
         EBImage::readImage(x)
       })
     names(list_img) <- basename(imgs)
+    if(isTRUE(plot)){
+      image_combine(list_img, nrow = nrow, ncol = ncol)
+    }
     return(list_img)
   } else{
     img_dir <- ifelse(is.null(path), file_dir(image), path)
@@ -155,6 +165,9 @@ image_import <- function(image,
                  EBImage::readImage(img_name[x], ...)
                })
       names(ls) <- basename(img_name)
+      if(isTRUE(plot)){
+        image_combine(ls, nrow = nrow, ncol = ncol)
+      }
       return(ls)
     } else{
       img <- EBImage::readImage(img_name, ...)
@@ -240,14 +253,18 @@ image_show <- function(image){
 }
 #' @export
 #' @name utils_image
-image_pliman <- function(image){
+image_pliman <- function(image, plot = FALSE){
   path <- system.file("tmp_images", package = "pliman")
   files <- list.files(path)
   if(!missing(image)){
     if(!image %in% files){
       stop("Image not available in pliman.\nAvaliable images: ", paste(files, collapse = ", "), call. = FALSE)
     }
-    system.file(paste0("tmp_images/", image), package = "pliman")
+    im <- image_import(system.file(paste0("tmp_images/", image), package = "pliman"))
+    if(isTRUE(plot)){
+      plot(im)
+    }
+    return(im)
   } else{
     path
   }
@@ -271,6 +288,10 @@ image_pliman <- function(image){
 #' histogram equalization. See more at [EBImage::clahe()].
 #' * `image_dilate()` Performs image dilatation. See more at [EBImage::dilate()].
 #' * `image_erode()` Performs image erosion. See more at [EBImage::erode()].
+#' * `image_opening()` Performs an erosion followed by a dilation. See more at
+#' [EBImage::opening()].
+#' * `image_closing()` Performs a dilation followed by an erosion. See more at
+#' [EBImage::closing()].
 #' * `image_filter()` Performs median filtering in constant time. See more at
 #' [EBImage::medianFilter()].
 #' * `image_blur()` Performs blurring filter of images. See more at
@@ -333,7 +354,7 @@ image_pliman <- function(image){
 #' * If `image` is a list, a list of the same length will be returned.
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("sev_leaf.jpg"))
+#'img <- image_pliman("sev_leaf.jpg")
 #'plot(img)
 #'img <- image_resize(img, 50)
 #'img1 <- image_rotate(img, 45)
@@ -415,7 +436,7 @@ image_crop <- function(image,
     }
     return(res)
   } else{
-    if (!is.null(width)  | !is.null(height)) {
+    if (!is.null(width) | !is.null(height)) {
       dim <- dim(image)[1:2]
       if (!is.null(width)  & is.null(height)) {
         height <- 1:dim[2]
@@ -901,6 +922,100 @@ image_erode <- function(image,
 }
 #' @name utils_transform
 #' @export
+image_opening <- function(image,
+                          kern = NULL,
+                          size = NULL,
+                          shape = "disc",
+                          parallel = FALSE,
+                          workers = NULL,
+                          verbose = TRUE,
+                          plot = FALSE){
+  check_ebi()
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_opening, kern, size, shape)
+    } else{
+      lapply(image, image_opening, size, kern, shape)
+    }
+  } else{
+    if(is.null(kern)){
+      dim <- dim(image)
+      size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
+      size <- ifelse(size == 0, 2, size)
+      kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
+    } else{
+      kern <- kern
+    }
+    img <- EBImage::opening(image, kern)
+    if (isTRUE(plot)) {
+      plot(img)
+    }
+    return(img)
+  }
+}
+#' @name utils_transform
+#' @export
+image_closing <- function(image,
+                          kern = NULL,
+                          size = NULL,
+                          shape = "disc",
+                          parallel = FALSE,
+                          workers = NULL,
+                          verbose = TRUE,
+                          plot = FALSE){
+  check_ebi()
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_closing, kern, size, shape)
+    } else{
+      lapply(image, image_closing, size, kern, shape)
+    }
+  } else{
+    if(is.null(kern)){
+      dim <- dim(image)
+      size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
+      size <- ifelse(size == 0, 2, size)
+      kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
+    } else{
+      kern <- kern
+    }
+    img <- EBImage::closing(image, kern)
+    if (isTRUE(plot)) {
+      plot(img)
+    }
+    return(img)
+  }
+}
+#' @name utils_transform
+#' @export
 image_skeleton <- function(image,
                            parallel = FALSE,
                            workers = NULL,
@@ -1115,10 +1230,8 @@ image_contrast <- function(image,
 #'
 #' @param image An image object.
 #' @param index A character value (or a vector of characters) specifying the
-#'   target mode for conversion to binary image. One of the following:  `"R"`,
-#'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
-#'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
-#'   `"BGI"`. See [image_index()] for more details.
+#'   target mode for conversion to binary image. See the available indexes with
+#'   [pliman_indexes()] and [image_index()] for more details.
 #' @param my_index User can calculate a different index using the band names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
@@ -1156,8 +1269,8 @@ image_contrast <- function(image,
 #' @importFrom utils read.csv
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("soybean_touch.jpg"))
-#'image_binary(img, index = c("R, NR"), nrow = 1)
+#'img <- image_pliman("soybean_touch.jpg")
+#'image_binary(img, index = c("R, G"))
 image_binary <- function(image,
                          index = NULL,
                          my_index = NULL,
@@ -1241,25 +1354,14 @@ image_binary <- function(image,
                     times = names(pixels)[1:ncol(pixels)-1])
           pixels$y <- as.numeric(pixels$y)
           p <-
-            ggplot(pixels, aes(id, y)) +
-            geom_raster(aes(fill = value)) +
-            scale_x_continuous(expand = expansion(mult = 0))+
-            scale_y_continuous(expand = expansion(mult = 0)) +
-            labs(x = NULL, y = NULL) +
-            scale_fill_gradient(low = "blue", high = "red") +
-            theme(axis.text = element_text(size = 12, color = "black"),
-                  axis.ticks.length = unit(0.2, "cm")) +
-            guides(fill = guide_colourbar(label = TRUE,
-                                          draw.ulim = TRUE,
-                                          draw.llim = TRUE,
-                                          frame.colour = "black",
-                                          ticks = TRUE,
-                                          ticks.colour = "black",
-                                          title = NULL,
-                                          label.position = "right",
-                                          barwidth = 1.3,
-                                          barheight = 20,
-                                          direction = 'vertical'))
+            levelplot(value ~ id * y,
+                      data = pixels,
+                      xlab = NULL,
+                      ylab = NULL,
+                      useRaster = TRUE,
+                      col.regions = terrain.colors(300),
+                      colorkey = list(interpolate = TRUE,
+                                      raster = TRUE))
           plot(p)
           threshold <- readline("Selected threshold: ")
         }
@@ -1298,7 +1400,7 @@ image_binary <- function(image,
         plot(imgs[[i]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
         }
       }
     }
@@ -1308,45 +1410,50 @@ image_binary <- function(image,
 
 #' Image indexes
 #'
-#' Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+#' `image_index()` Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+#'
 #' @details
 #' The following indexes are available in pliman.
 #'
-#'  | Index | Equation                   | Band |
-#'  |-------|----------------------------|------|
-#'  | R     | R                          | C    |
-#'  | G     | G                          | C    |
-#'  | B     | B                          | C    |
-#'  | NR    | R/(R+G+B)                  | C    |
-#'  | NG    | G/(R+G+B)                  | C    |
-#'  | NB    | B/(R+G+B)                  | C    |
-#'  | GB    | G/B                        | C    |
-#'  | RB    | R/B                        | C    |
-#'  | GR    | G/R                        | C    |
-#'  | BI    | sqrt((R^2+G^2+B^2)/3)      | C    |
-#'  | BIM   | sqrt((R*2+G*2+B*2)/3)      | C    |
-#'  | SCI   | (R-G)/(R+G)                | C    |
-#'  | GLI   | (2*G-R-B)/(2*G+R+B)        | C    |
-#'  | HI    | (2*R-G-B)/(G-B)            | C    |
-#'  | NDGRI | (G-R)/(G+R)                | C    |
-#'  | NDGBI | (G-B)/(G+B)                | C    |
-#'  | NDRBI | (R-B)/(R+B)                | C    |
-#'  | I     | R+G+B                      | C    |
-#'  | S     | ((R+G+B)-3*B)/(R+G+B)      | C    |
-#'  | L     | R+G+B/3                    | C    |
-#'  | VARI  | (G-R)/(G+R-B)              | C    |
-#'  | HUE   | atan(2*(B-G-R)/30.5*(G-R)) | C    |
-#'  | HUE2  | atan(2*(R-G-R)/30.5*(G-B)) | C    |
-#'  | BGI   | B/G                        | C    |
+#' * `R` red
+#' * `G` green
+#' * `B` blue
+#' * `NR` normalized red `R/(R+G+B)`.
+#' * `NG` normalized green `G/(R+G+B)`
+#' * `NB` normalized blue `B/(R+G+B)`
+#' * `GB` green blue ratio `G/B`
+#' * `RB` red blue ratio `R/B`
+#' * `GR` green red ratio `G/R`
+#' * `BI` brightness Index `sqrt((R^2+G^2+B^2)/3)`
+#' * `BIM` brightness Index 2 `sqrt((R*2+G*2+B*2)/3)`
+#' * `SCI` Soil Colour Index `(R-G)/(R+G)`
+#' * `GLI` Green leaf index Vis Louhaichi et al. (2001) `(2*G-R-B)/(2*G+R+B)`
+#' * `HI` Primary colours Hue Index    (2*R-G-B)/(G-B)
+#' * `NDGRI` Normalized green red difference index (Tucker, 1979) `(G-R)/(G+R)`
+#' * `NDGBI` Normalized green blue difference index `(G-B)/(G+B)`
+#' * `NDRBI` Normalized red blue difference index `(R-B)/(R+B)`
+#' * `I`     R+G+B
+#' * `S`     ((R+G+B)-3*B)/(R+G+B)
+#' * `L`     R+G+B/3
+#' * `VARI` A Visible Atmospherically Resistant Index `(G-R)/(G+R-B)`
+#' * `HUE` Overall Hue Index `atan(2*(B-G-R)/30.5*(G-R))`
+#' * `HUE2`  atan(2*(R-G-R)/30.5*(G-B))
+#' * `BGI`   B/G
+#' * `GRAY`	`0.299*R + 0.587*G + 0.114*B`
+#' * `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
+#' * `GRVI` Green-Red Vegetation Index (G-R)/(G+R)
+#' * `CI` Coloration Index `(R-B)/R`
+#' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
+#' * `SHP` Shape Index `2*(R-G-B)/(G-B)`
+#' * `RI` Redness Index `R**2/(B*G**3)`
+#'
 #' @name image_index
 #' @param image An image object.
 #' @param index A character value (or a vector of characters) specifying the
-#'   target mode for conversion to binary image. One of the following:  `"R"`,
-#'   `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`, `"BIM"`, `"SCI"`,
-#'   `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`, `"HUE2"`, `"BGI"`,
-#'   `"BGI"`. Defaults to `NULL` ((normalized) Red, Green and Blue).  One can
-#'   also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
-#'   indexes.
+#'   target mode for conversion to binary image. Use [pliman_indexes()] or the
+#'   `details` section to see the available indexes.  Defaults to `NULL`
+#'   ((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
+#'   "NRGB" for normalized RGB, or "all" for all indexes.
 #' @param my_index User can calculate a different index using the bands names,
 #'   e.g. `my_index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `30`, which
@@ -1376,8 +1483,8 @@ image_binary <- function(image,
 #'   number of indexes used.
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("soybean_touch.jpg"))
-#'image_index(img, c("R, NR"), nrow = 1)
+#'img <- image_pliman("soybean_touch.jpg")
+#'image_index(img, index = c("R, NR"))
 image_index <- function(image,
                         index = NULL,
                         my_index = NULL,
@@ -1444,8 +1551,6 @@ image_index <- function(image,
         if(is.null(my_index) & !indx %in% ind$Index){
           stop(paste("Index '",indx,"' is not available in pliman",sep = ""), call. = FALSE)
         }
-        # frames <- EBImage::getFrames(image)
-        # num_band <- length(frames)
         R <- try(image@.Data[,,1], TRUE)
         G <- try(image@.Data[,,2], TRUE)
         B <- try(image@.Data[,,3], TRUE)
@@ -1494,7 +1599,7 @@ image_index <- function(image,
         plot(imgs[[i]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
         }
       }
     }
@@ -1505,29 +1610,33 @@ image_index <- function(image,
 
 #' Plots an `image_index` object
 #'
-#' Produces an histogram of an `image_index` object
+#' `plot.image_index()` produces an histogram of an `image_index` object
 #'
 #' @name image_index
 #' @param x An object of class `image_index`.
 #' @param type The type of plot. Use `type = "raster"` (default) to produce a
 #'   raster plot showing the intensity of the pixels for each image index or
 #'   `type = "hist"` to produce a histogram with the pixels' intensity.
-#' @param facet Shows RGB values as a facet plot? Defaults to `TRUE`.
+#' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
+#'   `NULL`, i.e., a square grid is produced.
 #' @param ... Currently not used
 #' @method plot image_index
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
-#' @return A `ggplot` object containing the distribution of the pixels for each
+#' @return A `trellis` object containing the distribution of the pixels for each
 #'   index.
 #' @examples
 #' library(pliman)
-#' img <- image_import(image_pliman("sev_leaf.jpg"))
+#' img <- image_pliman("sev_leaf.jpg")
+#'
 #' # A half size of the original image
 #' ind <- image_index(img)
 #' plot(ind)
 plot.image_index <- function(x,
                              type = "raster",
-                             facet = TRUE, ...){
+                             nrow = NULL,
+                             ncol = NULL,
+                             ...){
   if(!type %in% c("raster", "hist")){
     stop("`type` must be one of the 'raster' or 'hist'. ")
   }
@@ -1556,16 +1665,25 @@ plot.image_index <- function(x,
                 direction = "long")
     }
     a$Spectrum <- factor(a$Spectrum, levels = names(x))
+    num_plots <- nlevels(a$Spectrum)
+    if (is.null(nrow) && is.null(ncol)){
+      ncol <- ceiling(sqrt(num_plots))
+      nrow <- ceiling(num_plots/ncol)
+    }
+    if (is.null(ncol)){
+      ncol <- ceiling(num_plots/nrow)
+    }
+    if (is.null(nrow)){
+      nrow <- ceiling(num_plots/ncol)
+    }
     p <-
-      ggplot(a, aes(value, fill = Spectrum)) +
-      geom_density(alpha = 0.6) +
-      scale_y_continuous(expand = expansion(c(0, 0.05))) +
-      scale_x_continuous(expand = expansion(c(0, 0))) +
-      {if(facet)facet_wrap(~Spectrum, ncol = 3, scales = "free")} +
-      theme(legend.position = "bottom",
-            legend.title = element_blank(),
-            axis.ticks.length = unit(0.2, "cm"),
-            panel.grid.minor = element_blank())
+      densityplot(~value | factor(Spectrum),
+                  data = a,
+                  groups = Spectrum,
+                  scales=list(relation="free"),
+                  xlab = "Pixel value",
+                  layout = c(ncol, nrow),
+                  plot.points = FALSE)
     return(p)
   } else{
     get_pixels <- function(x, spectrum){
@@ -1590,34 +1708,30 @@ plot.image_index <- function(x,
                 get_pixels(x[i], names(x[i]))
               })
       )
+    num_plots <-length(unique(pixels$spectrum))
+    if (is.null(nrow) && is.null(ncol)){
+      ncol <- ceiling(sqrt(num_plots))
+      nrow <- ceiling(num_plots/ncol)
+    }
+    if (is.null(ncol)){
+      ncol <- ceiling(num_plots/nrow)
+    }
+    if (is.null(nrow)){
+      nrow <- ceiling(num_plots/ncol)
+    }
     p <-
-      ggplot(pixels, aes(id, y)) +
-      geom_raster(aes(fill = value)) +
-      scale_x_continuous(expand = expansion(mult = 0))+
-      scale_y_continuous(expand = expansion(mult = 0)) +
-      labs(x = NULL, y = NULL) +
-      facet_wrap(~ spectrum) +
-      scale_fill_gradient(low = "blue", high = "red") +
-      theme(axis.text = element_text(size = 12, color = "black"),
-            axis.ticks.length = unit(0.2, "cm")) +
-      guides(fill = guide_colourbar(label = TRUE,
-                                    draw.ulim = TRUE,
-                                    draw.llim = TRUE,
-                                    frame.colour = "black",
-                                    ticks = TRUE,
-                                    ticks.colour = "black",
-                                    title = NULL,
-                                    label.position = "right",
-                                    barwidth = 1.3,
-                                    barheight = 20,
-                                    direction = 'vertical'))
+      levelplot(value ~ id * y | spectrum,
+                layout = c(ncol, nrow),
+                data = pixels,
+                xlab = NULL,
+                ylab = NULL,
+                useRaster = TRUE,
+                col.regions = terrain.colors(300),
+                colorkey = list(interpolate = TRUE,
+                                raster = TRUE))
     return(p)
   }
 }
-
-
-
-
 
 
 #' Image segmentation
@@ -1633,10 +1747,8 @@ plot.image_index <- function(x,
 #' @param image An image object or a list of image objects.
 #' @param index
 #'  * For `image_segment()`, a character value (or a vector of characters)
-#'  specifying the target mode for conversion to binary image. One of the
-#'  following:  `"R"`, `"G"`, `"B"` `"GR"`, `"NR"`, `"NG"`, `"NB"`, `"BI"`,
-#'  `"BIM"`, `"SCI"`, `"GLI"`, `"HI"`, `"NGRDI"`, `"SI"`, `"VARI"`, `"HUE"`,
-#'  `"HUE2"`, `"BGI"`, `"BGI", "GRAY"`. See [image_index()] for more details.
+#'  specifying the target mode for conversion to binary image. See the available
+#'  indexes with [pliman_indexes()].  See [image_index()] for more details.
 #' * For `image_segment_iter()` a character or a vector of characters with the
 #' same length of `nseg`. It can be either an available index (described above)
 #' or any operation involving the RGB values (e.g., `"B/R+G"`).
@@ -1686,7 +1798,7 @@ plot.image_index <- function(x,
 
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+#'img <- image_pliman("soybean_touch.jpg", plot = TRUE)
 #'image_segment(img, index = c("R, G, B"))
 #'
 image_segment <- function(image,
@@ -1719,9 +1831,9 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, my_index, threshold, fill_hull, re, nir, invert, show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, my_index, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, my_index, threshold, fill_hull, re, nir, invert, show_image, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
@@ -1783,7 +1895,7 @@ image_segment <- function(image,
         plot(imgs[[i]][[1]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]][[1]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
         }
       }
     }
@@ -1820,9 +1932,9 @@ image_segment_iter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, show_image, verbose, nrow, ncol,  ...)
+      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, show_image, verbose, nrow, ncol,  ...)
     } else{
-      a <- lapply(image, image_segment_iter, nseg, index, invert, show_image, verbose, nrow, ncol, ...)
+      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, show_image, verbose, nrow, ncol, ...)
     }
     results <-
       do.call(rbind, lapply(a, function(x){
@@ -2040,7 +2152,7 @@ image_segment_iter <- function(image,
 #'   values.
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("sev_leaf.jpg"))
+#'img <- image_pliman("sev_leaf.jpg")
 #'dim(img)
 #'mat <- image_to_mat(img)
 #'dim(mat[[1]])
@@ -2102,7 +2214,7 @@ image_to_mat <- function(image,
 #' @examples
 #' \donttest{
 #' library(pliman)
-#'img <- image_import(image_pliman("sev_leaf_nb.jpg"))
+#'img <- image_pliman("sev_leaf_nb.jpg")
 #'pal <- image_palette(img, npal = 4)
 #'
 #'image_combine(pal)
@@ -2176,7 +2288,7 @@ image_palette <- function(image,
 #' @details [dpi()] only run in an interactive section. To compute the image
 #'   resolution (dpi) the user must use the left button mouse to create a line
 #'   of known distance. This can be done, for example, using a template with
-#'   known distance in the image (e.g., `la_leaves.JPG`).
+#'   known distance in the image (e.g., `la_leaves.jpg`).
 #'
 #' @name utils_dpi
 #' @param image An image object.
@@ -2210,7 +2322,7 @@ image_palette <- function(image,
 #' #### compute the dpi (dots per inch) resolution ####
 #' # only works in an interactive section
 #' # objects_300dpi.jpg has a known resolution of 300 dpi
-#' img <- image_import(image_pliman("objects_300dpi.jpg"))
+#' img <- image_pliman("objects_300dpi.jpg")
 #' # Higher square: 10 x 10 cm
 #' # 1) Run the function dpi()
 #' # 2) Use the left mouse button to create a line in the higher square
@@ -2219,7 +2331,7 @@ image_palette <- function(image,
 #' dpi(img)
 #'
 #'
-#' img2 <- image_import(image_pliman("la_leaves.JPG"))
+#' img2 <- image_pliman("la_leaves.jpg")
 #' # square leaf sample (2 x 2 cm)
 #' dpi(img2)
 #' }
@@ -2275,7 +2387,7 @@ dpi <- function(image){
 #' @return A list containing the image in the new color space.
 #' @examples
 #' library(pliman)
-#'img <- image_import(image_pliman("sev_leaf.jpg"))
+#'img <- image_pliman("sev_leaf.jpg")
 #'img2 <- rgb_to_hsv(img)
 #'image_combine(img, img2)
 rgb_to_hsv <- function(image){

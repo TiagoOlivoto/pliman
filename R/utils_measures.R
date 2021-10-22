@@ -22,6 +22,15 @@
 #' * `radius_max` The known maximum radius of the object. If the object is a
 #' square, then the `radius_max` of such object according to the Pythagorean
 #' theorem will be `L x sqrt(2) / 2` where `L` is the length of the square side.
+#' @param sep Regular expression to manage file names. The function combines in
+#'   the `merge` object the object measures (sum of area and mean of all the
+#'   other measures) of all images that share the same filename prefix, defined
+#'   as the part of the filename preceding the first hyphen (-) or underscore
+#'   (_) (no hyphen or underscore is required). For example, the measures of
+#'   images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
+#'   single image information (L1). This feature allows the user to treat
+#'   multiple images as belonging to a single sample, if desired. Defaults to
+#'   `sep = "\\_|-"`.
 #' @param digits The number of significant figures. Defaults to `2.`
 #' @param size The size of the text. Defaults to `0.9`.
 #' @param col The color of the text. Defaults to `"white"`.
@@ -50,7 +59,7 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(image_pliman("objects_300dpi.jpg"))
+#' img <- image_pliman("objects_300dpi.jpg")
 #' plot(img)
 #' # Image with four objects with a known resolution of 300 dpi
 #' # Higher square: 10 x 10 cm
@@ -83,6 +92,7 @@ get_measures <- function(object,
                          id = NULL,
                          measure = NULL,
                          dpi = NULL,
+                         sep = "\\_|-",
                          verbose = TRUE,
                          digits = 3){
   if(is.data.frame(object)){
@@ -189,11 +199,30 @@ get_measures <- function(object,
     names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:ncol(res)]))
     smr$img <- unique(res$img)
     smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
+    smr$area_sd[is.na(smr$area_sd)] <- 0
+    merg <- smr
+    merg$img = sapply(strsplit(as.character(merg$img), sep), "[", 1)
+    mergt <-
+      do.call(cbind,
+              lapply(2:ncol(merg), function(i){
+                if(i %in% 2:3){
+                  aggregate(merg[[i]] ~ img, merg, sum, na.rm = TRUE)[2]
+                } else{
+                  aggregate(merg[[i]] ~ img, merg, mean, na.rm = TRUE)[2]
+                }
+              })
+      )
+    mergt$img <- unique(merg$img)
+    mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
+    names(mergt) <- names(smr)
     smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
     res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
+    rownames(res) <- NULL
+    mergt[,3:ncol(mergt)] <- apply(mergt[,3:ncol(mergt)], 2, round, digits)
     out <-
       list(results = res,
-           summary = smr)
+           summary = smr,
+           merge = mergt)
     class(out) <- c("measures_ls")
     return(out)
   } else{

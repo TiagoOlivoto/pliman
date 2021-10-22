@@ -69,10 +69,10 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(image_pliman("sev_leaf.jpg"))
-#' healthy <- image_import(image_pliman("sev_healthy.jpg"))
-#' symptoms <- image_import(image_pliman("sev_sympt.jpg"))
-#' background <- image_import(image_pliman("sev_back.jpg"))
+#' img <- image_pliman("sev_leaf.jpg")
+#' healthy <- image_pliman("sev_healthy.jpg")
+#' symptoms <- image_pliman("sev_sympt.jpg")
+#' background <- image_pliman("sev_back.jpg")
 #' image_combine(img, healthy, symptoms,background)
 #' symptomatic_area(img = img,
 #'                  img_healthy = healthy,

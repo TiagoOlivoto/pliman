@@ -8,7 +8,7 @@
 #'
 #' @details
 #'A binary image is first generated to segment the foreground and background.
-#'The argument index is useful to choose a proper index to segment the image
+#'The argument `index` is useful to choose a proper index to segment the image
 #'(see [image_binary()] for more details). Then, the number of objects in the
 #'foreground is counted. By setting up arguments such as `lower_size`,
 #'`upper_size` it is possible to set a threshold for lower and upper sizes of
@@ -16,7 +16,11 @@
 #'pre-defined values of `tolerance` and `extension` depending on the image
 #'resolution. This will influence the watershed-based object segmentation. Users
 #'can also tune-up `tolerance` and `extension` explicitly to a better precision
-#'of watershed segmentation. If color palettes samples are provided, a general
+#'of watershed segmentation.
+#'
+#'If `watershed = FALSE` is used,
+#'
+#'If color palettes samples are provided, a general
 #'linear model (binomial family) fitted to the RGB values is used to segment
 #'fore- and background.
 #'
@@ -124,8 +128,9 @@
 #'   image processing. Defaults to `NULL`, in which `"black"`, and `"white"` are
 #'   used, respectively.
 #' @param marker,marker_col,marker_size The type, color and size of the object
-#'   marker. Defaults to `NULL`, which plots the object id. Use `marker = "point"` to show a point in each
-#'   object or `marker = FALSE` to omit object marker
+#'   marker. Defaults to `NULL`, which plots the object id. Use `marker =
+#'   "point"` to show a point in each object or `marker = FALSE` to omit object
+#'   marker.
 #' @param save_image Save the image after processing? The image is saved in the
 #'   current working directory named as `proc_*` where `*` is the image name
 #'   given in `img`.
@@ -142,7 +147,8 @@
 #'  image:
 #'     - `id`  object identification.
 #'     - `x`,`y`,  x and y coordinates for the center of mass of the object.
-#'     - `area`:  area size (in pixels).
+#'     - `area`:  area of the object (in pixels).
+#'     - `area_ch`:  the area of the convex hull around object (in pixels).
 #'     - `perimeter`: perimeter (in pixels).
 #'     - `radius_min`, `radius_mean`, and `radius_max`: The minimum, mean, and
 #'     maximum radius (in pixels), respectively.
@@ -153,6 +159,9 @@
 #'     sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
 #'     line eccentricity is 1.
 #'     - `theta`: object angle (in radians).
+#'     - `solidity`: object solidity given by `area / area_ch`.
+#'     - `circularity`: the object circularity given by \eqn{4*pi *(area /
+#'     perimeter^2)}.
 #'     - `index`: (when `object_index` is declared) the index for pixel
 #'     intensity of each object. By default, the mean value of B (blue).
 #'  * `statistics`: A data frame with the summary statistics for the area of the
@@ -160,6 +169,16 @@
 #'  * `count`: If `pattern` is used, shows the number of objects in each image.
 #'  * `object_rgb`: If `object_index` is used, returns the R, G, and B values
 #'  for each pixel of each object.
+#' @references
+#' Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
+#' remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
+#' batatas): the influence of genetics, environment, and G×E. New Phytologist,
+#' 225(5), 2183–2195. \doi{10.1111/NPH.16286}
+#'
+#' Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
+#' and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
+#' \doi{10.5951/MATHTEACHER.110.8.0631}
+#'
 #' @export
 #' @name analyze_objects
 #' @importFrom  utils install.packages
@@ -168,14 +187,18 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(image_pliman("soybean_touch.jpg"))
-#' analyze_objects(img)
+#' img <- image_pliman("soybean_touch.jpg")
+#' obj <- analyze_objects(img)
+#' obj$statistics
 #'
 #' # Enumerate the objects in the original image
-#' analyze_objects(img,
-#'                 show_segmentation = FALSE,
-#'                 marker = "id",
-#'                 marker_col = "white")
+#' # Return the top-5 grains with the largest area
+#'
+#' top <-
+#'  analyze_objects(img,
+#'                  marker = "id",
+#'                  topn_upper = 5)
+#' top$results
 #' }
 #'
 analyze_objects <- function(img,
@@ -514,7 +537,7 @@ analyze_objects <- function(img,
                    col = marker_col,
                    cex = marker_size)
             }
-            if(isTRUE(show_contour)){
+            if(isTRUE(show_contour) & isTRUE(show_original)){
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(isTRUE(show_chull)){
@@ -529,7 +552,7 @@ analyze_objects <- function(img,
                      pch = 16,
                      cex = marker_size)
             }
-            if(isTRUE(show_contour)){
+            if(isTRUE(show_contour)  & isTRUE(show_original)){
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
@@ -544,28 +567,28 @@ analyze_objects <- function(img,
                      extens_ori),
               width = dim(im2@.Data)[1],
               height = dim(im2@.Data)[2])
-          if(marker == "text"){
+          if(marker != "point"){
             plot(im2)
             if(show_mark){
-              text(shape[,2],
-                   shape[,3],
-                   shape[,1],
+              text(shape[, 2],
+                   shape[, 3],
+                   round(shape[, marker], 2),
                    col = marker_col,
                    cex = marker_size)
             }
-            if(isTRUE(show_contour)){
+            if(isTRUE(show_contour) & isTRUE(show_original)){
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           } else{
             plot(im2)
             if(show_mark){
-              text(shape[,2],
-                   shape[,3],
-                   col = marker_col,
-                   pch = 16,
-                   cex = marker_size)
+              points(shape[, 2],
+                     shape[, 3],
+                     col = marker_col,
+                     pch = 16,
+                     cex = marker_size)
             }
-            if(isTRUE(show_contour)){
+            if(isTRUE(show_contour) & isTRUE(show_original)){
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
@@ -654,7 +677,7 @@ analyze_objects <- function(img,
     if(verbose == TRUE){
       names(summ) <- c("Image", "Objects")
       cat("--------------------------------------------\n")
-      print(summ)
+      print(summ, row.names = FALSE)
       cat("--------------------------------------------\n")
       message("Done!")
 
@@ -675,18 +698,21 @@ analyze_objects <- function(img,
 #' @param x An object of class `anal_obj`.
 #' @param ... Currently not used
 #' @method plot anal_obj
+#' @importFrom lattice densityplot levelplot
 #' @export
-#' @return `plot.anal_obj()` returns a `ggplot` object containing the distribution of the pixels for each
-#'   object
+#' @return `plot.anal_obj()` returns a `trellis` object containing the
+#'   distribution of the pixels for each object
 #' @examples
 #' \donttest{
 #' library(pliman)
 #'
-#' img <- image_import(image_pliman("soy_green.jpg"))
-#' # Segment the foreground (grains) using the normalized blue index
+#' img <- image_pliman("soy_green.jpg")
+#' # Segment the foreground (grains) using the normalized blue index (NB)
 #' # Shows the average value of the blue index in each object
+#'
 #' rgb <-
 #'    analyze_objects(img,
+#'                    marker = "id",
 #'                    index = "NB", # default
 #'                    object_index = "B")
 #' plot(rgb)
@@ -706,13 +732,10 @@ plot.anal_obj <- function(x, ...){
             timevar = "Spectrum",
             times = c("r", "g", "b"))
   rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
-  ggplot(rgb, aes(value, fill = Spectrum)) +
-    geom_density(alpha = 0.6) +
-    scale_y_continuous(expand = expansion(c(0, 0.05))) +
-    scale_x_continuous(expand = expansion(c(0, 0))) +
-    facet_wrap(~object) +
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          axis.ticks.length = unit(0.2, "cm"),
-          panel.grid.minor = element_blank())
+  densityplot(~value | factor(object),
+              data = rgb,
+              groups = Spectrum,
+              par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
+              xlab = "Pixel value",
+              plot.points = FALSE)
 }

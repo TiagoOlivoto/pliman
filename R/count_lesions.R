@@ -100,9 +100,9 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' img <- image_import(image_pliman("sev_leaf_nb.jpg"))
-#' healthy <- image_import(image_pliman("sev_healthy.jpg"))
-#' lesions <- image_import(image_pliman("sev_sympt.jpg"))
+#' img <- image_pliman("sev_leaf_nb.jpg")
+#' healthy <- image_pliman("sev_healthy.jpg")
+#' lesions <- image_pliman("sev_sympt.jpg")
 #' image_combine(img, healthy, lesions, ncol = 3)
 #' a <-
 #' count_lesions(img = img,

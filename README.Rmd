@@ -65,14 +65,25 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 
 # Basic usage
+
+# Analyze objects
+The function `analyze_objects()` can be used to count the objects such as leaves, grains, pods, and pollen in an image. The following example counts and compute the features of soybean grains of an image with 30 grains.
+
+```{r}
+library(pliman)
+img <-image_pliman("soybean_touch.jpg", plot = TRUE)
+soy <- analyze_objects(img, marker = "id")
+soy$statistics
+```
+
+
 # Disease severity
 
 ```{r fig.width=12, fig.height=3}
-library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
-healthy <- image_import(image_pliman("sev_healthy.jpg"))
-symptoms <- image_import(image_pliman("sev_sympt.jpg"))
-background <- image_import(image_pliman("sev_back.jpg"))
+img <-image_pliman("sev_leaf.jpg")
+healthy <-image_pliman("sev_healthy.jpg")
+symptoms <-image_pliman("sev_sympt.jpg")
+background <-image_pliman("sev_back.jpg")
 image_combine(img, healthy, symptoms, background, ncol = 4)
 
 ```
@@ -86,16 +97,6 @@ sev <-
 
 sev$severity
 ```
-
-# Count objects
-The function `count_objects()` can be used to count the objects such as leaves, grains, pods, pollen in an image. In the following example, we will count the number of soybean grains of an image with 30 grains.
-
-```{r}
-img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
-analyze_objects(img, marker = "id")
-
-```
-
 
 `pliman` takes the advantage of several powerful functions from [EBImage package](https://bioconductor.org/packages/release/bioc/html/EBImage.html). Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!
 
