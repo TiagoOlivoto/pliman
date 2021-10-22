@@ -3,6 +3,7 @@ title: "Measure leaf area using leaf images"
 author: "Tiago Olivoto"
 date: "`r Sys.Date()`"
 always_allow_html: yes
+output: rmarkdown::html_vignette
 fig_caption: yes
 vignette: >
   %\VignetteIndexEntry{Measure leaf area using leaf images}
@@ -105,7 +106,7 @@ plot_measures(area,
 
 
 ### knowing the image resolution in dpi (dots per inch)
-When the image resolution is known, the measures in pixels obtained with `analyze_objects()` are corrected by the image resolution. The function `dpi()` can be used to compute the dpi of an image, provided that the size of any object is known. See the [dpi](#dpi) section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the `dpi` argument of `get_measures9)`.
+When the image resolution is known, the measures in pixels obtained with `analyze_objects()` are corrected by the image resolution. The function `dpi()` can be used to compute the dpi of an image, provided that the size of any object is known. See the [dpi](#dpi) section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the `dpi` argument of `get_measures()`.
 
 ```{r leaf10}
 area2 <- get_measures(count, dpi = 50.8)

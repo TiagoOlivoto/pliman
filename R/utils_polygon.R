@@ -13,7 +13,7 @@
 #' corners of a polygon, and `n` is the number of coordinates.
 #' @param x,y Coordinate vectors of points. This can be specified as two vectors
 #'   (`x` and `y`), or a 2-column matrix `x`. If `x` is a list of vector
-#'   cordinates the function will be applied to each element using
+#'   coordinates the function will be applied to each element using
 #'   [base::lapply()].
 #' @param closed If `TRUE` (default) returns the vector of points of a closed
 #'   polygon, i.e., the first point is replicated as the last one.
@@ -34,23 +34,24 @@
 #' @examples
 #' \donttest{
 #' library(pliman)
-#' library(ggplot2)
 #' # A 2 x 2 square
 #' x <- c(0, 0, 2, 2, 0)
 #' y <- c(0, 2, 2, 0, 0)
 #' df <- data.frame(x = x, y = y)
-#' p <-
-#'  ggplot(df, aes(x, y, group = 1)) +
-#'  geom_polygon(fill = "red", alpha = 0.15)
-#' p
+#' plot(df)
+#' with(df, polygon(x, y, col = "red"))
 #'
 #' poly_area(x, y)
 #' poly_area(df)
 #'
 #'# The convex hull will be the vertices of the square
 #' (conv_square <- conv_hull(df))
+#' poly_area(conv_square)
 #'
-#' p + geom_path(data = conv_square)
+#' with(conv_square,
+#'      lines(x, y,
+#'            col  = "blue",
+#'            lwd = 4))
 #'
 #'# polygon
 #' x <- c(0, 2, 2,  5, 2, -1, 0, 0)
@@ -60,11 +61,9 @@
 #'# area of the polygon
 #' poly_area(df_poly)
 #'
-#' p2 <-
-#'   ggplot(df_poly, aes(x, y, group = 1)) +
-#'   geom_path(color = "red") +
-#'   geom_point(color = "red")
-#' plot(p2)
+#' plot(df_poly, pch = 19, col = "red")
+#' with(df_poly, polygon(x, y, col = "red"))
+#'
 #'
 #'# vertices of the convex hull
 #' (conv_poly <- conv_hull(df_poly))
@@ -72,10 +71,9 @@
 #'# area of the convex hull
 #' poly_area(conv_poly)
 #'
-#' p2 +
-#'   geom_polygon(data = conv_poly,
-#'                fill = "red",
-#'                alpha = 0.15)
+#' with(conv_poly,
+#'      polygon(x, y,
+#'            col  = rgb(1, 0, 0, 0.2)))
 #' }
 conv_hull <- function(x, y = NULL, closed = TRUE){
   if(inherits(x, "list")){

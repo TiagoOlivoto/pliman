@@ -34,7 +34,7 @@ To show the first approach, first we count the number of objects and plot an obj
 
 ```{r}
 library(pliman)
-leaves <- image_import(image_pliman("la_leaves.JPG"))
+leaves <- image_pliman("la_leaves.jpg")
 plot(leaves)
 count <- analyze_objects(leaves, marker = "id")
 ```
@@ -66,10 +66,10 @@ get_measures(count, dpi = 84)
 
 # Counting crop grains 
 
-Here, we will count the grains in the image `soybean_touch.png`. This image has a cyan background and contains 30 soybean grains that touch with each other.
+Here, we will count the grains in the image `soybean_touch.jpg`. This image has a cyan background and contains 30 soybean grains that touch with each other.
 
 ```{r}
-soy <- image_import(image_pliman("soybean_touch.jpg"))
+soy <- image_pliman("soybean_touch.jpg")
 plot(soy)
 
 # Count the objects in the image
@@ -87,10 +87,10 @@ The function `measure_disease()` is used to compute the percentage of symptomati
 The next example computes the symptomatic area of a soybean leaf. The proportion of the healthy and symptomatic areas is given as the proportion of the total leaf area, after segmenting the leaf from the background (blue).
 
 ```{r}
-img <- image_import(image_pliman("sev_leaf.jpg"))
-healthy <- image_import(image_pliman("sev_healthy.jpg"))
-symptoms <- image_import(image_pliman("sev_sympt.jpg"))
-background <- image_import(image_pliman("sev_back.jpg"))
+img <- image_pliman("sev_leaf.jpg")
+healthy <- image_pliman("sev_healthy.jpg")
+symptoms <- image_pliman("sev_sympt.jpg")
+background <- image_pliman("sev_back.jpg")
 image_combine(img, healthy, symptoms,background)
 
 # Computes the symptomatic area
@@ -106,7 +106,7 @@ measure_disease(img = img,
 The function `objects_rgb()` can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for 
 
 ```{r}
-img <- image_import(image_pliman("soy_green.jpg"))
+img <- image_pliman("soy_green.jpg")
 # Segment the foreground (grains) using the normalized blue index
 # Shows the average value of the blue index in each object
 

@@ -24,7 +24,7 @@ measure_disease(
   topn_upper = NULL,
   randomize = TRUE,
   nrows = 3000,
-  segment = FALSE,
+  watershed = FALSE,
   lesion_size = "medium",
   tolerance = NULL,
   extension = NULL,
@@ -34,7 +34,7 @@ measure_disease(
   show_original = TRUE,
   show_background = TRUE,
   show_contour = TRUE,
-  contour_col = "red",
+  contour_col = "white",
   contour_size = 1,
   col_leaf = NULL,
   col_lesions = NULL,
@@ -94,7 +94,7 @@ If a numeric value is informed, this value will be used as a threshold.
 Inform any non-numeric value different than "Otsu" to iteratively choose
 the threshold based on a raster plot showing pixel intensity of the index.}
 
-\item{invert}{Inverts the binary image, if desired. This is useful to process
+\item{invert}{Inverts the binary image if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
 
 \item{lower_size}{Lower limit for size for the image analysis. Leaf images
@@ -116,7 +116,7 @@ known area or use \code{lower_limit = 0} to select all objects (not advised).}
 \item{nrows}{The number of lines to be used in training step. Defaults to
 \code{3000}.}
 
-\item{segment}{If \code{TRUE} (Default) implements the Watershed Algorithm to
+\item{watershed}{If \code{TRUE} (Default) implements the Watershed Algorithm to
 segment lesions connected by a fairly few pixels that could be considered
 as two distinct lesions. If \code{FALSE}, lesions that are connected by any
 pixel are considered unique lesions. For more details see
@@ -156,7 +156,7 @@ background is shown by default when \code{show_original = FALSE}.}
 to \code{TRUE}.}
 
 \item{contour_col, contour_size}{The color and size for the contour line
-around objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
+around objects. Defaults to \code{contour_col = "white"} and \code{contour_size = 1}.}
 
 \item{col_leaf}{Leaf color after image processing. Defaults to \code{"green"}}
 
@@ -192,13 +192,14 @@ A list with the following objects:
 \item \code{severity} A data frame with the percentage of healthy and symptomatic
 areas.
 \item \code{shape},\code{statistics} If \code{show_features = TRUE} is used, returns the shape
-(area, perimeter, etc.) for each lesion and a summary of the results.
+(area, perimeter, etc.) for each lesion and a summary statistic of the
+results.
 }
 }
 \description{
 Computes the percentage of symptomatic leaf area and (optionally) counts and
 compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-entire leaf . See more at \strong{Details}.
+entire leaf. See more at \strong{Details}.
 }
 \details{
 A general linear model (binomial family) fitted to the RGB values is used to
@@ -216,18 +217,17 @@ healthy tissues.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(image_pliman("sev_leaf_nb.jpg"))
-healthy <- image_import(image_pliman("sev_healthy.jpg"))
-lesions <- image_import(image_pliman("sev_sympt.jpg"))
+img <- image_pliman("sev_leaf_nb.jpg")
+healthy <- image_pliman("sev_healthy.jpg")
+lesions <- image_pliman("sev_sympt.jpg")
 image_combine(img, healthy, lesions, ncol = 3)
-a <-
-measure_disease(img = img,
-                img_healthy = healthy,
-                img_symptoms = lesions,
-                lesion_size = "large",
-                show_image = TRUE,
-                segment = TRUE,
-                marker = "id")
+
+sev <-
+ measure_disease(img = img,
+                 img_healthy = healthy,
+                 img_symptoms = lesions,
+                 lesion_size = "large",
+                 show_image = TRUE)
 }
 
 }

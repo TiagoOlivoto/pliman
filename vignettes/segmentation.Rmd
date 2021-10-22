@@ -61,11 +61,11 @@ Both functions segment the image based on the value of some image index, which m
 
 
 
-Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their own index with the argument `my_index`.
+Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their index with the argument `my_index`.
 
 ```{r segmentation1 }
 library(pliman)
-soy <- image_import(image_pliman("soybean_touch.jpg"))
+soy <- image_pliman("soybean_touch.jpg")
 
 ```
 
@@ -106,7 +106,7 @@ image_segment(soy,
 The function `image_segment_iter()` provides an iterative image segmentation, returning the proportions of segmented pixels. This is useful when more than one segmentation procedure is needed. Users can choose how many segmentation perform, using the argument `nseg`.
 
 ```{r segmentation5}
-seg_iter <- image_import(image_pliman("sev_leaf_nb.jpg"), plot = TRUE)
+seg_iter <- image_pliman("sev_leaf_nb.jpg", plot = TRUE)
 
 ```
 
@@ -127,7 +127,7 @@ seg2 <-
 
 ```
 
-Note that the same results can be obtainet with `image_segment_iter()` using an iterative section.
+Note that the same results can be obtained with `image_segment_iter()` using an iterative section.
 
 ```{r segmentation7, eval=FALSE}
 # Only run iteratively

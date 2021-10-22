@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Title here — tune_tolerance • pliman</title>
+<title>Tune tolerance parameter — tune_tolerance • pliman</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,22 @@
 
 
 
-<meta property="og:title" content="Title here — tune_tolerance" />
-<meta property="og:description" content="Provides tools for counting and extracting objects' features (e.g., area,
-perimeter, radius) in an image. See more at Details section." />
+<meta property="og:title" content="Tune tolerance parameter — tune_tolerance" />
+<meta property="og:description" content="Provides options for tunning tolerance parameter utilized in
+[analyze_objects()] in two ways:
+Declaring the actual argument, an iterative algorithm will compute the
+first analysis and sequentially increase the parameter tolerance if the
+computed number of objects is greater than actual or reduce the parameter
+tolerance if the computed number of objects is less than actual. If the
+algorithm did not converge up to maxiter is reached, users can change the
+default extension value.
+The second way is to create a grid with tolerance and extension
+values. When grid is informed, all combinations (made by
+base::expand.grid()) are tested and the residual from actual value is
+plotted. Users can than find a better combination of parameters to use in
+analyze_objects().
+
+" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -194,14 +207,27 @@ perimeter, radius) in an image. See more at Details section." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Title here</h1>
+    <h1>Tune tolerance parameter</h1>
     <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/tune_tolerance.R'><code>R/tune_tolerance.R</code></a></small>
     <div class="hidden name"><code>tune_tolerance.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Provides tools for counting and extracting objects' features (e.g., area,
-perimeter, radius) in an image. See more at <strong>Details</strong> section.</p>
+    <p>Provides options for tunning <code>tolerance</code> parameter utilized in
+<code>[analyze_objects()]</code> in two ways:</p><ul>
+<li><p>Declaring the <code>actual</code> argument, an iterative algorithm will compute the
+first analysis and sequentially increase the parameter <code>tolerance</code> if the
+computed number of objects is greater than <code>actual</code> or reduce the parameter
+<code>tolerance</code> if the computed number of objects is less than <code>actual</code>. If the
+algorithm did not converge up to <code>maxiter</code> is reached, users can change the
+default <code>extension</code> value.</p></li>
+<li><p>The second way is to create a <code>grid</code> with <code>tolerance</code> and <code>extension</code>
+values. When <code>grid</code> is informed, all combinations (made by
+<code><a href='https://rdrr.io/r/base/expand.grid.html'>base::expand.grid()</a></code>) are tested and the residual from <code>actual</code> value is
+plotted. Users can than find a better combination of parameters to use in
+<code><a href='analyze_objects.html'>analyze_objects()</a></code>.</p></li>
+</ul>
+
     </div>
 
     <pre class="usage"><span class='fu'>tune_tolerance</span><span class='op'>(</span>
@@ -234,15 +260,15 @@ perimeter, radius) in an image. See more at <strong>Details</strong> section.</p
     </tr>
     <tr>
       <th>start_tol</th>
-      <td><p>An starting value for tolerance.</p></td>
+      <td><p>An starting value for tolerance. Defaults to <code>1</code>.</p></td>
     </tr>
     <tr>
       <th>extension</th>
-      <td><p>The extension value. Defaults to 1.</p></td>
+      <td><p>The extension value. Defaults to <code>1</code>.</p></td>
     </tr>
     <tr>
       <th>grid</th>
-      <td><p>A list with a numeric sequence for'tolerance' and 'extension'
+      <td><p>A list with a numeric sequence for <code>tolerance</code> and <code>extension</code>
 values. When grid is informed, all combinations are tested and the residual
 from <code>actual</code> value is plotted.</p></td>
     </tr>
@@ -290,19 +316,25 @@ images with black background. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>A binary image is first generated to segment the foreground and background.
-The argument index is useful to choose a proper index to segment the image.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='co'># }</span>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
+<span class='kw'>if</span><span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>{</span>
+ <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span>
 
+ <span class='co'># starts with tolerance = 1</span>
+ <span class='fu'>tune_tolerance</span><span class='op'>(</span><span class='va'>img</span>, actual <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>
+
+ <span class='co'># Using a grid of tolerance and extension values</span>
+ <span class='va'>tune2</span> <span class='op'>&lt;-</span>
+   <span class='fu'>tune_tolerance</span><span class='op'>(</span><span class='va'>img</span>,
+                  actual <span class='op'>=</span> <span class='fl'>29</span>,
+                  grid <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>tolerance <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>5</span>, by <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>,
+                              extension <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span>, plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

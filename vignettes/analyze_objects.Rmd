@@ -24,11 +24,11 @@ knitr::opts_chunk$set(
 
 # Getting started
 
-The function `analyze_objects()` can be used to count objects in an image. Let us start with a simple example with the image `object_300dpi.png` available in the [GitHub page](https://github.com/TiagoOlivoto/pliman/tree/master/image_examples). To facilitate the image importation from this folder, a helper function `image_pliman()` is used.
+The function `analyze_objects()` can be used to count objects in an image. Let us start with a simple example with the image `object_300dpi.png` available on the [GitHub page](https://github.com/TiagoOlivoto/pliman/tree/master/image_examples). To facilitate the image importation from this folder, a helper function `image_pliman()` is used.
 
 ```{r}
 library(pliman)
-img <- image_import(image_pliman("objects_300dpi.jpg"), plot = TRUE)
+img <- image_pliman("objects_300dpi.jpg", plot = TRUE)
 ```
 
 The above image was produced with Microsoft PowerPoint. It has a known resolution of 300 dpi (dots per inch) and shows four objects
@@ -78,7 +78,7 @@ get_measures(img_res,
 
 ## Declaring the image resolution
 
-If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with `pixels_to_cm()`. This function converts the number of pixels ($px$) to cm, considering the image resolution in $dpi$, as follows: $cm = px \times (2.54/dpi)$. Since we known the number of pixels of the larger square, its perimeter in cm is given by
+If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with `pixels_to_cm()`. This function converts the number of pixels ($px$) to cm, considering the image resolution in $dpi$, as follows: $cm = px \times (2.54/dpi)$. Since we know the number of pixels of the larger square, its perimeter in cm is given by
 
 ```{r}
 # number of pixels for the highest square perimeter
@@ -95,12 +95,12 @@ get_measures(img_res, dpi = 300)
 
 # Counting crop grains 
 
-Here, we will count the grains in the image `soybean_touch.png`. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes. 
+Here, we will count the grains in the image `soybean_touch.jpg`. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes. 
 
 ```{r,fig.width=10, fig.height=5}
-soy <-        image_import(image_pliman("soybean_touch.jpg"))
-grain <-      image_import(image_pliman("soybean_grain.jpg"))
-background <- image_import(image_pliman("la_back.jpg"))
+soy <-        image_pliman("soybean_touch.jpg")
+grain <-      image_pliman("soybean_grain.jpg")
+background <- image_pliman("la_back.jpg")
 image_combine(soy, grain, background, ncol = 3)
 ```
 
@@ -174,12 +174,12 @@ analyze_objects(img = "soy",
 
 # Leaf shape
 
-The function `analyze_objects()` computes a range of object features that can be used to study leaf shape. As a motivating example, I will use the image `potato_leaves.png`, that was gathered from Gupta et al. (2020)^[Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The remarkable morphological diversity of leaf shape in sweet potato (*Ipomoea batatas*): the influence of genetics, environment, and G×E. *New Phytologist*, 225(5), 2183–2195. https://doi.org/10.1111/nph.16286]
+The function `analyze_objects()` computes a range of object features that can be used to study leaf shape. As a motivating example, I will use the image `potato_leaves.png`, which was gathered from Gupta et al. (2020)^[Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The remarkable morphological diversity of leaf shape in sweet potato (*Ipomoea batatas*): the influence of genetics, environment, and G×E. *New Phytologist*, 225(5), 2183–2195. https://doi.org/10.1111/nph.16286]
 
 
 
 ```{r potato, fig.width=10}
-potato <- image_import(image_pliman("potato_leaves.png"), plot = TRUE)
+potato <- image_pliman("potato_leaves.jpg", plot = TRUE)
 pot_meas <-
   analyze_objects(potato,
                   watershed = FALSE,
@@ -234,7 +234,7 @@ Then, the area of the convex hull can be obtained with `poly_area()`.
 ```
 
 
-## Leaves as `ggplot2` plot
+## Leaves as base plot
 
 ```{r maskpoly, fig.width=8}
 # create a data frame for contour and convex hull
@@ -250,7 +250,33 @@ df_conv <-
             transform(conv[[i]], object = names(conv[i]))
           }))
 
-# create a plot
+
+# plot the objects
+palette(c("red","blue","green"))
+with(df_cont,
+     plot(X1, X2, 
+          cex = 0.5,
+          col = object,
+          xlab = NA,
+          ylab = NA,
+          axes = F))
+with(subset(df_conv, object == 1),
+     polygon(x, y, 
+             col = rgb(1, 0, 0, 0.2),
+             border = NA))
+with(subset(df_conv, object == 2),
+     polygon(x, y, 
+             col = rgb(0, 0, 1, 0.2),
+             border = NA))
+with(subset(df_conv, object == 3),
+     polygon(x, y, 
+             col = rgb(0, 1, 0, 0.2),
+             border = NA))
+
+```
+
+Or do the same with `ggplot2`
+```{r eval=FALSE}
 library(ggplot2)
 ggplot(df_cont, aes(X1, X2, group = object)) +
   geom_polygon(aes(fill = object)) +
@@ -260,8 +286,6 @@ ggplot(df_cont, aes(X1, X2, group = object)) +
   theme_void() +
   theme(legend.position = "bottom")
 ```
-
-
 
 
 # Batch processing
@@ -280,8 +304,4 @@ list_res <-
                   workers = 8, # 8 multiple sections
                   save_image = TRUE)
 ```
-
-
-
-
 

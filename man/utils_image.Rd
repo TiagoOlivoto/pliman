@@ -14,6 +14,8 @@ image_import(
   pattern = NULL,
   path = NULL,
   plot = FALSE,
+  nrow = NULL,
+  ncol = NULL,
   img_pattern = NULL
 )
 
@@ -21,12 +23,14 @@ image_export(image, name, extension = NULL, subfolder = NULL, ...)
 
 image_show(image)
 
-image_pliman(image)
+image_pliman(image, plot = FALSE)
 }
 \arguments{
 \item{image}{\itemize{
 \item For \code{image_import()}, a character vector of file names or URLs.
 \item For \code{image_export()}, an Image object, an array or a list of images.
+\item For \code{image_pliman()}, a charactere value specifying the image example. See
+\code{?pliman_images} for more details.
 }}
 
 \item{...}{Alternative arguments passed to the corresponding functions from
@@ -45,10 +49,13 @@ informed in \code{image} argument.}
 
 \item{plot}{Plots the image after importing? Defaults to \code{FALSE}.}
 
+\item{nrow, ncol}{Passed on to \code{\link[=image_combine]{image_combine()}}. The number of rows and
+columns to use in the composite image when \code{plot = TRUE}.}
+
 \item{img_pattern}{Deprecated. Use \code{pattern} instead.}
 
 \item{name}{An string specifying the name of the image. It can be either a
-charactere with the image name (e.g., "img1") or name and extension (e.g.,
+character with the image name (e.g., "img1") or name and extension (e.g.,
 "img1.jpg"). If none file extension is provided, the image will be saved as
 a *.jpg file.}
 
@@ -64,8 +71,9 @@ exist, it will be created.}
 \itemize{
 \item \code{image_import()} returns a new \code{Image} object.
 \item \code{image_export()} returns an invisible vector of file names.
-\item \code{image_pliman()} returns a character string with the path to the example
-image installed with the package.
+\item \code{image_pliman()} returns a new \code{Image} object with the example image
+required. If an empty call is used, the path to the \code{tmp_images} directory
+installed with the package is returned.
 }
 }
 \description{
@@ -74,7 +82,8 @@ batch processing.
 }
 \examples{
 library(pliman)
-(full_path <- image_pliman("sev_leaf.jpg"))
+folder <- image_pliman()
+full_path <- paste0(folder, "/sev_leaf.jpg")
 (path <- file_dir(full_path))
 (file <- basename(full_path))
 image_import(image = full_path)

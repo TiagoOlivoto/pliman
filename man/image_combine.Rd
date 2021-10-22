@@ -25,8 +25,8 @@ Combines several images to a grid
 }
 \examples{
 library(pliman)
-img1 <- image_import(image_pliman("sev_leaf.jpg"))
-img2 <- image_import(image_pliman("sev_leaf_nb.jpg"))
+img1 <- image_pliman("sev_leaf.jpg")
+img2 <- image_pliman("sev_leaf_nb.jpg")
 image_combine(img1, img2)
 }
 \author{

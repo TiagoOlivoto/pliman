@@ -42,10 +42,8 @@ image_segment_iter(
 
 \item{index}{\itemize{
 \item For \code{image_segment()}, a character value (or a vector of characters)
-specifying the target mode for conversion to binary image. One of the
-following:  \code{"R"}, \code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"},
-\code{"BIM"}, \code{"SCI"}, \code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"},
-\code{"HUE2"}, \code{"BGI"}, \verb{"BGI", "GRAY"}. See \code{\link[=image_index]{image_index()}} for more details.
+specifying the target mode for conversion to binary image. See the available
+indexes with \code{\link[=pliman_indexes]{pliman_indexes()}}.  See \code{\link[=image_index]{image_index()}} for more details.
 \item For \code{image_segment_iter()} a character or a vector of characters with the
 same length of \code{nseg}. It can be either an available index (described above)
 or any operation involving the RGB values (e.g., \code{"B/R+G"}).
@@ -117,7 +115,7 @@ the proportions of segmented pixels.
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+img <- image_pliman("soybean_touch.jpg", plot = TRUE)
 image_segment(img, index = c("R, G, B"))
 
 }

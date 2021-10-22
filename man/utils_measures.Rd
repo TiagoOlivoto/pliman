@@ -11,6 +11,7 @@ get_measures(
   id = NULL,
   measure = NULL,
   dpi = NULL,
+  sep = "\\\\_|-",
   verbose = TRUE,
   digits = 3
 )
@@ -46,6 +47,16 @@ theorem will be \verb{L x sqrt(2) / 2} where \code{L} is the length of the squar
 }}
 
 \item{dpi}{A known resolution of the image in DPI (dots per inch).}
+
+\item{sep}{Regular expression to manage file names. The function combines in
+the \code{merge} object the object measures (sum of area and mean of all the
+other measures) of all images that share the same filename prefix, defined
+as the part of the filename preceding the first hyphen (-) or underscore
+(_) (no hyphen or underscore is required). For example, the measures of
+images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
+single image information (L1). This feature allows the user to treat
+multiple images as belonging to a single sample, if desired. Defaults to
+\code{sep = "\\\\_|-"}.}
 
 \item{verbose}{If \code{FALSE}, runs the code silently.}
 
@@ -90,7 +101,7 @@ current plot. The object identification (\code{"id"}) is drawn by default.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(image_pliman("objects_300dpi.jpg"))
+img <- image_pliman("objects_300dpi.jpg")
 plot(img)
 # Image with four objects with a known resolution of 300 dpi
 # Higher square: 10 x 10 cm

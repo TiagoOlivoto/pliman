@@ -276,7 +276,7 @@ informed in the plot.</p></li>
     <p><code>dpi()</code> only run in an interactive section. To compute the image
 resolution (dpi) the user must use the left button mouse to create a line
 of known distance. This can be done, for example, using a template with
-known distance in the image (e.g., <code>la_leaves.JPG</code>).</p>
+known distance in the image (e.g., <code>la_leaves.jpg</code>).</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
@@ -299,7 +299,7 @@ known distance in the image (e.g., <code>la_leaves.JPG</code>).</p>
 <span class='co'>#### compute the dpi (dots per inch) resolution ####</span>
 <span class='co'># only works in an interactive section</span>
 <span class='co'># objects_300dpi.jpg has a known resolution of 300 dpi</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"objects_300dpi.jpg"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"objects_300dpi.jpg"</span><span class='op'>)</span>
 <span class='co'># Higher square: 10 x 10 cm</span>
 <span class='co'># 1) Run the function dpi()</span>
 <span class='co'># 2) Use the left mouse button to create a line in the higher square</span>
@@ -308,7 +308,7 @@ known distance in the image (e.g., <code>la_leaves.JPG</code>).</p>
 <span class='fu'>dpi</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
 
 
-<span class='va'>img2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"la_leaves.JPG"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>img2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"la_leaves.jpg"</span><span class='op'>)</span>
 <span class='co'># square leaf sample (2 x 2 cm)</span>
 <span class='fu'>dpi</span><span class='op'>(</span><span class='va'>img2</span><span class='op'>)</span>
 <span class='op'>}</span>

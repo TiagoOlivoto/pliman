@@ -49,7 +49,7 @@
 <meta property="og:title" content="Performs plant disease measurements — measure_disease" />
 <meta property="og:description" content="Computes the percentage of symptomatic leaf area and (optionally) counts and
 compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-entire leaf . See more at Details." />
+entire leaf. See more at Details." />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -203,7 +203,7 @@ entire leaf . See more at Details." />
     <div class="ref-description">
     <p>Computes the percentage of symptomatic leaf area and (optionally) counts and
 compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-entire leaf . See more at <strong>Details</strong>.</p>
+entire leaf. See more at <strong>Details</strong>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>measure_disease</span><span class='op'>(</span>
@@ -226,7 +226,7 @@ entire leaf . See more at <strong>Details</strong>.</p>
   topn_upper <span class='op'>=</span> <span class='cn'>NULL</span>,
   randomize <span class='op'>=</span> <span class='cn'>TRUE</span>,
   nrows <span class='op'>=</span> <span class='fl'>3000</span>,
-  segment <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  watershed <span class='op'>=</span> <span class='cn'>FALSE</span>,
   lesion_size <span class='op'>=</span> <span class='st'>"medium"</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
   extension <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -236,7 +236,7 @@ entire leaf . See more at <strong>Details</strong>.</p>
   show_original <span class='op'>=</span> <span class='cn'>TRUE</span>,
   show_background <span class='op'>=</span> <span class='cn'>TRUE</span>,
   show_contour <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  contour_col <span class='op'>=</span> <span class='st'>"red"</span>,
+  contour_col <span class='op'>=</span> <span class='st'>"white"</span>,
   contour_size <span class='op'>=</span> <span class='fl'>1</span>,
   col_leaf <span class='op'>=</span> <span class='cn'>NULL</span>,
   col_lesions <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -324,7 +324,7 @@ the threshold based on a raster plot showing pixel intensity of the index.</p></
     </tr>
     <tr>
       <th>invert</th>
-      <td><p>Inverts the binary image, if desired. This is useful to process
+      <td><p>Inverts the binary image if desired. This is useful to process
 images with black background. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
@@ -357,7 +357,7 @@ known area or use <code>lower_limit = 0</code> to select all objects (not advise
 <code>3000</code>.</p></td>
     </tr>
     <tr>
-      <th>segment</th>
+      <th>watershed</th>
       <td><p>If <code>TRUE</code> (Default) implements the Watershed Algorithm to
 segment lesions connected by a fairly few pixels that could be considered
 as two distinct lesions. If <code>FALSE</code>, lesions that are connected by any
@@ -418,7 +418,7 @@ to <code>TRUE</code>.</p></td>
     <tr>
       <th>contour_col, contour_size</th>
       <td><p>The color and size for the contour line
-around objects. Defaults to <code>contour_col = "red"</code> and <code>contour_size = 1</code>.</p></td>
+around objects. Defaults to <code>contour_col = "white"</code> and <code>contour_size = 1</code>.</p></td>
     </tr>
     <tr>
       <th>col_leaf</th>
@@ -472,7 +472,8 @@ saved in such a directory.</p></td>
 <li><p><code>severity</code> A data frame with the percentage of healthy and symptomatic
 areas.</p></li>
 <li><p><code>shape</code>,<code>statistics</code> If <code>show_features = TRUE</code> is used, returns the shape
-(area, perimeter, etc.) for each lesion and a summary of the results.</p></li>
+(area, perimeter, etc.) for each lesion and a summary statistic of the
+results.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -494,18 +495,17 @@ healthy tissues.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf_nb.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>healthy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_healthy.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>lesions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_sympt.jpg"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf_nb.jpg"</span><span class='op'>)</span>
+<span class='va'>healthy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_healthy.jpg"</span><span class='op'>)</span>
+<span class='va'>lesions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_sympt.jpg"</span><span class='op'>)</span>
 <span class='fu'><a href='image_combine.html'>image_combine</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='va'>healthy</span>, <span class='va'>lesions</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-</div><div class='img'><img src='measure_disease-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>a</span> <span class='op'>&lt;-</span>
-<span class='fu'>measure_disease</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
-                img_healthy <span class='op'>=</span> <span class='va'>healthy</span>,
-                img_symptoms <span class='op'>=</span> <span class='va'>lesions</span>,
-                lesion_size <span class='op'>=</span> <span class='st'>"large"</span>,
-                show_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                segment <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                marker <span class='op'>=</span> <span class='st'>"id"</span><span class='op'>)</span>
+</div><div class='img'><img src='measure_disease-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='va'>sev</span> <span class='op'>&lt;-</span>
+ <span class='fu'>measure_disease</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
+                 img_healthy <span class='op'>=</span> <span class='va'>healthy</span>,
+                 img_symptoms <span class='op'>=</span> <span class='va'>lesions</span>,
+                 lesion_size <span class='op'>=</span> <span class='st'>"large"</span>,
+                 show_image <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='img'><img src='measure_disease-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 
 </div></pre>

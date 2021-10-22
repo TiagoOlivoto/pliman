@@ -184,7 +184,7 @@ one can set \code{parallel = TRUE}.
 \donttest{
 library(pliman)
 ###### deprecated use analyze_objects() instead ############
-img <- image_import(image_pliman("soybean_touch.jpg"))
+img <- image_pliman("soybean_touch.jpg")
 analyze_objects(img)
 
 }

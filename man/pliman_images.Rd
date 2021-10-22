@@ -10,10 +10,10 @@
 \item \code{la_back.jpg} A cyan palette representing the background of images
 la_pattern, la_leaves, and soybean_touch.
 \item \code{la_leaf.jpg} A sample of the leaves in \code{la_leaves}
-\item \code{la_leaves.JPG} Tree leaves with a sample of known area.
-\item \code{la_pattern.JPG} Tree leaves with a yellow sample of known area.
-\item \code{la_temp.jpg} The yellow sample of \code{la_pattern.JPG}.
+\item \code{la_leaves.jpg} Tree leaves with a sample of known area.
 \item \code{objects_300dpi.jpg} An image with 300 dpi resolution.
+\item \code{potato_leaves.jpg} Three potato leaves, which were gathered from Gupta et
+al. (2020).
 \item \code{sev_leaf.jpg} A soybean leaf with a blue background.
 \item \code{sev_leaf_nb.jpg} A soybean leaf without background.
 \item \code{sev_back.jpg} A blue palette representing the background of \code{sev_leaf}.
@@ -21,14 +21,21 @@ la_pattern, la_leaves, and soybean_touch.
 \item \code{sev_sympt.jpg} The symptomatic area \code{sev_leaf}.
 \item \code{soy_green.jpg} Soybean grains with a white background.
 \item \code{soybean_grain.jpg} A sample palette of the grains in \code{soy_green}.
-\item \code{soybean_touch.jpg} Soybean grains with a cyan background touching one each other.
+\item \code{soybean_touch.jpg} Soybean grains with a cyan background touching one each
+other.
 }
 }
 \source{
-Personal data
+Personal data, Gupta et al. (2020).
 }
 \description{
 Sample images installed with the \pkg{pliman} package
+}
+\references{
+Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S.
+(2020). The remarkable morphological diversity of leaf shape in sweet
+potato (Ipomoea batatas): the influence of genetics, environment, and G×E.
+New Phytologist, 225(5), 2183–2195. \doi{10.1111/NPH.16286}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

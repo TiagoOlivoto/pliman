@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Plant IMage Analysis</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-13</h4>
+            <h4 class="date">2021-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/pliman_start.Rmd"><code>vignettes/pliman_start.Rmd</code></a></small>
       <div class="hidden name"><code>pliman_start.Rmd</code></div>
@@ -184,7 +184,7 @@
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co"># | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
 <span class="co"># |=======================================================|</span>
-<span class="va">leaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaves.JPG"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">leaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaves.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">leaves</span><span class="op">)</span>
 <span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-1-1.png" width="480"></p>
@@ -202,24 +202,24 @@
 <span class="co"># object id: 6</span>
 <span class="co"># area     : 4</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total    : 147.946 </span>
-<span class="co"># Average  : 24.658 </span>
+<span class="co"># Total    : 149.331 </span>
+<span class="co"># Average  : 24.888 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="va">area</span>
 <span class="co">#   id       x       y   area area_ch perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 537.383 498.991 41.332  41.538    22.091       3.678      2.756      5.259</span>
-<span class="co"># 2  2 438.651 165.238 35.363  35.503    19.478       3.371      2.875      4.547</span>
-<span class="co"># 3  3 110.879 477.028 31.269  32.108    20.116       3.269      2.375      4.857</span>
-<span class="co"># 4  4 178.420 174.235 27.446  27.878    18.202       3.027      2.307      4.395</span>
-<span class="co"># 5  5 315.236 434.611  8.536   8.549     9.693       1.656      1.312      2.253</span>
-<span class="co"># 6  6 313.491 655.205  4.000   4.027     7.688       1.125      0.926      1.379</span>
+<span class="co"># 1  1 537.380 498.981 41.716  41.895    22.161       3.695      2.768      5.279</span>
+<span class="co"># 2  2 438.655 165.253 35.724  35.858    19.502       3.386      2.891      4.590</span>
+<span class="co"># 3  3 110.862 477.018 31.584  32.438    20.174       3.284      2.389      4.897</span>
+<span class="co"># 4  4 178.467 174.227 27.697  28.096    18.157       3.039      2.311      4.405</span>
+<span class="co"># 5  5 315.232 434.602  8.608   8.614     9.782       1.664      1.319      2.271</span>
+<span class="co"># 6  6 313.445 655.336  4.000   4.008     7.672       1.125      0.929      1.371</span>
 <span class="co">#   radius_sd radius_ratio major_axis eccentricity  theta solidity circularity</span>
-<span class="co"># 1    21.470        1.908      9.147        0.766  1.537    0.995       1.064</span>
-<span class="co"># 2    13.686        1.582      7.851        0.675 -1.532    0.996       1.171</span>
-<span class="co"># 3    21.497        2.045      7.948        0.758  1.545    0.974       0.971</span>
-<span class="co"># 4    17.013        1.904      7.209        0.723  1.540    0.984       1.041</span>
-<span class="co"># 5     8.583        1.718      4.073        0.751 -1.466    0.998       1.142</span>
-<span class="co"># 6     3.958        1.488      2.396        0.380 -1.548    0.993       0.850</span>
+<span class="co"># 1    21.561        1.907      9.196        0.767  1.538    0.996       1.067</span>
+<span class="co"># 2    13.655        1.588      7.891        0.675 -1.533    0.996       1.180</span>
+<span class="co"># 3    21.404        2.050      7.989        0.758  1.545    0.974       0.975</span>
+<span class="co"># 4    17.091        1.906      7.242        0.723  1.539    0.986       1.056</span>
+<span class="co"># 5     8.608        1.721      4.095        0.752 -1.467    0.999       1.131</span>
+<span class="co"># 6     3.862        1.475      2.394        0.380 -1.550    0.998       0.854</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>, measure <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></code></pre></div>
@@ -228,26 +228,26 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">84</span><span class="op">)</span>
 <span class="co">#   id       x       y   area area_ch perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 537.383 498.991 40.929  41.133    21.983       3.660      2.743      5.234</span>
-<span class="co"># 2  2 438.651 165.238 35.017  35.156    19.383       3.354      2.861      4.525</span>
-<span class="co"># 3  3 110.879 477.028 30.963  31.794    20.018       3.253      2.363      4.833</span>
-<span class="co"># 4  4 178.420 174.235 27.178  27.606    18.113       3.012      2.296      4.373</span>
-<span class="co"># 5  5 315.236 434.611  8.452   8.466     9.646       1.648      1.305      2.242</span>
-<span class="co"># 6  6 313.491 655.205  3.961   3.987     7.650       1.120      0.922      1.372</span>
+<span class="co"># 1  1 537.380 498.981 40.823  40.997    21.923       3.656      2.738      5.222</span>
+<span class="co"># 2  2 438.655 165.253 34.959  35.090    19.292       3.350      2.860      4.541</span>
+<span class="co"># 3  3 110.862 477.018 30.908  31.743    19.957       3.249      2.364      4.844</span>
+<span class="co"># 4  4 178.467 174.227 27.104  27.494    17.961       3.006      2.286      4.357</span>
+<span class="co"># 5  5 315.232 434.602  8.424   8.429     9.676       1.646      1.305      2.247</span>
+<span class="co"># 6  6 313.445 655.336  3.914   3.923     7.590       1.113      0.919      1.356</span>
 <span class="co">#   radius_sd radius_ratio major_axis eccentricity  theta solidity circularity</span>
-<span class="co"># 1    21.470        1.908      9.103        0.766  1.537    0.995       1.064</span>
-<span class="co"># 2    13.686        1.582      7.813        0.675 -1.532    0.996       1.171</span>
-<span class="co"># 3    21.497        2.045      7.909        0.758  1.545    0.974       0.971</span>
-<span class="co"># 4    17.013        1.904      7.174        0.723  1.540    0.984       1.041</span>
-<span class="co"># 5     8.583        1.718      4.053        0.751 -1.466    0.998       1.142</span>
-<span class="co"># 6     3.958        1.488      2.384        0.380 -1.548    0.993       0.850</span></code></pre></div>
+<span class="co"># 1    21.561        1.907      9.097        0.767  1.538    0.996       1.067</span>
+<span class="co"># 2    13.655        1.588      7.806        0.675 -1.533    0.996       1.180</span>
+<span class="co"># 3    21.404        2.050      7.903        0.758  1.545    0.974       0.975</span>
+<span class="co"># 4    17.091        1.906      7.164        0.723  1.539    0.986       1.056</span>
+<span class="co"># 5     8.608        1.721      4.051        0.752 -1.467    0.999       1.131</span>
+<span class="co"># 6     3.862        1.475      2.368        0.380 -1.550    0.998       0.854</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
 <a href="#counting-crop-grains" class="anchor"></a>Counting crop grains</h1>
-<p>Here, we will count the grains in the image <code>soybean_touch.png</code>. This image has a cyan background and contains 30 soybean grains that touch with each other.</p>
+<p>Here, we will count the grains in the image <code>soybean_touch.jpg</code>. This image has a cyan background and contains 30 soybean grains that touch with each other.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
 
 <span class="co"># Count the objects in the image</span>
@@ -263,10 +263,10 @@
 <p>The function <code><a href="../reference/measure_disease.html">measure_disease()</a></code> is used to compute the percentage of symptomatic leaf area in a sample or entire leaf based on provided color palettes samples. A general linear model (binomial family) fitted to the RGB values is used to segment the lesions from the healthy leaf. If a pallet of background is provided, the function takes care of the details to isolate it before computing the number and area of lesions.</p>
 <p>The next example computes the symptomatic area of a soybean leaf. The proportion of the healthy and symptomatic areas is given as the proportion of the total leaf area, after segmenting the leaf from the background (blue).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span>
+<span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span>
+<span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span>
+<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>,<span class="va">background</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-4-1.png" width="480"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -278,8 +278,8 @@
                 show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <pre><code># $severity
-#   healthy symptomatic
-# 1 88.5018     11.4982
+#    healthy symptomatic
+# 1 89.45408    10.54592
 # 
 # $shape
 # NULL
@@ -295,7 +295,7 @@
 <a href="#rgb-values-for-objects" class="anchor"></a>RGB values for objects</h1>
 <p>The function <code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soy_green.jpg"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soy_green.jpg"</span><span class="op">)</span>
 <span class="co"># Segment the foreground (grains) using the normalized blue index</span>
 <span class="co"># Shows the average value of the blue index in each object</span>
 

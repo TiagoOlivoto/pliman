@@ -26,10 +26,8 @@ image_binary(
 \item{image}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  \code{"R"},
-\code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"}, \code{"BIM"}, \code{"SCI"},
-\code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
-\code{"BGI"}. See \code{\link[=image_index]{image_index()}} for more details.}
+target mode for conversion to binary image. See the available indexes with
+\code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}} for more details.}
 
 \item{my_index}{User can calculate a different index using the band names,
 e.g. \code{my_index = "R+B/G"}.}
@@ -81,8 +79,8 @@ clustering-based image thresholding.
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("soybean_touch.jpg"))
-image_binary(img, index = c("R, NR"), nrow = 1)
+img <- image_pliman("soybean_touch.jpg")
+image_binary(img, index = c("R, G"))
 }
 \references{
 Nobuyuki Otsu, "A threshold selection method from gray-level

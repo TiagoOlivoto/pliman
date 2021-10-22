@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Measure leaf area using leaf images</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-13</h4>
+            <h4 class="date">2021-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/leaf_area.Rmd"><code>vignettes/leaf_area.Rmd</code></a></small>
       <div class="hidden name"><code>leaf_area.Rmd</code></div>
@@ -312,7 +312,7 @@
 <div id="knowing-the-image-resolution-in-dpi-dots-per-inch" class="section level3">
 <h3 class="hasAnchor">
 <a href="#knowing-the-image-resolution-in-dpi-dots-per-inch" class="anchor"></a>knowing the image resolution in dpi (dots per inch)</h3>
-<p>When the image resolution is known, the measures in pixels obtained with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See the <a href="#dpi">dpi</a> section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the <code>dpi</code> argument of <code>get_measures9)</code>.</p>
+<p>When the image resolution is known, the measures in pixels obtained with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See the <a href="#dpi">dpi</a> section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the <code>dpi</code> argument of <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.8</span><span class="op">)</span>
 <span class="co"># compute the difference between the two methods</span>

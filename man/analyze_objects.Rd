@@ -188,8 +188,8 @@ image processing. Defaults to \code{NULL}, in which \code{"black"}, and \code{"w
 used, respectively.}
 
 \item{marker, marker_col, marker_size}{The type, color and size of the object
-marker. Defaults to \code{NULL}, which plots the object id. Use \code{marker = "point"} to show a point in each
-object or \code{marker = FALSE} to omit object marker}
+marker. Defaults to \code{NULL}, which plots the object id. Use \code{marker = "point"} to show a point in each object or \code{marker = FALSE} to omit object
+marker.}
 
 \item{save_image}{Save the image after processing? The image is saved in the
 current working directory named as \verb{proc_*} where \code{*} is the image name
@@ -218,7 +218,8 @@ image:
 \itemize{
 \item \code{id}  object identification.
 \item \code{x},\code{y},  x and y coordinates for the center of mass of the object.
-\item \code{area}:  area size (in pixels).
+\item \code{area}:  area of the object (in pixels).
+\item \code{area_ch}:  the area of the convex hull around object (in pixels).
 \item \code{perimeter}: perimeter (in pixels).
 \item \code{radius_min}, \code{radius_mean}, and \code{radius_max}: The minimum, mean, and
 maximum radius (in pixels), respectively.
@@ -229,6 +230,9 @@ maximum radius (in pixels), respectively.
 sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
 line eccentricity is 1.
 \item \code{theta}: object angle (in radians).
+\item \code{solidity}: object solidity given by \code{area / area_ch}.
+\item \code{circularity}: the object circularity given by \eqn{4*pi *(area /
+    perimeter^2)}.
 \item \code{index}: (when \code{object_index} is declared) the index for pixel
 intensity of each object. By default, the mean value of B (blue).
 }
@@ -239,8 +243,8 @@ objects.
 for each pixel of each object.
 }
 
-\code{plot.anal_obj()} returns a \code{ggplot} object containing the distribution of the pixels for each
-object
+\code{plot.anal_obj()} returns a \code{trellis} object containing the
+distribution of the pixels for each object
 }
 \description{
 \itemize{
@@ -253,7 +257,7 @@ argument \code{object_index} is used in the function \code{\link[=analyze_object
 }
 \details{
 A binary image is first generated to segment the foreground and background.
-The argument index is useful to choose a proper index to segment the image
+The argument \code{index} is useful to choose a proper index to segment the image
 (see \code{\link[=image_binary]{image_binary()}} for more details). Then, the number of objects in the
 foreground is counted. By setting up arguments such as \code{lower_size},
 \code{upper_size} it is possible to set a threshold for lower and upper sizes of
@@ -261,7 +265,11 @@ the objects, respectively. The argument \code{object_size} can be used to set up
 pre-defined values of \code{tolerance} and \code{extension} depending on the image
 resolution. This will influence the watershed-based object segmentation. Users
 can also tune-up \code{tolerance} and \code{extension} explicitly to a better precision
-of watershed segmentation. If color palettes samples are provided, a general
+of watershed segmentation.
+
+If \code{watershed = FALSE} is used,
+
+If color palettes samples are provided, a general
 linear model (binomial family) fitted to the RGB values is used to segment
 fore- and background.
 
@@ -273,28 +281,44 @@ one can set \code{parallel = TRUE}.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(image_pliman("soybean_touch.jpg"))
-analyze_objects(img)
+img <- image_pliman("soybean_touch.jpg")
+obj <- analyze_objects(img)
+obj$statistics
 
 # Enumerate the objects in the original image
-analyze_objects(img,
-                show_segmentation = FALSE,
-                marker = "id",
-                marker_col = "white")
+# Return the top-5 grains with the largest area
+
+top <-
+ analyze_objects(img,
+                 marker = "id",
+                 topn_upper = 5)
+top$results
 }
 
 \donttest{
 library(pliman)
 
-img <- image_import(image_pliman("soy_green.jpg"))
-# Segment the foreground (grains) using the normalized blue index
+img <- image_pliman("soy_green.jpg")
+# Segment the foreground (grains) using the normalized blue index (NB)
 # Shows the average value of the blue index in each object
+
 rgb <-
    analyze_objects(img,
+                   marker = "id",
                    index = "NB", # default
                    object_index = "B")
 plot(rgb)
 }
+}
+\references{
+Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
+remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
+batatas): the influence of genetics, environment, and G×E. New Phytologist,
+225(5), 2183–2195. \doi{10.1111/NPH.16286}
+
+Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
+and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
+\doi{10.5951/MATHTEACHER.110.8.0631}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

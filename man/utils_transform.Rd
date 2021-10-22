@@ -14,6 +14,8 @@
 \alias{image_trim}
 \alias{image_dilate}
 \alias{image_erode}
+\alias{image_opening}
+\alias{image_closing}
 \alias{image_skeleton}
 \alias{image_filter}
 \alias{image_blur}
@@ -119,6 +121,28 @@ image_dilate(
 )
 
 image_erode(
+  image,
+  kern = NULL,
+  size = NULL,
+  shape = "disc",
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_opening(
+  image,
+  kern = NULL,
+  size = NULL,
+  shape = "disc",
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE
+)
+
+image_closing(
   image,
   kern = NULL,
   size = NULL,
@@ -255,6 +279,10 @@ Performs image rotation and reflection
 histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}}.
 \item \code{image_dilate()} Performs image dilatation. See more at \code{\link[EBImage:morphology]{EBImage::dilate()}}.
 \item \code{image_erode()} Performs image erosion. See more at \code{\link[EBImage:morphology]{EBImage::erode()}}.
+\item \code{image_opening()} Performs an erosion followed by a dilation. See more at
+\code{\link[EBImage:morphology]{EBImage::opening()}}.
+\item \code{image_closing()} Performs a dilation followed by an erosion. See more at
+\code{\link[EBImage:morphology]{EBImage::closing()}}.
 \item \code{image_filter()} Performs median filtering in constant time. See more at
 \code{\link[EBImage:medianFilter]{EBImage::medianFilter()}}.
 \item \code{image_blur()} Performs blurring filter of images. See more at
@@ -264,7 +292,7 @@ histogram equalization. See more at \code{\link[EBImage:clahe]{EBImage::clahe()}
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
+img <- image_pliman("sev_leaf.jpg")
 plot(img)
 img <- image_resize(img, 50)
 img1 <- image_rotate(img, 45)

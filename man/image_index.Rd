@@ -20,18 +20,16 @@ image_index(
   verbose = TRUE
 )
 
-\method{plot}{image_index}(x, type = "raster", facet = TRUE, ...)
+\method{plot}{image_index}(x, type = "raster", nrow = NULL, ncol = NULL, ...)
 }
 \arguments{
 \item{image}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  \code{"R"},
-\code{"G"}, \code{"B"} \code{"GR"}, \code{"NR"}, \code{"NG"}, \code{"NB"}, \code{"BI"}, \code{"BIM"}, \code{"SCI"},
-\code{"GLI"}, \code{"HI"}, \code{"NGRDI"}, \code{"SI"}, \code{"VARI"}, \code{"HUE"}, \code{"HUE2"}, \code{"BGI"},
-\code{"BGI"}. Defaults to \code{NULL} ((normalized) Red, Green and Blue).  One can
-also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
-indexes.}
+target mode for conversion to binary image. Use \code{\link[=pliman_indexes]{pliman_indexes()}} or the
+\code{details} section to see the available indexes.  Defaults to \code{NULL}
+((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
+"NRGB" for normalized RGB, or "all" for all indexes.}
 
 \item{my_index}{User can calculate a different index using the bands names,
 e.g. \code{my_index = "R+B/G"}.}
@@ -67,57 +65,63 @@ number of parallel processes that can be active at the same time.}
 raster plot showing the intensity of the pixels for each image index or
 \code{type = "hist"} to produce a histogram with the pixels' intensity.}
 
-\item{facet}{Shows RGB values as a facet plot? Defaults to \code{TRUE}.}
-
 \item{...}{Currently not used}
 }
 \value{
 A list containing Grayscale images. The length will depend on the
 number of indexes used.
 
-A \code{ggplot} object containing the distribution of the pixels for each
+A \code{trellis} object containing the distribution of the pixels for each
 index.
 }
 \description{
-Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+\code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
 
-Produces an histogram of an \code{image_index} object
+\code{plot.image_index()} produces an histogram of an \code{image_index} object
 }
 \details{
-The following indexes are available in pliman.\tabular{lll}{
-   Index \tab Equation \tab Band \cr
-   R \tab R \tab C \cr
-   G \tab G \tab C \cr
-   B \tab B \tab C \cr
-   NR \tab R/(R+G+B) \tab C \cr
-   NG \tab G/(R+G+B) \tab C \cr
-   NB \tab B/(R+G+B) \tab C \cr
-   GB \tab G/B \tab C \cr
-   RB \tab R/B \tab C \cr
-   GR \tab G/R \tab C \cr
-   BI \tab sqrt((R^2+G^2+B^2)/3) \tab C \cr
-   BIM \tab sqrt((R\emph{2+G}2+B*2)/3) \tab C \cr
-   SCI \tab (R-G)/(R+G) \tab C \cr
-   GLI \tab (2\emph{G-R-B)/(2}G+R+B) \tab C \cr
-   HI \tab (2*R-G-B)/(G-B) \tab C \cr
-   NDGRI \tab (G-R)/(G+R) \tab C \cr
-   NDGBI \tab (G-B)/(G+B) \tab C \cr
-   NDRBI \tab (R-B)/(R+B) \tab C \cr
-   I \tab R+G+B \tab C \cr
-   S \tab ((R+G+B)-3*B)/(R+G+B) \tab C \cr
-   L \tab R+G+B/3 \tab C \cr
-   VARI \tab (G-R)/(G+R-B) \tab C \cr
-   HUE \tab atan(2*(B-G-R)/30.5*(G-R)) \tab C \cr
-   HUE2 \tab atan(2*(R-G-R)/30.5*(G-B)) \tab C \cr
-   BGI \tab B/G \tab C \cr
+The following indexes are available in pliman.
+\itemize{
+\item \code{R} red
+\item \code{G} green
+\item \code{B} blue
+\item \code{NR} normalized red \code{R/(R+G+B)}.
+\item \code{NG} normalized green \code{G/(R+G+B)}
+\item \code{NB} normalized blue \code{B/(R+G+B)}
+\item \code{GB} green blue ratio \code{G/B}
+\item \code{RB} red blue ratio \code{R/B}
+\item \code{GR} green red ratio \code{G/R}
+\item \code{BI} brightness Index \code{sqrt((R^2+G^2+B^2)/3)}
+\item \code{BIM} brightness Index 2 \code{sqrt((R*2+G*2+B*2)/3)}
+\item \code{SCI} Soil Colour Index \code{(R-G)/(R+G)}
+\item \code{GLI} Green leaf index Vis Louhaichi et al. (2001) \code{(2*G-R-B)/(2*G+R+B)}
+\item \code{HI} Primary colours Hue Index    (2*R-G-B)/(G-B)
+\item \code{NDGRI} Normalized green red difference index (Tucker, 1979) \code{(G-R)/(G+R)}
+\item \code{NDGBI} Normalized green blue difference index \code{(G-B)/(G+B)}
+\item \code{NDRBI} Normalized red blue difference index \code{(R-B)/(R+B)}
+\item \code{I}     R+G+B
+\item \code{S}     ((R+G+B)-3*B)/(R+G+B)
+\item \code{L}     R+G+B/3
+\item \code{VARI} A Visible Atmospherically Resistant Index \code{(G-R)/(G+R-B)}
+\item \code{HUE} Overall Hue Index \code{atan(2*(B-G-R)/30.5*(G-R))}
+\item \code{HUE2}  atan(2*(R-G-R)/30.5*(G-B))
+\item \code{BGI}   B/G
+\item \code{GRAY}	\code{0.299*R + 0.587*G + 0.114*B}
+\item \code{GLAI} \code{(25*(G-R)/(G+R-B)+1.25)}
+\item \code{GRVI} Green-Red Vegetation Index (G-R)/(G+R)
+\item \code{CI} Coloration Index \code{(R-B)/R}
+\item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}
+\item \code{SHP} Shape Index \code{2*(R-G-B)/(G-B)}
+\item \code{RI} Redness Index \code{R**2/(B*G**3)}
 }
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("soybean_touch.jpg"))
-image_index(img, c("R, NR"), nrow = 1)
+img <- image_pliman("soybean_touch.jpg")
+image_index(img, index = c("R, NR"))
 library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
+img <- image_pliman("sev_leaf.jpg")
+
 # A half size of the original image
 ind <- image_index(img)
 plot(ind)

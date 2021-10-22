@@ -53,6 +53,7 @@ res <-
                   img_healthy = healthy,
                   img_symptoms = symptoms,
                   img_background = background)
+res$severity
 ```
 
 Alternatively, users can create a mask instead of showing the original image.
@@ -60,17 +61,19 @@ Alternatively, users can create a mask instead of showing the original image.
 ```{r disease3, fig.width=10, fig.height=7}
 
 # create a personalized mask
-measure_disease(img = img,
-                img_healthy = healthy,
-                img_symptoms = symptoms,
-                img_background = background,
-                show_original = FALSE, # create a mask
-                show_contour = FALSE, # hide the contour line
-                col_background = "white", # default
-                col_lesions = "red", # default
-                col_leaf = "green") # default
+res2 <- 
+  measure_disease(img = img,
+                  img_healthy = healthy,
+                  img_symptoms = symptoms,
+                  img_background = background,
+                  show_original = FALSE, # create a mask
+                  show_contour = FALSE, # hide the contour line
+                  col_background = "white", # default
+                  col_lesions = "red", # default
+                  col_leaf = "green") # default
 
 
+res2$severity
 ```
 
 
@@ -85,28 +88,27 @@ symptoms2 <- image_import("sympt2.jpg", path = path_soy)
 background2 <- image_import("back2.jpg", path = path_soy)
 image_combine(healthy2, symptoms2, background2, ncol = 3)
 
-img2 <- img
-res <-
+res3 <-
   measure_disease(img = img,
                   img_healthy = healthy2,
                   img_symptoms = symptoms2,
                   img_background = background2)
-res$severity
+res3$severity
 ```
 
 
-# Lesion shape
+# Lesion features
 
 ```{r fig.width=10, fig.height=7}
-res <-
+res4 <-
   measure_disease(img = img,
                   img_healthy = healthy,
                   img_symptoms = symptoms,
                   img_background = background,
                   show_features = TRUE,
                   marker = "area")
-res$shape
-res$statistics
+res4$shape
+res4$statistics
 ```
 
 

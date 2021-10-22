@@ -12,12 +12,15 @@ object_coord(
   image,
   id = NULL,
   index = "NB",
+  watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
   edge = 2,
   extension = NULL,
   tolerance = NULL,
   object_size = "medium",
+  parallel = FALSE,
+  workers = NULL,
   show_image = TRUE
 )
 
@@ -30,15 +33,17 @@ object_contour(
   extension = NULL,
   tolerance = NULL,
   object_size = "medium",
+  parallel = FALSE,
+  workers = NULL,
   show_image = TRUE
 )
 
-object_isolate(image, id = NULL, ...)
+object_isolate(image, id = NULL, parallel = FALSE, workers = NULL, ...)
 
-object_id(image, ...)
+object_id(image, parallel = FALSE, workers = NULL, ...)
 }
 \arguments{
-\item{image}{An image of class \code{Image}.}
+\item{image}{An image of class \code{Image} or a list of \code{Image} objects.}
 
 \item{id}{\itemize{
 \item For \code{object_coord()}, a vector (or scalar) of object \code{id} to compute the
@@ -48,6 +53,12 @@ bounding rectangle. Object ids can be obtained with \code{\link[=object_id]{obje
 
 \item{index}{The index to produce a binary image used to compute bounding
 rectangle coordinates. See \code{\link[=image_binary]{image_binary()}} for more details.}
+
+\item{watershed}{If \code{TRUE} (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If \code{FALSE}, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.}
 
 \item{invert}{Inverts the binary image, if desired. Defaults to \code{FALSE}.}
 
@@ -59,14 +70,16 @@ Defaults to \code{2}.}
 \item{extension, tolerance, object_size}{Controls the watershed segmentation of
 objects in the image. See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}
 
+\item{parallel}{Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time when \code{image} is a list. The number of sections is set
+up to 50\% of available cores.}
+
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
+
 \item{show_image}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
-
-\item{watershed}{If \code{TRUE} (default) performs watershed-based object
-detection. This will detect objects even when they are touching one other.
-If \code{FALSE}, all pixels for each connected set of foreground pixels are set
-to a unique object. This is faster but is not able to segment touching
-objects.}
 
 \item{...}{\itemize{
 \item For \code{object_isolate()}, further arguments passed on to \code{\link[=object_coord]{object_coord()}}.
@@ -97,7 +110,7 @@ of each object in the image.
 \examples{
 \donttest{
 library(pliman)
-img <- image_import(image_pliman("la_leaves.JPG"))
+img <- image_pliman("la_leaves.jpg")
 # Get the object's (leaves) identification
 object_id(img)
 

@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Analyzing objects in an image</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-13</h4>
+            <h4 class="date">2021-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/analyze_objects.Rmd"><code>vignettes/analyze_objects.Rmd</code></a></small>
       <div class="hidden name"><code>analyze_objects.Rmd</code></div>
@@ -162,7 +162,7 @@
 <div id="getting-started" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h1>
-<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> can be used to count objects in an image. Let us start with a simple example with the image <code>object_300dpi.png</code> available in the <a href="https://github.com/TiagoOlivoto/pliman/tree/master/image_examples">GitHub page</a>. To facilitate the image importation from this folder, a helper function <code><a href="../reference/utils_image.html">image_pliman()</a></code> is used.</p>
+<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> can be used to count objects in an image. Let us start with a simple example with the image <code>object_300dpi.png</code> available on the <a href="https://github.com/TiagoOlivoto/pliman/tree/master/image_examples">GitHub page</a>. To facilitate the image importation from this folder, a helper function <code><a href="../reference/utils_image.html">image_pliman()</a></code> is used.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |=======================================================|</span>
@@ -171,7 +171,7 @@
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
 <span class="co">#&gt; |=======================================================|</span>
-<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="analyze_objects_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
 <p>The above image was produced with Microsoft PowerPoint. It has a known resolution of 300 dpi (dots per inch) and shows four objects</p>
 <ul>
@@ -263,7 +263,7 @@
 <div id="declaring-the-image-resolution" class="section level2">
 <h2 class="hasAnchor">
 <a href="#declaring-the-image-resolution" class="anchor"></a>Declaring the image resolution</h2>
-<p>If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with <code><a href="../reference/utils_dpi.html">pixels_to_cm()</a></code>. This function converts the number of pixels (<span class="math inline">\(px\)</span>) to cm, considering the image resolution in <span class="math inline">\(dpi\)</span>, as follows: <span class="math inline">\(cm = px \times (2.54/dpi)\)</span>. Since we known the number of pixels of the larger square, its perimeter in cm is given by</p>
+<p>If the image resolution is known, all the measures will be adjusted according to this resolution. Let us to see a numerical example with <code><a href="../reference/utils_dpi.html">pixels_to_cm()</a></code>. This function converts the number of pixels (<span class="math inline">\(px\)</span>) to cm, considering the image resolution in <span class="math inline">\(dpi\)</span>, as follows: <span class="math inline">\(cm = px \times (2.54/dpi)\)</span>. Since we know the number of pixels of the larger square, its perimeter in cm is given by</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># number of pixels for the highest square perimeter</span>
 <span class="va">ls_px</span> <span class="op">&lt;-</span> <span class="va">img_res</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">perimeter</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
@@ -292,11 +292,11 @@
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
 <a href="#counting-crop-grains" class="anchor"></a>Counting crop grains</h1>
-<p>Here, we will count the grains in the image <code>soybean_touch.png</code>. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes.</p>
+<p>Here, we will count the grains in the image <code>soybean_touch.jpg</code>. This image has a cyan background and contains 30 soybean grains that touch with each other. Two segmentation strategies are used. The first one is by using is image segmentation based on color indexes.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span>        <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_back.jpg"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span>        <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>
+<span class="va">grain</span> <span class="op">&lt;-</span>      <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_grain.jpg"</span><span class="op">)</span>
+<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_back.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">grain</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <p><img src="analyze_objects_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
 <p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> segment the image using as default the normalized blue index, as follows <span class="math inline">\(NB = (B/(R+G+B))\)</span>, where <span class="math inline">\(R\)</span>, <span class="math inline">\(G\)</span>, and <span class="math inline">\(B\)</span> are the red, green, and blue bands. Objects are count and the segmented objects are colored with random permutations.</p>
@@ -415,9 +415,9 @@
 <div id="leaf-shape" class="section level1">
 <h1 class="hasAnchor">
 <a href="#leaf-shape" class="anchor"></a>Leaf shape</h1>
-<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> computes a range of object features that can be used to study leaf shape. As a motivating example, I will use the image <code>potato_leaves.png</code>, that was gathered from Gupta et al. (2020)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> computes a range of object features that can be used to study leaf shape. As a motivating example, I will use the image <code>potato_leaves.png</code>, which was gathered from Gupta et al. (2020)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">potato</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"potato_leaves.png"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">potato</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"potato_leaves.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">pot_meas</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">potato</span>,
                   watershed <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -427,17 +427,17 @@
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">pot_meas</span><span class="op">$</span><span class="va">results</span><span class="op">)</span>
 <span class="co">#&gt;   id        x        y  area area_ch perimeter radius_mean radius_min</span>
-<span class="co">#&gt; 1  1 854.5021 223.9845 51409   54604       864    131.6104   92.00580</span>
-<span class="co">#&gt; 2  2 197.7975 217.9751 58849   76661      1088    140.1460   70.14579</span>
-<span class="co">#&gt; 3  3 536.2565 240.1453 35203   63154      1323    109.9245   38.04980</span>
-<span class="co">#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity       theta</span>
-<span class="co">#&gt; 1   198.8997  26.27966     2.161817   305.8835    0.6103275  1.39474531</span>
-<span class="co">#&gt; 2   191.2485  28.62491     2.726444   318.2787    0.5095139 -0.09807888</span>
-<span class="co">#&gt; 3   188.6634  35.58658     4.958329   253.9835    0.2832585  1.09847274</span>
+<span class="co">#&gt; 1  1 854.5424 224.0429 51380   54536       852    131.5653   92.11085</span>
+<span class="co">#&gt; 2  2 197.8440 217.8508 58923   76706      1064    140.2962   70.10608</span>
+<span class="co">#&gt; 3  3 536.2100 240.2380 35117   62792      1310    109.9000   38.13658</span>
+<span class="co">#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity      theta</span>
+<span class="co">#&gt; 1   198.0248  26.06131     2.149854   305.7374    0.6102310  1.3936873</span>
+<span class="co">#&gt; 2   192.3613  28.58523     2.743861   318.2436    0.5079648 -0.0992339</span>
+<span class="co">#&gt; 3   188.5105  35.50978     4.943037   253.4985    0.2810738  1.0968854</span>
 <span class="co">#&gt;    solidity circularity</span>
-<span class="co">#&gt; 1 0.9414878   0.8654093</span>
-<span class="co">#&gt; 2 0.7676524   0.6247283</span>
-<span class="co">#&gt; 3 0.5574152   0.2527376</span></code></pre></div>
+<span class="co">#&gt; 1 0.9421300   0.8894566</span>
+<span class="co">#&gt; 2 0.7681668   0.6540508</span>
+<span class="co">#&gt; 3 0.5592591   0.2571489</span></code></pre></div>
 <p>Three key measures (in pixel units) are:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -481,17 +481,17 @@
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">conv</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $`1`</span>
-<span class="co">#&gt; [1] 54604</span>
+<span class="co">#&gt; [1] 54536</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $`2`</span>
-<span class="co">#&gt; [1] 76661</span>
+<span class="co">#&gt; [1] 76706</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $`3`</span>
-<span class="co">#&gt; [1] 63154</span></code></pre></div>
+<span class="co">#&gt; [1] 62792</span></code></pre></div>
 </div>
-<div id="leaves-as-ggplot2-plot" class="section level2">
+<div id="leaves-as-base-plot" class="section level2">
 <h2 class="hasAnchor">
-<a href="#leaves-as-ggplot2-plot" class="anchor"></a>Leaves as <code>ggplot2</code> plot</h2>
+<a href="#leaves-as-base-plot" class="anchor"></a>Leaves as base plot</h2>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create a data frame for contour and convex hull</span>
 <span class="va">df_cont</span> <span class="op">&lt;-</span>
@@ -506,8 +506,32 @@
             <span class="fu"><a href="https://rdrr.io/r/base/transform.html">transform</a></span><span class="op">(</span><span class="va">conv</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">conv</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
           <span class="op">}</span><span class="op">)</span><span class="op">)</span>
 
-<span class="co"># create a plot</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+
+<span class="co"># plot the objects</span>
+<span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html">palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"red"</span>,<span class="st">"blue"</span>,<span class="st">"green"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">df_cont</span>,
+     <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">X1</span>, <span class="va">X2</span>, 
+          cex <span class="op">=</span> <span class="fl">0.5</span>,
+          col <span class="op">=</span> <span class="va">object</span>,
+          xlab <span class="op">=</span> <span class="cn">NA</span>,
+          ylab <span class="op">=</span> <span class="cn">NA</span>,
+          axes <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">df_conv</span>, <span class="va">object</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,
+     <span class="fu"><a href="https://rdrr.io/r/graphics/polygon.html">polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, 
+             col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html">rgb</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>,
+             border <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">df_conv</span>, <span class="va">object</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,
+     <span class="fu"><a href="https://rdrr.io/r/graphics/polygon.html">polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, 
+             col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html">rgb</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.2</span><span class="op">)</span>,
+             border <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">df_conv</span>, <span class="va">object</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span>,
+     <span class="fu"><a href="https://rdrr.io/r/graphics/polygon.html">polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, 
+             col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html">rgb</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>,
+             border <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="analyze_objects_files/figure-html/maskpoly-1.png" width="768"></p>
+<p>Or do the same with <code>ggplot2</code></p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cont</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">X1</span>, <span class="va">X2</span>, group <span class="op">=</span> <span class="va">object</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">object</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_conv</span>,
@@ -515,7 +539,6 @@
                alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
-<p><img src="analyze_objects_files/figure-html/maskpoly-1.png" width="768"></p>
 </div>
 </div>
 <div id="batch-processing" class="section level1">
@@ -524,7 +547,7 @@
 <p>In plant image analysis, frequently it is necessary to process more than one image. For example, in plant breeding, the number of grains per plant (e.g., wheat) is frequently used in the indirect selection of high-yielding plants. In <code>pliman</code>, batch processing can be done when the user declares the argument <code>pattern</code>.</p>
 <p>The following example would be used to count the objects in the images with a pattern name <code>"trat"</code> (e.g., <code>"trat1"</code>, <code>"trat2"</code>, <code>"tratn"</code>) saved into the subfolder "<code>originals"</code> in the current working directory. The processed images will be saved into the subfolder <code>"processed"</code>. The object <code>list_res</code> will be a list with two objects (<code>results</code> and <code>statistics</code>) for each image.</p>
 <p>To speed up the processing time, especially for a large number of images, the argument <code>parallel = TRUE</code> can be used. In this case, the images are processed asynchronously (in parallel) in separate <code>R</code> sessions running in the background on the same machine. The number of sections is set up to 50% of available cores. This number can be controlled explicitly with the argument <code>workers</code>.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">list_res</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"trat"</span>, <span class="co"># matches the name pattern in 'originals' subfolder</span>
                   dir_original <span class="op">=</span> <span class="st">"originals"</span>,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tune_tolerance.R
 \name{tune_tolerance}
 \alias{tune_tolerance}
-\title{Title here}
+\title{Tune tolerance parameter}
 \usage{
 tune_tolerance(
   img,
@@ -26,11 +26,11 @@ tune_tolerance(
 
 \item{actual}{The actual number of objects.}
 
-\item{start_tol}{An starting value for tolerance.}
+\item{start_tol}{An starting value for tolerance. Defaults to \code{1}.}
 
-\item{extension}{The extension value. Defaults to 1.}
+\item{extension}{The extension value. Defaults to \code{1}.}
 
-\item{grid}{A list with a numeric sequence for'tolerance' and 'extension'
+\item{grid}{A list with a numeric sequence for \code{tolerance} and \code{extension}
 values. When grid is informed, all combinations are tested and the residual
 from \code{actual} value is plotted.}
 
@@ -61,18 +61,37 @@ images with black background. Defaults to \code{FALSE}.}
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \description{
-Provides tools for counting and extracting objects' features (e.g., area,
-perimeter, radius) in an image. See more at \strong{Details} section.
+Provides options for tunning \code{tolerance} parameter utilized in
+\verb{[analyze_objects()]} in two ways:
+\itemize{
+\item Declaring the \code{actual} argument, an iterative algorithm will compute the
+first analysis and sequentially increase the parameter \code{tolerance} if the
+computed number of objects is greater than \code{actual} or reduce the parameter
+\code{tolerance} if the computed number of objects is less than \code{actual}. If the
+algorithm did not converge up to \code{maxiter} is reached, users can change the
+default \code{extension} value.
+\item The second way is to create a \code{grid} with \code{tolerance} and \code{extension}
+values. When \code{grid} is informed, all combinations (made by
+\code{\link[base:expand.grid]{base::expand.grid()}}) are tested and the residual from \code{actual} value is
+plotted. Users can than find a better combination of parameters to use in
+\code{analyze_objects()}.
 }
-\details{
-A binary image is first generated to segment the foreground and background.
-The argument index is useful to choose a proper index to segment the image.
 }
 \examples{
-\donttest{
 library(pliman)
-}
+if(FALSE){
+ img <- image_pliman("soybean_touch.jpg")
 
+ # starts with tolerance = 1
+ tune_tolerance(img, actual = 30)
+
+ # Using a grid of tolerance and extension values
+ tune2 <-
+   tune_tolerance(img,
+                  actual = 30,
+                  grid = list(tolerance = seq(0, 5, by = 0.1),
+                              extension = 1:4), plot = TRUE)
+}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

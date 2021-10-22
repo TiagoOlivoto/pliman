@@ -17,7 +17,7 @@ Convert RGB to LAB color space.
 }
 \examples{
 library(pliman)
-img <- image_import(image_pliman("sev_leaf.jpg"))
+img <- image_pliman("sev_leaf.jpg")
 img2 <- rgb_to_hsv(img)
 image_combine(img, img2)
 }

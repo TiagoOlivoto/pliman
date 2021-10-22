@@ -155,22 +155,20 @@
 
 <p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. Image indexes can also be used to segment images. The package will help you to:</p>
 <ul>
-<li>Measure leaf area with <code><a href="reference/leaf_area.html">leaf_area()</a></code>
-</li>
-<li>Measure disease severity with <code><a href="reference/symptomatic_area.html">symptomatic_area()</a></code>
-</li>
-<li>Count the number of lesions with <code><a href="reference/count_lesions.html">count_lesions()</a></code>
-</li>
-<li>Count objects in an image with <code><a href="reference/count_objects.html">count_objects()</a></code>
-</li>
-<li>Get the RGB values for each object in an image with <code><a href="reference/objects_rgb.html">objects_rgb()</a></code>
-</li>
-<li>Get object measures with <code><a href="reference/utils_measures.html">get_measures()</a></code>
-</li>
-<li>Plot object measures with <code><a href="reference/utils_measures.html">plot_measures()</a></code>
-</li>
+<li>Measure leaf area;</li>
+<li>Measure disease severity;</li>
+<li>Count the number of lesions;</li>
+<li>Obtain the shape of lesions;</li>
+<li>Count objects in an image;</li>
+<li>Get object features (area, perimeter, radius, circularity, eccentricity, solidity);</li>
+<li>Get the RGB values for each object in an image;</li>
+<li>Get the object coordinates;</li>
+<li>Get the object contours;</li>
+<li>Get convex hulls;</li>
+<li>Isolate objects;</li>
+<li>Plot object measures.</li>
 </ul>
-<p><code>pliman</code> also provides useful functions for <a href="https://tiagoolivoto.github.io/pliman/reference/image_combine.html">operation</a>, <a href="https://tiagoolivoto.github.io/pliman/reference/utils_transform.html">transformation</a>, and <a href="https://tiagoolivoto.github.io/pliman/reference/image_binary.html">segmentation</a> of images. Please, visit the <a href="https://tiagoolivoto.github.io/pliman/index.html">Examples</a> page in <code>pliman</code> website for a detailed documentation of each function.</p>
+<p><code>pliman</code> also provides useful functions for image <a href="https://tiagoolivoto.github.io/pliman/reference/utils_transform.html">transformation</a>, <a href="https://tiagoolivoto.github.io/pliman/reference/image_binary.html">binarization</a>, <a href="https://tiagoolivoto.github.io/pliman/reference/image_segment.html">segmentation</a>, and <a href="https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html">resolution</a>. Please, visit the <a href="https://tiagoolivoto.github.io/pliman/index.html">Examples</a> page in <code>pliman</code> website for a detailed documentation of each function.</p>
 </div>
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
@@ -190,9 +188,10 @@
 <h1 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic usage</h1>
 </div>
-<div id="disease-severity" class="section level1">
+<div id="analyze-objects" class="section level1">
 <h1 class="hasAnchor">
-<a href="#disease-severity" class="anchor"></a>Disease severity</h1>
+<a href="#analyze-objects" class="anchor"></a>Analyze objects</h1>
+<p>The function <code><a href="reference/analyze_objects.html">analyze_objects()</a></code> can be used to count the objects such as leaves, grains, pods, and pollen in an image. The following example counts and compute the features of soybean grains of an image with 30 grains.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co"># |=======================================================|</span>
@@ -201,47 +200,47 @@
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co"># | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
 <span class="co"># |=======================================================|</span>
-<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">soy</span><span class="op">$</span><span class="va">statistics</span>
+<span class="co">#        stat      value</span>
+<span class="co"># 1         n    30.0000</span>
+<span class="co"># 2  min_area  1366.0000</span>
+<span class="co"># 3 mean_area  2057.3667</span>
+<span class="co"># 4  max_area  2445.0000</span>
+<span class="co"># 5   sd_area   230.5574</span>
+<span class="co"># 6  sum_area 61721.0000</span></code></pre></div>
+</div>
+<div id="disease-severity" class="section level1">
+<h1 class="hasAnchor">
+<a href="#disease-severity" class="anchor"></a>Disease severity</h1>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/measure_disease.html">measure_disease</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
-                 img_healthy <span class="op">=</span> <span class="va">healthy</span>,
-                 img_symptoms <span class="op">=</span> <span class="va">symptoms</span>,
-                 img_background <span class="op">=</span> <span class="va">background</span>,
-                 show_image <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># $severity</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#    healthy symptomatic</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 89.31109    10.68891</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># $shape</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># NULL</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># $statistics</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># NULL</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># attr(,"class")</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># [1] "plm_disease"</span></span></code></pre></div>
-</div>
-<div id="count-objects" class="section level1">
-<h1 class="hasAnchor">
-<a href="#count-objects" class="anchor"></a>Count objects</h1>
-<p>The function <code><a href="reference/count_objects.html">count_objects()</a></code> can be used to count the objects such as leaves, grains, pods, pollen in an image. In the following example, we will count the number of soybean grains of an image with 30 grains.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">sev</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="reference/measure_disease.html">measure_disease</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
+                  img_healthy <span class="op">=</span> <span class="va">healthy</span>,
+                  img_symptoms <span class="op">=</span> <span class="va">symptoms</span>,
+                  img_background <span class="op">=</span> <span class="va">background</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png"><!-- --></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sev</span><span class="op">$</span><span class="va">severity</span>
+<span class="co">#    healthy symptomatic</span>
+<span class="co"># 1 89.21025    10.78975</span></code></pre></div>
 <p><code>pliman</code> takes the advantage of several powerful functions from <a href="https://bioconductor.org/packages/release/bioc/html/EBImage.html">EBImage package</a>. Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!</p>
 </div>
 <div id="getting-help" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-help" class="anchor"></a>Getting help</h1>
 <ul>
-<li><p>If you encounter a clear bug, please file a minimal reproducible example on <a href="https://github.com/TiagoOlivoto/pliman/issues">github</a></p></li>
+<li><p>If you encounter a clear bug, please file a minimal reproducible example on <a href="https://github.com/TiagoOlivoto/pliman/issues">github</a>. The package <a href="https://reprex.tidyverse.org/">reprex</a> may help you with that.</p></li>
 <li><p>Suggestions and criticisms to improve the quality and usability of the package are welcome!</p></li>
 </ul>
 </div>

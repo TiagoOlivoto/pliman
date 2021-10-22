@@ -59,7 +59,7 @@ section.
 \code{\link[=dpi]{dpi()}} only run in an interactive section. To compute the image
 resolution (dpi) the user must use the left button mouse to create a line
 of known distance. This can be done, for example, using a template with
-known distance in the image (e.g., \code{la_leaves.JPG}).
+known distance in the image (e.g., \code{la_leaves.jpg}).
 }
 \examples{
 library(pliman)
@@ -79,7 +79,7 @@ if(isTRUE(interactive())){
 #### compute the dpi (dots per inch) resolution ####
 # only works in an interactive section
 # objects_300dpi.jpg has a known resolution of 300 dpi
-img <- image_import(image_pliman("objects_300dpi.jpg"))
+img <- image_pliman("objects_300dpi.jpg")
 # Higher square: 10 x 10 cm
 # 1) Run the function dpi()
 # 2) Use the left mouse button to create a line in the higher square
@@ -88,7 +88,7 @@ img <- image_import(image_pliman("objects_300dpi.jpg"))
 dpi(img)
 
 
-img2 <- image_import(image_pliman("la_leaves.JPG"))
+img2 <- image_pliman("la_leaves.jpg")
 # square leaf sample (2 x 2 cm)
 dpi(img2)
 }

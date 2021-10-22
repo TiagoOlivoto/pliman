@@ -47,8 +47,8 @@
 
 
 <meta property="og:title" content="Image indexes — image_index" />
-<meta property="og:description" content="Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
-Produces an histogram of an image_index object" />
+<meta property="og:description" content="image_index() Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+plot.image_index() produces an histogram of an image_index object" />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -200,8 +200,8 @@ Produces an histogram of an image_index object" />
     </div>
 
     <div class="ref-description">
-    <p>Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.</p>
-<p>Produces an histogram of an <code>image_index</code> object</p>
+    <p><code>image_index()</code> Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.</p>
+<p><code>plot.image_index()</code> produces an histogram of an <code>image_index</code> object</p>
     </div>
 
     <pre class="usage"><span class='fu'>image_index</span><span class='op'>(</span>
@@ -220,7 +220,7 @@ Produces an histogram of an image_index object" />
 <span class='op'>)</span>
 
 <span class='co'># S3 method for image_index</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"raster"</span>, facet <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"raster"</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -232,12 +232,10 @@ Produces an histogram of an image_index object" />
     <tr>
       <th>index</th>
       <td><p>A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. One of the following:  <code>"R"</code>,
-<code>"G"</code>, <code>"B"</code> <code>"GR"</code>, <code>"NR"</code>, <code>"NG"</code>, <code>"NB"</code>, <code>"BI"</code>, <code>"BIM"</code>, <code>"SCI"</code>,
-<code>"GLI"</code>, <code>"HI"</code>, <code>"NGRDI"</code>, <code>"SI"</code>, <code>"VARI"</code>, <code>"HUE"</code>, <code>"HUE2"</code>, <code>"BGI"</code>,
-<code>"BGI"</code>. Defaults to <code>NULL</code> ((normalized) Red, Green and Blue).  One can
-also use "RGB" for RGB only, "NRGB" for normalized RGB, or "all" for all
-indexes.</p></td>
+target mode for conversion to binary image. Use <code><a href='utils_file.html'>pliman_indexes()</a></code> or the
+<code>details</code> section to see the available indexes.  Defaults to <code>NULL</code>
+((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
+"NRGB" for normalized RGB, or "all" for all indexes.</p></td>
     </tr>
     <tr>
       <th>my_index</th>
@@ -296,10 +294,6 @@ raster plot showing the intensity of the pixels for each image index or
 <code>type = "hist"</code> to produce a histogram with the pixels' intensity.</p></td>
     </tr>
     <tr>
-      <th>facet</th>
-      <td><p>Shows RGB values as a facet plot? Defaults to <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Currently not used</p></td>
     </tr>
@@ -309,38 +303,43 @@ raster plot showing the intensity of the pixels for each image index or
 
     <p>A list containing Grayscale images. The length will depend on the
 number of indexes used.</p>
-<p>A <code>ggplot</code> object containing the distribution of the pixels for each
+<p>A <code>trellis</code> object containing the distribution of the pixels for each
 index.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The following indexes are available in pliman.</p><table class='table'>
-<tr><td>Index</td><td>Equation</td><td>Band</td></tr>
-<tr><td>R</td><td>R</td><td>C</td></tr>
-<tr><td>G</td><td>G</td><td>C</td></tr>
-<tr><td>B</td><td>B</td><td>C</td></tr>
-<tr><td>NR</td><td>R/(R+G+B)</td><td>C</td></tr>
-<tr><td>NG</td><td>G/(R+G+B)</td><td>C</td></tr>
-<tr><td>NB</td><td>B/(R+G+B)</td><td>C</td></tr>
-<tr><td>GB</td><td>G/B</td><td>C</td></tr>
-<tr><td>RB</td><td>R/B</td><td>C</td></tr>
-<tr><td>GR</td><td>G/R</td><td>C</td></tr>
-<tr><td>BI</td><td>sqrt((R^2+G^2+B^2)/3)</td><td>C</td></tr>
-<tr><td>BIM</td><td>sqrt((R<em>2+G</em>2+B*2)/3)</td><td>C</td></tr>
-<tr><td>SCI</td><td>(R-G)/(R+G)</td><td>C</td></tr>
-<tr><td>GLI</td><td>(2<em>G-R-B)/(2</em>G+R+B)</td><td>C</td></tr>
-<tr><td>HI</td><td>(2*R-G-B)/(G-B)</td><td>C</td></tr>
-<tr><td>NDGRI</td><td>(G-R)/(G+R)</td><td>C</td></tr>
-<tr><td>NDGBI</td><td>(G-B)/(G+B)</td><td>C</td></tr>
-<tr><td>NDRBI</td><td>(R-B)/(R+B)</td><td>C</td></tr>
-<tr><td>I</td><td>R+G+B</td><td>C</td></tr>
-<tr><td>S</td><td>((R+G+B)-3*B)/(R+G+B)</td><td>C</td></tr>
-<tr><td>L</td><td>R+G+B/3</td><td>C</td></tr>
-<tr><td>VARI</td><td>(G-R)/(G+R-B)</td><td>C</td></tr>
-<tr><td>HUE</td><td>atan(2*(B-G-R)/30.5*(G-R))</td><td>C</td></tr>
-<tr><td>HUE2</td><td>atan(2*(R-G-R)/30.5*(G-B))</td><td>C</td></tr>
-<tr><td>BGI</td><td>B/G</td><td>C</td></tr>
-</table>
-
+    <p>The following indexes are available in pliman.</p><ul>
+<li><p><code>R</code> red</p></li>
+<li><p><code>G</code> green</p></li>
+<li><p><code>B</code> blue</p></li>
+<li><p><code>NR</code> normalized red <code>R/(R+G+B)</code>.</p></li>
+<li><p><code>NG</code> normalized green <code>G/(R+G+B)</code></p></li>
+<li><p><code>NB</code> normalized blue <code>B/(R+G+B)</code></p></li>
+<li><p><code>GB</code> green blue ratio <code>G/B</code></p></li>
+<li><p><code>RB</code> red blue ratio <code>R/B</code></p></li>
+<li><p><code>GR</code> green red ratio <code>G/R</code></p></li>
+<li><p><code>BI</code> brightness Index <code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt((R^2+G^2+B^2)/3)</a></code></p></li>
+<li><p><code>BIM</code> brightness Index 2 <code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt((R*2+G*2+B*2)/3)</a></code></p></li>
+<li><p><code>SCI</code> Soil Colour Index <code>(R-G)/(R+G)</code></p></li>
+<li><p><code>GLI</code> Green leaf index Vis Louhaichi et al. (2001) <code>(2*G-R-B)/(2*G+R+B)</code></p></li>
+<li><p><code>HI</code> Primary colours Hue Index    (2*R-G-B)/(G-B)</p></li>
+<li><p><code>NDGRI</code> Normalized green red difference index (Tucker, 1979) <code>(G-R)/(G+R)</code></p></li>
+<li><p><code>NDGBI</code> Normalized green blue difference index <code>(G-B)/(G+B)</code></p></li>
+<li><p><code>NDRBI</code> Normalized red blue difference index <code>(R-B)/(R+B)</code></p></li>
+<li><p><code>I</code>     R+G+B</p></li>
+<li><p><code>S</code>     ((R+G+B)-3*B)/(R+G+B)</p></li>
+<li><p><code>L</code>     R+G+B/3</p></li>
+<li><p><code>VARI</code> A Visible Atmospherically Resistant Index <code>(G-R)/(G+R-B)</code></p></li>
+<li><p><code>HUE</code> Overall Hue Index <code><a href='https://rdrr.io/r/base/Trig.html'>atan(2*(B-G-R)/30.5*(G-R))</a></code></p></li>
+<li><p><code>HUE2</code>  atan(2*(R-G-R)/30.5*(G-B))</p></li>
+<li><p><code>BGI</code>   B/G</p></li>
+<li><p><code>GRAY</code>	<code>0.299*R + 0.587*G + 0.114*B</code></p></li>
+<li><p><code>GLAI</code> <code>(25*(G-R)/(G+R-B)+1.25)</code></p></li>
+<li><p><code>GRVI</code> Green-Red Vegetation Index (G-R)/(G+R)</p></li>
+<li><p><code>CI</code> Coloration Index <code>(R-B)/R</code></p></li>
+<li><p><code>SAT</code> Overhall Saturation Index <code>(max(R,G,B) - min(R,G,B)) / max(R,G,B)</code></p></li>
+<li><p><code>SHP</code> Shape Index <code>2*(R-G-B)/(G-B)</code></p></li>
+<li><p><code>RI</code> Redness Index <code>R**2/(B*G**3)</code></p></li>
+</ul>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -354,14 +353,15 @@ doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.43100
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span>
+<span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='image_index-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_import</a></span><span class='op'>(</span><span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span>
+
 <span class='co'># A half size of the original image</span>
 <span class='va'>ind</span> <span class='op'>&lt;-</span> <span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span><span class='op'>)</span>
 </div><div class='img'><img src='image_index-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ind</span><span class='op'>)</span>
-</div><div class='img'><img src='image_index-3.png' alt='' width='700' height='433' /></div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: device support for raster images unknown, ignoring 'raster=TRUE'</span></div><div class='img'><img src='image_index-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

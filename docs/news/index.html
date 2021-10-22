@@ -200,6 +200,40 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#pliman-development-version" class="anchor"></a>pliman (development version)<small> Unreleased </small>
 </h1>
+<div id="new-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions" class="anchor"></a>New functions</h2>
+<ul>
+<li>
+<code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> is now used as the main function to compute the number and shape of objects.</li>
+<li>
+<code><a href="../reference/measure_disease.html">measure_disease()</a></code> is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as number and shape of lesions.</li>
+<li>
+<code><a href="../reference/image_segment.html">image_segment_iter()</a></code> is used to performs iterative image segmentation.</li>
+<li>
+<code><a href="../reference/utils_polygon.html">conv_hull()</a></code>, <code><a href="../reference/utils_polygon.html">poly_area()</a></code>, and <code><a href="../reference/utils_polygon.html">plot_contour()</a></code> as utilities for analyzing polygons.</li>
+<li>
+<code><a href="../reference/utils_dpi.html">dpi()</a></code> to compute the resolution (dots per inch) of an image.</li>
+<li>
+<code><a href="../reference/tune_tolerance.html">tune_tolerance()</a></code> for tunning the <code>tolerance</code> parameter.</li>
+</ul>
+</div>
+<div id="deprecated-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#deprecated-functions" class="anchor"></a>Deprecated functions.</h2>
+<ul>
+<li>
+<code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> will be depracated in the future. Now, to compute an index for each object use the <code>object_index</code> argument in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, for example, <code><a href="../reference/analyze_objects.html">analyze_objects(object_index = "B")</a></code>.</li>
+<li>
+<code><a href="../reference/leaf_area.html">leaf_area()</a></code> will be depracated in the future. Now, combine <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> with <code><a href="../reference/utils_measures.html">get_measures()</a></code> to obtain the area and shape of objects (leaves).</li>
+<li>
+<code><a href="../reference/prop_segmented.html">prop_segmented()</a></code> is now deprecated in favour of <code><a href="../reference/image_segment.html">image_segment_iter()</a></code>.</li>
+<li>
+<code><a href="../reference/count_lesions.html">count_lesions()</a></code> is now deprecated. Now, to compute the number and shape of lesions, use the argument <code>show_features = TRUE</code> in <code><a href="../reference/measure_disease.html">measure_disease()</a></code>.</li>
+<li>
+<code><a href="../reference/utils_image.html">image_show()</a></code> is now deprecated in favour of <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>.</li>
+</ul>
+</div>
 <div id="minor-improvements" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
@@ -208,6 +242,9 @@
 </li>
 <li>Improve <code><a href="../reference/utils_transform.html">image_contrast()</a></code> function to avoid error regarding image resolution.</li>
 <li>New argument <code>subfolder</code> in <code><a href="../reference/utils_image.html">image_export()</a></code> to export an image to a subfolder.</li>
+<li>Now <code>EBImage</code> installation is checked when pliman is installed.</li>
+<li>
+<code><a href="../reference/utils_image.html">image_import()</a></code> now returns the image object instead of the path to the image. So, it is not necessarily to call it within <code><a href="../reference/utils_image.html">image_import()</a></code>.</li>
 </ul>
 </div>
 </div>
@@ -215,9 +252,9 @@
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#pliman-030" class="anchor"></a>pliman 0.3.0<small> 2021-06-10 </small>
 </h1>
-<div id="new-functions" class="section level2">
+<div id="new-functions-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions" class="anchor"></a>New functions</h2>
+<a href="#new-functions-1" class="anchor"></a>New functions</h2>
 <ul>
 <li>
 <code><a href="../reference/utils_transform.html">image_autocrop()</a></code> for automatic image cropping.</li>

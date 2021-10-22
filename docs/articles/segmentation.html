@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Image segmentation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-13</h4>
+            <h4 class="date">2021-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/segmentation.Rmd"><code>vignettes/segmentation.Rmd</code></a></small>
       <div class="hidden name"><code>segmentation.Rmd</code></div>
@@ -281,7 +281,7 @@
 </tr>
 </tbody>
 </table>
-<p>Here, I use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. Users can also provide their own index with the argument <code>my_index</code>.</p>
+<p>Here, I use the argument <code>index"</code> to test the segmentation based on the RGB and their normalized values. Users can also provide their index with the argument <code>my_index</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |=======================================================|</span>
@@ -290,14 +290,16 @@
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
 <span class="co">#&gt; |=======================================================|</span>
-<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Compute the indexes</span>
 <span class="va">indexes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-1.png" width="960"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Create a raster plot with the RGB values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span>
+<span class="co">#&gt; Warning in levelplot.formula(value ~ id * y | spectrum, layout = c(ncol, :</span>
+<span class="co">#&gt; device support for raster images unknown, ignoring 'raster=TRUE'</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-2.png" width="960"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Create a histogram with the RGB values</span>
@@ -323,7 +325,7 @@
 <a href="#iterative-segmentation" class="anchor"></a>Iterative segmentation</h2>
 <p>The function <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> provides an iterative image segmentation, returning the proportions of segmented pixels. This is useful when more than one segmentation procedure is needed. Users can choose how many segmentation perform, using the argument <code>nseg</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">seg_iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf_nb.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">seg_iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf_nb.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation5-1.png" width="700"></p>
 <p>Using a soybean sample leaf (above), I will use the function <code>image_segment_iter</code> to segment the diseased tissue from healthy tissue. The aim is to segment the symptoms into two classes, namely, necrosis (brown areas) and chlorosis (yellow areas), and compute the percentage of each symptom class.</p>
 <p>First, we need to find a suitable index for segmentation.</p>
@@ -339,7 +341,7 @@
   <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">seg</span><span class="op">$</span><span class="va">VARI</span><span class="op">$</span><span class="va">image</span>,
                 index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation6-2.png" width="960"></p>
-<p>Note that the same results can be obtainet with <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> using an iterative section.</p>
+<p>Note that the same results can be obtained with <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> using an iterative section.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Only run iteratively</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>, nseg <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
