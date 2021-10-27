@@ -44,11 +44,13 @@
 #' @param index_dh The index used to segment diseased from healthy tissues when
 #'   `img_healthy` and `img_symptoms` are not declared. Defaults to `"GLI"`. See
 #'   [image_index()] for more details.
-#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
-#'   on Otsu's method is used to reduce the grayscale image to a binary image.
-#'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than "Otsu" to iteratively choose
-#'   the threshold based on a raster plot showing pixel intensity of the index.
+#' @param threshold By default (`threshold = NULL`), a threshold value based on
+#'   Otsu's method is used to reduce the grayscale image to a binary image. If a
+#'   numeric value is informed, this value will be used as a threshold. Inform
+#'   any non-numeric value different than "Otsu" to iteratively choose the
+#'   threshold based on a raster plot showing pixel intensity of the index. Must
+#'   be a vector of length 2 to indicate the threshold for `index_lb` and
+#'   `index_dh`, respectively.
 #' @param invert Inverts the binary image if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
@@ -152,7 +154,7 @@ measure_disease <- function(img,
                             fill_hull = TRUE,
                             index_lb = NULL,
                             index_dh = "GLI",
-                            threshold = "Otsu",
+                            threshold = NULL,
                             invert = FALSE,
                             lower_size = NULL,
                             upper_size = NULL,
@@ -449,9 +451,18 @@ measure_disease <- function(img,
             my_index_lb <- NULL
             index_lb <- index_lb
           }
+          if(is.null(threshold)){
+            threshold <- rep("Otsu", 2)
+          } else{
+            threshold <- threshold
+          }
+          my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[1]))),
+                              as.character(threshold[1]),
+                              as.numeric(threshold[1]))
           seg <- image_segment(img,
                                index = index_lb,
                                my_index = my_index_lb,
+                               threshold = my_thresh,
                                show_image = FALSE,
                                fill_hull = FALSE)
 
@@ -465,10 +476,13 @@ measure_disease <- function(img,
           my_index_dh <- NULL
           index_dh <- index_dh
         }
+        my_thresh2 <- ifelse(is.na(suppressWarnings(as.numeric(threshold[2]))),
+                            as.character(threshold[2]),
+                            as.numeric(threshold[2]))
         img2 <- image_binary(img,
                              index = index_dh,
-                             threshold = threshold,
                              my_index = my_index_dh,
+                             threshold = my_thresh2,
                              invert = invert,
                              resize = FALSE,
                              show_image = FALSE)[[1]]

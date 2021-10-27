@@ -25,7 +25,7 @@ BGI;B/G;C
 L;R+G+B/3;C
 GRAY;0.299*R + 0.587*G + 0.114*B;C
 GLAI;(25*(G-R)/(G+R-B)+1.25);C
-GRVI;(G-R)/(G+R);C
+SAT;(max(R,G,B) - min(R,G,B)) / max(R,G,B);C
 CI;(R-B)/R;C
 SHP;2*(R-G-B)/(G-B);C
 RI;R**2/(B*G**3);C

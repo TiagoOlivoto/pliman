@@ -243,6 +243,7 @@ plot_measures <- function(object,
   if("measures"  %in% class(object)){
     object <- object
   } else if(class(object) == "anal_obj"){
+    index <- object$object_index
     object <- object$results
   } else if(class(object) == "objects_rgb"){
     object <- object$objects
@@ -251,15 +252,27 @@ plot_measures <- function(object,
   } else{
     stop("Object of ivalid class.")
   }
-  measures <- colnames(object)
-  if(!measure %in% measures){
-    stop("'measure' must be one of {", paste(measures, collapse = ", "),"}.", call. = FALSE)
+  if(measure %in% colnames(object)){
+    text(x = object[,2],
+         y = object[,3],
+         labels = round(object[, which(colnames(object) == measure)], digits),
+         col = col,
+         cex = size,
+         ...)
+  } else{
+    if(!is.null(index)){
+      measures <- colnames(index)
+      if(!measure %in% measures){
+        stop("'measure' must be one of {", paste(c(colnames(object), measures), collapse = ", "),"}.", call. = FALSE)
+      }
+      text(x = object[,2],
+           y = object[,3],
+           labels = round(index[, which(colnames(index) == measure)], digits),
+           col = col,
+           cex = size,
+           ...)
+    } else{
+      stop("'measure' must be one of {", paste(colnames(object), collapse = ", "),"}.", call. = FALSE)
+    }
   }
-  text(x = object[,2],
-       y = object[,3],
-       labels = round(object[, which(colnames(object) == measure)], digits),
-       col = col,
-       cex = size,
-       ...)
 }
-

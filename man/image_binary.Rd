@@ -38,9 +38,10 @@ If a numeric value is informed, this value will be used as a threshold.
 Inform any non-numeric value different than "Otsu" to iteratively chosen
 the threshold based on a raster plot showing pixel intensity of the index.}
 
-\item{resize}{Resize the image before processing? Defaults to \code{30}, which
-resizes the image to 30\% of the original size to speed up image processing.
-Set \code{resize = FALSE} to keep the original size of the image.}
+\item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
+numeric value as the percentage of desired resizing. For example, if
+\code{resize = 30}, the resized image will have 30\% of the size of original
+image.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 

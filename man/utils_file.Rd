@@ -7,6 +7,7 @@
 \alias{file_dir}
 \alias{manipulate_files}
 \alias{pliman_indexes}
+\alias{pliman_indexes_eq}
 \title{Utilities for file manipulation}
 \usage{
 file_extension(file)
@@ -30,6 +31,8 @@ manipulate_files(
 )
 
 pliman_indexes()
+
+pliman_indexes_eq()
 }
 \arguments{
 \item{file}{The file name.}
@@ -85,6 +88,8 @@ attempted.
 (insert prefix or suffix) and save the new files to the same or other provided
 directory.
 \item \code{pliman_indexes()} Get the indexes available in pliman.
+\item \code{pliman_indexes_eq()} Get the equation of the indexes available
+in pliman.
 }
 }
 \examples{

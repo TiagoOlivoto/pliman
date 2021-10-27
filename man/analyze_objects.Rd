@@ -54,7 +54,7 @@ analyze_objects(
   verbose = TRUE
 )
 
-\method{plot}{anal_obj}(x, ...)
+\method{plot}{anal_obj}(x, facet = FALSE, ...)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -123,8 +123,9 @@ more details.}
 
 \item{object_index}{Defaults to \code{FALSE}. If an index is informed, the average
 value for each object is returned. It can be the R, G, and B values or any
-operation involving them, e.g., \code{object_index = "R/B"} will return, for
-each object in the image, the average value of the R/B ratio.}
+operation involving them, e.g., \code{object_index = "R/B"}. In this case, it
+will return for each object in the image, the average value of the R/B
+ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equations of available indexes.}
 
 \item{threshold}{A numeric value for the segmentation threshold.  By default,
 a threshold value based on Otsu's method is used to reduce the grayscale
@@ -208,6 +209,8 @@ saved in such a directory.}
 
 \item{x}{An object of class \code{anal_obj}.}
 
+\item{facet}{Create a facet plot for each object. Defaults to \code{FALSE}.}
+
 \item{...}{Currently not used}
 }
 \value{
@@ -244,7 +247,8 @@ for each pixel of each object.
 }
 
 \code{plot.anal_obj()} returns a \code{trellis} object containing the
-distribution of the pixels for each object
+distribution of the pixels, optionally  for each object when \code{facet = TRUE}
+is used.
 }
 \description{
 \itemize{
@@ -308,6 +312,7 @@ rgb <-
                    index = "NB", # default
                    object_index = "B")
 plot(rgb)
+plot(rgb, facet = TRUE)
 }
 }
 \references{

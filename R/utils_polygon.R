@@ -18,6 +18,8 @@
 #' @param closed If `TRUE` (default) returns the vector of points of a closed
 #'   polygon, i.e., the first point is replicated as the last one.
 #' @param col,lwd The color and width of the lines, respectively.
+#' @param id The object identification (numeric) to plot the contour. By default
+#'   (`id = NULL`), the contour is plotted to all objects
 #' @name utils_polygon
 #' @return
 #' * `conv_hull()` returns a matrix with `x` and `y` coordinates for the convex
@@ -121,9 +123,17 @@ poly_area <- function(x, y = NULL){
 }
 #' @name utils_polygon
 #' @export
-plot_contour <- function(x, y = NULL, col = "white", lwd = 1){
+plot_contour <- function(x,
+                         y = NULL,
+                         id = NULL,
+                         col = "white",
+                         lwd = 1){
   if(inherits(x, "list")){
-    invisible(lapply(x, plot_contour, y, col, lwd))
+    if(is.null(id)){
+      invisible(lapply(x, plot_contour, y, id, col, lwd))
+    } else{
+      invisible(lapply(x[id], plot_contour, y, id, col, lwd))
+    }
   } else{
     if(is.null(y)){
       if(is.data.frame(x) | is.matrix(x)){

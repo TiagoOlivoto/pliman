@@ -16,7 +16,7 @@ measure_disease(
   fill_hull = TRUE,
   index_lb = NULL,
   index_dh = "GLI",
-  threshold = "Otsu",
+  threshold = NULL,
   invert = FALSE,
   lower_size = NULL,
   upper_size = NULL,
@@ -88,11 +88,13 @@ considered in the computation of the severity.}
 \code{img_healthy} and \code{img_symptoms} are not declared. Defaults to \code{"GLI"}. See
 \code{\link[=image_index]{image_index()}} for more details.}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively choose
-the threshold based on a raster plot showing pixel intensity of the index.}
+\item{threshold}{By default (\code{threshold = NULL}), a threshold value based on
+Otsu's method is used to reduce the grayscale image to a binary image. If a
+numeric value is informed, this value will be used as a threshold. Inform
+any non-numeric value different than "Otsu" to iteratively choose the
+threshold based on a raster plot showing pixel intensity of the index. Must
+be a vector of length 2 to indicate the threshold for \code{index_lb} and
+\code{index_dh}, respectively.}
 
 \item{invert}{Inverts the binary image if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}

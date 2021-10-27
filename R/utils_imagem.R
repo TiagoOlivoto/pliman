@@ -29,7 +29,7 @@ image_combine <- function(...,
     }
   }else{
     plots <- list(...)
-    names(plots) <- strsplit(gsub("c\\(|\\)",  "", deparse(substitute(c(...)))), "\\s*(\\s|,)\\s*")[[1]]
+    names(plots) <- unlist(strsplit(gsub("c\\(|\\)",  "", substitute(c(...))), "\\s*(\\s|,)\\s*"))[-1]
   }
   num_plots <- length(plots)
   if (is.null(nrow) && is.null(ncol)){
@@ -507,7 +507,7 @@ image_dimension <- function(image,
                 lapply(image, function(x){
                   dim <- image_dimension(x, verbose = FALSE)
                   data.frame(width = dim[[1]],
-                             heiht = dim[[2]])
+                             height = dim[[2]])
                 }))
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
       rownames(res) <- NULL
@@ -1239,9 +1239,10 @@ image_contrast <- function(image,
 #'   If a numeric value is informed, this value will be used as a threshold.
 #'   Inform any non-numeric value different than "Otsu" to iteratively chosen
 #'   the threshold based on a raster plot showing pixel intensity of the index.
-#' @param resize Resize the image before processing? Defaults to `30`, which
-#'   resizes the image to 30% of the original size to speed up image processing.
-#'   Set `resize = FALSE` to keep the original size of the image.
+#' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
+#'   numeric value as the percentage of desired resizing. For example, if
+#'   `resize = 30`, the resized image will have 30% of the size of original
+#'   image.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
@@ -1400,7 +1401,7 @@ image_binary <- function(image,
         plot(imgs[[i]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
         }
       }
     }
@@ -1441,7 +1442,6 @@ image_binary <- function(image,
 #' * `BGI`   B/G
 #' * `GRAY`	`0.299*R + 0.587*G + 0.114*B`
 #' * `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
-#' * `GRVI` Green-Red Vegetation Index (G-R)/(G+R)
 #' * `CI` Coloration Index `(R-B)/R`
 #' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
 #' * `SHP` Shape Index `2*(R-G-B)/(G-B)`
@@ -1488,7 +1488,7 @@ image_binary <- function(image,
 image_index <- function(image,
                         index = NULL,
                         my_index = NULL,
-                        resize = 30,
+                        resize = FALSE,
                         re = NULL,
                         nir = NULL,
                         show_image = TRUE,
@@ -1542,8 +1542,8 @@ image_index <- function(image,
         indx <-
           switch (indx,
                   R = "red",
-                  G = "blue",
-                  B = "green",
+                  G = "green",
+                  B = "blue",
                   GR = "gray"
           )
         imgs[[i]] <- EBImage::channel(image, indx)
@@ -1610,13 +1610,15 @@ image_index <- function(image,
 
 #' Plots an `image_index` object
 #'
-#' `plot.image_index()` produces an histogram of an `image_index` object
+#' `plot.image_index()` produces a raster (`type = "raster"`, default) or a
+#' density (`type = "density"`) plot of the index values computed with
+#' `image_index()`.
 #'
 #' @name image_index
 #' @param x An object of class `image_index`.
 #' @param type The type of plot. Use `type = "raster"` (default) to produce a
 #'   raster plot showing the intensity of the pixels for each image index or
-#'   `type = "hist"` to produce a histogram with the pixels' intensity.
+#'   `type = "density"` to produce a density plot with the pixels' intensity.
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param ... Currently not used
@@ -1629,18 +1631,18 @@ image_index <- function(image,
 #' library(pliman)
 #' img <- image_pliman("sev_leaf.jpg")
 #'
-#' # A half size of the original image
-#' ind <- image_index(img)
+#' # resize the image to 30% of the original size
+#' ind <- image_index(img, resize = 30, show_image = FALSE)
 #' plot(ind)
 plot.image_index <- function(x,
                              type = "raster",
                              nrow = NULL,
                              ncol = NULL,
                              ...){
-  if(!type %in% c("raster", "hist")){
-    stop("`type` must be one of the 'raster' or 'hist'. ")
+  if(!type %in% c("raster", "density")){
+    stop("`type` must be one of the 'raster' or 'density'. ")
   }
-  if(type == "hist"){
+  if(type == "density"){
     mat <-
       as.data.frame(
         do.call(cbind,
@@ -1969,6 +1971,7 @@ image_segment_iter <- function(image,
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
                  "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
                  "S", "VARI", "HUE", "HUE2", "BGI", "L")
+        my_index <- NULL
       } else{
         index <- index[1]
         if(!index %in% avali_index){

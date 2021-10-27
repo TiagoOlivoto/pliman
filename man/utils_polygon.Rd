@@ -11,7 +11,7 @@ conv_hull(x, y = NULL, closed = TRUE)
 
 poly_area(x, y = NULL)
 
-plot_contour(x, y = NULL, col = "white", lwd = 1)
+plot_contour(x, y = NULL, id = NULL, col = "white", lwd = 1)
 }
 \arguments{
 \item{x, y}{Coordinate vectors of points. This can be specified as two vectors
@@ -21,6 +21,9 @@ coordinates the function will be applied to each element using
 
 \item{closed}{If \code{TRUE} (default) returns the vector of points of a closed
 polygon, i.e., the first point is replicated as the last one.}
+
+\item{id}{The object identification (numeric) to plot the contour. By default
+(\code{id = NULL}), the contour is plotted to all objects}
 
 \item{col, lwd}{The color and width of the lines, respectively.}
 }

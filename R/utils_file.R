@@ -7,6 +7,8 @@
 #'(insert prefix or suffix) and save the new files to the same or other provided
 #'directory.
 #'* `pliman_indexes()` Get the indexes available in pliman.
+#'* `pliman_indexes_eq()` Get the equation of the indexes available
+#'in pliman.
 #' @name utils_file
 #' @param file The file name.
 #' @param pattern A file name pattern.
@@ -184,4 +186,12 @@ pliman_indexes <- function(){
                             package = "pliman",
                             mustWork = TRUE),
            header = T, sep = ";")$Index
+}
+#' @name utils_file
+#' @export
+pliman_indexes_eq <- function(){
+  read.csv(file=system.file("indexes.csv",
+                            package = "pliman",
+                            mustWork = TRUE),
+           header = T, sep = ";")$Equation
 }

@@ -9,7 +9,7 @@ image_index(
   image,
   index = NULL,
   my_index = NULL,
-  resize = 30,
+  resize = FALSE,
   re = NULL,
   nir = NULL,
   show_image = TRUE,
@@ -63,7 +63,7 @@ number of parallel processes that can be active at the same time.}
 
 \item{type}{The type of plot. Use \code{type = "raster"} (default) to produce a
 raster plot showing the intensity of the pixels for each image index or
-\code{type = "hist"} to produce a histogram with the pixels' intensity.}
+\code{type = "density"} to produce a density plot with the pixels' intensity.}
 
 \item{...}{Currently not used}
 }
@@ -77,7 +77,9 @@ index.
 \description{
 \code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
 
-\code{plot.image_index()} produces an histogram of an \code{image_index} object
+\code{plot.image_index()} produces a raster (\code{type = "raster"}, default) or a
+density (\code{type = "density"}) plot of the index values computed with
+\code{image_index()}.
 }
 \details{
 The following indexes are available in pliman.
@@ -108,7 +110,6 @@ The following indexes are available in pliman.
 \item \code{BGI}   B/G
 \item \code{GRAY}	\code{0.299*R + 0.587*G + 0.114*B}
 \item \code{GLAI} \code{(25*(G-R)/(G+R-B)+1.25)}
-\item \code{GRVI} Green-Red Vegetation Index (G-R)/(G+R)
 \item \code{CI} Coloration Index \code{(R-B)/R}
 \item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}
 \item \code{SHP} Shape Index \code{2*(R-G-B)/(G-B)}
@@ -122,8 +123,8 @@ image_index(img, index = c("R, NR"))
 library(pliman)
 img <- image_pliman("sev_leaf.jpg")
 
-# A half size of the original image
-ind <- image_index(img)
+# resize the image to 30\% of the original size
+ind <- image_index(img, resize = 30, show_image = FALSE)
 plot(ind)
 }
 \references{

@@ -80,8 +80,9 @@
 #'   more details.
 #' @param object_index Defaults to `FALSE`. If an index is informed, the average
 #'   value for each object is returned. It can be the R, G, and B values or any
-#'   operation involving them, e.g., `object_index = "R/B"` will return, for
-#'   each object in the image, the average value of the R/B ratio.
+#'   operation involving them, e.g., `object_index = "R/B"`. In this case, it
+#'   will return for each object in the image, the average value of the R/B
+#'   ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
 #' @param threshold A numeric value for the segmentation threshold.  By default,
 #'   a threshold value based on Otsu's method is used to reduce the grayscale
 #'   image to a binary image.
@@ -247,7 +248,7 @@ analyze_objects <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  check_ebi()
+  # check_ebi()
   if(!missing(img_pattern)){
     warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.", call. = FALSE)
     pattern <- img_pattern
@@ -430,12 +431,14 @@ analyze_objects <- function(img,
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
         }
-        object_index <- toupper(object_index)
-        bands <- unique(unlist(strsplit(unlist(object_index), "[^a-zA-Z]+")))
-        if(!all(bands %in% c("R", "G", "B"))){
-          stop("`object_index` must contains only R, G, and B values.", call. = FALSE)
-        }
+        ind_formula <- object_index
         data_mask <- nmask@.Data
+        get_rgb <- function(img, data_mask, index){
+          data.frame(object = index,
+                     R = img@.Data[,,1][which(data_mask == index)],
+                     G = img@.Data[,,2][which(data_mask == index)],
+                     B = img@.Data[,,3][which(data_mask == index)])
+        }
         if(isTRUE(parallel)){
           nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
           clust <- makeCluster(nworkers)
@@ -458,12 +461,30 @@ analyze_objects <- function(img,
                     }))
         }
         object_rgb <- subset(object_rgb, object %in% shape$id)
-        indexes <- transform(object_rgb, index = eval(parse(text = object_index)))
-        indexes <- aggregate(index ~ object, data = indexes, FUN = mean)
-        shape <- cbind(shape, index = indexes[, 2])
-        colnames(shape[14]) <- "index"
+        # indexes by object
+        indexes <-
+          by(object_rgb,
+             INDICES = object_rgb$object,
+             FUN = function(x){
+               data.frame(
+                 do.call(cbind,
+                         lapply(seq_along(ind_formula), function(i){
+                           data.frame(transform(x, index = eval(parse(text = ind_formula[i])))[,5])
+                         })
+                 )
+               )
+             }
+          )
+        indexes <-
+          do.call(rbind,
+                  lapply(indexes, data.frame)
+          )
+        indexes <- data.frame(cbind(object = object_rgb$object, indexes))
+        colnames(indexes) <- c("object", ind_formula)
+        indexes <- aggregate(. ~ object, indexes, mean, na.rm = TRUE)
       } else{
         object_rgb <- NULL
+        indexes <- NULL
       }
       stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
                                    "sd_area", "sum_area"),
@@ -475,7 +496,8 @@ analyze_objects <- function(img,
                                     sum(shape$area)))
       results <- list(results = shape,
                       statistics = stats,
-                      object_rgb = object_rgb)
+                      object_rgb = object_rgb,
+                      object_index = indexes)
       class(results) <- "anal_obj"
       if(show_image == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
@@ -696,12 +718,14 @@ analyze_objects <- function(img,
 
 #' @name analyze_objects
 #' @param x An object of class `anal_obj`.
+#' @param facet Create a facet plot for each object. Defaults to `FALSE`.
 #' @param ... Currently not used
 #' @method plot anal_obj
 #' @importFrom lattice densityplot levelplot
 #' @export
 #' @return `plot.anal_obj()` returns a `trellis` object containing the
-#'   distribution of the pixels for each object
+#'   distribution of the pixels, optionally  for each object when `facet = TRUE`
+#'   is used.
 #' @examples
 #' \donttest{
 #' library(pliman)
@@ -716,8 +740,9 @@ analyze_objects <- function(img,
 #'                    index = "NB", # default
 #'                    object_index = "B")
 #' plot(rgb)
+#' plot(rgb, facet = TRUE)
 #' }
-plot.anal_obj <- function(x, ...){
+plot.anal_obj <- function(x, facet = FALSE, ...){
   rgb <- x$object_rgb
   if(is.null(rgb)){
     stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.", call. = FALSE)
@@ -732,10 +757,19 @@ plot.anal_obj <- function(x, ...){
             timevar = "Spectrum",
             times = c("r", "g", "b"))
   rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
-  densityplot(~value | factor(object),
-              data = rgb,
-              groups = Spectrum,
-              par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
-              xlab = "Pixel value",
-              plot.points = FALSE)
+  if(isTRUE(facet)){
+    densityplot(~value | factor(object),
+                data = rgb,
+                groups = Spectrum,
+                par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
+                xlab = "Pixel value",
+                plot.points = FALSE)
+  } else{
+    densityplot(~value,
+                data = rgb,
+                groups = Spectrum,
+                par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
+                xlab = "Pixel value",
+                plot.points = FALSE)
+  }
 }
