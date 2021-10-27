@@ -299,6 +299,8 @@ image_pliman <- function(image, plot = FALSE){
 #' * `image_skeleton()` Performs image skeletonization.
 #' @name utils_transform
 #' @param image An image or a list of images of class `Image`.
+#' @param index The index to segment the image. See [image_index()] for more
+#'   details. Defaults to `"NB"` (normalized blue).
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
@@ -363,6 +365,7 @@ image_pliman <- function(image, plot = FALSE){
 #'img4 <- image_vertical(img)
 #'image_combine(img1, img2, img3, img4)
 image_autocrop <- function(image,
+                           index = "NB",
                            edge = 5,
                            parallel = FALSE,
                            workers = NULL,
@@ -385,13 +388,14 @@ image_autocrop <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_autocrop, edge)
+      res <- parLapply(clust, image, image_autocrop, index, edge)
     } else{
-      res <- lapply(image, image_autocrop, edge)
+      res <- lapply(image, image_autocrop, index, edge)
     }
     return(structure(res, class = "autocrop_list"))
   } else{
     conv_hull <- object_coord(image,
+                              index = index,
                               id = NULL,
                               edge = edge,
                               show_image = FALSE)

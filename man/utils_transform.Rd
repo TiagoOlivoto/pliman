@@ -24,6 +24,7 @@
 \usage{
 image_autocrop(
   image,
+  index = "NB",
   edge = 5,
   parallel = FALSE,
   workers = NULL,
@@ -191,6 +192,9 @@ image_contrast(
 }
 \arguments{
 \item{image}{An image or a list of images of class \code{Image}.}
+
+\item{index}{The index to segment the image. See \code{\link[=image_index]{image_index()}} for more
+details. Defaults to \code{"NB"} (normalized blue).}
 
 \item{edge}{\itemize{
 \item for \code{\link[=image_autocrop]{image_autocrop()}} the number of pixels in the edge of the cropped
