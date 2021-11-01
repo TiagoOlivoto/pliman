@@ -1,6 +1,6 @@
 #' Utilities for object measures
 #'
-#'* `get_measures()` computes object measures (area, perimeter, radius) by using
+#' * `get_measures()` computes object measures (area, perimeter, radius) by using
 #'either a known resolution (dpi) or an object with known measurements.
 #' * `plot_measures()` draws the object measures given in an object to the
 #' current plot. The object identification (`"id"`) is drawn by default.
@@ -31,6 +31,10 @@
 #'   single image information (L1). This feature allows the user to treat
 #'   multiple images as belonging to a single sample, if desired. Defaults to
 #'   `sep = "\\_|-"`.
+#' @param hjust,vjust A numeric value to adjust the labels horizontally and
+#'   vertically. Positive values will move labels to right (hjust) and top
+#'   (vjust). Negative values will move the labels to left and bottom,
+#'   respectively.
 #' @param digits The number of significant figures. Defaults to `2.`
 #' @param size The size of the text. Defaults to `0.9`.
 #' @param col The color of the text. Defaults to `"white"`.
@@ -148,7 +152,11 @@ get_measures <- function(object,
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
       res$radius_max <- res$radius_max * px_side
+      res$diam_mean <- res$diam_mean * px_side
+      res$diam_min <- res$diam_min * px_side
+      res$diam_max <- res$diam_max * px_side
       res$major_axis <- res$major_axis * px_side
+      res$minor_axis <- res$major_axis * px_side
     }
     if(var != "area"){
       id_val <- res[which(res$id == id), var]
@@ -159,7 +167,11 @@ get_measures <- function(object,
       res$radius_mean <- res$radius_mean * px_side
       res$radius_min <- res$radius_min * px_side
       res$radius_max <- res$radius_max * px_side
+      res$diam_mean <- res$diam_mean * px_side
+      res$diam_min <- res$diam_min * px_side
+      res$diam_max <- res$diam_max * px_side
       res$major_axis <- res$major_axis * px_side
+      res$minor_axis <- res$major_axis * px_side
     }
     if(verbose == TRUE){
       cat("-----------------------------------------\n")
@@ -179,7 +191,11 @@ get_measures <- function(object,
     res$radius_mean <- res$radius_mean / dpc
     res$radius_min <- res$radius_min / dpc
     res$radius_max <- res$radius_max / dpc
+    res$diam_mean <- res$diam_mean / dpc
+    res$diam_min <- res$diam_min / dpc
+    res$diam_max <- res$diam_max / dpc
     res$major_axis <- res$major_axis / dpc
+    res$minor_axis <- res$major_axis / dpc
   }
   if("img" %in% names(res)){
     smr <-
@@ -236,6 +252,8 @@ get_measures <- function(object,
 #' @export
 plot_measures <- function(object,
                           measure = "id",
+                          hjust = NULL,
+                          vjust = NULL,
                           digits = 2,
                           size = 0.9,
                           col = "white",
@@ -253,8 +271,10 @@ plot_measures <- function(object,
     stop("Object of ivalid class.")
   }
   if(measure %in% colnames(object)){
-    text(x = object[,2],
-         y = object[,3],
+    hjust <- ifelse(is.null(hjust), 0, hjust)
+    vjust <- ifelse(is.null(vjust), 0, vjust)
+    text(x = object[,2] + hjust,
+         y = object[,3] - vjust,
          labels = round(object[, which(colnames(object) == measure)], digits),
          col = col,
          cex = size,

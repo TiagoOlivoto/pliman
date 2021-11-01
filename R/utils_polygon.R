@@ -4,6 +4,8 @@
 #'* `poly_area()` Compute the area of a polygon given by the vertices in the
 #'vectors `x` and `y`.
 #'* `plot_contour()` Plot contour lines using [graphics::lines()].
+#'* `plot_ellipse()` Plots an ellipse that fits the major and minor axis for
+#'each object.
 #'
 #' @details
 #' `poly_area()` computes the area of a polygon given a set of x and y
@@ -15,11 +17,12 @@
 #'   (`x` and `y`), or a 2-column matrix `x`. If `x` is a list of vector
 #'   coordinates the function will be applied to each element using
 #'   [base::lapply()].
+#' @param object An object computed with [analyze_objects()].
 #' @param closed If `TRUE` (default) returns the vector of points of a closed
 #'   polygon, i.e., the first point is replicated as the last one.
 #' @param col,lwd The color and width of the lines, respectively.
-#' @param id The object identification (numeric) to plot the contour. By default
-#'   (`id = NULL`), the contour is plotted to all objects
+#' @param id The object identification (numeric) to plot the contour/ellipse. By
+#'   default (`id = NULL`), the contour is plotted to all objects
 #' @name utils_polygon
 #' @return
 #' * `conv_hull()` returns a matrix with `x` and `y` coordinates for the convex
@@ -28,6 +31,7 @@
 #' points.
 #' * `plot_contour()` returns a `double`, or a list if `x` is a list of vector
 #' points.
+#' * `plot_ellipse()` returns a `NULL` object.
 #' @importFrom grDevices chull
 #' @export
 #' @references Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area
@@ -146,4 +150,33 @@ plot_contour <- function(x,
     }
     lines(vx, vy, col = col, lwd = lwd)
   }
+}
+
+#' @name utils_polygon
+#' @export
+plot_ellipse <- function(object,
+                         id = NULL,
+                         col = "white",
+                         lwd = 1){
+  res <- object$results
+  if(is.null(id)){
+    ids <- res$id
+  } else{
+    ids <- id
+  }
+  points <-
+    lapply(1:length(ids), function(i){
+      xc <- res$x[i] # center x_c or h
+      yc <- res$y[i] # y_c or k
+      a <- res$major_axis[i]/2 # major axis length
+      b <- res$minor_axis[i]/2 # minor axis length
+      tt <- seq(0,  2 * pi, length = 2000)
+      sa <- sin(res$theta[i])
+      ca <- cos(res$theta[i])
+      ct <- cos(tt)
+      st <- sin(tt)
+      x <- xc + a * ct * ca - b * st * sa
+      y <- yc + a * ct * sa + b * st * ca
+      lines(x, y, col = col, lwd = lwd)
+    })
 }

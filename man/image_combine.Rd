@@ -4,14 +4,26 @@
 \alias{image_combine}
 \title{Combines images to a grid}
 \usage{
-image_combine(..., nrow = NULL, ncol = NULL, verbose = TRUE)
+image_combine(
+  ...,
+  labels = NULL,
+  nrow = NULL,
+  ncol = NULL,
+  col = "black",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{...}{a comma-separated name of image objects or a list containing image
 objects.}
 
+\item{labels}{A character vector with the same length of the number of
+objects in \code{...} to indicate the plot labels.}
+
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
+
+\item{col}{The color for the plot labels. Defaults to \code{col = "black"}.}
 
 \item{verbose}{Shows the name of objects declared in \code{...} or a numeric
 sequence if a list with no names is provided. Set to \code{FALSE} to supress the

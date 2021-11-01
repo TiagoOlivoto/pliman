@@ -3,8 +3,11 @@
 #'Combines several images to a grid
 #' @param ... a comma-separated name of image objects or a list containing image
 #'   objects.
+#' @param labels A character vector with the same length of the number of
+#'   objects in `...` to indicate the plot labels.
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
+#' @param col The color for the plot labels. Defaults to `col = "black"`.
 #' @param verbose Shows the name of objects declared in `...` or a numeric
 #'   sequence if a list with no names is provided. Set to `FALSE` to supress the
 #'   text.
@@ -18,8 +21,10 @@
 #'img2 <- image_pliman("sev_leaf_nb.jpg")
 #'image_combine(img1, img2)
 image_combine <- function(...,
+                          labels = NULL,
                           nrow = NULL,
                           ncol = NULL,
+                          col = "black",
                           verbose = TRUE){
   if(is.list(c(...))){
     plots <- as.list(...)
@@ -27,9 +32,16 @@ image_combine <- function(...,
                            "img_mat_list", "palette_list")){
       plots <- lapply(plots, function(x){x[[1]]})
     }
+    if(!is.null(labels)){
+      names(plots) <- labels
+    }
   }else{
     plots <- list(...)
-    names(plots) <- unlist(strsplit(gsub("c\\(|\\)",  "", substitute(c(...))), "\\s*(\\s|,)\\s*"))[-1]
+    if(is.null(labels)){
+      names(plots) <- unlist(strsplit(gsub("c\\(|\\)",  "", substitute(c(...))), "\\s*(\\s|,)\\s*"))[-1]
+    } else{
+      names(plots) <- labels
+    }
   }
   num_plots <- length(plots)
   if (is.null(nrow) && is.null(ncol)){
@@ -49,7 +61,7 @@ image_combine <- function(...,
     plot(plots[[i]])
     if(verbose == TRUE){
       dim <- image_dimension(plots[[i]], verbose = FALSE)
-      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
+      text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = col)
     }
   }
 }
@@ -1901,7 +1913,7 @@ image_segment <- function(image,
         plot(imgs[[i]][[1]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]][[1]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
         }
       }
     }
@@ -1972,9 +1984,9 @@ image_segment_iter <- function(image,
                       ...)
         index <-
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
-                 "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
-                 "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
-                 "S", "VARI", "HUE", "HUE2", "BGI", "L")
+                 "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
+                 "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
         my_index <- NULL
       } else{
         index <- index[1]
@@ -2019,9 +2031,9 @@ image_segment_iter <- function(image,
                       ...)
         indx <-
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
-                 "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
-                 "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
-                 "S", "VARI", "HUE", "HUE2", "BGI", "L")
+                 "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
+                 "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
         my_index <- NULL
       } else{
         if(length(index) != nseg){
@@ -2070,9 +2082,9 @@ image_segment_iter <- function(image,
                         ...)
           indx <-
             switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
-                   "R", "G", "B", "NR", "NG", "NB", "GB", "RB",
-                   "GR", "BI", "BIM", "SCI", "GLI", "HI", "NGRDI", "NDGBI", "NDRBI", "I",
-                   "S", "VARI", "HUE", "HUE2", "BGI", "L")
+                   "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
+                   "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
+                   "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
           if(is.null(indx)){
             break
           }

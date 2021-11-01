@@ -18,7 +18,10 @@
 #'can also tune-up `tolerance` and `extension` explicitly to a better precision
 #'of watershed segmentation.
 #'
-#'If `watershed = FALSE` is used,
+#'If `watershed = FALSE` is used, all pixels for each connected set of
+#'foreground pixels in `img` are set to a unique object. This is faster
+#'(specially for a large number of objects) but is not able to segment touching
+#'objects.
 #'
 #'If color palettes samples are provided, a general
 #'linear model (binomial family) fitted to the RGB values is used to segment
@@ -141,13 +144,15 @@
 #'   processed images. Defaults to `NULL`. In this case, the function will
 #'   search for the image `img` in the current working directory. After
 #'   processing, when `save_image = TRUE`, the processed image will be also
-#'   saved in such a directory.
+#'   saved in such a directory. It can be either a full path, e.g.,
+#'   `"C:/Desktop/imgs"`, or a subfolder within the current working directory,
+#'   e.g., `"/imgs"`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return `analyze_objects()` returns a list with the following objects:
 #'  * `results` A data frame with the following variables for each object in the
 #'  image:
-#'     - `id`  object identification.
-#'     - `x`,`y`,  x and y coordinates for the center of mass of the object.
+#'     - `id`:  object identification.
+#'     - `x`,`y`:  x and y coordinates for the center of mass of the object.
 #'     - `area`:  area of the object (in pixels).
 #'     - `area_ch`:  the area of the convex hull around object (in pixels).
 #'     - `perimeter`: perimeter (in pixels).
@@ -155,7 +160,10 @@
 #'     maximum radius (in pixels), respectively.
 #'     - `radius_sd`: standard deviation of the mean radius (in pixels).
 #'     - `radius_ratio`: radius ratio given by `radius_max / radius_min`.
-#'     - `major_axis`: elliptical fit major axis (in pixels).
+#'     - `diam_min`, `diam_mean`, and `diam_max`: The minimum, mean, and
+#'     maximum diameter (in pixels), respectively.
+#'     - `major_axis`, `minor_axis`: elliptical fit for major and minor axes (in
+#'     pixels).
 #'     - `eccentricity`: elliptical eccentricity defined by
 #'     sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
 #'     line eccentricity is 1.
@@ -163,13 +171,13 @@
 #'     - `solidity`: object solidity given by `area / area_ch`.
 #'     - `circularity`: the object circularity given by \eqn{4*pi *(area /
 #'     perimeter^2)}.
-#'     - `index`: (when `object_index` is declared) the index for pixel
-#'     intensity of each object. By default, the mean value of B (blue).
 #'  * `statistics`: A data frame with the summary statistics for the area of the
 #'  objects.
 #'  * `count`: If `pattern` is used, shows the number of objects in each image.
 #'  * `object_rgb`: If `object_index` is used, returns the R, G, and B values
 #'  for each pixel of each object.
+#'  * `object_index`: If `object_index` is used, returns the index computed for
+#'  each object.
 #' @references
 #' Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
 #' remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
@@ -262,12 +270,18 @@ analyze_objects <- function(img,
   if(is.null(dir_original)){
     diretorio_original <- paste0("./")
   } else{
-    diretorio_original <- paste0("./", dir_original)
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
   }
   if(is.null(dir_processed)){
     diretorio_processada <- paste0("./")
   } else{
-    diretorio_processada <- paste0("./", dir_processed)
+    diretorio_processada <-
+      ifelse(grepl("[/\\]", dir_processed),
+             dir_processed,
+             paste0("./", dir_processed))
   }
   help_count <-
     function(img, foreground, background, resize, fill_hull, threshold, filter, tolerance, extension,
@@ -397,14 +411,21 @@ analyze_objects <- function(img,
       shape <- transform(shape,
                          id = 1:nrow(shape),
                          radius_ratio = s.radius.max / s.radius.min,
+                         diam_mean = s.radius.mean * 2,
+                         diam_min = s.radius.min * 2,
+                         diam_max = s.radius.max * 2,
                          area_ch =   area_ch,
                          solidity = s.area / area_ch,
-                         circularity = 4*pi*(s.area / s.perimeter^2))
-      shape <- shape[, c(12, 7, 8, 1, 14, 2, 3, 5:6, 4, 13, 9:11, 15, 16)]
-      colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter",
-                           "radius_mean",
-                           "radius_min", "radius_max", "radius_sd", "radius_ratio",
-                           "major_axis", "eccentricity", "theta", "solidity", "circularity")
+                         circularity = 4*pi*(s.area / s.perimeter^2),
+                         minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
+      shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
+                         "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
+                         "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
+                         "m.theta", "solidity",  "circularity")]
+      colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
+                           "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
+                           "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
+                           "theta", "solidity", "circularity")
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
       }

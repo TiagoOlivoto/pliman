@@ -203,7 +203,9 @@ given in \code{img}.}
 processed images. Defaults to \code{NULL}. In this case, the function will
 search for the image \code{img} in the current working directory. After
 processing, when \code{save_image = TRUE}, the processed image will be also
-saved in such a directory.}
+saved in such a directory. It can be either a full path, e.g.,
+\code{"C:/Desktop/imgs"}, or a subfolder within the current working directory,
+e.g., \code{"/imgs"}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
@@ -219,8 +221,8 @@ saved in such a directory.}
 \item \code{results} A data frame with the following variables for each object in the
 image:
 \itemize{
-\item \code{id}  object identification.
-\item \code{x},\code{y},  x and y coordinates for the center of mass of the object.
+\item \code{id}:  object identification.
+\item \code{x},\code{y}:  x and y coordinates for the center of mass of the object.
 \item \code{area}:  area of the object (in pixels).
 \item \code{area_ch}:  the area of the convex hull around object (in pixels).
 \item \code{perimeter}: perimeter (in pixels).
@@ -228,7 +230,10 @@ image:
 maximum radius (in pixels), respectively.
 \item \code{radius_sd}: standard deviation of the mean radius (in pixels).
 \item \code{radius_ratio}: radius ratio given by \code{radius_max / radius_min}.
-\item \code{major_axis}: elliptical fit major axis (in pixels).
+\item \code{diam_min}, \code{diam_mean}, and \code{diam_max}: The minimum, mean, and
+maximum diameter (in pixels), respectively.
+\item \code{major_axis}, \code{minor_axis}: elliptical fit for major and minor axes (in
+pixels).
 \item \code{eccentricity}: elliptical eccentricity defined by
 sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
 line eccentricity is 1.
@@ -236,14 +241,14 @@ line eccentricity is 1.
 \item \code{solidity}: object solidity given by \code{area / area_ch}.
 \item \code{circularity}: the object circularity given by \eqn{4*pi *(area /
     perimeter^2)}.
-\item \code{index}: (when \code{object_index} is declared) the index for pixel
-intensity of each object. By default, the mean value of B (blue).
 }
 \item \code{statistics}: A data frame with the summary statistics for the area of the
 objects.
 \item \code{count}: If \code{pattern} is used, shows the number of objects in each image.
 \item \code{object_rgb}: If \code{object_index} is used, returns the R, G, and B values
 for each pixel of each object.
+\item \code{object_index}: If \code{object_index} is used, returns the index computed for
+each object.
 }
 
 \code{plot.anal_obj()} returns a \code{trellis} object containing the
@@ -271,7 +276,10 @@ resolution. This will influence the watershed-based object segmentation. Users
 can also tune-up \code{tolerance} and \code{extension} explicitly to a better precision
 of watershed segmentation.
 
-If \code{watershed = FALSE} is used,
+If \code{watershed = FALSE} is used, all pixels for each connected set of
+foreground pixels in \code{img} are set to a unique object. This is faster
+(specially for a large number of objects) but is not able to segment touching
+objects.
 
 If color palettes samples are provided, a general
 linear model (binomial family) fitted to the RGB values is used to segment

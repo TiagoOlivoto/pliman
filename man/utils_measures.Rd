@@ -19,6 +19,8 @@ get_measures(
 plot_measures(
   object,
   measure = "id",
+  hjust = NULL,
+  vjust = NULL,
   digits = 2,
   size = 0.9,
   col = "white",
@@ -61,6 +63,11 @@ multiple images as belonging to a single sample, if desired. Defaults to
 \item{verbose}{If \code{FALSE}, runs the code silently.}
 
 \item{digits}{The number of significant figures. Defaults to \code{2.}}
+
+\item{hjust, vjust}{A numeric value to adjust the labels horizontally and
+vertically. Positive values will move labels to right (hjust) and top
+(vjust). Negative values will move the labels to left and bottom,
+respectively.}
 
 \item{size}{The size of the text. Defaults to \code{0.9}.}
 

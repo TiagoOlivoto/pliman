@@ -30,6 +30,7 @@ knitr::opts_chunk$set(
 * Measure disease severity;
 * Count the number of lesions;
 * Obtain the shape of lesions;
+* Produce Standard Area Diagrams;
 * Count objects in an image;
 * Get object features (area, perimeter, radius, circularity, eccentricity, solidity);
 * Get the RGB values for each object in an image;

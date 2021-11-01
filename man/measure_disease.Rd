@@ -23,7 +23,8 @@ measure_disease(
   topn_lower = NULL,
   topn_upper = NULL,
   randomize = TRUE,
-  nrows = 3000,
+  nrows = "deprecated",
+  nsample = 3000,
   watershed = FALSE,
   lesion_size = "medium",
   tolerance = NULL,
@@ -115,8 +116,10 @@ known area or use \code{lower_limit = 0} to select all objects (not advised).}
 \item{randomize}{Randomize the lines before training the model? Defaults to
 \code{TRUE}.}
 
-\item{nrows}{The number of lines to be used in training step. Defaults to
-\code{3000}.}
+\item{nrows}{Deprecated. Use \code{nsamples} instead.}
+
+\item{nsample}{The number of sample pixels to be used in training step.
+Defaults to \code{3000}.}
 
 \item{watershed}{If \code{TRUE} (Default) implements the Watershed Algorithm to
 segment lesions connected by a fairly few pixels that could be considered
@@ -184,7 +187,9 @@ given in \code{img}.}
 processed images. Defaults to \code{NULL}. In this case, the function will
 search for the image \code{img} in the current working directory. After
 processing, when \code{save_image = TRUE}, the processed image will be also
-saved in such a directory.}
+saved in such a directory. It can be either a full path, e.g.,
+\code{"C:/Desktop/imgs"}, or a subfolder within the current working directory,
+e.g., \code{"/imgs"}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }

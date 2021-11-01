@@ -65,8 +65,9 @@
 #'   `topn_upper` selects the `n` lesions with the largest area.
 #' @param randomize Randomize the lines before training the model? Defaults to
 #'   `TRUE`.
-#' @param nrows The number of lines to be used in training step. Defaults to
-#'   `3000`.
+#' @param nrows Deprecated. Use `nsamples` instead.
+#' @param nsample The number of sample pixels to be used in training step.
+#'   Defaults to `3000`.
 #' @param watershed If `TRUE` (Default) implements the Watershed Algorithm to
 #'   segment lesions connected by a fairly few pixels that could be considered
 #'   as two distinct lesions. If `FALSE`, lesions that are connected by any
@@ -116,7 +117,9 @@
 #'   processed images. Defaults to `NULL`. In this case, the function will
 #'   search for the image `img` in the current working directory. After
 #'   processing, when `save_image = TRUE`, the processed image will be also
-#'   saved in such a directory.
+#'   saved in such a directory. It can be either a full path, e.g.,
+#'   `"C:/Desktop/imgs"`, or a subfolder within the current working directory,
+#'   e.g., `"/imgs"`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @return A list with the following objects:
 #'  * `severity` A data frame with the percentage of healthy and symptomatic
@@ -161,7 +164,8 @@ measure_disease <- function(img,
                             topn_lower = NULL,
                             topn_upper = NULL,
                             randomize = TRUE,
-                            nrows = 3000,
+                            nrows = "deprecated",
+                            nsample = 3000,
                             watershed = FALSE,
                             lesion_size = "medium",
                             tolerance = NULL,
@@ -185,24 +189,34 @@ measure_disease <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  check_ebi()
+  # check_ebi()
+  if(nrows != "deprecated"){
+    warning("Argument 'nrows' was deprecated. Use 'nsample' instead.", call. = FALSE)
+    nsample <- nrows
+  }
   if(!missing(img) & !missing(pattern)){
     stop("Only one of `img` or `pattern` arguments can be used.", call. = FALSE)
   }
   if(is.null(dir_original)){
     diretorio_original <- paste("./", sep = "")
   } else{
-    diretorio_original <- paste("./", dir_original, sep = "")
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
   }
   if(is.null(dir_processed)){
     diretorio_processada <- paste("./", sep = "")
   } else{
-    diretorio_processada <- paste("./", dir_processed, sep = "")
+    diretorio_processada <-
+      ifelse(grepl("[/\\]", dir_processed),
+             dir_processed,
+             paste0("./", dir_processed))
   }
   help_count <-
     function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
              index_lb, index_dh, lesion_size, tolerance, extension,
-             randomize, nrows, show_image, show_original, show_background,
+             randomize, nsample, show_image, show_original, show_background,
              col_leaf, col_lesions, col_background,
              save_image, dir_original, dir_processed){
       if(is.character(img)){
@@ -256,8 +270,8 @@ measure_disease <- function(img,
         ################## no background #############
         if(is.null(img_background)){
           sadio_sintoma <-
-            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
-                            sintoma[sample(1:nrow(sintoma)),][1:nrows,]),
+            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nsample,],
+                            sintoma[sample(1:nrow(sintoma)),][1:nsample,]),
                       Y = ifelse(CODE == "img_healthy", 1, 0))
           sadio_sintoma$CODE <- NULL
           usef_area <- nrow(original)
@@ -342,9 +356,9 @@ measure_disease <- function(img,
                        B = c(img_background@.Data[,,3]))
           # separate image from background
           fundo_resto <-
-            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
-                            sintoma[sample(1:nrow(sintoma)),][1:nrows,],
-                            fundo[sample(1:nrow(fundo)),][1:nrows,]),
+            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nsample,],
+                            sintoma[sample(1:nrow(sintoma)),][1:nsample,],
+                            fundo[sample(1:nrow(fundo)),][1:nsample,]),
                       Y = ifelse(CODE == "img_background", 0, 1))
           modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
                                           data = fundo_resto))
@@ -354,8 +368,8 @@ measure_disease <- function(img,
                  plant_background <- matrix(pred1, ncol = ncol_img))
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
-            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nrows,],
-                            sintoma[sample(1:nrow(sintoma)),][1:nrows,]),
+            transform(rbind(sadio[sample(1:nrow(sadio)),][1:nsample,],
+                            sintoma[sample(1:nrow(sintoma)),][1:nsample,]),
                       Y = ifelse(CODE == "img_healthy", 1, 0))
           sadio_sintoma$CODE <- NULL
           modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
@@ -454,11 +468,11 @@ measure_disease <- function(img,
           if(is.null(threshold)){
             threshold <- rep("Otsu", 2)
           } else{
-            threshold <- threshold
+            threshold <- ifelse(length(threshold == 1), threshold, threshold[1])
           }
-          my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[1]))),
-                              as.character(threshold[1]),
-                              as.numeric(threshold[1]))
+          my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold))),
+                              as.character(threshold),
+                              as.numeric(threshold))
           seg <- image_segment(img,
                                index = index_lb,
                                my_index = my_index_lb,
@@ -476,9 +490,14 @@ measure_disease <- function(img,
           my_index_dh <- NULL
           index_dh <- index_dh
         }
-        my_thresh2 <- ifelse(is.na(suppressWarnings(as.numeric(threshold[2]))),
-                            as.character(threshold[2]),
-                            as.numeric(threshold[2]))
+        if(is.null(threshold)){
+          threshold <- rep("Otsu", 2)
+        } else{
+          threshold <- ifelse(length(threshold == 1), threshold, threshold[2])
+        }
+        my_thresh2 <- ifelse(is.na(suppressWarnings(as.numeric(threshold))),
+                             as.character(threshold),
+                             as.numeric(threshold))
         img2 <- image_binary(img,
                              index = index_dh,
                              my_index = my_index_dh,
@@ -692,7 +711,7 @@ measure_disease <- function(img,
   if(missing(pattern)){
     help_count(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                index_lb, index_dh, lesion_size, tolerance, extension, randomize,
-               nrows, show_image, show_original, show_background, col_leaf,
+               nsample, show_image, show_original, show_background, col_leaf,
                col_lesions, col_background, save_image, dir_original, dir_processed)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
@@ -725,7 +744,7 @@ measure_disease <- function(img,
                     help_count(x,
                                img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                                index_lb, index_dh, lesion_size, tolerance, extension, randomize,
-                               nrows, show_image, show_original, show_background, col_leaf,
+                               nsample, show_image, show_original, show_background, col_leaf,
                                col_lesions, col_background, save_image, dir_original, dir_processed)
                   })
 
@@ -741,7 +760,7 @@ measure_disease <- function(img,
           help_count(img  = names_plant[i],
                      img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                      index_lb, index_dh, lesion_size, tolerance, extension, randomize,
-                     nrows, show_image, show_original, show_background, col_leaf,
+                     nsample, show_image, show_original, show_background, col_leaf,
                      col_lesions, col_background, save_image, dir_original, dir_processed)
       }
     }
@@ -774,7 +793,16 @@ measure_disease <- function(img,
       )
     return(list(severity = severity,
                 shape = shape,
-                stats = stats))
+                stats = stats,
+                parms = list(
+                  pattern = pattern,
+                  img_healthy = img_healthy,
+                  img_symptoms = img_symptoms,
+                  img_background = img_background,
+                  dir_original = diretorio_original,
+                  dir_processed = diretorio_processada,
+                  save_image = save_image))
+    )
   }
 }
 
