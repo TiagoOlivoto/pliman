@@ -1,4 +1,4 @@
-# pliman (development version)
+# pliman 1.0.0
 ## New functions
 * `analyze_objects()` is now used as the main function to compute the number and shape of objects.
 * `measure_disease()` is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as number and shape of lesions.
