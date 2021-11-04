@@ -162,7 +162,11 @@ entire leaf. See more at Details." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -218,14 +222,15 @@ entire leaf. See more at <strong>Details</strong>.</p>
   fill_hull <span class='op'>=</span> <span class='cn'>TRUE</span>,
   index_lb <span class='op'>=</span> <span class='cn'>NULL</span>,
   index_dh <span class='op'>=</span> <span class='st'>"GLI"</span>,
-  threshold <span class='op'>=</span> <span class='st'>"Otsu"</span>,
+  threshold <span class='op'>=</span> <span class='cn'>NULL</span>,
   invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
   lower_size <span class='op'>=</span> <span class='cn'>NULL</span>,
   upper_size <span class='op'>=</span> <span class='cn'>NULL</span>,
   topn_lower <span class='op'>=</span> <span class='cn'>NULL</span>,
   topn_upper <span class='op'>=</span> <span class='cn'>NULL</span>,
   randomize <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  nrows <span class='op'>=</span> <span class='fl'>3000</span>,
+  nrows <span class='op'>=</span> <span class='st'>"deprecated"</span>,
+  nsample <span class='op'>=</span> <span class='fl'>3000</span>,
   watershed <span class='op'>=</span> <span class='cn'>FALSE</span>,
   lesion_size <span class='op'>=</span> <span class='st'>"medium"</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -316,11 +321,13 @@ considered in the computation of the severity.</p></td>
     </tr>
     <tr>
       <th>threshold</th>
-      <td><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively choose
-the threshold based on a raster plot showing pixel intensity of the index.</p></td>
+      <td><p>By default (<code>threshold = NULL</code>), a threshold value based on
+Otsu's method is used to reduce the grayscale image to a binary image. If a
+numeric value is informed, this value will be used as a threshold. Inform
+any non-numeric value different than "Otsu" to iteratively choose the
+threshold based on a raster plot showing pixel intensity of the index. Must
+be a vector of length 2 to indicate the threshold for <code>index_lb</code> and
+<code>index_dh</code>, respectively.</p></td>
     </tr>
     <tr>
       <th>invert</th>
@@ -353,8 +360,12 @@ known area or use <code>lower_limit = 0</code> to select all objects (not advise
     </tr>
     <tr>
       <th>nrows</th>
-      <td><p>The number of lines to be used in training step. Defaults to
-<code>3000</code>.</p></td>
+      <td><p>Deprecated. Use <code>nsamples</code> instead.</p></td>
+    </tr>
+    <tr>
+      <th>nsample</th>
+      <td><p>The number of sample pixels to be used in training step.
+Defaults to <code>3000</code>.</p></td>
     </tr>
     <tr>
       <th>watershed</th>
@@ -458,7 +469,9 @@ given in <code>img</code>.</p></td>
 processed images. Defaults to <code>NULL</code>. In this case, the function will
 search for the image <code>img</code> in the current working directory. After
 processing, when <code>save_image = TRUE</code>, the processed image will be also
-saved in such a directory.</p></td>
+saved in such a directory. It can be either a full path, e.g.,
+<code>"C:/Desktop/imgs"</code>, or a subfolder within the current working directory,
+e.g., <code>"/imgs"</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>

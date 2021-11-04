@@ -55,6 +55,8 @@ pixels_to_cm() converts the number of pixels to centimeters, given a
 known resolution (dpi).
 cm_to_pixels() converts a distance (cm) to number of pixels, given a
 known resolution (dpi).
+distance() Computes the distance between two points in an image based on
+the Pythagorean theorem.
 dpi() An interactive function to compute the image resolution given a
 known distance informed by the user. See more information in the Details
 section.
@@ -173,7 +175,11 @@ npixels() returns the number of pixels of an image.
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -220,6 +226,8 @@ dots per inch (dpi).</p><ul>
 known resolution (dpi).</p></li>
 <li><p><code>cm_to_pixels()</code> converts a distance (cm) to number of pixels, given a
 known resolution (dpi).</p></li>
+<li><p><code>distance()</code> Computes the distance between two points in an image based on
+the Pythagorean theorem.</p></li>
 <li><p><code>dpi()</code> An interactive function to compute the image resolution given a
 known distance informed by the user. See more information in the <strong>Details</strong>
 section.</p></li>
@@ -238,7 +246,9 @@ section.</p></li>
 
 <span class='fu'>npixels</span><span class='op'>(</span><span class='va'>image</span><span class='op'>)</span>
 
-<span class='fu'>dpi</span><span class='op'>(</span><span class='va'>image</span><span class='op'>)</span></pre>
+<span class='fu'>dpi</span><span class='op'>(</span><span class='va'>image</span>, plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='fu'>distance</span><span class='op'>(</span><span class='va'>image</span>, plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -258,6 +268,10 @@ section.</p></li>
     <tr>
       <th>image</th>
       <td><p>An image object.</p></td>
+    </tr>
+    <tr>
+      <th>plot</th>
+      <td><p>Call a new plot to <code>image</code>? Defaults to <code>TRUE</code>.</p></td>
     </tr>
     </table>
 

@@ -168,7 +168,11 @@ argument object_index is used in the function analyze_objects().
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -268,7 +272,7 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span class='op'>)</span>
 
 <span class='co'># S3 method for anal_obj</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, facet <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -371,8 +375,9 @@ more details.</p></td>
       <th>object_index</th>
       <td><p>Defaults to <code>FALSE</code>. If an index is informed, the average
 value for each object is returned. It can be the R, G, and B values or any
-operation involving them, e.g., <code>object_index = "R/B"</code> will return, for
-each object in the image, the average value of the R/B ratio.</p></td>
+operation involving them, e.g., <code>object_index = "R/B"</code>. In this case, it
+will return for each object in the image, the average value of the R/B
+ratio. Use <code><a href='utils_file.html'>pliman_indexes_eq()</a></code> to see the equations of available indexes.</p></td>
     </tr>
     <tr>
       <th>threshold</th>
@@ -490,7 +495,9 @@ given in <code>img</code>.</p></td>
 processed images. Defaults to <code>NULL</code>. In this case, the function will
 search for the image <code>img</code> in the current working directory. After
 processing, when <code>save_image = TRUE</code>, the processed image will be also
-saved in such a directory.</p></td>
+saved in such a directory. It can be either a full path, e.g.,
+<code>"C:/Desktop/imgs"</code>, or a subfolder within the current working directory,
+e.g., <code>"/imgs"</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -499,6 +506,10 @@ saved in such a directory.</p></td>
     <tr>
       <th>x</th>
       <td><p>An object of class <code>anal_obj</code>.</p></td>
+    </tr>
+    <tr>
+      <th>facet</th>
+      <td><p>Create a facet plot for each object. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -511,8 +522,8 @@ saved in such a directory.</p></td>
     <p><code>analyze_objects()</code> returns a list with the following objects:</p><ul>
 <li><p><code>results</code> A data frame with the following variables for each object in the
 image:</p><ul>
-<li><p><code>id</code>  object identification.</p></li>
-<li><p><code>x</code>,<code>y</code>,  x and y coordinates for the center of mass of the object.</p></li>
+<li><p><code>id</code>:  object identification.</p></li>
+<li><p><code>x</code>,<code>y</code>:  x and y coordinates for the center of mass of the object.</p></li>
 <li><p><code>area</code>:  area of the object (in pixels).</p></li>
 <li><p><code>area_ch</code>:  the area of the convex hull around object (in pixels).</p></li>
 <li><p><code>perimeter</code>: perimeter (in pixels).</p></li>
@@ -520,25 +531,30 @@ image:</p><ul>
 maximum radius (in pixels), respectively.</p></li>
 <li><p><code>radius_sd</code>: standard deviation of the mean radius (in pixels).</p></li>
 <li><p><code>radius_ratio</code>: radius ratio given by <code>radius_max / radius_min</code>.</p></li>
-<li><p><code>major_axis</code>: elliptical fit major axis (in pixels).</p></li>
+<li><p><code>diam_min</code>, <code>diam_mean</code>, and <code>diam_max</code>: The minimum, mean, and
+maximum diameter (in pixels), respectively.</p></li>
+<li><p><code>major_axis</code>, <code>minor_axis</code>: elliptical fit for major and minor axes (in
+pixels).</p></li>
 <li><p><code>eccentricity</code>: elliptical eccentricity defined by
 sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
 line eccentricity is 1.</p></li>
 <li><p><code>theta</code>: object angle (in radians).</p></li>
 <li><p><code>solidity</code>: object solidity given by <code>area / area_ch</code>.</p></li>
-<li><p><code>circularity</code>: the object circularity given by \(4\*pi\*(area / perimeter^2)\).</p></li>
-<li><p><code>index</code>: (when <code>object_index</code> is declared) the index for pixel
-intensity of each object. By default, the mean value of B (blue).</p></li>
+<li><p><code>circularity</code>: the object circularity given by \(4*pi *(area /
+    perimeter^2)\).</p></li>
 </ul></li>
 <li><p><code>statistics</code>: A data frame with the summary statistics for the area of the
 objects.</p></li>
 <li><p><code>count</code>: If <code>pattern</code> is used, shows the number of objects in each image.</p></li>
 <li><p><code>object_rgb</code>: If <code>object_index</code> is used, returns the R, G, and B values
 for each pixel of each object.</p></li>
+<li><p><code>object_index</code>: If <code>object_index</code> is used, returns the index computed for
+each object.</p></li>
 </ul>
 
 <p><code>plot.anal_obj()</code> returns a <code>trellis</code> object containing the
-distribution of the pixels for each object</p>
+distribution of the pixels, optionally  for each object when <code>facet = TRUE</code>
+is used.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>A binary image is first generated to segment the foreground and background.
@@ -551,7 +567,10 @@ pre-defined values of <code>tolerance</code> and <code>extension</code> dependin
 resolution. This will influence the watershed-based object segmentation. Users
 can also tune-up <code>tolerance</code> and <code>extension</code> explicitly to a better precision
 of watershed segmentation.</p>
-<p>If <code>watershed = FALSE</code> is used,</p>
+<p>If <code>watershed = FALSE</code> is used, all pixels for each connected set of
+foreground pixels in <code>img</code> are set to a unique object. This is faster
+(specially for a large number of objects) but is not able to segment touching
+objects.</p>
 <p>If color palettes samples are provided, a general
 linear model (binomial family) fitted to the RGB values is used to segment
 fore- and background.</p>
@@ -599,32 +618,34 @@ doi: <a href='https://doi.org/10.5951/MATHTEACHER.110.8.0631'>10.5951/MATHTEACHE
 #&gt; 3   3 237.5917 339.82483 2312    2282       152    26.69878   23.96521
 #&gt; 5   5 406.9314  77.54909 2302    2264       153    26.64891   23.96546
 #&gt; 2   2 538.0561 401.89604 2299    2258       153    26.60716   24.95688
-#&gt;    radius_max radius_sd radius_ratio major_axis eccentricity      theta
-#&gt; 4    30.47116 1.7303597     1.234525   60.92191    0.5443558 -0.9908157
-#&gt; 11   30.78003 2.3489729     1.336482   61.22955    0.6175840  1.2923197
-#&gt; 3    29.04402 1.2334610     1.211924   57.50966    0.4538087 -0.5715211
-#&gt; 5    29.63586 1.6395963     1.236607   58.85962    0.5325370  1.1444750
-#&gt; 2    28.40020 0.9346592     1.137971   56.60376    0.4058277 -0.8382015
-#&gt;    solidity circularity
-#&gt; 4  1.016209    1.230763
-#&gt; 11 1.017582    1.210870
-#&gt; 3  1.013146    1.257507
-#&gt; 5  1.016784    1.235755
-#&gt; 2  1.018158    1.234144</div><div class='input'><span class='co'># }</span>
+#&gt;    radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis
+#&gt; 4    30.47116 1.7303597     1.234525  55.02687 49.36499 60.94232   60.92191
+#&gt; 11   30.78003 2.3489729     1.336482  53.53085 46.06129 61.56007   61.22955
+#&gt; 3    29.04402 1.2334610     1.211924  53.39756 47.93042 58.08803   57.50966
+#&gt; 5    29.63586 1.6395963     1.236607  53.29783 47.93092 59.27173   58.85962
+#&gt; 2    28.40020 0.9346592     1.137971  53.21431 49.91376 56.80040   56.60376
+#&gt;    minor_axis eccentricity      theta solidity circularity
+#&gt; 4    51.10462    0.5443558 -0.9908157 1.016209    1.230763
+#&gt; 11   48.15734    0.6175840  1.2923197 1.017582    1.210870
+#&gt; 3    51.24681    0.4538087 -0.5715211 1.013146    1.257507
+#&gt; 5    49.81918    0.5325370  1.1444750 1.016784    1.235755
+#&gt; 2    51.73299    0.4058277 -0.8382015 1.018158    1.234144</div><div class='input'><span class='co'># }</span>
 
 <span class='co'># \donttest{</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
 
 <span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soy_green.jpg"</span><span class='op'>)</span>
-<span class='co'># Segment the foreground (grains) using the normalized blue index</span>
+<span class='co'># Segment the foreground (grains) using the normalized blue index (NB)</span>
 <span class='co'># Shows the average value of the blue index in each object</span>
 
 <span class='va'>rgb</span> <span class='op'>&lt;-</span>
    <span class='fu'>analyze_objects</span><span class='op'>(</span><span class='va'>img</span>,
+                   marker <span class='op'>=</span> <span class='st'>"id"</span>,
                    index <span class='op'>=</span> <span class='st'>"NB"</span>, <span class='co'># default</span>
                    object_index <span class='op'>=</span> <span class='st'>"B"</span><span class='op'>)</span>
 </div><div class='img'><img src='analyze_objects-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>rgb</span><span class='op'>)</span>
-</div><div class='img'><img src='analyze_objects-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='analyze_objects-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>rgb</span>, facet <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='img'><img src='analyze_objects-5.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

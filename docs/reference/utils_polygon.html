@@ -52,7 +52,12 @@
 conv_hull() Compute convex hull of a set of points.
 poly_area() Compute the area of a polygon given by the vertices in the
 vectors x and y.
-plot_contour() Plot contour lines using graphics::lines().
+poly_mass() Compute the center of mass of a polygon given by the vertices
+in the vectors x and y.
+poly_spline() Smooths a polygon contour.
+plot_contour() Plot contour lines.
+plot_ellipse() Plots an ellipse that fits the major and minor axis for
+each object.
 
 " />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
@@ -167,7 +172,11 @@ plot_contour() Plot contour lines using graphics::lines().
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -211,7 +220,12 @@ plot_contour() Plot contour lines using graphics::lines().
 <li><p><code>conv_hull()</code> Compute convex hull of a set of points.</p></li>
 <li><p><code>poly_area()</code> Compute the area of a polygon given by the vertices in the
 vectors <code>x</code> and <code>y</code>.</p></li>
-<li><p><code>plot_contour()</code> Plot contour lines using <code><a href='https://rdrr.io/r/graphics/lines.html'>graphics::lines()</a></code>.</p></li>
+<li><p><code>poly_mass()</code> Compute the center of mass of a polygon given by the vertices
+in the vectors <code>x</code> and <code>y</code>.</p></li>
+<li><p><code>poly_spline()</code> Smooths a polygon contour.</p></li>
+<li><p><code>plot_contour()</code> Plot contour lines.</p></li>
+<li><p><code>plot_ellipse()</code> Plots an ellipse that fits the major and minor axis for
+each object.</p></li>
 </ul>
 
     </div>
@@ -220,7 +234,23 @@ vectors <code>x</code> and <code>y</code>.</p></li>
 
 <span class='fu'>poly_area</span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>plot_contour</span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>NULL</span>, col <span class='op'>=</span> <span class='st'>"white"</span>, lwd <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></pre>
+<span class='fu'>poly_mass</span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+
+<span class='fu'>poly_spline</span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>NULL</span>, vertices <span class='op'>=</span> <span class='fl'>100</span>, k <span class='op'>=</span> <span class='fl'>2</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>plot_contour</span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>NULL</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, col <span class='op'>=</span> <span class='st'>"black"</span>, lwd <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>plot_mass</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  y <span class='op'>=</span> <span class='cn'>NULL</span>,
+  id <span class='op'>=</span> <span class='cn'>NULL</span>,
+  arrow <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  col <span class='op'>=</span> <span class='st'>"black"</span>,
+  cex <span class='op'>=</span> <span class='fl'>1</span>,
+  lwd <span class='op'>=</span> <span class='fl'>1</span>
+<span class='op'>)</span>
+
+<span class='fu'>plot_ellipse</span><span class='op'>(</span><span class='va'>object</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, col <span class='op'>=</span> <span class='st'>"black"</span>, lwd <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -238,8 +268,40 @@ coordinates the function will be applied to each element using
 polygon, i.e., the first point is replicated as the last one.</p></td>
     </tr>
     <tr>
-      <th>col, lwd</th>
-      <td><p>The color and width of the lines, respectively.</p></td>
+      <th>vertices</th>
+      <td><p>The number of spline vertices to create.</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>The number of points to wrap around the ends to obtain a smooth
+periodic spline.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><ul>
+<li><p>For <code>plot_contour()</code> and <code>plot_ellipse()</code> further arguments passed on to
+<code><a href='https://rdrr.io/r/graphics/lines.html'>graphics::lines()</a></code>.</p></li>
+<li><p>For <code>plot_mass()</code>, further arguments passed on to <code><a href='https://rdrr.io/r/graphics/points.html'>graphics::points()</a></code>.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>id</th>
+      <td><p>The object identification (numeric) to plot the contour/ellipse. By
+default (<code>id = NULL</code>), the contour is plotted to all objects</p></td>
+    </tr>
+    <tr>
+      <th>col, lwd, cex</th>
+      <td><p>The color, width of the lines, and size of point,
+respectively.</p></td>
+    </tr>
+    <tr>
+      <th>arrow</th>
+      <td><p>If <code>TRUE</code> (default) plots two arrows connecting the center of
+mass to the minimum and maximum radius.</p></td>
+    </tr>
+    <tr>
+      <th>object</th>
+      <td><p>An object computed with <code><a href='analyze_objects.html'>analyze_objects()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -247,12 +309,16 @@ polygon, i.e., the first point is replicated as the last one.</p></td>
 
     
 <ul>
-<li><p><code>conv_hull()</code> returns a matrix with <code>x</code> and <code>y</code> coordinates for the convex
-hull in clockwise order. If <code>x</code> is a list, a list of points is returned.</p></li>
+<li><p><code>conv_hull()</code> and <code>poly_spline()</code> returns a matrix with <code>x</code> and <code>y</code>
+coordinates for the convex hull/smooth line in clockwise order. If <code>x</code> is a
+list, a list of points is returned.</p></li>
 <li><p><code>poly_area()</code> returns a <code>double</code>, or a list if <code>x</code> is a list of vector
 points.</p></li>
-<li><p><code>plot_contour()</code> returns a <code>double</code>, or a list if <code>x</code> is a list of vector
-points.</p></li>
+<li><p><code>poly_mass()</code> returns a <code>data.frame</code> containing the coordinates for the
+center of mass, as well as for the maximum and minimum distance from contour
+to the center of mass.</p></li>
+<li><p><code>plot_contour()</code>, <code>plot_mass()</code>, and <code>plot_ellipse()</code> return a <code>NULL</code>
+object.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -281,6 +347,10 @@ of a Polygon and the Vector Cross Product. The Mathematics Teacher, 110(8),
 <span class='fu'>poly_area</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 4</div><div class='input'><span class='fu'>poly_area</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 4</div><div class='input'>
+<span class='co'># center of mass of the square</span>
+<span class='va'>cm</span> <span class='op'>&lt;-</span> <span class='fu'>poly_mass</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span>
+<span class='fu'>plot_mass</span><span class='op'>(</span><span class='va'>cm</span><span class='op'>)</span>
+</div><div class='input'>
 <span class='co'># The convex hull will be the vertices of the square</span>
 <span class='op'>(</span><span class='va'>conv_square</span> <span class='op'>&lt;-</span> <span class='fu'>conv_hull</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;     x y
@@ -293,34 +363,38 @@ of a Polygon and the Vector Cross Product. The Mathematics Teacher, 110(8),
 <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='va'>conv_square</span>,
      <span class='fu'><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>,
            col  <span class='op'>=</span> <span class='st'>"blue"</span>,
-           lwd <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
+           lwd <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='utils_polygon-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># polygon</span>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>,  <span class='fl'>5</span>, <span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>
-<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>6</span>, <span class='fl'>3</span>,  <span class='fl'>1</span>, <span class='fl'>1</span>,  <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>5</span><span class='op'>)</span>
+<span class='co'>############# Example with a polygon#############</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span>,   <span class='fl'>2</span>, <span class='fl'>3</span>,  <span class='fl'>5</span>, <span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>6.5</span>, <span class='fl'>7</span>, <span class='fl'>3</span>,  <span class='fl'>1</span>, <span class='fl'>1</span>,  <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>5</span><span class='op'>)</span>
 <span class='va'>df_poly</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 
 <span class='co'># area of the polygon</span>
 <span class='fu'>poly_area</span><span class='op'>(</span><span class='va'>df_poly</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 13</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>df_poly</span>, pch <span class='op'>=</span> <span class='fl'>19</span>, col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 18</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>df_poly</span>, pch <span class='op'>=</span> <span class='fl'>19</span>, col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='va'>df_poly</span>, <span class='fu'><a href='https://rdrr.io/r/graphics/polygon.html'>polygon</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='input'>
-
+<span class='co'># center of mass of polygon</span>
+<span class='co'># arrows from center of mass to maximum and minimum radius</span>
+<span class='va'>cm</span> <span class='op'>&lt;-</span> <span class='fu'>poly_mass</span><span class='op'>(</span><span class='va'>df_poly</span><span class='op'>)</span>
+<span class='fu'>plot_mass</span><span class='op'>(</span><span class='va'>cm</span>, arrow <span class='op'>=</span> <span class='cn'>TRUE</span>, col <span class='op'>=</span> <span class='st'>"blue"</span><span class='op'>)</span>
+</div><div class='input'>
 <span class='co'># vertices of the convex hull</span>
 <span class='op'>(</span><span class='va'>conv_poly</span> <span class='op'>&lt;-</span> <span class='fu'>conv_hull</span><span class='op'>(</span><span class='va'>df_poly</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;      x y
-#&gt; 4    5 1
-#&gt; 6   -1 0
-#&gt; 8    0 5
-#&gt; 2    2 6
-#&gt; 4.1  5 1</div><div class='input'>
+</div><div class='output co'>#&gt;      x   y
+#&gt; 5    5 1.0
+#&gt; 7   -1 0.0
+#&gt; 9    0 5.0
+#&gt; 2    1 6.5
+#&gt; 3    2 7.0
+#&gt; 5.1  5 1.0</div><div class='input'>
 <span class='co'># area of the convex hull</span>
 <span class='fu'>poly_area</span><span class='op'>(</span><span class='va'>conv_poly</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 21</div><div class='input'>
+</div><div class='output co'>#&gt; [1] 24</div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='va'>conv_poly</span>,
      <span class='fu'><a href='https://rdrr.io/r/graphics/polygon.html'>polygon</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>,
-           col  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/grDevices/rgb.html'>rgb</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>0.2</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+           col  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/grDevices/rgb.html'>rgb</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0.2</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='utils_polygon-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>

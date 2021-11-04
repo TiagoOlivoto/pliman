@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • pliman</title>
+<title>Produces Santandard Area Diagrams — sad • pliman</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,9 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Produces Santandard Area Diagrams — sad" />
+<meta property="og:description" content="Given an object computed with measure_disease() a Standard Area Diagram
+(SAD) with n images are returned with the respective severity values." />
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg" />
 
 
@@ -76,7 +78,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -196,28 +198,103 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Produces Santandard Area Diagrams</h1>
+    <small class="dont-index">Source: <a href='https://github.com/TiagoOlivoto/pliman/blob/master/R/sad.R'><code>R/sad.R</code></a></small>
+    <div class="hidden name"><code>sad.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="analyze_objects.html">Analyzing objects in an image</a></dt>
-        <dd></dt>
-        <dt><a href="leaf_area.html">Measure leaf area using leaf images</a></dt>
-        <dd></dt>
-        <dt><a href="manipulation.html">Image manipulation with pliman</a></dt>
-        <dd></dt>
-        <dt><a href="phytopatometry.html">Phytopatometry in R with the package pliman</a></dt>
-        <dd></dt>
-        <dt><a href="pliman_start.html">Plant IMage Analysis</a></dt>
-        <dd></dt>
-        <dt><a href="segmentation.html">Image segmentation with pliman</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Given an object computed with <code><a href='measure_disease.html'>measure_disease()</a></code> a Standard Area Diagram
+(SAD) with <code>n</code> images are returned with the respective severity values.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>sad</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>n</span>,
+  show_original <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  show_contour <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  nrow <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ncol <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>object</th>
+      <td><p>An object computed with <code><a href='measure_disease.html'>measure_disease()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>The number of leaves in the Standard Area Diagram.</p></td>
+    </tr>
+    <tr>
+      <th>show_original</th>
+      <td><p>Show original images? Defaults to <code>FALSE</code>, i.e., a mask
+is returned.</p></td>
+    </tr>
+    <tr>
+      <th>show_contour</th>
+      <td><p>Show original images? Defaults to <code>FALSE</code>, i.e., a mask
+is returned.</p></td>
+    </tr>
+    <tr>
+      <th>nrow, ncol</th>
+      <td><p>The number of rows and columns in the plot. See
+[image_combine())]</p>
+<p>[image_combine())]: R:image_combine())</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments passed on to <code><a href='measure_disease.html'>measure_disease()</a></code>.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A data frame with the severity values for the <code>n</code> sampled leaves. A plot with
+the standard area diagram can be saved by wrapping <code>sad()</code> with <code><a href='https://rdrr.io/r/grDevices/png.html'>png()</a></code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The leaves with the smallest and highest severity will always be in the SAD.
+If <code>n = 1</code>, the leaf with the smallest severity will be returned. The others
+are sampled sequentially to achieve the <code>n</code> images after severity has been
+ordered in an ascending order. For example, if there are 30 leaves and n is
+set to 3, the leaves sampled will be the 1st, 15th, and 30th with the
+smallest severity values.</p>
+<p>The SAD can be only computed if an image pattern name is used in argument
+<code>pattern</code> of <code><a href='measure_disease.html'>measure_disease()</a></code>. If the images are saved, the <code>n</code> images
+will be retrevied from <code>dir_processed</code> directory. Otherwise, the severity
+will be computed again to generate the images.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Del Ponte EM, Pethybridge SJ, Bock CH, et al (2017) Standard area
+diagrams for aiding severity estimation: Scientometrics, pathosystems, and
+methodological trends in the last 25 years. Phytopathology 107:1161–1174.
+doi: <a href='https://doi.org/10.1094/PHYTO-02-17-0069-FI'>10.1094/PHYTO-02-17-0069-FI</a></p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
+<span class='va'>sev</span> <span class='op'>&lt;-</span>
+<span class='fu'><a href='measure_disease.html'>measure_disease</a></span><span class='op'>(</span>pattern <span class='op'>=</span> <span class='st'>"sev_leaf"</span>,
+                img_healthy <span class='op'>=</span> <span class='st'>"sev_healthy"</span>,
+                img_symptoms <span class='op'>=</span> <span class='st'>"sev_sympt"</span>,
+                img_background  <span class='op'>=</span> <span class='st'>"sev_back"</span>,
+                show_image <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                save_image <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                show_original <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                dir_original <span class='op'>=</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='op'>)</span>,
+                dir_processed <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>sad</span><span class='op'>(</span><span class='va'>sev</span>, n <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

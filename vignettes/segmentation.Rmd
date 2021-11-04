@@ -76,8 +76,8 @@ indexes <- image_index(soy, index = c("R, G, B, NR, NG, NB"))
 # Create a raster plot with the RGB values
 plot(indexes)
 
-# Create a histogram with the RGB values
-plot(indexes, type = "hist")
+# Create a density plot with the RGB values
+plot(indexes, type = "density")
 ```
 
 In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.

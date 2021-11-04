@@ -1033,6 +1033,7 @@ image_closing <- function(image,
 #' @name utils_transform
 #' @export
 image_skeleton <- function(image,
+                           kern = NULL,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
@@ -1615,7 +1616,7 @@ image_index <- function(image,
         plot(imgs[[i]])
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "black")
+          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
         }
       }
     }
@@ -2300,6 +2301,8 @@ image_palette <- function(image,
 #' known resolution (dpi).
 #' * [cm_to_pixels()] converts a distance (cm) to number of pixels, given a
 #' known resolution (dpi).
+#' * [distance()] Computes the distance between two points in an image based on
+#' the Pythagorean theorem.
 #' * [dpi()] An interactive function to compute the image resolution given a
 #' known distance informed by the user. See more information in the **Details**
 #' section.
@@ -2311,6 +2314,7 @@ image_palette <- function(image,
 #'
 #' @name utils_dpi
 #' @param image An image object.
+#' @param plot Call a new plot to `image`? Defaults to `TRUE`.
 #' @param dpi The image resolution in dots per inch.
 #' @param px The number of pixels.
 #' @param cm The size in centimeters.
@@ -2383,19 +2387,31 @@ npixels <- function(image){
 }
 #' @name utils_dpi
 #' @export
-dpi <- function(image){
+dpi <- function(image, plot = TRUE){
   if(isTRUE(interactive())){
-    plot(image)
+    pix <- distance(image, plot = plot)
+    known <- as.numeric(readline("known distance (cm): "))
+    pix / (known / 2.54)
+  }
+}
+#' @name utils_dpi
+#' @export
+distance <- function(image, plot = TRUE){
+  if(isTRUE(interactive())){
+    if(isTRUE(plot)){
+      plot(image)
+    }
     message("Use the first mouse button to create a line in the plot.")
     coords <- locator(type = "l",
                       n = 2,
                       lwd = 2,
                       col = "red")
     pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
-    known <- as.numeric(readline("known distance (cm): "))
-    pix / (known / 2.54)
+    return(pix)
   }
 }
+
+
 
 #' Color spaces
 #'

@@ -8,6 +8,7 @@
 \alias{cm_to_pixels}
 \alias{npixels}
 \alias{dpi}
+\alias{distance}
 \title{Utilities for image resolution}
 \usage{
 dpi_to_cm(dpi)
@@ -20,7 +21,9 @@ cm_to_pixels(cm, dpi)
 
 npixels(image)
 
-dpi(image)
+dpi(image, plot = TRUE)
+
+distance(image, plot = TRUE)
 }
 \arguments{
 \item{dpi}{The image resolution in dots per inch.}
@@ -30,6 +33,8 @@ dpi(image)
 \item{px}{The number of pixels.}
 
 \item{image}{An image object.}
+
+\item{plot}{Call a new plot to \code{image}? Defaults to \code{TRUE}.}
 }
 \value{
 \itemize{
@@ -49,6 +54,8 @@ dots per inch (dpi).
 known resolution (dpi).
 \item \code{\link[=cm_to_pixels]{cm_to_pixels()}} converts a distance (cm) to number of pixels, given a
 known resolution (dpi).
+\item \code{\link[=distance]{distance()}} Computes the distance between two points in an image based on
+the Pythagorean theorem.
 \item \code{\link[=dpi]{dpi()}} An interactive function to compute the image resolution given a
 known distance informed by the user. See more information in the \strong{Details}
 section.

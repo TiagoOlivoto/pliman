@@ -114,7 +114,11 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -150,7 +154,7 @@
       <h1 data-toc-skip>Plant IMage Analysis</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-19</h4>
+            <h4 class="date">2021-11-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/pliman_start.Rmd"><code>vignettes/pliman_start.Rmd</code></a></small>
       <div class="hidden name"><code>pliman_start.Rmd</code></div>
@@ -179,7 +183,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co"># |=======================================================|</span>
-<span class="co"># | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co"># | Tools for Plant Image Analysis (pliman 1.0.0)         |</span>
 <span class="co"># | Author: Tiago Olivoto                                 |</span>
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co"># | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
@@ -213,13 +217,20 @@
 <span class="co"># 4  4 178.467 174.227 27.697  28.096    18.157       3.039      2.311      4.405</span>
 <span class="co"># 5  5 315.232 434.602  8.608   8.614     9.782       1.664      1.319      2.271</span>
 <span class="co"># 6  6 313.445 655.336  4.000   4.008     7.672       1.125      0.929      1.371</span>
-<span class="co">#   radius_sd radius_ratio major_axis eccentricity  theta solidity circularity</span>
-<span class="co"># 1    21.561        1.907      9.196        0.767  1.538    0.996       1.067</span>
-<span class="co"># 2    13.655        1.588      7.891        0.675 -1.533    0.996       1.180</span>
-<span class="co"># 3    21.404        2.050      7.989        0.758  1.545    0.974       0.975</span>
-<span class="co"># 4    17.091        1.906      7.242        0.723  1.539    0.986       1.056</span>
-<span class="co"># 5     8.608        1.721      4.095        0.752 -1.467    0.999       1.131</span>
-<span class="co"># 6     3.862        1.475      2.394        0.380 -1.550    0.998       0.854</span>
+<span class="co">#   radius_sd radius_ratio diam_mean diam_min diam_max major_axis minor_axis</span>
+<span class="co"># 1    21.561        1.907     7.391    5.536   10.558      9.196      0.281</span>
+<span class="co"># 2    13.655        1.588     6.772    5.782    9.181      7.891      0.241</span>
+<span class="co"># 3    21.404        2.050     6.569    4.779    9.794      7.989      0.244</span>
+<span class="co"># 4    17.091        1.906     6.077    4.623    8.810      7.242      0.221</span>
+<span class="co"># 5     8.608        1.721     3.328    2.639    4.542      4.095      0.125</span>
+<span class="co"># 6     3.862        1.475     2.250    1.859    2.742      2.394      0.073</span>
+<span class="co">#   eccentricity  theta solidity circularity</span>
+<span class="co"># 1        0.767  1.538    0.996       1.067</span>
+<span class="co"># 2        0.675 -1.533    0.996       1.180</span>
+<span class="co"># 3        0.758  1.545    0.974       0.975</span>
+<span class="co"># 4        0.723  1.539    0.986       1.056</span>
+<span class="co"># 5        0.752 -1.467    0.999       1.131</span>
+<span class="co"># 6        0.380 -1.550    0.998       0.854</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>, measure <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></code></pre></div>
@@ -234,13 +245,20 @@
 <span class="co"># 4  4 178.467 174.227 27.104  27.494    17.961       3.006      2.286      4.357</span>
 <span class="co"># 5  5 315.232 434.602  8.424   8.429     9.676       1.646      1.305      2.247</span>
 <span class="co"># 6  6 313.445 655.336  3.914   3.923     7.590       1.113      0.919      1.356</span>
-<span class="co">#   radius_sd radius_ratio major_axis eccentricity  theta solidity circularity</span>
-<span class="co"># 1    21.561        1.907      9.097        0.767  1.538    0.996       1.067</span>
-<span class="co"># 2    13.655        1.588      7.806        0.675 -1.533    0.996       1.180</span>
-<span class="co"># 3    21.404        2.050      7.903        0.758  1.545    0.974       0.975</span>
-<span class="co"># 4    17.091        1.906      7.164        0.723  1.539    0.986       1.056</span>
-<span class="co"># 5     8.608        1.721      4.051        0.752 -1.467    0.999       1.131</span>
-<span class="co"># 6     3.862        1.475      2.368        0.380 -1.550    0.998       0.854</span></code></pre></div>
+<span class="co">#   radius_sd radius_ratio diam_mean diam_min diam_max major_axis minor_axis</span>
+<span class="co"># 1    21.561        1.907     7.311    5.476   10.445      9.097      0.275</span>
+<span class="co"># 2    13.655        1.588     6.700    5.720    9.082      7.806      0.236</span>
+<span class="co"># 3    21.404        2.050     6.498    4.727    9.689      7.903      0.239</span>
+<span class="co"># 4    17.091        1.906     6.012    4.573    8.715      7.164      0.217</span>
+<span class="co"># 5     8.608        1.721     3.292    2.610    4.493      4.051      0.122</span>
+<span class="co"># 6     3.862        1.475     2.226    1.839    2.712      2.368      0.072</span>
+<span class="co">#   eccentricity  theta solidity circularity</span>
+<span class="co"># 1        0.767  1.538    0.996       1.067</span>
+<span class="co"># 2        0.675 -1.533    0.996       1.180</span>
+<span class="co"># 3        0.758  1.545    0.974       0.975</span>
+<span class="co"># 4        0.723  1.539    0.986       1.056</span>
+<span class="co"># 5        0.752 -1.467    0.999       1.131</span>
+<span class="co"># 6        0.380 -1.550    0.998       0.854</span></code></pre></div>
 </div>
 <div id="counting-crop-grains" class="section level1">
 <h1 class="hasAnchor">
@@ -279,7 +297,7 @@
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <pre><code># $severity
 #    healthy symptomatic
-# 1 89.45408    10.54592
+# 1 89.06608    10.93392
 # 
 # $shape
 # NULL
@@ -302,7 +320,11 @@
 <span class="va">rgb</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>,
                   object_index <span class="op">=</span> <span class="st">"B"</span>,
-                  marker <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span></code></pre></div>
+                  marker <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span>
+<span class="co"># Warning: Accepted 'marker' are: {id, x, y, area, area_ch, perimeter,</span>
+<span class="co"># radius_mean, radius_min, radius_max, radius_sd, radius_ratio, diam_mean,</span>
+<span class="co"># diam_min, diam_max, major_axis, minor_axis, eccentricity, theta, solidity,</span>
+<span class="co"># circularity}. Drawing the object id.</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-5-1.png" width="480"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the distribution of RGB values of each object</span>

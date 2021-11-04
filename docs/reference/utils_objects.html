@@ -169,7 +169,11 @@ object_isolate() isolates an object from an image.
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -224,12 +228,15 @@ of each object in the image.</p></li>
   <span class='va'>image</span>,
   id <span class='op'>=</span> <span class='cn'>NULL</span>,
   index <span class='op'>=</span> <span class='st'>"NB"</span>,
+  watershed <span class='op'>=</span> <span class='cn'>TRUE</span>,
   invert <span class='op'>=</span> <span class='cn'>FALSE</span>,
   fill_hull <span class='op'>=</span> <span class='cn'>FALSE</span>,
   edge <span class='op'>=</span> <span class='fl'>2</span>,
   extension <span class='op'>=</span> <span class='cn'>NULL</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
   object_size <span class='op'>=</span> <span class='st'>"medium"</span>,
+  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   show_image <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
@@ -242,19 +249,21 @@ of each object in the image.</p></li>
   extension <span class='op'>=</span> <span class='cn'>NULL</span>,
   tolerance <span class='op'>=</span> <span class='cn'>NULL</span>,
   object_size <span class='op'>=</span> <span class='st'>"medium"</span>,
+  parallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   show_image <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
-<span class='fu'>object_isolate</span><span class='op'>(</span><span class='va'>image</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>object_isolate</span><span class='op'>(</span><span class='va'>image</span>, id <span class='op'>=</span> <span class='cn'>NULL</span>, parallel <span class='op'>=</span> <span class='cn'>FALSE</span>, workers <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>object_id</span><span class='op'>(</span><span class='va'>image</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>object_id</span><span class='op'>(</span><span class='va'>image</span>, parallel <span class='op'>=</span> <span class='cn'>FALSE</span>, workers <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>image</th>
-      <td><p>An image of class <code>Image</code>.</p></td>
+      <td><p>An image of class <code>Image</code> or a list of <code>Image</code> objects.</p></td>
     </tr>
     <tr>
       <th>id</th>
@@ -268,6 +277,14 @@ bounding rectangle. Object ids can be obtained with <code>object_id()</code>. Se
       <th>index</th>
       <td><p>The index to produce a binary image used to compute bounding
 rectangle coordinates. See <code><a href='image_binary.html'>image_binary()</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <th>watershed</th>
+      <td><p>If <code>TRUE</code> (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If <code>FALSE</code>, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.</p></td>
     </tr>
     <tr>
       <th>invert</th>
@@ -288,17 +305,21 @@ Defaults to <code>2</code>.</p></td>
 objects in the image. See <code><a href='analyze_objects.html'>analyze_objects()</a></code> for more details.</p></td>
     </tr>
     <tr>
+      <th>parallel</th>
+      <td><p>Processes the images asynchronously (in parallel) in separate
+R sessions running in the background on the same machine. It may speed up
+the processing time when <code>image</code> is a list. The number of sections is set
+up to 50% of available cores.</p></td>
+    </tr>
+    <tr>
+      <th>workers</th>
+      <td><p>A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.</p></td>
+    </tr>
+    <tr>
       <th>show_image</th>
       <td><p>Shows the image with bounding rectangles? Defaults to
 <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>watershed</th>
-      <td><p>If <code>TRUE</code> (default) performs watershed-based object
-detection. This will detect objects even when they are touching one other.
-If <code>FALSE</code>, all pixels for each connected set of foreground pixels are set
-to a unique object. This is faster but is not able to segment touching
-objects.</p></td>
     </tr>
     <tr>
       <th>...</th>

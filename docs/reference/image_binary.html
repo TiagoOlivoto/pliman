@@ -163,7 +163,11 @@ clustering-based image thresholding." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -254,9 +258,10 @@ the threshold based on a raster plot showing pixel intensity of the index.</p></
     </tr>
     <tr>
       <th>resize</th>
-      <td><p>Resize the image before processing? Defaults to <code>30</code>, which
-resizes the image to 30% of the original size to speed up image processing.
-Set <code>resize = FALSE</code> to keep the original size of the image.</p></td>
+      <td><p>Resize the image before processing? Defaults to <code>FALSE</code>. Use a
+numeric value as the percentage of desired resizing. For example, if
+<code>resize = 30</code>, the resized image will have 30% of the size of original
+image.</p></td>
     </tr>
     <tr>
       <th>fill_hull</th>

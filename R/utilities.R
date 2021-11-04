@@ -92,7 +92,7 @@ check_ebi <- function(){
   if(!requireNamespace("EBImage", quietly = TRUE)) {
     if(interactive() == TRUE){
     inst <-
-    switch(menu(c("Yes", "No"), title = "Package {EBImage} required but not available.\nDo you want to install it now?"),
+    switch(menu(c("Yes", "No"), title = "Package {EBImage} required but not installed.\nDo you want to install it now?"),
            "yes", "no")
     if(inst == "yes"){
       if(!requireNamespace("BiocManager", quietly = TRUE)) {

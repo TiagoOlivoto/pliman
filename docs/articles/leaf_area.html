@@ -114,7 +114,11 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -150,7 +154,7 @@
       <h1 data-toc-skip>Measure leaf area using leaf images</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-19</h4>
+            <h4 class="date">2021-11-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/leaf_area.Rmd"><code>vignettes/leaf_area.Rmd</code></a></small>
       <div class="hidden name"><code>leaf_area.Rmd</code></div>
@@ -166,7 +170,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |=======================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.0.0)         |</span>
 <span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
@@ -254,54 +258,54 @@
 <span class="co">#&gt; 21 21  344.537 602.703   5.370   5.946    11.806       1.621      0.344</span>
 <span class="co">#&gt; 22 22  714.360 576.056   3.788   3.690     7.134       1.120      0.645</span>
 <span class="co">#&gt; 23 23  473.760 785.686   4.252   4.661    27.781       3.482      0.137</span>
-<span class="co">#&gt;    radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity</span>
-<span class="co">#&gt; 1       9.246    27.138        2.069     16.615        0.837  1.529    0.998</span>
-<span class="co">#&gt; 2       8.575    20.758        2.504     13.672        0.548 -1.558    0.787</span>
-<span class="co">#&gt; 3      10.691    46.500        4.030     18.979        0.936 -1.510    0.941</span>
-<span class="co">#&gt; 4       6.364    16.271        2.027     10.962        0.788 -1.487    0.988</span>
-<span class="co">#&gt; 5       6.413    16.586        2.066     10.207        0.760 -1.392    0.965</span>
-<span class="co">#&gt; 6       5.930    11.935        2.032      9.086        0.572 -1.471    0.945</span>
-<span class="co">#&gt; 7       7.148    23.705        2.394     12.675        0.868  1.404    0.986</span>
-<span class="co">#&gt; 8       5.519    14.081        2.097      8.835        0.740 -1.329    0.970</span>
-<span class="co">#&gt; 9       5.417    14.594        2.239      8.419        0.633 -1.476    0.928</span>
-<span class="co">#&gt; 10      3.475     6.134        1.441      5.869        0.254 -1.563    1.005</span>
-<span class="co">#&gt; 11      4.727    13.566        1.988      8.160        0.812  1.568    0.987</span>
-<span class="co">#&gt; 12      4.982    15.198        2.539      7.543        0.635 -1.417    0.885</span>
-<span class="co">#&gt; 13      5.942    26.280        3.748      9.993        0.939 -1.103    0.949</span>
-<span class="co">#&gt; 14      5.099    22.338        3.636      8.773        0.934 -1.382    0.940</span>
-<span class="co">#&gt; 15      4.095    16.808        3.500      7.356        0.926  1.554    0.968</span>
-<span class="co">#&gt; 16      3.026    10.113        2.409      5.006        0.842  0.235    0.963</span>
-<span class="co">#&gt; 17      3.415    14.864        4.394      6.087        0.945  1.424    0.999</span>
-<span class="co">#&gt; 18      2.624     9.952        3.009      4.024        0.878 -0.519    0.936</span>
-<span class="co">#&gt; 19      1.754     5.726        2.089      3.384        0.859 -1.546    1.022</span>
-<span class="co">#&gt; 20      3.533    16.478        7.179      6.118        0.955  1.557    0.935</span>
-<span class="co">#&gt; 21      2.997    14.938        8.712      5.516        0.969 -1.429    0.903</span>
-<span class="co">#&gt; 22      1.719     6.426        2.666      3.312        0.896  1.421    1.027</span>
-<span class="co">#&gt; 23      6.947    39.753       50.583     14.308        1.000 -0.037    0.912</span>
-<span class="co">#&gt;    circularity</span>
-<span class="co">#&gt; 1        1.005</span>
-<span class="co">#&gt; 2        0.460</span>
-<span class="co">#&gt; 3        0.556</span>
-<span class="co">#&gt; 4        0.984</span>
-<span class="co">#&gt; 5        0.935</span>
-<span class="co">#&gt; 6        0.950</span>
-<span class="co">#&gt; 7        0.926</span>
-<span class="co">#&gt; 8        0.928</span>
-<span class="co">#&gt; 9        0.830</span>
-<span class="co">#&gt; 10       0.818</span>
-<span class="co">#&gt; 11       1.015</span>
-<span class="co">#&gt; 12       0.754</span>
-<span class="co">#&gt; 13       0.629</span>
-<span class="co">#&gt; 14       0.628</span>
-<span class="co">#&gt; 15       0.710</span>
-<span class="co">#&gt; 16       0.873</span>
-<span class="co">#&gt; 17       0.632</span>
-<span class="co">#&gt; 18       0.748</span>
-<span class="co">#&gt; 19       1.032</span>
-<span class="co">#&gt; 20       0.442</span>
-<span class="co">#&gt; 21       0.484</span>
-<span class="co">#&gt; 22       0.935</span>
-<span class="co">#&gt; 23       0.069</span>
+<span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis</span>
+<span class="co">#&gt; 1       9.246    27.138        2.069    12.513    8.938   18.492     16.615</span>
+<span class="co">#&gt; 2       8.575    20.758        2.504    11.919    6.849   17.150     13.672</span>
+<span class="co">#&gt; 3      10.691    46.500        4.030    12.534    5.306   21.383     18.979</span>
+<span class="co">#&gt; 4       6.364    16.271        2.027     8.719    6.280   12.728     10.962</span>
+<span class="co">#&gt; 5       6.413    16.586        2.066     8.461    6.207   12.825     10.207</span>
+<span class="co">#&gt; 6       5.930    11.935        2.032     8.101    5.836   11.859      9.086</span>
+<span class="co">#&gt; 7       7.148    23.705        2.394     9.252    5.972   14.296     12.675</span>
+<span class="co">#&gt; 8       5.519    14.081        2.097     7.327    5.263   11.037      8.835</span>
+<span class="co">#&gt; 9       5.417    14.594        2.239     7.149    4.839   10.834      8.419</span>
+<span class="co">#&gt; 10      3.475     6.134        1.441     5.669    4.822    6.950      5.869</span>
+<span class="co">#&gt; 11      4.727    13.566        1.988     6.377    4.756    9.454      8.160</span>
+<span class="co">#&gt; 12      4.982    15.198        2.539     6.287    3.924    9.963      7.543</span>
+<span class="co">#&gt; 13      5.942    26.280        3.748     6.894    3.171   11.885      9.993</span>
+<span class="co">#&gt; 14      5.099    22.338        3.636     5.949    2.805   10.197      8.773</span>
+<span class="co">#&gt; 15      4.095    16.808        3.500     4.909    2.340    8.190      7.356</span>
+<span class="co">#&gt; 16      3.026    10.113        2.409     3.849    2.512    6.051      5.006</span>
+<span class="co">#&gt; 17      3.415    14.864        4.394     3.901    1.555    6.831      6.087</span>
+<span class="co">#&gt; 18      2.624     9.952        3.009     3.066    1.744    5.247      4.024</span>
+<span class="co">#&gt; 19      1.754     5.726        2.089     2.426    1.679    3.507      3.384</span>
+<span class="co">#&gt; 20      3.533    16.478        7.179     3.801    0.984    7.066      6.118</span>
+<span class="co">#&gt; 21      2.997    14.938        8.712     3.243    0.688    5.994      5.516</span>
+<span class="co">#&gt; 22      1.719     6.426        2.666     2.240    1.290    3.439      3.312</span>
+<span class="co">#&gt; 23      6.947    39.753       50.583     6.965    0.275   13.895     14.308</span>
+<span class="co">#&gt;    minor_axis eccentricity  theta solidity circularity</span>
+<span class="co">#&gt; 1       0.835        0.837  1.529    0.998       1.005</span>
+<span class="co">#&gt; 2       0.687        0.548 -1.558    0.787       0.460</span>
+<span class="co">#&gt; 3       0.953        0.936 -1.510    0.941       0.556</span>
+<span class="co">#&gt; 4       0.551        0.788 -1.487    0.988       0.984</span>
+<span class="co">#&gt; 5       0.513        0.760 -1.392    0.965       0.935</span>
+<span class="co">#&gt; 6       0.456        0.572 -1.471    0.945       0.950</span>
+<span class="co">#&gt; 7       0.637        0.868  1.404    0.986       0.926</span>
+<span class="co">#&gt; 8       0.444        0.740 -1.329    0.970       0.928</span>
+<span class="co">#&gt; 9       0.423        0.633 -1.476    0.928       0.830</span>
+<span class="co">#&gt; 10      0.295        0.254 -1.563    1.005       0.818</span>
+<span class="co">#&gt; 11      0.410        0.812  1.568    0.987       1.015</span>
+<span class="co">#&gt; 12      0.379        0.635 -1.417    0.885       0.754</span>
+<span class="co">#&gt; 13      0.502        0.939 -1.103    0.949       0.629</span>
+<span class="co">#&gt; 14      0.441        0.934 -1.382    0.940       0.628</span>
+<span class="co">#&gt; 15      0.370        0.926  1.554    0.968       0.710</span>
+<span class="co">#&gt; 16      0.251        0.842  0.235    0.963       0.873</span>
+<span class="co">#&gt; 17      0.306        0.945  1.424    0.999       0.632</span>
+<span class="co">#&gt; 18      0.202        0.878 -0.519    0.936       0.748</span>
+<span class="co">#&gt; 19      0.170        0.859 -1.546    1.022       1.032</span>
+<span class="co">#&gt; 20      0.307        0.955  1.557    0.935       0.442</span>
+<span class="co">#&gt; 21      0.277        0.969 -1.429    0.903       0.484</span>
+<span class="co">#&gt; 22      0.166        0.896  1.421    1.027       0.935</span>
+<span class="co">#&gt; 23      0.719        1.000 -0.037    0.912       0.069</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>,

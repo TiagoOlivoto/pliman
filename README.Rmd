@@ -112,3 +112,9 @@ sev$severity
 
 Please note that the pliman project is released with a [Contributor Code of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
 
+
+<!-- inicio academic icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+<!-- final academic icons -->
+<!-- inicio font awesome -->
+<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>

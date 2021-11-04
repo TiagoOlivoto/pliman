@@ -3,7 +3,10 @@
 #'* `conv_hull()` Compute convex hull of a set of points.
 #'* `poly_area()` Compute the area of a polygon given by the vertices in the
 #'vectors `x` and `y`.
-#'* `plot_contour()` Plot contour lines using [graphics::lines()].
+#'* `poly_mass()` Compute the center of mass of a polygon given by the vertices
+#'in the vectors `x` and `y`.
+#'* `poly_spline()` Smooths a polygon contour.
+#'* `plot_contour()` Plot contour lines.
 #'* `plot_ellipse()` Plots an ellipse that fits the major and minor axis for
 #'each object.
 #'
@@ -17,22 +20,37 @@
 #'   (`x` and `y`), or a 2-column matrix `x`. If `x` is a list of vector
 #'   coordinates the function will be applied to each element using
 #'   [base::lapply()].
+#' @param vertices The number of spline vertices to create.
+#' @param k The number of points to wrap around the ends to obtain a smooth
+#'   periodic spline.
 #' @param object An object computed with [analyze_objects()].
 #' @param closed If `TRUE` (default) returns the vector of points of a closed
 #'   polygon, i.e., the first point is replicated as the last one.
-#' @param col,lwd The color and width of the lines, respectively.
+#' @param col,lwd,cex The color, width of the lines, and size of point,
+#'   respectively.
 #' @param id The object identification (numeric) to plot the contour/ellipse. By
 #'   default (`id = NULL`), the contour is plotted to all objects
+#' @param arrow If `TRUE` (default) plots two arrows connecting the center of
+#'   mass to the minimum and maximum radius.
+#' @param ...
+#' * For `plot_contour()` and `plot_ellipse()` further arguments passed on to
+#' [graphics::lines()].
+#' * For `plot_mass()`, further arguments passed on to [graphics::points()].
 #' @name utils_polygon
 #' @return
-#' * `conv_hull()` returns a matrix with `x` and `y` coordinates for the convex
-#' hull in clockwise order. If `x` is a list, a list of points is returned.
+#' * `conv_hull()` and `poly_spline()` returns a matrix with `x` and `y`
+#' coordinates for the convex hull/smooth line in clockwise order. If `x` is a
+#' list, a list of points is returned.
 #' * `poly_area()` returns a `double`, or a list if `x` is a list of vector
 #' points.
-#' * `plot_contour()` returns a `double`, or a list if `x` is a list of vector
-#' points.
-#' * `plot_ellipse()` returns a `NULL` object.
+#' * `poly_mass()` returns a `data.frame` containing the coordinates for the
+#' center of mass, as well as for the maximum and minimum distance from contour
+#' to the center of mass.
+#' * `plot_contour()`, `plot_mass()`, and `plot_ellipse()` return a `NULL`
+#' object.
 #' @importFrom grDevices chull
+#' @importFrom graphics arrows
+#' @importFrom stats spline
 #' @export
 #' @references Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area
 #'   of a Polygon and the Vector Cross Product. The Mathematics Teacher, 110(8),
@@ -50,6 +68,10 @@
 #' poly_area(x, y)
 #' poly_area(df)
 #'
+#'# center of mass of the square
+#' cm <- poly_mass(df)
+#' plot_mass(cm)
+#'
 #'# The convex hull will be the vertices of the square
 #' (conv_square <- conv_hull(df))
 #' poly_area(conv_square)
@@ -57,19 +79,22 @@
 #' with(conv_square,
 #'      lines(x, y,
 #'            col  = "blue",
-#'            lwd = 4))
+#'            lwd = 10))
 #'
-#'# polygon
-#' x <- c(0, 2, 2,  5, 2, -1, 0, 0)
-#' y <- c(5, 6, 3,  1, 1,  0, 2, 5)
+#'############# Example with a polygon#############
+#' x <- c(0, 1,   2, 3,  5, 2, -1, 0, 0)
+#' y <- c(5, 6.5, 7, 3,  1, 1,  0, 2, 5)
 #' df_poly <- data.frame(x = x, y = y)
 #'
 #'# area of the polygon
 #' poly_area(df_poly)
-#'
 #' plot(df_poly, pch = 19, col = "red")
 #' with(df_poly, polygon(x, y, col = "red"))
 #'
+#'# center of mass of polygon
+#'# arrows from center of mass to maximum and minimum radius
+#' cm <- poly_mass(df_poly)
+#' plot_mass(cm, arrow = TRUE, col = "blue")
 #'
 #'# vertices of the convex hull
 #' (conv_poly <- conv_hull(df_poly))
@@ -122,7 +147,79 @@ poly_area <- function(x, y = NULL){
       vy <- y
     }
     nr <- length(vx)
-    trunc(abs(sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr]) / 2))
+    abs(sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr]) / 2)
+  }
+}
+#' @name utils_polygon
+#' @export
+poly_mass <- function(x, y = NULL){
+  # adapted from https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
+  if(inherits(x, "list")){
+    do.call(rbind, lapply(x, poly_mass, y))
+  } else{
+    if(is.null(y)){
+      if(is.data.frame(x) | is.matrix(x)){
+        vx <- x[, 1]
+        vy <- x[, 2]
+      }
+    } else{
+      vx <- x
+      vy <- y
+    }
+    if(min(vx) < 0 | min(vy) < 0){
+      nr <- length(vx)
+      ar <- sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr])/2
+      cx <- 1 / (6 * ar) * sum((vx[-nr] + vx[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr]))
+      cy <- 1 / (6 * ar) * sum((vy[-nr] + vy[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr]))
+      ct <- sqrt((vx - cx)^2 + (vy - cy)^2)
+    } else{
+      nr <- length(vx)
+      ar <- abs(sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr])/2)
+      cx <- 1 / (6 * ar) * abs(sum((vx[-nr] + vx[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr])))
+      cy <- 1 / (6 * ar) * abs(sum((vy[-nr] + vy[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr])))
+      ct <- sqrt((vx - cx)^2 + (vy - cy)^2)
+    }
+
+    return(data.frame(x = cx,
+                      y = cy,
+                      min_x = vx[which.min(ct)],
+                      min_y = vy[which.min(ct)],
+                      max_x = vx[which.max(ct)],
+                      max_y = vy[which.max(ct)]))
+  }
+}
+#' @name utils_polygon
+#' @export
+poly_spline <- function(x,
+                        y = NULL,
+                        vertices = 100,
+                        k = 2,
+                        ...){
+  # adapted from https://gis.stackexchange.com/questions/24827/smoothing-polygons-in-contour-map
+  if(inherits(x, "list")){
+    lapply(x, poly_spline, y, vertices, k, ...)
+  } else{
+    if(is.null(y)){
+      if(is.data.frame(x) | is.matrix(x)){
+        xy <- x
+      }
+    } else{
+      xy <- cbind(x, y)
+    }
+    n <- dim(xy)[1]
+    if (k >= 1) {
+      data <- rbind(xy[(n-k+1):n,], xy, xy[1:k, ])
+    } else {
+      data <- xy
+    }
+    # Spline the x and y coordinates.
+    data.spline <- spline(1:(n+2*k), data[,1], n=vertices, ...)
+    x <- data.spline$x
+    x1 <- data.spline$y
+    x2 <- spline(1:(n+2*k), data[,2], n=vertices, ...)$y
+    sl <- cbind(x1, x2)[k < x & x <= n+k, ]
+    # ensure a closed line
+    rbind(sl, sl[1,])
   }
 }
 #' @name utils_polygon
@@ -130,8 +227,9 @@ poly_area <- function(x, y = NULL){
 plot_contour <- function(x,
                          y = NULL,
                          id = NULL,
-                         col = "white",
-                         lwd = 1){
+                         col = "black",
+                         lwd = 1,
+                         ...){
   if(inherits(x, "list")){
     if(is.null(id)){
       invisible(lapply(x, plot_contour, y, id, col, lwd))
@@ -148,15 +246,63 @@ plot_contour <- function(x,
       vx <- x
       vy <- y
     }
-    lines(vx, vy, col = col, lwd = lwd)
+    lines(vx, vy, col = col, lwd = lwd, ...)
   }
 }
-
+#' @name utils_polygon
+#' @export
+plot_mass <- function(x,
+                      y = NULL,
+                      id = NULL,
+                      arrow = TRUE,
+                      col = "black",
+                      cex = 1,
+                      lwd = 1){
+  if(inherits(x, "list")){
+    if(is.null(id)){
+      invisible(lapply(x, plot_mass, y, id, arrow, col, cex, lwd))
+    } else{
+      invisible(lapply(x[id], plot_mass, y, id, arrow, col, cex, lwd))
+    }
+  } else{
+    if(is.null(y)){
+      if(is.data.frame(x) | is.matrix(x)){
+        vx <- x[, 1]
+        vy <- x[, 2]
+        if("min_x"  %in% colnames(x)){
+          min_x <- x$min_x
+          min_y <- x$min_y
+          max_x <- x$max_x
+          max_y <- x$max_y
+        }
+      }
+    } else{
+      vx <- x
+      vy <- y
+    }
+    points(vx, vy, pch = 16, col = col, cex = cex)
+    if(arrow == TRUE){
+      if(!exists("min_x")){
+        stop("Arrows can only be plotted using an object computed with 'poly_mass()`.")
+      }
+      arrows(vx, vy, min_x, min_y,
+             angle = 25,
+             col = col,
+             lwd = lwd,
+             length = 0.15)
+      arrows(vx, vy, max_x, max_y,
+             angle = 25,
+             col = col,
+             lwd = lwd,
+             length = 0.15)
+    }
+  }
+}
 #' @name utils_polygon
 #' @export
 plot_ellipse <- function(object,
                          id = NULL,
-                         col = "white",
+                         col = "black",
                          lwd = 1){
   res <- object$results
   if(is.null(id)){
@@ -177,6 +323,6 @@ plot_ellipse <- function(object,
       st <- sin(tt)
       x <- xc + a * ct * ca - b * st * sa
       y <- yc + a * ct * sa + b * st * ca
-      lines(x, y, col = col, lwd = lwd)
+      lines(x, y, col = col, lwd = lwd, )
     })
 }

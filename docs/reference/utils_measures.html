@@ -167,7 +167,11 @@ current plot. The object identification (&quot;id&quot;) is drawn by default.
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -221,6 +225,7 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
   id <span class='op'>=</span> <span class='cn'>NULL</span>,
   measure <span class='op'>=</span> <span class='cn'>NULL</span>,
   dpi <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sep <span class='op'>=</span> <span class='st'>"\\_|-"</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
   digits <span class='op'>=</span> <span class='fl'>3</span>
 <span class='op'>)</span>
@@ -228,6 +233,8 @@ current plot. The object identification (<code>"id"</code>) is drawn by default.
 <span class='fu'>plot_measures</span><span class='op'>(</span>
   <span class='va'>object</span>,
   measure <span class='op'>=</span> <span class='st'>"id"</span>,
+  hjust <span class='op'>=</span> <span class='cn'>NULL</span>,
+  vjust <span class='op'>=</span> <span class='cn'>NULL</span>,
   digits <span class='op'>=</span> <span class='fl'>2</span>,
   size <span class='op'>=</span> <span class='fl'>0.9</span>,
   col <span class='op'>=</span> <span class='st'>"white"</span>,
@@ -267,12 +274,31 @@ theorem will be <code>L x sqrt(2) / 2</code> where <code>L</code> is the length 
       <td><p>A known resolution of the image in DPI (dots per inch).</p></td>
     </tr>
     <tr>
+      <th>sep</th>
+      <td><p>Regular expression to manage file names. The function combines in
+the <code>merge</code> object the object measures (sum of area and mean of all the
+other measures) of all images that share the same filename prefix, defined
+as the part of the filename preceding the first hyphen (-) or underscore
+(_) (no hyphen or underscore is required). For example, the measures of
+images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
+single image information (L1). This feature allows the user to treat
+multiple images as belonging to a single sample, if desired. Defaults to
+<code>sep = "\\_|-"</code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p>If <code>FALSE</code>, runs the code silently.</p></td>
     </tr>
     <tr>
       <th>digits</th>
       <td><p>The number of significant figures. Defaults to <code>2.</code></p></td>
+    </tr>
+    <tr>
+      <th>hjust, vjust</th>
+      <td><p>A numeric value to adjust the labels horizontally and
+vertically. Positive values will move labels to right (hjust) and top
+(vjust). Negative values will move the labels to left and bottom,
+respectively.</p></td>
     </tr>
     <tr>
       <th>size</th>
@@ -333,19 +359,19 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class='op'>(</span><span class='va'>measures</span> <span class='op'>&lt;-</span> <span class='fu'>get_measures</span><span class='op'>(</span><span class='va'>results</span>, dpi <span class='op'>=</span> <span class='fl'>300</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   id        x        y   area area_ch perimeter radius_mean radius_min
 #&gt; 1  1  669.000  798.000 99.982  99.813    39.920       5.732      4.994
-#&gt; 2  2 1737.500  453.000 24.996  24.911    19.964       2.864      2.493
-#&gt; 3  3 1737.548 1296.345  7.051   7.049     8.721       1.494      1.481
-#&gt; 4  4 1737.498  939.493  7.984   7.934    11.930       1.672      0.994
-#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity
-#&gt; 1      7.058    74.267        1.413     11.546        0.004 -0.785    1.002
-#&gt; 2      3.529    37.171        1.415      5.778        0.058  1.571    1.003
-#&gt; 3      1.506     0.501        1.017      2.997        0.038  0.109    1.000
-#&gt; 4      2.227    49.911        2.240      4.614        0.866  0.000    1.006
-#&gt;   circularity
-#&gt; 1       0.788
-#&gt; 2       0.788
-#&gt; 3       1.165
-#&gt; 4       0.705</div><div class='input'>
+#&gt; 2  2 1737.502  453.000 24.996  24.911    19.947       2.864      2.491
+#&gt; 3  3 1737.590 1296.339  7.050   7.044     8.551       1.494      1.481
+#&gt; 4  4 1737.496  939.498  7.984   7.934    11.904       1.671      0.993
+#&gt;   radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis
+#&gt; 1      7.058    74.266        1.413    11.464    9.989   14.117     11.546
+#&gt; 2      3.528    37.117        1.416     5.728    4.983    7.055      5.778
+#&gt; 3      1.506     0.567        1.017     2.988    2.963    3.013      2.997
+#&gt; 4      2.224    49.872        2.239     3.341    1.987    4.448      4.614
+#&gt;   minor_axis eccentricity theta solidity circularity
+#&gt; 1      0.098        0.002 0.785    1.002       0.788
+#&gt; 2      0.049        0.058 1.571    1.003       0.789
+#&gt; 3      0.025        0.036 0.028    1.001       1.212
+#&gt; 4      0.039        0.866 0.000    1.006       0.708</div><div class='input'>
 <span class='co'># Calculated diagonal of the object 1</span>
 <span class='co'># 10 * sqrt(2) = 14.14</span>
 
@@ -362,23 +388,23 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 #&gt; object id: 1
 #&gt; area     : 100
 #&gt; -----------------------------------------
-#&gt; Total    : 140.038 
-#&gt; Average  : 35.01 
+#&gt; Total    : 140.037 
+#&gt; Average  : 35.009 
 #&gt; -----------------------------------------</div><div class='output co'>#&gt;   id        x        y    area area_ch perimeter radius_mean radius_min
 #&gt; 1  1  669.000  798.000 100.000  99.831    39.924       5.733      4.995
-#&gt; 2  2 1737.500  453.000  25.000  24.916    19.966       2.865      2.494
-#&gt; 3  3 1737.548 1296.345   7.052   7.050     8.721       1.494      1.481
-#&gt; 4  4 1737.498  939.493   7.986   7.935    11.931       1.672      0.994
-#&gt;   radius_max radius_sd radius_ratio major_axis eccentricity  theta solidity
-#&gt; 1      7.059    74.267        1.413     11.547        0.004 -0.785    1.002
-#&gt; 2      3.530    37.171        1.415      5.778        0.058  1.571    1.003
-#&gt; 3      1.506     0.501        1.017      2.998        0.038  0.109    1.000
-#&gt; 4      2.227    49.911        2.240      4.615        0.866  0.000    1.006
-#&gt;   circularity
-#&gt; 1       0.788
-#&gt; 2       0.788
-#&gt; 3       1.165
-#&gt; 4       0.705</div><div class='input'><span class='co'># }</span>
+#&gt; 2  2 1737.502  453.000  25.000  24.915    19.949       2.864      2.492
+#&gt; 3  3 1737.590 1296.339   7.051   7.046     8.552       1.494      1.481
+#&gt; 4  4 1737.496  939.498   7.986   7.935    11.905       1.671      0.994
+#&gt;   radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis
+#&gt; 1      7.059    74.266        1.413    11.465    9.989   14.118     11.547
+#&gt; 2      3.528    37.117        1.416     5.728    4.983    7.056      5.778
+#&gt; 3      1.506     0.567        1.017     2.989    2.963    3.013      2.997
+#&gt; 4      2.224    49.872        2.239     3.341    1.987    4.448      4.614
+#&gt;   minor_axis eccentricity theta solidity circularity
+#&gt; 1      0.098        0.002 0.785    1.002       0.788
+#&gt; 2      0.049        0.058 1.571    1.003       0.789
+#&gt; 3      0.025        0.036 0.028    1.001       1.212
+#&gt; 4      0.039        0.866 0.000    1.006       0.708</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -161,7 +161,11 @@ batch processing." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -229,6 +233,8 @@ batch processing.</p>
       <td><ul>
 <li><p>For <code>image_import()</code>, a character vector of file names or URLs.</p></li>
 <li><p>For <code>image_export()</code>, an Image object, an array or a list of images.</p></li>
+<li><p>For <code>image_pliman()</code>, a charactere value specifying the image example. See
+<code><a href='pliman_images.html'>?pliman_images</a></code> for more details.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -291,8 +297,9 @@ exist, it will be created.</p></td>
 <ul>
 <li><p><code>image_import()</code> returns a new <code>Image</code> object.</p></li>
 <li><p><code>image_export()</code> returns an invisible vector of file names.</p></li>
-<li><p><code>image_pliman()</code> returns a character string with the path to the example
-image installed with the package.</p></li>
+<li><p><code>image_pliman()</code> returns a new <code>Image</code> object with the example image
+required. If an empty call is used, the path to the <code>tmp_images</code> directory
+installed with the package is returned.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
@@ -300,7 +307,40 @@ image installed with the package.</p></li>
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"></pre>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
+<span class='va'>folder</span> <span class='op'>&lt;-</span> <span class='fu'>image_pliman</span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>full_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>folder</span>, <span class='st'>"/sev_leaf.jpg"</span><span class='op'>)</span>
+<span class='op'>(</span><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_file.html'>file_dir</a></span><span class='op'>(</span><span class='va'>full_path</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "C:/Users/tiago/AppData/Local/Temp/RtmpI3SZzZ/temp_libpath217c3a973223/pliman/tmp_images"</div><div class='input'><span class='op'>(</span><span class='va'>file</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/basename.html'>basename</a></span><span class='op'>(</span><span class='va'>full_path</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "sev_leaf.jpg"</div><div class='input'><span class='fu'>image_import</span><span class='op'>(</span>image <span class='op'>=</span> <span class='va'>full_path</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Image 
+#&gt;   colorMode    : Color 
+#&gt;   storage.mode : double 
+#&gt;   dim          : 490 557 3 
+#&gt;   frames.total : 3 
+#&gt;   frames.render: 1 
+#&gt; 
+#&gt; imageData(object)[1:5,1:6,1]
+#&gt;             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+#&gt; [1,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [2,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [3,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [4,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [5,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.003921569</div><div class='input'><span class='fu'>image_import</span><span class='op'>(</span>image <span class='op'>=</span> <span class='va'>file</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Image 
+#&gt;   colorMode    : Color 
+#&gt;   storage.mode : double 
+#&gt;   dim          : 490 557 3 
+#&gt;   frames.total : 3 
+#&gt;   frames.render: 1 
+#&gt; 
+#&gt; imageData(object)[1:5,1:6,1]
+#&gt;             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+#&gt; [1,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [2,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [3,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [4,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137
+#&gt; [5,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.003921569</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

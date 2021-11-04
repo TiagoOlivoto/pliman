@@ -156,6 +156,7 @@ image_closing(
 
 image_skeleton(
   image,
+  kern = NULL,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,

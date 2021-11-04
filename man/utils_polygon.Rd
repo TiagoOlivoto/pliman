@@ -4,7 +4,10 @@
 \alias{utils_polygon}
 \alias{conv_hull}
 \alias{poly_area}
+\alias{poly_mass}
+\alias{poly_spline}
 \alias{plot_contour}
+\alias{plot_mass}
 \alias{plot_ellipse}
 \title{Utilities for Polygons}
 \usage{
@@ -12,9 +15,23 @@ conv_hull(x, y = NULL, closed = TRUE)
 
 poly_area(x, y = NULL)
 
-plot_contour(x, y = NULL, id = NULL, col = "white", lwd = 1)
+poly_mass(x, y = NULL)
 
-plot_ellipse(object, id = NULL, col = "white", lwd = 1)
+poly_spline(x, y = NULL, vertices = 100, k = 2, ...)
+
+plot_contour(x, y = NULL, id = NULL, col = "black", lwd = 1, ...)
+
+plot_mass(
+  x,
+  y = NULL,
+  id = NULL,
+  arrow = TRUE,
+  col = "black",
+  cex = 1,
+  lwd = 1
+)
+
+plot_ellipse(object, id = NULL, col = "black", lwd = 1)
 }
 \arguments{
 \item{x, y}{Coordinate vectors of points. This can be specified as two vectors
@@ -25,22 +42,40 @@ coordinates the function will be applied to each element using
 \item{closed}{If \code{TRUE} (default) returns the vector of points of a closed
 polygon, i.e., the first point is replicated as the last one.}
 
+\item{vertices}{The number of spline vertices to create.}
+
+\item{k}{The number of points to wrap around the ends to obtain a smooth
+periodic spline.}
+
+\item{...}{\itemize{
+\item For \code{plot_contour()} and \code{plot_ellipse()} further arguments passed on to
+\code{\link[graphics:lines]{graphics::lines()}}.
+\item For \code{plot_mass()}, further arguments passed on to \code{\link[graphics:points]{graphics::points()}}.
+}}
+
 \item{id}{The object identification (numeric) to plot the contour/ellipse. By
 default (\code{id = NULL}), the contour is plotted to all objects}
 
-\item{col, lwd}{The color and width of the lines, respectively.}
+\item{col, lwd, cex}{The color, width of the lines, and size of point,
+respectively.}
+
+\item{arrow}{If \code{TRUE} (default) plots two arrows connecting the center of
+mass to the minimum and maximum radius.}
 
 \item{object}{An object computed with \code{\link[=analyze_objects]{analyze_objects()}}.}
 }
 \value{
 \itemize{
-\item \code{conv_hull()} returns a matrix with \code{x} and \code{y} coordinates for the convex
-hull in clockwise order. If \code{x} is a list, a list of points is returned.
+\item \code{conv_hull()} and \code{poly_spline()} returns a matrix with \code{x} and \code{y}
+coordinates for the convex hull/smooth line in clockwise order. If \code{x} is a
+list, a list of points is returned.
 \item \code{poly_area()} returns a \code{double}, or a list if \code{x} is a list of vector
 points.
-\item \code{plot_contour()} returns a \code{double}, or a list if \code{x} is a list of vector
-points.
-\item \code{plot_ellipse()} returns a \code{NULL} object.
+\item \code{poly_mass()} returns a \code{data.frame} containing the coordinates for the
+center of mass, as well as for the maximum and minimum distance from contour
+to the center of mass.
+\item \code{plot_contour()}, \code{plot_mass()}, and \code{plot_ellipse()} return a \code{NULL}
+object.
 }
 }
 \description{
@@ -48,7 +83,10 @@ points.
 \item \code{conv_hull()} Compute convex hull of a set of points.
 \item \code{poly_area()} Compute the area of a polygon given by the vertices in the
 vectors \code{x} and \code{y}.
-\item \code{plot_contour()} Plot contour lines using \code{\link[graphics:lines]{graphics::lines()}}.
+\item \code{poly_mass()} Compute the center of mass of a polygon given by the vertices
+in the vectors \code{x} and \code{y}.
+\item \code{poly_spline()} Smooths a polygon contour.
+\item \code{plot_contour()} Plot contour lines.
 \item \code{plot_ellipse()} Plots an ellipse that fits the major and minor axis for
 each object.
 }
@@ -73,6 +111,10 @@ with(df, polygon(x, y, col = "red"))
 poly_area(x, y)
 poly_area(df)
 
+# center of mass of the square
+cm <- poly_mass(df)
+plot_mass(cm)
+
 # The convex hull will be the vertices of the square
 (conv_square <- conv_hull(df))
 poly_area(conv_square)
@@ -80,19 +122,22 @@ poly_area(conv_square)
 with(conv_square,
      lines(x, y,
            col  = "blue",
-           lwd = 4))
+           lwd = 10))
 
-# polygon
-x <- c(0, 2, 2,  5, 2, -1, 0, 0)
-y <- c(5, 6, 3,  1, 1,  0, 2, 5)
+############# Example with a polygon#############
+x <- c(0, 1,   2, 3,  5, 2, -1, 0, 0)
+y <- c(5, 6.5, 7, 3,  1, 1,  0, 2, 5)
 df_poly <- data.frame(x = x, y = y)
 
 # area of the polygon
 poly_area(df_poly)
-
 plot(df_poly, pch = 19, col = "red")
 with(df_poly, polygon(x, y, col = "red"))
 
+# center of mass of polygon
+# arrows from center of mass to maximum and minimum radius
+cm <- poly_mass(df_poly)
+plot_mass(cm, arrow = TRUE, col = "blue")
 
 # vertices of the convex hull
 (conv_poly <- conv_hull(df_poly))

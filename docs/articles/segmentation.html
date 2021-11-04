@@ -114,7 +114,11 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">RG</a>
+  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="ai ai ai ai-researchgate"></span>
+     
+    RG
+  </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
@@ -150,7 +154,7 @@
       <h1 data-toc-skip>Image segmentation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-10-19</h4>
+            <h4 class="date">2021-11-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/segmentation.Rmd"><code>vignettes/segmentation.Rmd</code></a></small>
       <div class="hidden name"><code>segmentation.Rmd</code></div>
@@ -285,7 +289,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |=======================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.0.0)         |</span>
 <span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
@@ -302,8 +306,8 @@
 <span class="co">#&gt; device support for raster images unknown, ignoring 'raster=TRUE'</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-2.png" width="960"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Create a histogram with the RGB values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span>, type <span class="op">=</span> <span class="st">"hist"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># Create a density plot with the RGB values</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-3.png" width="960"></p>
 <p>In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.</p>
 <div id="segment-an-image" class="section level2">

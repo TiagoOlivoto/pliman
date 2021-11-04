@@ -29,9 +29,8 @@
 #' @keywords images
 NULL
 
-
 .onAttach <- function(libname, pkgname) {
-  vers <-  "0.3.0"
+  vers <-  "1.0.0"
   packageStartupMessage("|=======================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")         |")
   packageStartupMessage("| Author: Tiago Olivoto                                 |")
@@ -45,5 +44,6 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(
     c("Contorno", "display", "CODE", "dir_original" ,"dir_processada",
       "Spectrum", "value", "area", "id", ".", "object", "s.radius.max",
-      "s.radius.min", "y", "s.area", "s.perimeter", "symptomatic"))
+      "s.radius.min", "y", "s.area", "s.perimeter", "symptomatic", "m.eccentricity",
+      "m.majoraxis", "s.radius.mean"))
   }

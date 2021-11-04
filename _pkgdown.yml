@@ -54,6 +54,7 @@ navbar:
   right:
     - text: "RG"
       href: https://www.researchgate.net/profile/Tiago_Olivoto2
+      icon: ai ai-researchgate
     - icon: "fab-github"
       href: https://github.com/TiagoOlivoto
     - icon: "fab fa-twitter"
