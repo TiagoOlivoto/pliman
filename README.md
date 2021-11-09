@@ -24,6 +24,7 @@ will help you to:
 -   Measure disease severity;
 -   Count the number of lesions;
 -   Obtain the shape of lesions;
+-   Produce Standard Area Diagrams;
 -   Count objects in an image;
 -   Get object features (area, perimeter, radius, circularity,
     eccentricity, solidity);
@@ -79,12 +80,12 @@ grains.
 ``` r
 library(pliman)
 # |=======================================================|
-# | Tools for Plant Image Analysis (pliman 0.3.0)         |
+# | Tools for Plant Image Analysis (pliman 1.0.0)         |
 # | Author: Tiago Olivoto                                 |
 # | Type 'vignette('pliman_start')' for a short tutorial  |
 # | Visit 'https://bit.ly/pliman' for a complete tutorial |
 # |=======================================================|
-img <- image_import(image_pliman("soybean_touch.jpg"), plot = TRUE)
+img <-image_pliman("soybean_touch.jpg", plot = TRUE)
 soy <- analyze_objects(img, marker = "id")
 ```
 
@@ -104,10 +105,10 @@ soy$statistics
 # Disease severity
 
 ``` r
-img <- image_import(image_pliman("sev_leaf.jpg"))
-healthy <- image_import(image_pliman("sev_healthy.jpg"))
-symptoms <- image_import(image_pliman("sev_sympt.jpg"))
-background <- image_import(image_pliman("sev_back.jpg"))
+img <-image_pliman("sev_leaf.jpg")
+healthy <-image_pliman("sev_healthy.jpg")
+symptoms <-image_pliman("sev_sympt.jpg")
+background <-image_pliman("sev_back.jpg")
 image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
@@ -126,7 +127,7 @@ sev <-
 ``` r
 sev$severity
 #    healthy symptomatic
-# 1 89.21025    10.78975
+# 1 89.04464    10.95536
 ```
 
 `pliman` takes the advantage of several powerful functions from [EBImage

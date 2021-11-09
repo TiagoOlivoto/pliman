@@ -1,5 +1,5 @@
 ## Release summary
-This is a minor release (0.1.0) that includes new functions, minor improvements. I changed the R dependency to R (>= 4.1) to fix the bug with EBImage installation. See `NEWS.md` for additional information
+This is a major release (1.0.0) that includes new features, bug corrections, and minor improvements. Please,  see `NEWS.md` for additional information.
 
 
 ## Test environments

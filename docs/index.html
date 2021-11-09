@@ -174,6 +174,7 @@
 <li>Measure disease severity;</li>
 <li>Count the number of lesions;</li>
 <li>Obtain the shape of lesions;</li>
+<li>Produce Standard Area Diagrams;</li>
 <li>Count objects in an image;</li>
 <li>Get object features (area, perimeter, radius, circularity, eccentricity, solidity);</li>
 <li>Get the RGB values for each object in an image;</li>
@@ -210,12 +211,12 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
 <span class="co"># |=======================================================|</span>
-<span class="co"># | Tools for Plant Image Analysis (pliman 0.3.0)         |</span>
+<span class="co"># | Tools for Plant Image Analysis (pliman 1.0.0)         |</span>
 <span class="co"># | Author: Tiago Olivoto                                 |</span>
 <span class="co"># | Type 'vignette('pliman_start')' for a short tutorial  |</span>
 <span class="co"># | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
 <span class="co"># |=======================================================|</span>
-<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">img</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -232,10 +233,10 @@
 <h1 class="hasAnchor">
 <a href="#disease-severity" class="anchor"></a>Disease severity</h1>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">symptoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">background</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span>
+<span class="va">healthy</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span>
+<span class="va">symptoms</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span>
+<span class="va">background</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -248,7 +249,7 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sev</span><span class="op">$</span><span class="va">severity</span>
 <span class="co">#    healthy symptomatic</span>
-<span class="co"># 1 89.21025    10.78975</span></code></pre></div>
+<span class="co"># 1 89.04464    10.95536</span></code></pre></div>
 <p><code>pliman</code> takes the advantage of several powerful functions from <a href="https://bioconductor.org/packages/release/bioc/html/EBImage.html">EBImage package</a>. Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!</p>
 </div>
 <div id="getting-help" class="section level1">

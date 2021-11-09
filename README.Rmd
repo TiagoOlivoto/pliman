@@ -77,7 +77,6 @@ soy <- analyze_objects(img, marker = "id")
 soy$statistics
 ```
 
-
 # Disease severity
 
 ```{r fig.width=12, fig.height=3}

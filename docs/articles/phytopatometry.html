@@ -218,7 +218,7 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res</span><span class="op">$</span><span class="va">severity</span>
 <span class="co">#&gt;    healthy symptomatic</span>
-<span class="co">#&gt; 1 89.22702    10.77298</span></code></pre></div>
+<span class="co">#&gt; 1 89.31286    10.68714</span></code></pre></div>
 <p>Alternatively, users can create a mask instead of showing the original image.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -239,7 +239,7 @@
 
 <span class="va">res2</span><span class="op">$</span><span class="va">severity</span>
 <span class="co">#&gt;    healthy symptomatic</span>
-<span class="co">#&gt; 1 89.38145    10.61855</span></code></pre></div>
+<span class="co">#&gt; 1 88.76553    11.23447</span></code></pre></div>
 </div>
 <div id="variations-in-image-palettes" class="section level1">
 <h1 class="hasAnchor">
@@ -264,7 +264,7 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res3</span><span class="op">$</span><span class="va">severity</span>
 <span class="co">#&gt;    healthy symptomatic</span>
-<span class="co">#&gt; 1 93.86121    6.138791</span></code></pre></div>
+<span class="co">#&gt; 1 93.67464    6.325357</span></code></pre></div>
 </div>
 <div id="lesion-features" class="section level1">
 <h1 class="hasAnchor">
@@ -281,47 +281,49 @@
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res4</span><span class="op">$</span><span class="va">shape</span>
 <span class="co">#&gt;    id        x        y area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1   1 222.3081 114.5996  964       169   22.089227  0.7860029  38.771399</span>
-<span class="co">#&gt; 2   2 190.6217 130.1407 1237       215   20.161685  1.5231191  38.614600</span>
-<span class="co">#&gt; 3   3 178.9569 213.9870 3623       401   49.834381  1.2007553  94.223459</span>
-<span class="co">#&gt; 4   4 210.7272 194.5332 1763       218   23.680281  1.6099284  42.079274</span>
-<span class="co">#&gt; 5   5 264.1000 193.6000  130        38    6.018896  4.2975384   7.843562</span>
-<span class="co">#&gt; 6   6 120.6235 202.3412   85        29    4.764471  3.2292510   6.038422</span>
-<span class="co">#&gt; 9   7 211.8550 329.1710  883       123   17.881273  7.3957916  30.236039</span>
-<span class="co">#&gt; 11  8 281.2918 324.8911  257        53    8.849646  5.4810590  12.473539</span>
-<span class="co">#&gt; 12  9 347.9697 335.9205  264        54    8.967773  5.6583696  12.404394</span>
-<span class="co">#&gt; 13 10 184.7270 385.5640 1835       163   24.942991 12.2947739  37.689913</span>
-<span class="co">#&gt; 14 11 334.4275 370.2971  138        38    6.264066  4.3421053   8.426848</span>
-<span class="co">#&gt; 15 12 250.6716 377.4925  134        37    6.359633  3.3393420   8.967802</span>
-<span class="co">#&gt; 17 13 173.4002 450.3011 2189       235   28.356667 12.5831867  46.526638</span>
-<span class="co">#&gt; 20 14 109.1137 465.0995  211        60    8.180511  2.9397657  12.695494</span>
-<span class="co">#&gt; 21 15 123.8044 493.3944  900       112   17.471221  9.3636198  27.623079</span>
-<span class="co">#&gt; 22 16 150.0802 521.2828 1259       140   20.796205 10.6625513  32.361860</span>
+<span class="co">#&gt; 1   1 222.2887 114.6310 1046       172   22.403190  0.3139535  39.374835</span>
+<span class="co">#&gt; 2   2 190.8768 130.8834 1347       216   20.618337  1.4972039  38.603648</span>
+<span class="co">#&gt; 3   3 178.9976 214.1491 3735       403   50.147839  1.9180034  94.976418</span>
+<span class="co">#&gt; 4   4 210.8096 194.4208 1849       223   24.197001  0.8860333  42.460061</span>
+<span class="co">#&gt; 5   5 264.3768 193.6232  138        41    6.227708  4.3878720   8.276311</span>
+<span class="co">#&gt; 6   6 120.4600 202.2900  100        32    5.221618  3.1290599   6.858645</span>
+<span class="co">#&gt; 8   7 146.3521 261.8310   71        27    4.327466  3.0669261   5.530933</span>
+<span class="co">#&gt; 9   8 211.9205 329.0709  931       126   18.465829  7.5120295  30.797631</span>
+<span class="co">#&gt; 11  9 281.2727 325.0945  275        57    9.105716  5.3219234  13.142541</span>
+<span class="co">#&gt; 12 10 347.9933 335.8395  299        58    9.626815  6.2538692  13.069068</span>
+<span class="co">#&gt; 14 11 184.7567 385.3610 1878       164   25.184601 12.8391252  38.360316</span>
+<span class="co">#&gt; 16 12 334.2756 370.2436  156        40    6.723178  4.4702489   9.210490</span>
+<span class="co">#&gt; 17 13 250.7273 377.2987  154        39    6.831217  3.6234680   9.383635</span>
+<span class="co">#&gt; 19 14 173.2269 450.1422 2279       239   28.795630 12.8861388  47.416545</span>
+<span class="co">#&gt; 22 15 110.3394 465.0547  274        67    9.195734  4.0853012  13.637749</span>
+<span class="co">#&gt; 23 16 123.6069 493.3826  954       115   17.962954  9.9391342  27.653985</span>
+<span class="co">#&gt; 24 17 149.9523 521.2032 1299       140   21.236081 11.1714857  33.014963</span>
 <span class="co">#&gt;     radius_sd radius_ratio major_axis eccentricity       theta</span>
-<span class="co">#&gt; 1  11.2270164    49.327300   89.89300    0.9792454  1.39707872</span>
-<span class="co">#&gt; 2   8.9219132    25.352318   71.92778    0.8922875  1.48882769</span>
-<span class="co">#&gt; 3  25.3707260    78.470162  190.81747    0.9785970  1.16748882</span>
-<span class="co">#&gt; 4  10.0311965    26.137358   80.87732    0.8466161  1.27686034</span>
-<span class="co">#&gt; 5   1.0072635     1.825129   15.53860    0.7091755  0.06423295</span>
-<span class="co">#&gt; 6   0.8153877     1.869914   12.38446    0.6869883  0.11255328</span>
-<span class="co">#&gt; 9   6.2846866     4.088276   55.94020    0.9273173  1.54037560</span>
-<span class="co">#&gt; 11  1.9280128     2.275753   24.41219    0.8268777 -0.47920887</span>
-<span class="co">#&gt; 12  1.9452800     2.192221   24.70499    0.8266683  0.97625044</span>
-<span class="co">#&gt; 13  7.4770722     3.065523   75.43400    0.9067328  1.20507406</span>
-<span class="co">#&gt; 14  1.1640319     1.940729   16.42445    0.7361303  0.69651290</span>
-<span class="co">#&gt; 15  1.5849202     2.685500   18.38356    0.8563692 -0.76948291</span>
-<span class="co">#&gt; 17  9.7481634     3.697524   87.82668    0.8528370  0.97944688</span>
-<span class="co">#&gt; 20  2.7392857     4.318539   23.27308    0.8029749  0.01837607</span>
-<span class="co">#&gt; 21  5.5031294     2.950043   53.56349    0.9133958 -0.29195811</span>
-<span class="co">#&gt; 22  5.9292863     3.035095   58.71686    0.8604024 -0.06439327</span>
+<span class="co">#&gt; 1  11.1755916   125.416141   89.39593    0.9764562  1.39887312</span>
+<span class="co">#&gt; 2   8.9447371    25.783828   72.72970    0.8858606  1.48010840</span>
+<span class="co">#&gt; 3  25.3211016    49.518378  190.85475    0.9780844  1.16589555</span>
+<span class="co">#&gt; 4  10.1569704    47.921519   81.19874    0.8422778  1.27653300</span>
+<span class="co">#&gt; 5   1.1417925     1.886179   16.41411    0.7348168  0.11792299</span>
+<span class="co">#&gt; 6   1.0337754     2.191919   13.98327    0.7386224  0.04303979</span>
+<span class="co">#&gt; 8   0.6500446     1.803413   11.07961    0.6600266  0.45878072</span>
+<span class="co">#&gt; 9   6.4114268     4.099775   57.35088    0.9266472  1.54032658</span>
+<span class="co">#&gt; 11  2.0710833     2.469510   25.46050    0.8337564 -0.43324218</span>
+<span class="co">#&gt; 12  2.0059656     2.089757   26.08633    0.8212703  0.97031268</span>
+<span class="co">#&gt; 14  7.4266357     2.987767   75.79999    0.9040359  1.20711232</span>
+<span class="co">#&gt; 16  1.3381902     2.060398   17.67801    0.7478441  0.71462492</span>
+<span class="co">#&gt; 17  1.7686239     2.589683   19.81144    0.8545446 -0.75923505</span>
+<span class="co">#&gt; 19  9.8830893     3.679655   89.44341    0.8566149  0.98824516</span>
+<span class="co">#&gt; 22  2.7702290     3.338248   27.25855    0.8466537  0.02324116</span>
+<span class="co">#&gt; 23  5.5284069     2.782333   54.63570    0.9103912 -0.28990693</span>
+<span class="co">#&gt; 24  6.0158994     2.955289   59.62924    0.8617372 -0.05496710</span>
 <span class="va">res4</span><span class="op">$</span><span class="va">statistics</span>
 <span class="co">#&gt;        stat      value</span>
-<span class="co">#&gt; 1         n    16.0000</span>
-<span class="co">#&gt; 2  min_area    85.0000</span>
-<span class="co">#&gt; 3 mean_area   992.0000</span>
-<span class="co">#&gt; 4  max_area  3623.0000</span>
-<span class="co">#&gt; 5   sd_area   984.0002</span>
-<span class="co">#&gt; 6  sum_area 15872.0000</span></code></pre></div>
+<span class="co">#&gt; 1         n    17.0000</span>
+<span class="co">#&gt; 2  min_area    71.0000</span>
+<span class="co">#&gt; 3 mean_area   987.3529</span>
+<span class="co">#&gt; 4  max_area  3735.0000</span>
+<span class="co">#&gt; 5   sd_area  1006.6055</span>
+<span class="co">#&gt; 6  sum_area 16785.0000</span></code></pre></div>
 </div>
   </div>
 
