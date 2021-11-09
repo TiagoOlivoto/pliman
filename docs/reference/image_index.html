@@ -133,8 +133,20 @@ image_index()." />
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -164,26 +176,25 @@ image_index()." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -325,8 +336,8 @@ index.</p>
 <li><p><code>GB</code> green blue ratio <code>G/B</code></p></li>
 <li><p><code>RB</code> red blue ratio <code>R/B</code></p></li>
 <li><p><code>GR</code> green red ratio <code>G/R</code></p></li>
-<li><p><code>BI</code> brightness Index <code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt((R^2+G^2+B^2)/3)</a></code></p></li>
-<li><p><code>BIM</code> brightness Index 2 <code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt((R*2+G*2+B*2)/3)</a></code></p></li>
+<li><p><code>BI</code> brightness Index <code>sqrt((R^2+G^2+B^2)/3)</code></p></li>
+<li><p><code>BIM</code> brightness Index 2 <code>sqrt((R*2+G*2+B*2)/3)</code></p></li>
 <li><p><code>SCI</code> Soil Colour Index <code>(R-G)/(R+G)</code></p></li>
 <li><p><code>GLI</code> Green leaf index Vis Louhaichi et al. (2001) <code>(2*G-R-B)/(2*G+R+B)</code></p></li>
 <li><p><code>HI</code> Primary colours Hue Index    (2*R-G-B)/(G-B)</p></li>
@@ -337,7 +348,7 @@ index.</p>
 <li><p><code>S</code>     ((R+G+B)-3*B)/(R+G+B)</p></li>
 <li><p><code>L</code>     R+G+B/3</p></li>
 <li><p><code>VARI</code> A Visible Atmospherically Resistant Index <code>(G-R)/(G+R-B)</code></p></li>
-<li><p><code>HUE</code> Overall Hue Index <code><a href='https://rdrr.io/r/base/Trig.html'>atan(2*(B-G-R)/30.5*(G-R))</a></code></p></li>
+<li><p><code>HUE</code> Overall Hue Index <code>atan(2*(B-G-R)/30.5*(G-R))</code></p></li>
 <li><p><code>HUE2</code>  atan(2*(R-G-R)/30.5*(G-B))</p></li>
 <li><p><code>BGI</code>   B/G</p></li>
 <li><p><code>GRAY</code>	<code>0.299*R + 0.587*G + 0.114*B</code></p></li>
@@ -359,16 +370,19 @@ doi: <a href='https://doi.org/10.1109/TSMC.1979.4310076'>10.1109/TSMC.1979.43100
 <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span>
-<span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='image_index-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span>
-
-<span class='co'># resize the image to 30% of the original size</span>
-<span class='va'>ind</span> <span class='op'>&lt;-</span> <span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, resize <span class='op'>=</span> <span class='fl'>30</span>, show_image <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ind</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: device support for raster images unknown, ignoring 'raster=TRUE'</span></div><div class='img'><img src='image_index-2.png' alt='' width='700' height='433' /></div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"soybean_touch.jpg"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"R, NR"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='image_index-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf.jpg"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># resize the image to 30% of the original size</span></span>
+<span class='r-in'><span class='va'>ind</span> <span class='op'>&lt;-</span> <span class='fu'>image_index</span><span class='op'>(</span><span class='va'>img</span>, resize <span class='op'>=</span> <span class='fl'>30</span>, show_image <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ind</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>device support for raster images unknown, ignoring 'raster=TRUE'</span>
+<span class='r-plt img'><img src='image_index-2.png' alt='' width='700' height='433' /></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

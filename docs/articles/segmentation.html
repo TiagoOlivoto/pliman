@@ -84,8 +84,20 @@
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
 <li>
-  <a href="../news/index.html">News</a>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -115,26 +127,25 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -154,7 +165,7 @@
       <h1 data-toc-skip>Image segmentation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-11-04</h4>
+            <h4 class="date">2021-11-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/segmentation.Rmd"><code>vignettes/segmentation.Rmd</code></a></small>
       <div class="hidden name"><code>segmentation.Rmd</code></div>
@@ -300,13 +311,15 @@
 <span class="va">indexes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">soy</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"R, G, B, NR, NG, NB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-1.png" width="960"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Create a raster plot with the RGB values</span>
+<code class="sourceCode R">
+<span class="co"># Create a raster plot with the RGB values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span><span class="op">)</span>
 <span class="co">#&gt; Warning in levelplot.formula(value ~ id * y | spectrum, layout = c(ncol, :</span>
 <span class="co">#&gt; device support for raster images unknown, ignoring 'raster=TRUE'</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-2.png" width="960"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Create a density plot with the RGB values</span>
+<code class="sourceCode R">
+<span class="co"># Create a density plot with the RGB values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">indexes</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation2-3.png" width="960"></p>
 <p>In this example, we can see the distribution of the RGB values (first row) and the normalized RGB values (second row). The two peaks represent the grains (smaller peak) and the blue background (larger peak). The clearer the difference between these peaks, the better will the image segmentation.</p>
@@ -340,7 +353,8 @@
                 index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation6-1.png" width="960"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># second segmentation</span>
+<code class="sourceCode R">
+<span class="co"># second segmentation</span>
 <span class="va">seg2</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">seg</span><span class="op">$</span><span class="va">VARI</span><span class="op">$</span><span class="va">image</span>,
                 index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
@@ -351,7 +365,8 @@
 <span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>, nseg <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p>The <code>"VARI"</code> seems to be a suitable index to segment symptoms (necrosis and chlorosis) from healthy tissues. The <code>"GLI"</code> can be used to segment necrosis from chlorosis. Knowing this, we can now use <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> explicitly indicating these indexes, as follows</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>,
+<code class="sourceCode R">
+<span class="fu"><a href="../reference/image_segment.html">image_segment_iter</a></span><span class="op">(</span><span class="va">seg_iter</span>,
                    nseg <span class="op">=</span> <span class="fl">2</span>, <span class="co"># two segmentations</span>
                    index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"VARI"</span>, <span class="st">"GLI"</span><span class="op">)</span>,
                    ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
@@ -385,6 +400,7 @@
 <span class="co">#&gt; 1 original 1317600 100.00000</span>
 <span class="co">#&gt; 2     seg1  321729  24.41781</span>
 <span class="co">#&gt; 3     seg2  101883  31.66733</span>
+
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">seg_iter1</span><span class="op">$</span><span class="va">images</span><span class="op">$</span><span class="va">seg1</span>,
               <span class="va">seg_iter2</span><span class="op">$</span><span class="va">images</span><span class="op">$</span><span class="va">seg1</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/segmentation9-1.png" width="960"></p>
@@ -399,7 +415,8 @@
 <code class="sourceCode R"><span class="va">binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span></code></pre></div>
 <p><img src="segmentation_files/figure-html/binary1-1.png" width="960"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># original image size</span>
+<code class="sourceCode R">
+<span class="co"># original image size</span>
 <span class="fu"><a href="../reference/image_binary.html">image_binary</a></span><span class="op">(</span><span class="va">soy</span>,
              index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"B, NB"</span><span class="op">)</span>,
              resize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>

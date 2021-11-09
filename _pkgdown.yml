@@ -5,6 +5,7 @@ home:
   description: Tools for Plant Image Analysis
 
 template:
+  assets: fans.html
   params:
     bootswatch: spacelab
     ganalytics: G-VWN5YL53DP
@@ -38,7 +39,11 @@ navbar:
     - text: "Functions"
       href: reference/index.html
     - text: News
-      href: news/index.html
+      menu:
+      - text: Package news
+        href: news/index.html
+      - text: Blog posts
+        href: https://olivoto.netlify.app/
     - text: More
       menu:
       - text: Code of Conduct
@@ -52,14 +57,13 @@ navbar:
       - text: Licence
         href: LICENSE.html
   right:
-    - text: "RG"
+    - icon: "fab fa-researchgate fa-2x"
       href: https://www.researchgate.net/profile/Tiago_Olivoto2
-      icon: ai ai-researchgate
-    - icon: "fab-github"
+    - icon: "fa-github fa-2x"
       href: https://github.com/TiagoOlivoto
-    - icon: "fab fa-twitter"
+    - icon: "fab fa-twitter fa-2x"
       href: https://twitter.com/tolivoto
-    - icon: "fab fa-mendeley"
+    - icon: "fab fa-mendeley fa-2x"
       href: https://www.mendeley.com/profiles/tiago-olivoto/
 
 
@@ -127,3 +131,5 @@ reference:
       - measure_disease
       - symptomatic_area
       - sad
+
+

@@ -84,8 +84,20 @@
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
 <li>
-  <a href="../news/index.html">News</a>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -115,26 +127,25 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -154,7 +165,7 @@
       <h1 data-toc-skip>Image manipulation with pliman</h1>
                         <h4 class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-11-04</h4>
+            <h4 class="date">2021-11-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/manipulation.Rmd"><code>vignettes/manipulation.Rmd</code></a></small>
       <div class="hidden name"><code>manipulation.Rmd</code></div>
@@ -200,7 +211,8 @@
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy</span>, <span class="va">soy</span><span class="op">)</span></code></pre></div>
 <p><img src="manipulation_files/figure-html/display2-1.png" width="1152"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Combine images</span>
+<code class="sourceCode R">
+<span class="co"># Combine images</span>
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">soy_list</span>, ncol <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <p><img src="manipulation_files/figure-html/display2-2.png" width="1152"></p>
 </div>
@@ -270,7 +282,8 @@
              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="manipulation_files/figure-html/manipulate2-1.png" width="960"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># trim 100 pixels from top and bottom</span>
+<code class="sourceCode R">
+<span class="co"># trim 100 pixels from top and bottom</span>
 <span class="va">soy_trim3</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/utils_transform.html">image_trim</a></span><span class="op">(</span><span class="va">soy</span>,
              top <span class="op">=</span> <span class="fl">100</span>,

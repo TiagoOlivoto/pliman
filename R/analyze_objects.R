@@ -186,7 +186,7 @@
 #'
 #' Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 #' and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
-#' \doi{10.5951/MATHTEACHER.110.8.0631}
+#' \doi{10.5951/mathteacher.110.8.0631}
 #'
 #' @export
 #' @name analyze_objects

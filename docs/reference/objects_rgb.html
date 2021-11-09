@@ -132,8 +132,20 @@ object_index instead." />
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -163,26 +175,25 @@ object_index instead." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -359,7 +370,7 @@ or equal 120 and less than or equal 140 will be considered.</p></td>
     <tr>
       <th>save_image</th>
       <td><p>Save the image after processing? The image is saved in the
-current working directory named as <code>proc_*</code> where <code><a href='https://rdrr.io/r/base/Arithmetic.html'>*</a></code> is the image name
+current working directory named as <code>proc_*</code> where <code>*</code> is the image name
 given in <code>img</code>.</p></td>
     </tr>
     <tr>
@@ -416,11 +427,12 @@ one can set <code>parallel = TRUE</code>.</p>
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># objects_rgb() will be deprecated in the future.</span>
-<span class='co'># Use analyze_objects() with the argument `object_index` instead.</span>
-<span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># objects_rgb() will be deprecated in the future.</span></span>
+<span class='r-in'><span class='co'># Use analyze_objects() with the argument `object_index` instead.</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

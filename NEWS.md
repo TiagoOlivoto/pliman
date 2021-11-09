@@ -1,12 +1,11 @@
 # pliman 1.0.0
 ## New functions
 * `analyze_objects()` is now used as the main function to compute the number and shape of objects.
-* `measure_disease()` is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as number and shape of lesions.
+* `measure_disease()` is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as the number and shape of lesions.
 * `image_segment_iter()` is used to performs iterative image segmentation.
-* `conv_hull()`, `poly_area()`, and `plot_contour()` as utilities for analyzing polygons.
+* `conv_hull()`, `poly_area()`, `poly_mass()`, `poly_spline()`, `plot_contour()`, and `plot_ellipse()` as utilities for analyzing polygons.
 * `dpi()` to compute the resolution (dots per inch) of an image.
 * `tune_tolerance()` for tunning the `tolerance` parameter.
-
 
 ## Deprecated functions.
 * `objects_rgb()` will be depracated in the future. Now, to compute an index for each object use the `object_index` argument in  `analyze_objects()`, for example, `analyze_objects(object_index = "B")`.

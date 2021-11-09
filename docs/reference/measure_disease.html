@@ -132,8 +132,20 @@ entire leaf. See more at Details." />
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -163,26 +175,25 @@ entire leaf. See more at Details." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -455,7 +466,7 @@ name of the <code>shape</code> data frame returned by the function.</p></td>
     <tr>
       <th>save_image</th>
       <td><p>Save the image after processing? The image is saved in the
-current working directory named as <code>proc_*</code> where <code><a href='https://rdrr.io/r/base/Arithmetic.html'>*</a></code> is the image name
+current working directory named as <code>proc_*</code> where <code>*</code> is the image name
 given in <code>img</code>.</p></td>
     </tr>
     <tr>
@@ -506,22 +517,24 @@ healthy tissues.</p>
     <p>Tiago Olivoto <a href='mailto:tiagoolivoto@gmail.com'>tiagoolivoto@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span>
-<span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf_nb.jpg"</span><span class='op'>)</span>
-<span class='va'>healthy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_healthy.jpg"</span><span class='op'>)</span>
-<span class='va'>lesions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_sympt.jpg"</span><span class='op'>)</span>
-<span class='fu'><a href='image_combine.html'>image_combine</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='va'>healthy</span>, <span class='va'>lesions</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-</div><div class='img'><img src='measure_disease-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='va'>sev</span> <span class='op'>&lt;-</span>
- <span class='fu'>measure_disease</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,
-                 img_healthy <span class='op'>=</span> <span class='va'>healthy</span>,
-                 img_symptoms <span class='op'>=</span> <span class='va'>lesions</span>,
-                 lesion_size <span class='op'>=</span> <span class='st'>"large"</span>,
-                 show_image <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='img'><img src='measure_disease-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/TiagoOlivoto/pliman'>pliman</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>img</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_leaf_nb.jpg"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>healthy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_healthy.jpg"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>lesions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='utils_image.html'>image_pliman</a></span><span class='op'>(</span><span class='st'>"sev_sympt.jpg"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='image_combine.html'>image_combine</a></span><span class='op'>(</span><span class='va'>img</span>, <span class='va'>healthy</span>, <span class='va'>lesions</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='measure_disease-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>sev</span> <span class='op'>&lt;-</span></span>
+<span class='r-in'> <span class='fu'>measure_disease</span><span class='op'>(</span>img <span class='op'>=</span> <span class='va'>img</span>,</span>
+<span class='r-in'>                 img_healthy <span class='op'>=</span> <span class='va'>healthy</span>,</span>
+<span class='r-in'>                 img_symptoms <span class='op'>=</span> <span class='va'>lesions</span>,</span>
+<span class='r-in'>                 lesion_size <span class='op'>=</span> <span class='st'>"large"</span>,</span>
+<span class='r-in'>                 show_image <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='measure_disease-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

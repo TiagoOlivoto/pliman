@@ -129,8 +129,20 @@
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../news/index.html">Package news</a>
+    </li>
+    <li>
+      <a href="https://olivoto.netlify.app/">Blog posts</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -160,26 +172,25 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="ai ai ai ai-researchgate"></span>
+    <span class="fab fa-researchgate fa-2x"></span>
      
-    RG
   </a>
 </li>
 <li>
   <a href="https://github.com/TiagoOlivoto">
-    <span class="fab fab-github"></span>
+    <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter"></span>
+    <span class="fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley"></span>
+    <span class="fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
@@ -211,11 +222,11 @@
 <li>
 <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> is now used as the main function to compute the number and shape of objects.</li>
 <li>
-<code><a href="../reference/measure_disease.html">measure_disease()</a></code> is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as number and shape of lesions.</li>
+<code><a href="../reference/measure_disease.html">measure_disease()</a></code> is now used as the main function to perform phytopatometry studies. The function can compute symptomatic area, as well as the number and shape of lesions.</li>
 <li>
 <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> is used to performs iterative image segmentation.</li>
 <li>
-<code><a href="../reference/utils_polygon.html">conv_hull()</a></code>, <code><a href="../reference/utils_polygon.html">poly_area()</a></code>, and <code><a href="../reference/utils_polygon.html">plot_contour()</a></code> as utilities for analyzing polygons.</li>
+<code><a href="../reference/utils_polygon.html">conv_hull()</a></code>, <code><a href="../reference/utils_polygon.html">poly_area()</a></code>, <code><a href="../reference/utils_polygon.html">poly_mass()</a></code>, <code><a href="../reference/utils_polygon.html">poly_spline()</a></code>, <code><a href="../reference/utils_polygon.html">plot_contour()</a></code>, and <code><a href="../reference/utils_polygon.html">plot_ellipse()</a></code> as utilities for analyzing polygons.</li>
 <li>
 <code><a href="../reference/utils_dpi.html">dpi()</a></code> to compute the resolution (dots per inch) of an image.</li>
 <li>
@@ -227,7 +238,7 @@
 <a href="#deprecated-functions" class="anchor"></a>Deprecated functions.</h2>
 <ul>
 <li>
-<code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> will be depracated in the future. Now, to compute an index for each object use the <code>object_index</code> argument in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, for example, <code><a href="../reference/analyze_objects.html">analyze_objects(object_index = "B")</a></code>.</li>
+<code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> will be depracated in the future. Now, to compute an index for each object use the <code>object_index</code> argument in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, for example, <code>analyze_objects(object_index = "B")</code>.</li>
 <li>
 <code><a href="../reference/leaf_area.html">leaf_area()</a></code> will be depracated in the future. Now, combine <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> with <code><a href="../reference/utils_measures.html">get_measures()</a></code> to obtain the area and shape of objects (leaves).</li>
 <li>

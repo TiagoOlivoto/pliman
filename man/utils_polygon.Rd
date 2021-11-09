@@ -117,12 +117,10 @@ plot_mass(cm)
 
 # The convex hull will be the vertices of the square
 (conv_square <- conv_hull(df))
+plot_contour(conv_square,
+             col = "blue",
+             lwd = 6)
 poly_area(conv_square)
-
-with(conv_square,
-     lines(x, y,
-           col  = "blue",
-           lwd = 10))
 
 ############# Example with a polygon#############
 x <- c(0, 1,   2, 3,  5, 2, -1, 0, 0)
@@ -153,5 +151,5 @@ with(conv_poly,
 \references{
 Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area
 of a Polygon and the Vector Cross Product. The Mathematics Teacher, 110(8),
-631–636. doi:10.5951/MATHTEACHER.110.8.0631
+631–636. \doi{10.5951/mathteacher.110.8.0631}
 }
