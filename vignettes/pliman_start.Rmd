@@ -127,3 +127,10 @@ plot(rgb)
 -   If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues)
 
 -   Suggestions and criticisms to improve the quality and usability of the package are welcome!
+
+# <i class="fas fa-scroll"></i> A little bit more!
+
+<!-- inicio font awesome -->
+<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
+
+> At [this link](https://tiagoolivoto.github.io/paper_pliman/code.html) you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded [here](https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip). You can also find a talk (Portuguese language) about {pliman} [here](https://www.youtube.com/watch?v=ElvUVlPocgA). <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!

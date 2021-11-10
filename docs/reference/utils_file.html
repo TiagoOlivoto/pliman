@@ -354,11 +354,11 @@ attempted.</p></li>
 <span class='r-in'><span class='co'># manipulate files</span></span>
 <span class='r-in'><span class='va'>dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"          "file15b42d1c622d" "file15b4c946339" </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"         "file2fec35f3c75" "file2fec654de3b"</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.create</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"/test.txt"</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"          "file15b42d1c622d" "file15b4c946339"  "test.txt"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"         "file2fec35f3c75" "file2fec654de3b" "test.txt"       </span>
 <span class='r-in'><span class='fu'>manipulate_files</span><span class='op'>(</span><span class='st'>"test"</span>,</span>
 <span class='r-in'>                 dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"\\"</span><span class='op'>)</span>,</span>
 <span class='r-in'>                prefix <span class='op'>=</span> <span class='st'>"chang_"</span>,</span>
@@ -366,7 +366,7 @@ attempted.</p></li>
 <span class='r-in'>                overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Failed to copy 1 files.</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"          "file15b42d1c622d" "file15b4c946339"  "test.txt"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "downlit"         "file2fec35f3c75" "file2fec654de3b" "test.txt"       </span>
 <span class='r-in'><span class='co'># }</span></span>
 </pre>
   </div>
