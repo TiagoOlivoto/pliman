@@ -91,13 +91,18 @@ reference:
     contents:
       - utils_dpi
 
+  - title: "Utilities for image points"
+    desc: "Opens an iterative section to count objects, extract pixel intensity and create image palettes manually. "
+    contents:
+      - utils_pick
+
 
   - title: "Image segmentation"
     desc: "Performs image segmentation based on indexes such as RGB bands or vegetation indexes "
     contents:
       - image_binary
       - image_index
-      - image_palette
+      - palettes
       - image_segment
       - image_to_mat
       - prop_segmented

@@ -189,7 +189,7 @@ measure_disease <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  # check_ebi()
+  check_ebi()
   if(nrows != "deprecated"){
     warning("Argument 'nrows' was deprecated. Use 'nsample' instead.", call. = FALSE)
     nsample <- nrows
@@ -466,17 +466,23 @@ measure_disease <- function(img,
             index_lb <- index_lb
           }
           if(is.null(threshold)){
-            threshold <- rep("Otsu", 2)
+            threshold1 <- "Otsu"
           } else{
-            threshold <- ifelse(length(threshold == 1), threshold, threshold[1])
+            threshold1 <- ifelse(length(threshold) == 1, threshold, threshold[1])
           }
-          my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold))),
-                              as.character(threshold),
-                              as.numeric(threshold))
+          my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold1))),
+                              as.character(threshold1),
+                              as.numeric(threshold1))
+          if(!isFALSE(invert)){
+            invert1 <- ifelse(length(invert) == 1, invert, invert[1])
+          } else{
+            invert1 <- FALSE
+          }
           seg <- image_segment(img,
                                index = index_lb,
                                my_index = my_index_lb,
                                threshold = my_thresh,
+                               invert = invert1,
                                show_image = FALSE,
                                fill_hull = FALSE)
 
@@ -491,18 +497,23 @@ measure_disease <- function(img,
           index_dh <- index_dh
         }
         if(is.null(threshold)){
-          threshold <- rep("Otsu", 2)
+          threshold2 <- "Otsu"
         } else{
-          threshold <- ifelse(length(threshold == 1), threshold, threshold[2])
+          threshold2 <- ifelse(length(threshold) == 1, threshold, threshold[2])
         }
-        my_thresh2 <- ifelse(is.na(suppressWarnings(as.numeric(threshold))),
-                             as.character(threshold),
-                             as.numeric(threshold))
+        my_thresh2 <- ifelse(is.na(suppressWarnings(as.numeric(threshold2))),
+                             as.character(threshold2),
+                             as.numeric(threshold2))
+        if(!isFALSE(invert)){
+          invert2 <- ifelse(length(invert) == 1, invert, invert[2])
+        } else{
+          invert2 <- FALSE
+        }
         img2 <- image_binary(img,
                              index = index_dh,
                              my_index = my_index_dh,
                              threshold = my_thresh2,
-                             invert = invert,
+                             invert = invert2,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         img2@.Data[is.na(img2@.Data)] <- FALSE
@@ -805,4 +816,3 @@ measure_disease <- function(img,
     )
   }
 }
-

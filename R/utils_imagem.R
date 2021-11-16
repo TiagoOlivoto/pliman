@@ -2212,16 +2212,17 @@ image_to_mat <- function(image,
 }
 
 
-#' Create an image palette
+#' Create image palettes
 #'
-#' Creates image palettes by applying the k-means algorithm to the RGB values.
+#' `image_palette()`  creates image palettes by applying the k-means algorithm
+#' to the RGB values.
 #' @param image An image object.
 #' @param npal The number of color palettes.
 #' @param filter Performs median filtering. This can be useful to reduce the
 #'   noise in produced palettes. Defaults to `TRUE`. See more at
 #'   [image_filter()].
-#' @param blur Performs blurring filter of palettes?  Defaults to `FALSE`. See more at
-#'   [image_blur()].
+#' @param blur Performs blurring filter of palettes?  Defaults to `FALSE`. See
+#'   more at [image_blur()].
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
@@ -2229,15 +2230,23 @@ image_to_mat <- function(image,
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A list with `npal` color palettes of class `Image`.
+#' @return
+#' * `image_palette()` returns a list with `npal` color palettes of class `Image`.
+#' *
+#' @name palettes
 #' @export
 #' @examples
 #' \donttest{
 #' library(pliman)
 #'img <- image_pliman("sev_leaf_nb.jpg")
 #'pal <- image_palette(img, npal = 4)
-#'
 #'image_combine(pal)
+#'
+#'
+#'# runs only in an iterative section
+#' if(FALSE){
+#' image_palette_pick(img)
+#' }
 #'}
 image_palette <- function(image,
                           npal,
@@ -2290,6 +2299,7 @@ image_palette <- function(image,
     return(rgbs)
   }
 }
+
 
 #' Utilities for image resolution
 #'
