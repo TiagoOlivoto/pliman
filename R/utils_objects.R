@@ -23,6 +23,11 @@
 #'   If `FALSE`, all pixels for each connected set of foreground pixels are set
 #'   to a unique object. This is faster but is not able to segment touching
 #'   objects.
+#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
+#'   on Otsu's method is used to reduce the grayscale image to a binary image.
+#'   If a numeric value is informed, this value will be used as a threshold.
+#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
+#'   the threshold based on a raster plot showing pixel intensity of the index.
 #' @param edge The number of pixels in the edge of the bounding rectangle.
 #'   Defaults to `2`.
 #' @param extension,tolerance,object_size Controls the watershed segmentation of
@@ -68,6 +73,7 @@ object_coord <- function(image,
                          watershed = TRUE,
                          invert = FALSE,
                          fill_hull = FALSE,
+                         threshold = "Otsu",
                          edge = 2,
                          extension = NULL,
                          tolerance = NULL,
@@ -87,10 +93,11 @@ object_coord <- function(image,
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       parLapply(clust, image, object_coord, id, index, invert,
-                fill_hull, edge, extension, tolerance, object_size, show_image)
+                fill_hull, threshold, edge, extension, tolerance,
+                object_size, show_image)
     } else{
-      lapply(image, object_coord, id, index, invert,
-             fill_hull, edge, extension, tolerance, object_size, show_image)
+      lapply(image, object_coord, id, index, invert, fill_hull, threshold,
+             edge, extension, tolerance, object_size, show_image)
     }
   } else{
     # helper function to get coordinates from a mask
@@ -126,6 +133,7 @@ object_coord <- function(image,
                          index = index,
                          invert = invert,
                          fill_hull = fill_hull,
+                         threshold = threshold,
                          show_image = FALSE,
                          resize = FALSE)[[1]]
     if(is.null(id)){
@@ -185,6 +193,7 @@ object_contour <- function(image,
                            index = "NB",
                            invert = FALSE,
                            fill_hull = FALSE,
+                           threshold = "Otsu",
                            watershed = TRUE,
                            extension = NULL,
                            tolerance = NULL,
@@ -203,10 +212,10 @@ object_contour <- function(image,
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_contour, index, invert, fill_hull,
+      parLapply(clust, image, object_contour, index, invert, fill_hull, threshold,
                 watershed, extension, tolerance, object_size, show_image)
     } else{
-      lapply(image, object_contour, index, invert, fill_hull,
+      lapply(image, object_contour, index, invert, fill_hull, threshold,
              watershed, extension, tolerance, object_size, show_image)
     }
   } else{
@@ -214,6 +223,7 @@ object_contour <- function(image,
                          index = index,
                          invert = invert,
                          fill_hull = fill_hull,
+                         threshold = threshold,
                          show_image = FALSE,
                          resize = FALSE)[[1]]
     if(isTRUE(watershed)){

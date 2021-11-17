@@ -15,6 +15,7 @@ object_coord(
   watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
+  threshold = "Otsu",
   edge = 2,
   extension = NULL,
   tolerance = NULL,
@@ -29,6 +30,7 @@ object_contour(
   index = "NB",
   invert = FALSE,
   fill_hull = FALSE,
+  threshold = "Otsu",
   watershed = TRUE,
   extension = NULL,
   tolerance = NULL,
@@ -63,6 +65,12 @@ objects.}
 \item{invert}{Inverts the binary image, if desired. Defaults to \code{FALSE}.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
+
+\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image.
+If a numeric value is informed, this value will be used as a threshold.
+Inform any non-numeric value different than "Otsu" to iteratively chosen
+the threshold based on a raster plot showing pixel intensity of the index.}
 
 \item{edge}{The number of pixels in the edge of the bounding rectangle.
 Defaults to \code{2}.}

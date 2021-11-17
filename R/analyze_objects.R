@@ -86,9 +86,11 @@
 #'   operation involving them, e.g., `object_index = "R/B"`. In this case, it
 #'   will return for each object in the image, the average value of the R/B
 #'   ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
-#' @param threshold A numeric value for the segmentation threshold.  By default,
-#'   a threshold value based on Otsu's method is used to reduce the grayscale
-#'   image to a binary image.
+#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
+#'   on Otsu's method is used to reduce the grayscale image to a binary image.
+#'   If a numeric value is informed, this value will be used as a threshold.
+#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
+#'   the threshold based on a raster plot showing pixel intensity of the index.
 #' @param tolerance The minimum height of the object in the units of image
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
