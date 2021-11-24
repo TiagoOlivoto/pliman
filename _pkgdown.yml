@@ -121,6 +121,7 @@ reference:
       - utils_objects
       - tune_tolerance
       - plot.anal_obj
+      - report_index
       - utils_polygon
 
 

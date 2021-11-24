@@ -251,6 +251,7 @@ get_measures <- function(object,
 #' @name utils_measures
 #' @export
 plot_measures <- function(object,
+                          id = NULL,
                           measure = "id",
                           hjust = NULL,
                           vjust = NULL,
@@ -270,6 +271,12 @@ plot_measures <- function(object,
   } else{
     stop("Object of ivalid class.")
   }
+  if(is.null(id)){
+    id <- object$id
+  } else{
+    id <- id
+  }
+  object <- object[which(object$id %in% id), ]
   if(measure %in% colnames(object)){
     hjust <- ifelse(is.null(hjust), 0, hjust)
     vjust <- ifelse(is.null(vjust), 0, vjust)
@@ -287,7 +294,7 @@ plot_measures <- function(object,
       }
       text(x = object[,2],
            y = object[,3],
-           labels = round(index[, which(colnames(index) == measure)], digits),
+           labels = round(index[object$id , which(colnames(index) == measure)], digits),
            col = col,
            cex = size,
            ...)
@@ -296,3 +303,61 @@ plot_measures <- function(object,
     }
   }
 }
+
+
+
+
+#' Reports for an object index
+#'
+#' Performs a report of the object index when `object_index` argument is used in
+#' `analyze_objects()`. By using a cut point, the proportion and mean values for
+#' the selected objects are returned.
+#'
+#' @param object An object computed with [analyze_objects()].
+#' @param index The index desired, e.g., "B". Note that these value must match the index(es) used in
+#' @param cut_point The cut point
+#' @param select_higher If `FALSE` (default) selects the objects with `index`
+#'   smaller than the `cut_point`. Use `select_higher = TRUE` to select the
+#'   objects with `index` higher than `cut_point`.
+#'
+#' @return A list with the following elements:
+#' * `ids` The identification of selected objects.
+#' * `report` A data frame with the following columns
+#'    - `n` The number of objects.
+#'    - `nsel` The number of selected objects.
+#'    - `prop` The proportion of objects selected.
+#'    - `mean_index_sel`, and `mean_index_nsel` The mean value of `index` for the
+#' selected and non-selected objects, respectively.
+#' @export
+#'
+#' @examples
+#' soy <- image_pliman("soy_green.jpg")
+#' anal <- analyze_objects(soy, object_index = "G")
+#' plot_measures(anal, measure = "G")
+#'
+#' report_index(anal, index = "G", cut_point = 0.5)
+report_index <- function(object,
+                         index,
+                         cut_point,
+                         select_higher = FALSE){
+  if(is.null(object$object_index)){
+    stop("'object' was not computed using the `object_index` argument.")
+  }
+  temp <- object$object_index
+
+  if(isFALSE(select_higher)){
+    ids <- which(temp[[index]] < cut_point)
+  } else{
+    ids <- which(temp[[index]] > cut_point)
+  }
+  list(ids = ids,
+       report = data.frame(
+         n = nrow(temp),
+         nsel = length(ids),
+         prop = length(ids) / nrow(temp),
+         mean_index_sel = mean(temp[[index]][ids]),
+         mean_index_nsel = mean(temp[[index]][!temp$id %in% ids])
+       )
+  )
+}
+

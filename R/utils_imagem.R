@@ -80,6 +80,8 @@ image_combine <- function(...,
 #'   character with the image name (e.g., "img1") or name and extension (e.g.,
 #'   "img1.jpg"). If none file extension is provided, the image will be saved as
 #'   a *.jpg file.
+#' @param prefix A prefix to include in the image name when exporting a list of
+#'   images. Defaults to `""`, i.e., no prefix.
 #' @param extension When `image` is a list, `extension` can be used to define
 #'   the extension of exported files. This will overwrite the file extensions
 #'   given in `image`.
@@ -195,6 +197,7 @@ image_import <- function(image,
 #' @name utils_image
 image_export <- function(image,
                          name,
+                         prefix = "",
                          extension = NULL,
                          subfolder = NULL,
                          ...){
@@ -225,12 +228,18 @@ image_export <- function(image,
       if(dir.exists(dir_out) == FALSE){
         dir.create(dir_out, recursive = TRUE)
       }
-      names(image) <- paste0(dir_out, "/", name, ".", extens)
+      names(image) <- paste0(dir_out, "/", prefix, name, ".", extens)
+      a <-
+        lapply(seq_along(image), function(i){
+          EBImage::writeImage(x = image[[i]], files = names(image[i]), ...)
+        })
+    } else{
+      a <-
+        lapply(seq_along(image), function(i){
+          EBImage::writeImage(x = image[[i]], files = paste0(prefix, names(image[i])), ...)
+        })
     }
-    a <-
-      lapply(seq_along(image), function(i){
-        EBImage::writeImage(x = image[[i]], files = names(image[i]), ...)
-      })
+
   } else{
     filname <- file_name(name)
     extens <- unlist(file_extension(name))

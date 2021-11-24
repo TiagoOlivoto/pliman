@@ -19,7 +19,7 @@ image_import(
   img_pattern = NULL
 )
 
-image_export(image, name, extension = NULL, subfolder = NULL, ...)
+image_export(image, name, prefix = "", extension = NULL, subfolder = NULL, ...)
 
 image_show(image)
 
@@ -58,6 +58,9 @@ columns to use in the composite image when \code{plot = TRUE}.}
 character with the image name (e.g., "img1") or name and extension (e.g.,
 "img1.jpg"). If none file extension is provided, the image will be saved as
 a *.jpg file.}
+
+\item{prefix}{A prefix to include in the image name when exporting a list of
+images. Defaults to \code{""}, i.e., no prefix.}
 
 \item{extension}{When \code{image} is a list, \code{extension} can be used to define
 the extension of exported files. This will overwrite the file extensions

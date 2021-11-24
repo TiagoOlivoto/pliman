@@ -457,7 +457,7 @@ analyze_objects <- function(img,
         ind_formula <- object_index
         data_mask <- nmask@.Data
         get_rgb <- function(img, data_mask, index){
-          data.frame(object = index,
+          data.frame(id = index,
                      R = img@.Data[,,1][which(data_mask == index)],
                      G = img@.Data[,,2][which(data_mask == index)],
                      B = img@.Data[,,3][which(data_mask == index)])
@@ -483,11 +483,11 @@ analyze_objects <- function(img,
                       get_rgb(img, data_mask, i)
                     }))
         }
-        object_rgb <- subset(object_rgb, object %in% shape$id)
-        # indexes by object
+        object_rgb <- subset(object_rgb, id %in% shape$id)
+        # indexes by id
         indexes <-
           by(object_rgb,
-             INDICES = object_rgb$object,
+             INDICES = object_rgb$id,
              FUN = function(x){
                data.frame(
                  do.call(cbind,
@@ -502,9 +502,9 @@ analyze_objects <- function(img,
           do.call(rbind,
                   lapply(indexes, data.frame)
           )
-        indexes <- data.frame(cbind(object = object_rgb$object, indexes))
-        colnames(indexes) <- c("object", ind_formula)
-        indexes <- aggregate(. ~ object, indexes, mean, na.rm = TRUE)
+        indexes <- data.frame(cbind(id = object_rgb$id, indexes))
+        colnames(indexes) <- c("id", ind_formula)
+        indexes <- aggregate(. ~ id, indexes, mean, na.rm = TRUE)
       } else{
         object_rgb <- NULL
         indexes <- NULL
@@ -781,7 +781,7 @@ plot.anal_obj <- function(x, facet = FALSE, ...){
             times = c("r", "g", "b"))
   rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
   if(isTRUE(facet)){
-    densityplot(~value | factor(object),
+    densityplot(~value | factor(id),
                 data = rgb,
                 groups = Spectrum,
                 par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
