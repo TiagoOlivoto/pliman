@@ -54,7 +54,14 @@ analyze_objects(
   verbose = TRUE
 )
 
-\method{plot}{anal_obj}(x, facet = FALSE, ...)
+\method{plot}{anal_obj}(
+  x,
+  which = "measure",
+  measure = "area",
+  type = "density",
+  facet = FALSE,
+  ...
+)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -213,9 +220,19 @@ e.g., \code{"/imgs"}.}
 
 \item{x}{An object of class \code{anal_obj}.}
 
-\item{facet}{Create a facet plot for each object. Defaults to \code{FALSE}.}
+\item{which}{Which to plot. Either 'measure' (object measures) or 'index'
+(object index). Defaults to \code{"measure"}.}
 
-\item{...}{Currently not used}
+\item{measure}{The measure to plot. Defaults to \code{"area"}.}
+
+\item{type}{The type of plot. Either \code{"hist"} or \code{"density"}. Partial matches
+are recognized.}
+
+\item{facet}{Create a facet plot for each object when \code{which = "index"} is
+used?. Defaults to \code{FALSE}.}
+
+\item{...}{Further argument passed on to \code{\link[lattice:histogram]{lattice::histogram()}} or
+\code{\link[lattice:histogram]{lattice::densityplot()}}}
 }
 \value{
 \code{analyze_objects()} returns a list with the following objects:
@@ -313,16 +330,21 @@ top$results
 library(pliman)
 
 img <- image_pliman("soy_green.jpg")
-# Segment the foreground (grains) using the normalized blue index (NB)
+# Segment the foreground (grains) using the normalized blue index (NB, default)
 # Shows the average value of the blue index in each object
 
 rgb <-
    analyze_objects(img,
                    marker = "id",
-                   index = "NB", # default
                    object_index = "B")
+# histogram of area
 plot(rgb)
-plot(rgb, facet = TRUE)
+
+# density of perimeter
+plot(rgb, measure = "dd", type = "den")
+
+# density of the blue (B) index
+plot(rgb, which = "index")
 }
 }
 \references{

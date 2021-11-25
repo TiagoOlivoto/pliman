@@ -741,8 +741,15 @@ analyze_objects <- function(img,
 
 #' @name analyze_objects
 #' @param x An object of class `anal_obj`.
-#' @param facet Create a facet plot for each object. Defaults to `FALSE`.
-#' @param ... Currently not used
+#' @param which Which to plot. Either 'measure' (object measures) or 'index'
+#'   (object index). Defaults to `"measure"`.
+#' @param measure The measure to plot. Defaults to `"area"`.
+#' @param type The type of plot. Either `"hist"` or `"density"`. Partial matches
+#'   are recognized.
+#' @param facet Create a facet plot for each object when `which = "index"` is
+#'   used?. Defaults to `FALSE`.
+#' @param ... Further argument passed on to [lattice::histogram()] or
+#'   [lattice::densityplot()]
 #' @method plot anal_obj
 #' @importFrom lattice densityplot levelplot
 #' @export
@@ -754,45 +761,83 @@ analyze_objects <- function(img,
 #' library(pliman)
 #'
 #' img <- image_pliman("soy_green.jpg")
-#' # Segment the foreground (grains) using the normalized blue index (NB)
+#' # Segment the foreground (grains) using the normalized blue index (NB, default)
 #' # Shows the average value of the blue index in each object
 #'
 #' rgb <-
 #'    analyze_objects(img,
 #'                    marker = "id",
-#'                    index = "NB", # default
 #'                    object_index = "B")
+#' # histogram of area
 #' plot(rgb)
-#' plot(rgb, facet = TRUE)
+#'
+#' # density of perimeter
+#' plot(rgb, measure = "dd", type = "den")
+#'
+#' # density of the blue (B) index
+#' plot(rgb, which = "index")
 #' }
-plot.anal_obj <- function(x, facet = FALSE, ...){
-  rgb <- x$object_rgb
-  if(is.null(rgb)){
-    stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.", call. = FALSE)
+plot.anal_obj <- function(x,
+                          which = "measure",
+                          measure = "area",
+                          type = "density",
+                          facet = FALSE,
+                          ...){
+  if(!which %in% c("measure", "index")){
+    stop("'which' must be one of 'measure' or 'index'", call. = FALSE)
   }
-  rgb$id <- rownames(rgb)
-  rgb <-
-    reshape(rgb,
-            direction = "long",
-            varying = list(names(rgb)[2:4]),
-            v.names = "value",
-            idvar = "id",
-            timevar = "Spectrum",
-            times = c("r", "g", "b"))
-  rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
-  if(isTRUE(facet)){
-    densityplot(~value | factor(id),
-                data = rgb,
-                groups = Spectrum,
-                par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
-                xlab = "Pixel value",
-                plot.points = FALSE)
+  if(which == "measure"){
+    nam <- colnames(x$results)
+    if(!measure %in% nam){
+      stop("Measure '", measure, "' not available in 'x'. Try one of the '",
+           paste0(nam, collapse = ", "), call. = FALSE)
+    }
+    temp <- x$results[[measure]]
+    types <- c("density", "histogram")
+    matches <- grepl(type, types)
+    type <- types[matches]
+    if(type == "histogram"){
+      lattice::histogram(temp,
+                         type = "count",
+                         xlab = paste(measure, "(pixels)"),
+                         ...)
+    } else{
+      lattice::densityplot(temp,
+                           xlab = paste(measure, "(pixels)"),
+                           col = "blue",
+                           ...)
+    }
   } else{
-    densityplot(~value,
-                data = rgb,
-                groups = Spectrum,
-                par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
-                xlab = "Pixel value",
-                plot.points = FALSE)
+    rgb <- x$object_rgb
+    if(is.null(rgb)){
+      stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.", call. = FALSE)
+    }
+    rgb$id <- rownames(rgb)
+    rgb <-
+      reshape(rgb,
+              direction = "long",
+              varying = list(names(rgb)[2:4]),
+              v.names = "value",
+              idvar = "id",
+              timevar = "Spectrum",
+              times = c("r", "g", "b"))
+    rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
+    if(isTRUE(facet)){
+      densityplot(~value | factor(id),
+                  data = rgb,
+                  groups = Spectrum,
+                  par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
+                  xlab = "Pixel value",
+                  plot.points = FALSE,
+                  ...)
+    } else{
+      densityplot(~value,
+                  data = rgb,
+                  groups = Spectrum,
+                  par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
+                  xlab = "Pixel value",
+                  plot.points = FALSE,
+                  ...)
+    }
   }
 }
