@@ -156,7 +156,7 @@ get_measures <- function(object,
       res$diam_min <- res$diam_min * px_side
       res$diam_max <- res$diam_max * px_side
       res$major_axis <- res$major_axis * px_side
-      res$minor_axis <- res$major_axis * px_side
+      res$minor_axis <- res$minor_axis * px_side
     }
     if(var != "area"){
       id_val <- res[which(res$id == id), var]
@@ -171,7 +171,7 @@ get_measures <- function(object,
       res$diam_min <- res$diam_min * px_side
       res$diam_max <- res$diam_max * px_side
       res$major_axis <- res$major_axis * px_side
-      res$minor_axis <- res$major_axis * px_side
+      res$minor_axis <- res$minor_axis * px_side
     }
     if(verbose == TRUE){
       cat("-----------------------------------------\n")
@@ -195,7 +195,7 @@ get_measures <- function(object,
     res$diam_min <- res$diam_min / dpc
     res$diam_max <- res$diam_max / dpc
     res$major_axis <- res$major_axis / dpc
-    res$minor_axis <- res$major_axis / dpc
+    res$minor_axis <- res$minor_axis / dpc
   }
   if("img" %in% names(res)){
     smr <-
