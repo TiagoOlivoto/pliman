@@ -32,6 +32,8 @@ analyze_objects(
   topn_upper = NULL,
   lower_eccent = NULL,
   upper_eccent = NULL,
+  lower_circ = NULL,
+  upper_circ = NULL,
   randomize = TRUE,
   nrows = 2000,
   show_image = TRUE,
@@ -163,11 +165,11 @@ or equal 120 and less than or equal 140 will be considered.}
 \code{topn_lower} selects the \code{n} elements with the smallest area whereas
 \code{topn_upper} selects the \code{n} objects with the largest area.}
 
-\item{lower_eccent, upper_eccent}{Lower and upper limit for object
-eccentricity for the image analysis. Users may use these arguments to
-remove objects such as square papers for scale (low eccentricity) or cut
-petioles (high eccentricity) from the images. Defaults to \code{NULL} (i.e., no
-lower and upper limits).}
+\item{lower_eccent, upper_eccent, lower_circ, upper_circ}{Lower and upper limit
+for object eccentricity/circularity for the image analysis. Users may use
+these arguments to remove objects such as square papers for scale (low
+eccentricity) or cut petioles (high eccentricity) from the images. Defaults
+to \code{NULL} (i.e., no lower and upper limits).}
 
 \item{randomize}{Randomize the lines before training the model?}
 
@@ -337,11 +339,11 @@ rgb <-
    analyze_objects(img,
                    marker = "id",
                    object_index = "B")
-# histogram of area
+# density of area
 plot(rgb)
 
-# density of perimeter
-plot(rgb, measure = "dd", type = "den")
+# histogram of perimeter
+plot(rgb, measure = "perimeter", type = "histogram") # or 'hist'
 
 # density of the blue (B) index
 plot(rgb, which = "index")

@@ -110,11 +110,11 @@
 #' @param topn_lower,topn_upper Select the top `n` objects based on its area.
 #'   `topn_lower` selects the `n` elements with the smallest area whereas
 #'   `topn_upper` selects the `n` objects with the largest area.
-#' @param lower_eccent,upper_eccent Lower and upper limit for object
-#'   eccentricity for the image analysis. Users may use these arguments to
-#'   remove objects such as square papers for scale (low eccentricity) or cut
-#'   petioles (high eccentricity) from the images. Defaults to `NULL` (i.e., no
-#'   lower and upper limits).
+#' @param lower_eccent,upper_eccent,lower_circ,upper_circ Lower and upper limit
+#'   for object eccentricity/circularity for the image analysis. Users may use
+#'   these arguments to remove objects such as square papers for scale (low
+#'   eccentricity) or cut petioles (high eccentricity) from the images. Defaults
+#'   to `NULL` (i.e., no lower and upper limits).
 #' @param randomize Randomize the lines before training the model?
 #' @param nrows The number of lines to be used in training step. Defaults to
 #'   2000.
@@ -238,6 +238,8 @@ analyze_objects <- function(img,
                             topn_upper = NULL,
                             lower_eccent = NULL,
                             upper_eccent = NULL,
+                            lower_circ = NULL,
+                            upper_circ = NULL,
                             randomize = TRUE,
                             nrows = 2000,
                             show_image = TRUE,
@@ -448,6 +450,12 @@ analyze_objects <- function(img,
       }
       if(!is.null(upper_eccent)){
         shape <- shape[shape$eccentricity < upper_eccent, ]
+      }
+      if(!is.null(lower_circ)){
+        shape <- shape[shape$circularity > lower_circ, ]
+      }
+      if(!is.null(upper_circ)){
+        shape <- shape[shape$circularity < upper_circ, ]
       }
       object_contour <- object_contour[shape$id]
       if(!is.null(object_index)){
@@ -768,11 +776,11 @@ analyze_objects <- function(img,
 #'    analyze_objects(img,
 #'                    marker = "id",
 #'                    object_index = "B")
-#' # histogram of area
+#' # density of area
 #' plot(rgb)
 #'
-#' # density of perimeter
-#' plot(rgb, measure = "dd", type = "den")
+#' # histogram of perimeter
+#' plot(rgb, measure = "perimeter", type = "histogram") # or 'hist'
 #'
 #' # density of the blue (B) index
 #' plot(rgb, which = "index")
