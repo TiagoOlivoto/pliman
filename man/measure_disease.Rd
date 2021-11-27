@@ -2,6 +2,7 @@
 % Please edit documentation in R/measure_disease.R
 \name{measure_disease}
 \alias{measure_disease}
+\alias{measure_disease_iter}
 \title{Performs plant disease measurements}
 \usage{
 measure_disease(
@@ -49,6 +50,8 @@ measure_disease(
   dir_processed = NULL,
   verbose = TRUE
 )
+
+measure_disease_iter(img, has_background = TRUE, r = 5, ...)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -192,9 +195,18 @@ saved in such a directory. It can be either a full path, e.g.,
 e.g., \code{"/imgs"}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+
+\item{has_background}{A logical indicating if the image has a background to
+be segmented before processing.}
+
+\item{r}{The radius of neighborhood pixels. Defaults to \code{5}. A square is
+drawn indicating the selected pixels.}
+
+\item{...}{Further parameters passed on to \code{measure_disease()}.}
 }
 \value{
-A list with the following objects:
+\itemize{
+\item \code{measure_disease()} returns a list with the following objects:
 \itemize{
 \item \code{severity} A data frame with the percentage of healthy and symptomatic
 areas.
@@ -202,24 +214,49 @@ areas.
 (area, perimeter, etc.) for each lesion and a summary statistic of the
 results.
 }
+\item \code{measure_disease_iter()} returns a list with the following objects:
+\itemize{
+\item \code{results} A list with the objects returned by \code{measure_disease()}.
+\item \code{leaf} The color palettes for the healthy leaf.
+\item \code{disease} The color palettes for the diseased leaf.
+\item \code{background} The color palettes for the background.
+}
+}
 }
 \description{
-Computes the percentage of symptomatic leaf area and (optionally) counts and
-compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-entire leaf. See more at \strong{Details}.
+\itemize{
+\item \code{measure_disease()} computes the percentage of symptomatic leaf area and
+(optionally) counts and compute shapes (area, perimeter, radius, etc.) of
+lesions in a sample or entire leaf using color palettes. See more at
+\strong{Details}.
+\item \code{measure_disease_iter()} provides an iterative section for
+\code{measure_disease()}, where the user picks up samples in the image to create
+the needed color palettes.
+}
 }
 \details{
-A general linear model (binomial family) fitted to the RGB values is used to
-segment the lesions from the healthy leaf. If a pallet of background is
-provided, the function takes care of the details to isolate it before
-computing the number and area of lesions. By using \code{pattern} it is possible to
-process several images with common pattern names that are stored in the
-current working directory or in the subdirectory informed in \code{dir_original}.
+In \code{measure_disease()}, a general linear model (binomial family) fitted to
+the RGB values is used to segment the lesions from the healthy leaf. If a
+pallet of background is provided, the function takes care of the details to
+isolate it before computing the number and area of lesions. By using \code{pattern}
+it is possible to process several images with common pattern names that are
+stored in the current working directory or in the subdirectory informed in
+\code{dir_original}.
 
 If \code{img_healthy} and \code{img_symptoms} are not declared, RGB-based phenotyping of
 foliar disease severity is performed using the index informed in \code{index_lb} to
 first segment leaf from background and \code{index_dh} to segment diseased from
 healthy tissues.
+
+\code{measure_disease_iter()} only run in an interactive section. In this function,
+users will be able to pick up samples of images to iteratively create the
+needed color palettes. This process calls \code{\link[=pick_palette]{pick_palette()}} internally. If
+\code{has_background} is TRUE (default) the color palette for the background is
+first created. The sample of colors is performed in each left-button mouse
+click and continues until the user press Esc. Then, a new sampling process is
+performed to sample the color of healthy tissues and then diseased tissues.
+The generated palettes are then passed on to measure_disease(). All the
+arguments of such function can be passed using the ... (three dots).
 }
 \examples{
 \donttest{
@@ -235,6 +272,9 @@ sev <-
                  img_symptoms = lesions,
                  lesion_size = "large",
                  show_image = TRUE)
+
+# an interactive section
+measure_disease_iter(img)
 }
 
 }

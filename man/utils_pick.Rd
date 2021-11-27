@@ -29,6 +29,7 @@ pick_palette(
   col = "red",
   size = 0.8,
   plot = TRUE,
+  palette = TRUE,
   verbose = TRUE
 )
 }
@@ -44,7 +45,7 @@ This means that picking will run until the user press Esc.}
 
 \item{verbose}{If \code{TRUE} (default) shows a counter in the console.}
 
-\item{r}{The radius of neighbohood pixels. Defaults to \code{1}.}
+\item{r}{The radius of neighborhood pixels. Defaults to \code{1}.}
 
 \item{shape}{A character vector indicating the shape of the brush around the
 selected pixel. It  can be \code{"box"}, \code{"disc"}, \code{"diamond"}, \code{"Gaussian"} or
@@ -57,6 +58,8 @@ around the selected pixel.}
 
 \item{width, height}{The width and height of the generated palette. Defaults
 to \code{100} for both, i.e., a square image of 100 x 100.}
+
+\item{palette}{Plot the generated palette? Defaults to \code{TRUE}.}
 }
 \value{
 \itemize{

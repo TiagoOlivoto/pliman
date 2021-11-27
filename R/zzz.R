@@ -45,5 +45,5 @@ if (getRversion() >= "2.15.1") {
     c("Contorno", "display", "CODE", "dir_original" ,"dir_processada",
       "Spectrum", "value", "area", "id", ".", "object", "s.radius.max",
       "s.radius.min", "y", "s.area", "s.perimeter", "symptomatic", "m.eccentricity",
-      "m.majoraxis", "s.radius.mean"))
+      "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames"))
   }

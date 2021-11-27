@@ -1,22 +1,41 @@
 #' Performs plant disease measurements
 #'
 #' @description
-#'Computes the percentage of symptomatic leaf area and (optionally) counts and
-#'compute shapes (area, perimeter, radius, etc.) of lesions in a sample or
-#'entire leaf. See more at **Details**.
+#'* `measure_disease()` computes the percentage of symptomatic leaf area and
+#'(optionally) counts and compute shapes (area, perimeter, radius, etc.) of
+#'lesions in a sample or entire leaf using color palettes. See more at
+#'**Details**.
+#'
+#'* `measure_disease_iter()` provides an iterative section for
+#'`measure_disease()`, where the user picks up samples in the image to create
+#'the needed color palettes.
 #'
 #' @details
-#'A general linear model (binomial family) fitted to the RGB values is used to
-#'segment the lesions from the healthy leaf. If a pallet of background is
-#'provided, the function takes care of the details to isolate it before
-#'computing the number and area of lesions. By using `pattern` it is possible to
-#'process several images with common pattern names that are stored in the
-#'current working directory or in the subdirectory informed in `dir_original`.
+#'
+#' In `measure_disease()`, a general linear model (binomial family) fitted to
+#'the RGB values is used to segment the lesions from the healthy leaf. If a
+#'pallet of background is provided, the function takes care of the details to
+#'isolate it before computing the number and area of lesions. By using `pattern`
+#'it is possible to process several images with common pattern names that are
+#'stored in the current working directory or in the subdirectory informed in
+#'`dir_original`.
 #'
 #'If `img_healthy` and `img_symptoms` are not declared, RGB-based phenotyping of
 #'foliar disease severity is performed using the index informed in `index_lb` to
 #'first segment leaf from background and `index_dh` to segment diseased from
 #'healthy tissues.
+#'
+#'`measure_disease_iter()` only run in an interactive section. In this function,
+#'users will be able to pick up samples of images to iteratively create the
+#'needed color palettes. This process calls [`pick_palette()`] internally. If
+#'`has_background` is TRUE (default) the color palette for the background is
+#'first created. The sample of colors is performed in each left-button mouse
+#'click and continues until the user press Esc. Then, a new sampling process is
+#'performed to sample the color of healthy tissues and then diseased tissues.
+#'The generated palettes are then passed on to measure_disease(). All the
+#'arguments of such function can be passed using the ... (three dots).
+#'
+#'
 #' @param img The image to be analyzed.
 #' @param img_healthy A color palette of healthy areas.
 #' @param img_symptoms A color palette of lesioned areas.
@@ -121,12 +140,24 @@
 #'   `"C:/Desktop/imgs"`, or a subfolder within the current working directory,
 #'   e.g., `"/imgs"`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return A list with the following objects:
-#'  * `severity` A data frame with the percentage of healthy and symptomatic
+#' @param has_background A logical indicating if the image has a background to
+#'   be segmented before processing.
+#' @param r The radius of neighborhood pixels. Defaults to `5`. A square is
+#'   drawn indicating the selected pixels.
+#' @param ... Further parameters passed on to `measure_disease()`.
+#' @return
+#' * `measure_disease()` returns a list with the following objects:
+#'   - `severity` A data frame with the percentage of healthy and symptomatic
 #'  areas.
-#'  * `shape`,`statistics` If `show_features = TRUE` is used, returns the shape
+#'   - `shape`,`statistics` If `show_features = TRUE` is used, returns the shape
 #'  (area, perimeter, etc.) for each lesion and a summary statistic of the
 #'  results.
+#' * `measure_disease_iter()` returns a list with the following objects:
+#'    - `results` A list with the objects returned by `measure_disease()`.
+#'    - `leaf` The color palettes for the healthy leaf.
+#'    - `disease` The color palettes for the diseased leaf.
+#'    - `background` The color palettes for the background.
+#' @name measure_disease
 #' @export
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -144,6 +175,9 @@
 #'                  img_symptoms = lesions,
 #'                  lesion_size = "large",
 #'                  show_image = TRUE)
+#'
+#' # an interactive section
+#' measure_disease_iter(img)
 #' }
 #'
 measure_disease <- function(img,
@@ -814,5 +848,97 @@ measure_disease <- function(img,
                   dir_processed = diretorio_processada,
                   save_image = save_image))
     )
+  }
+}
+
+
+#' @name measure_disease
+#' @export
+measure_disease_iter <- function(img,
+                                 has_background = TRUE,
+                                 r = 5,
+                                 ...){
+  if(interactive()){
+  done <- "n"
+  plot(img)
+  while(done != "y"){
+    if(isTRUE(has_background)){
+      message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
+      back <- pick_palette(img,
+                           r = r,
+                           verbose = FALSE,
+                           palette  = FALSE,
+                           plot = FALSE,
+                           col = "blue")
+    } else{
+      back <- NULL
+    }
+    message("Use the first mouse button to pick up LEAF colors. Press Est to exit")
+    leaf <- pick_palette(img,
+                         r = r,
+                         verbose = FALSE,
+                         palette  = FALSE,
+                         plot = FALSE,
+                         col = "black")
+    message("Use the first mouse button to pick up DISEASE colors. Press Est to exit")
+    disease <- pick_palette(img,
+                            r = r,
+                            verbose = FALSE,
+                            palette  = FALSE,
+                            plot = FALSE,
+                            col = "red")
+    temp <-
+      measure_disease(img = img,
+                      img_healthy = leaf,
+                      img_symptoms = disease,
+                      img_background = back,
+                      ...)
+    done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+    while(!done %in% c("y", "n", "Y", "N")){
+      message("Please, select one of 'y/Y' or 'n/N'")
+      done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+    }
+    while(done != "y"){
+      plot(img)
+      npix <- length(leaf)/3
+      samples <- sample(1:npix, 5000)
+      if(isTRUE(has_background)){
+        message("Use the first mouse button to pick up BACKGROUND colors. Press Est to skip")
+        tback <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
+        back@.Data[,,1][samples] <-  tback@.Data[,,1][samples]
+        back@.Data[,,2][samples] <-  tback@.Data[,,2][samples]
+        back@.Data[,,3][samples] <-  tback@.Data[,,3][samples]
+      } else{
+        back <- NULL
+      }
+      message("Use the first mouse button to pick up LEAF colors. Press Est to skip")
+      tleaf <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
+      leaf@.Data[,,1][samples] <-  tleaf@.Data[,,1][samples]
+      leaf@.Data[,,2][samples] <-  tleaf@.Data[,,2][samples]
+      leaf@.Data[,,3][samples] <-  tleaf@.Data[,,3][samples]
+
+      message("Use the first mouse button to pick up DISEASE colors. Press Est to skip")
+      tdisease <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE)
+      disease@.Data[,,1][samples] <-  tdisease@.Data[,,1][samples]
+      disease@.Data[,,2][samples] <-  tdisease@.Data[,,2][samples]
+      disease@.Data[,,3][samples] <-  tdisease@.Data[,,3][samples]
+      temp <-
+        measure_disease(img = img,
+                        img_healthy = leaf,
+                        img_symptoms = disease,
+                        img_background = back,
+                        ...)
+      done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+      while(!done %in% c("y", "n", "Y", "N")){
+        message("Please, select one of 'y/Y' or 'n/N'")
+        done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+      }
+    }
+
+  }
+  return(list(results = temp,
+              leaf = leaf,
+              disease = disease,
+              background = back))
   }
 }

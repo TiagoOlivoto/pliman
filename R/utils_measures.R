@@ -60,6 +60,7 @@
 #' the x and y coordinates of the objects in `object`.
 #' @export
 #' @importFrom stats as.formula
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
 #' \donttest{
 #' library(pliman)
@@ -306,58 +307,101 @@ plot_measures <- function(object,
 
 
 
-
-#' Reports for an object index
+#' Summary an object index
 #'
-#' Performs a report of the object index when `object_index` argument is used in
-#' `analyze_objects()`. By using a cut point, the proportion and mean values for
-#' the selected objects are returned.
+#' Performs a report of the index between and within objects when `object_index`
+#' argument is used in `analyze_objects()`. By using a cut point, the number and
+#' proportion of objects with mean value of `index` bellow and above `cut_point`
+#' are returned. Additionaly, the number and proportion of pixels bellow and
+#' above the cutpoint is shown for each object (id).
 #'
 #' @param object An object computed with [analyze_objects()].
-#' @param index The index desired, e.g., "B". Note that these value must match the index(es) used in
-#' @param cut_point The cut point
+#' @param index The index desired, e.g., `"B"`. Note that these value must match
+#'   the index(es) used in the argument `object_index` of `analyze_objects()`.
+#' @param cut_point The cut point.
 #' @param select_higher If `FALSE` (default) selects the objects with `index`
 #'   smaller than the `cut_point`. Use `select_higher = TRUE` to select the
 #'   objects with `index` higher than `cut_point`.
 #'
 #' @return A list with the following elements:
 #' * `ids` The identification of selected objects.
-#' * `report` A data frame with the following columns
+#' * `between_id` A data frame with the following columns
 #'    - `n` The number of objects.
 #'    - `nsel` The number of selected objects.
 #'    - `prop` The proportion of objects selected.
 #'    - `mean_index_sel`, and `mean_index_nsel` The mean value of `index` for the
 #' selected and non-selected objects, respectively.
+#' * `within_id` A data frame with the following columns
+#'    - `id` The object identification
+#'    - `n_less` The number of pixels with values lesser than or equal to
+#'    `cut_point`.
+#'    - `n_greater` The number of pixels with values greater than `cut_point`.
+#'    - `less_ratio` The proportion of pixels with values lesser than or equal to
+#'    `cut_point`.
+#'    - `greater_ratio` The proportion of pixels with values greater than
+#'    `cut_point`.
+#' @importFrom stats setNames
 #' @export
+#' @name summary_index
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #'
 #' @examples
+#' library(pliman)
 #' soy <- image_pliman("soy_green.jpg")
 #' anal <- analyze_objects(soy, object_index = "G")
 #' plot_measures(anal, measure = "G")
 #'
-#' report_index(anal, index = "G", cut_point = 0.5)
-report_index <- function(object,
+#' summary_index(anal, index = "G", cut_point = 0.5)
+summary_index <- function(object,
                          index,
                          cut_point,
                          select_higher = FALSE){
   if(is.null(object$object_index)){
     stop("'object' was not computed using the `object_index` argument.")
   }
-  temp <- object$object_index
+  coords <- object$results[2:3]
+  obj_in <- object$object_index
 
   if(isFALSE(select_higher)){
-    ids <- which(temp[[index]] < cut_point)
+    ids <- which(obj_in[[index]] <= cut_point)
   } else{
-    ids <- which(temp[[index]] > cut_point)
+    ids <- which(obj_in[[index]] >= cut_point)
   }
+
+  temp <- object$object_rgb
+  indexes <-
+    do.call(rbind,
+            lapply(  by(temp,
+                        INDICES = temp$id,
+                        FUN = function(x){
+                          x[[index]] <= cut_point
+                        }
+            ), data.frame)
+    )
+  res <-
+    transform(temp,
+              threshold = ifelse(indexes[[1]] == TRUE, "less", "greater"),
+              n = 1:nrow(indexes)) %>%
+    aggregate(n ~ id + threshold, FUN = length, data = .) %>%
+    reshape(direction = "wide",
+            timevar = "threshold",
+            idvar = "id",
+            v.names = "n") %>%
+    as.data.frame() %>%
+    setNames(c("id", "n_greater", "n_less")) %>%
+    transform(less_ratio = round(n_less / (n_less  + n_greater), 3),
+              greater_ratio = 1 - round(n_less / (n_less  + n_greater), 3))
+
+
   list(ids = ids,
-       report = data.frame(
-         n = nrow(temp),
+       between_id = data.frame(
+         n = nrow(obj_in),
          nsel = length(ids),
-         prop = length(ids) / nrow(temp),
-         mean_index_sel = mean(temp[[index]][ids]),
-         mean_index_nsel = mean(temp[[index]][!temp$id %in% ids])
-       )
+         prop = length(ids) / nrow(obj_in),
+         mean_index_sel = mean(obj_in[[index]][ids]),
+         mean_index_nsel = mean(obj_in[[index]][!obj_in$id %in% ids])
+       ),
+       within_id = cbind(coords, res)[, c(3, 1, 2, 5, 4, 6, 7)]
   )
 }
 

@@ -11,7 +11,7 @@
 #' @param image An `Image` object.
 #' @param n The number of points of the `pick_*` function. Defaults to `Inf`.
 #'   This means that picking will run until the user press Esc.
-#' @param r The radius of neighbohood pixels. Defaults to `1`.
+#' @param r The radius of neighborhood pixels. Defaults to `1`.
 #' @param col,size The color and size for the marker point.
 #' @param shape A character vector indicating the shape of the brush around the
 #'   selected pixel. It  can be `"box"`, `"disc"`, `"diamond"`, `"Gaussian"` or
@@ -24,6 +24,7 @@
 #'   to `100` for both, i.e., a square image of 100 x 100.
 #' @param verbose If `TRUE` (default) shows a counter in the console.
 #' @param plot Call a new `plot(image)` before processing? Defaults to `TRUE`.
+#' @param palette Plot the generated palette? Defaults to `TRUE`.
 #' @return
 #' * `pick_count()` returns `data.frame` with the `x` and `y` coordinates of the
 #' selected point(x).
@@ -59,7 +60,9 @@ pick_count <- function(image,
       plot(image)
     }
     on.exit(return(data.frame(x = x, y = y)))
-    message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
+    if(isTRUE(verbose)){
+      message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
+    }
     x <- y <- NULL
     i <- 1
     while (i <= n) {
@@ -92,7 +95,9 @@ pick_rgb <- function(image,
       plot(image)
     }
     on.exit(return(pixels))
+    if(isTRUE(verbose)){
     message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
+    }
     pixels <- NULL
     x <- y <- NULL
     i <- 1
@@ -132,13 +137,15 @@ pick_palette <- function(image,
                          col = "red",
                          size = 0.8,
                          plot = TRUE,
+                         palette = TRUE,
                          verbose = TRUE){
   if (isTRUE(interactive())) {
     if (isTRUE(plot)) {
       plot(image)
     }
-    on.exit(return(pal))
-    message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
+    if(isTRUE(verbose)){
+      message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
+    }
     bind <- NULL
     i <- 1
     while (i <= n) {
@@ -146,7 +153,6 @@ pick_palette <- function(image,
       if (is.null(d)) {
         break
       }
-      points(d$x, d$y, type = "p", col = col, cex = size, pch = 19)
       xrmin <- trunc(d$x) - r
       xrmax <- trunc(d$x) + r
       yrmin <- trunc(d$y) - r
@@ -156,11 +162,15 @@ pick_palette <- function(image,
       R <- image@.Data[xrmin:xrmax, yrmin:yrmax, 1][kern]
       G <- image@.Data[xrmin:xrmax, yrmin:yrmax, 2][kern]
       B <- image@.Data[xrmin:xrmax, yrmin:yrmax, 3][kern]
+      rect(xrmin, yrmin, xrmax, yrmax, border = col, lwd = size)
       bind <- rbind(bind, cbind(R, G, B))
       if(isTRUE(verbose)){
         cat("Number of points:", i, "\r")
       }
       i <- i + 1
+    }
+    if(i == 1){
+      stop("Process interrupted", call. = FALSE)
     }
     dim_mat <- trunc(sqrt(nrow(bind)))
     if(isTRUE(random)){
@@ -173,8 +183,11 @@ pick_palette <- function(image,
                      dim = c(dim_mat, dim_mat, 3),
                      colormode = "Color") %>%
       image_resize(width = width, height = height)
-    if(isTRUE(plot)){
+    if(isTRUE(palette)){
       plot(pal)
+    }
+    if(i > 1){
+    on.exit(return(pal))
     }
   }
 }

@@ -1,8 +1,10 @@
 # pliman (development version)
 ## New functions
+* `measure_disease_iter()` to measure disease in an interactive section.
 * `pick_count()` to count objects in an image manually.
 * `pick_palette()` to create an image palette by picking up color point(s) from the image
 * `pick_rgb()` to pick up the RGB values from selected point(s) in the image.
+* `summary_index()` to summary the index either between and within objects.
 * `pliman` now exports the foward-pipe operator `%>%`. Code from [poorman](https://github.com/nathaneastwood/poorman/blob/master/R/pipe.R) package.
 
 # pliman 1.0.0

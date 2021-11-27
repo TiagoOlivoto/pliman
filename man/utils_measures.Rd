@@ -139,3 +139,6 @@ get_measures(results,
              area ~ 100)
 }
 }
+\author{
+Tiago Olivoto \email{tiagoolivoto@gmail.com}
+}
