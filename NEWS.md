@@ -1,4 +1,4 @@
-# pliman (development version)
+# pliman 1.1.0
 ## New functions
 * `measure_disease_iter()` to measure disease in an interactive section.
 * `pick_count()` to count objects in an image manually.
