@@ -5,9 +5,8 @@ home:
   description: Tools for Plant Image Analysis
 
 template:
-  assets: fans.html
+  bootstrap: 5
   params:
-    bootswatch: spacelab
     ganalytics: G-VWN5YL53DP
 
 toc:
@@ -84,6 +83,7 @@ reference:
     desc: "Provides utilities for manipulating files"
     contents:
       - utils_file
+      - pipe
 
 
   - title: "Utilities for image resolution"
@@ -121,7 +121,7 @@ reference:
       - utils_objects
       - tune_tolerance
       - plot.anal_obj
-      - report_index
+      - summary_index
       - utils_polygon
 
 

@@ -260,7 +260,7 @@ analyze_objects <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  # check_ebi()
+  check_ebi()
   if(!missing(img_pattern)){
     warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.", call. = FALSE)
     pattern <- img_pattern

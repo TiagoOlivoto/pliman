@@ -1,99 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//index.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/404.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/analyze_objects.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/count_lesions.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/count_objects.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/leaf_area.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_binary.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/manipulation.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_combine.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/phytopatometry.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_index.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/pliman_start.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_palette.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/segmentation.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_segment.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/authors.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/image_to_mat.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/leaf_area.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/CONTRIBUTING.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/measure_disease.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/index.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/objects_rgb.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/ISSUE_TEMPLATE.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/pliman_images.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/prop_segmented.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/news/index.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/rgb_to_hsv.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/analyze_objects.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/sad.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/count_lesions.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/symptomatic_area.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/count_objects.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/tune_tolerance.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_binary.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_dpi.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_combine.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_file.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_index.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_image.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_palette.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_measures.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_segment.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_objects.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_to_mat.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_polygon.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//reference/utils_transform.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/leaf_area.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/analyze_objects.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/measure_disease.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/leaf_area.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/objects_rgb.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/manipulation.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/palettes.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/phytopatometry.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/pliman_start.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/pliman_images.html</loc>
   </url>
   <url>
-    <loc>https://tiagoolivoto.github.io/pliman//articles/segmentation.html</loc>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/prop_segmented.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/rgb_to_hsv.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/sad.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/summary_index.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/symptomatic_area.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/tune_tolerance.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_file.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_image.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_objects.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_pick.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_polygon.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_transform.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/SUPPORT.html</loc>
   </url>
 </urlset>

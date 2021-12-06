@@ -11,7 +11,7 @@
 #' @param image An `Image` object.
 #' @param n The number of points of the `pick_*` function. Defaults to `Inf`.
 #'   This means that picking will run until the user press Esc.
-#' @param r The radius of neighborhood pixels. Defaults to `1`.
+#' @param r The radius of neighborhood pixels. Defaults to `3`.
 #' @param col,size The color and size for the marker point.
 #' @param shape A character vector indicating the shape of the brush around the
 #'   selected pixel. It  can be `"box"`, `"disc"`, `"diamond"`, `"Gaussian"` or
@@ -129,7 +129,7 @@ pick_rgb <- function(image,
 #' @export
 pick_palette <- function(image,
                          n = Inf,
-                         r = 1,
+                         r = 3,
                          shape = "box",
                          random = TRUE,
                          width = 100,

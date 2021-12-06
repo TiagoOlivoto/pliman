@@ -1,5 +1,5 @@
-pandoc: 2.11.2
-pkgdown: 1.6.1
+pandoc: 2.11.4
+pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   analyze_objects: analyze_objects.html
@@ -8,8 +8,8 @@ articles:
   phytopatometry: phytopatometry.html
   pliman_start: pliman_start.html
   segmentation: segmentation.html
-last_built: 2021-11-10T13:08Z
+last_built: 2021-12-06T20:45Z
 urls:
-  reference: https://tiagoolivoto.github.io/pliman//reference
-  article: https://tiagoolivoto.github.io/pliman//articles
+  reference: https://tiagoolivoto.github.io/pliman/reference
+  article: https://tiagoolivoto.github.io/pliman/articles
 

@@ -21,7 +21,7 @@ pick_rgb(image, n = Inf, col = "red", size = 0.8, plot = TRUE, verbose = TRUE)
 pick_palette(
   image,
   n = Inf,
-  r = 1,
+  r = 3,
   shape = "box",
   random = TRUE,
   width = 100,
@@ -45,7 +45,7 @@ This means that picking will run until the user press Esc.}
 
 \item{verbose}{If \code{TRUE} (default) shows a counter in the console.}
 
-\item{r}{The radius of neighborhood pixels. Defaults to \code{1}.}
+\item{r}{The radius of neighborhood pixels. Defaults to \code{3}.}
 
 \item{shape}{A character vector indicating the shape of the brush around the
 selected pixel. It  can be \code{"box"}, \code{"disc"}, \code{"diamond"}, \code{"Gaussian"} or

@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="pliman">
 <title>Measure leaf area using leaf images • pliman</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -12,12 +13,11 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/spacelab/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Measure leaf area using leaf images">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Measure leaf area using leaf images">
 <meta property="og:description" content="pliman">
 <meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -31,161 +31,122 @@
   gtag('config', 'G-VWN5YL53DP');
 </script>
 </head>
-<body data-spy="scroll" data-target="#toc">
-    <div class="container template-article">
-      <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">pliman</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
-      </span>
-    </div>
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+    
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
+    <nav class="navbar fixed-top navbar-inverse navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">pliman</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-2">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="../index.html">
     <span class="fa fa-home"></span>
      
     Home
   </a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Examples
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/manipulation.html">Image manipulation</a>
-    </li>
-    <li>
-      <a href="../articles/segmentation.html">Image segmentation</a>
-    </li>
-    <li>
-      <a href="../articles/analyze_objects.html">Analyze objects in an image</a>
-    </li>
-    <li>
-      <a href="../articles/leaf_area.html">Measure leaf area</a>
-    </li>
-    <li>
-      <a href="../articles/phytopatometry.html">Phytopatometry</a>
-    </li>
-  </ul>
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
+    <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
+    <a class="dropdown-item" href="../articles/analyze_objects.html">Analyze objects in an image</a>
+    <a class="dropdown-item" href="../articles/leaf_area.html">Measure leaf area</a>
+    <a class="dropdown-item" href="../articles/phytopatometry.html">Phytopatometry</a>
+  </div>
 </li>
-<li>
-  <a href="../reference/index.html">Functions</a>
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Functions</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    News
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../news/index.html">Package news</a>
-    </li>
-    <li>
-      <a href="https://olivoto.netlify.app/">Blog posts</a>
-    </li>
-  </ul>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-news">
+    <a class="dropdown-item" href="../news/index.html">Package news</a>
+    <a class="external-link dropdown-item" href="https://olivoto.netlify.app/">Blog posts</a>
+  </div>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    More
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../CODE_OF_CONDUCT.html">Code of Conduct</a>
-    </li>
-    <li>
-      <a href="../CONTRIBUTING.html">Contributing</a>
-    </li>
-    <li>
-      <a href="../ISSUE_TEMPLATE.html">Issues</a>
-    </li>
-    <li>
-      <a href="../SUPPORT.html">Support</a>
-    </li>
-    <li>
-      <a href="../LICENSE.html">Licence</a>
-    </li>
-  </ul>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-more">More</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-more">
+    <a class="dropdown-item" href="../CODE_OF_CONDUCT.html">Code of Conduct</a>
+    <a class="dropdown-item" href="../CONTRIBUTING.html">Contributing</a>
+    <a class="dropdown-item" href="../ISSUE_TEMPLATE.html">Issues</a>
+    <a class="dropdown-item" href="../SUPPORT.html">Support</a>
+    <a class="dropdown-item" href="../LICENSE.html">Licence</a>
+  </div>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://www.researchgate.net/profile/Tiago_Olivoto2">
-    <span class="fab fa-researchgate fa-2x"></span>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://www.researchgate.net/profile/Tiago_Olivoto2">
+    <span class="fab fa fab fa-researchgate fa-2x"></span>
      
   </a>
 </li>
-<li>
-  <a href="https://github.com/TiagoOlivoto">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/TiagoOlivoto">
     <span class="fa fa-github fa-2x"></span>
      
   </a>
 </li>
-<li>
-  <a href="https://twitter.com/tolivoto">
-    <span class="fab fa-twitter fa-2x"></span>
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://twitter.com/tolivoto">
+    <span class="fab fa fab fa-twitter fa-2x"></span>
      
   </a>
 </li>
-<li>
-  <a href="https://www.mendeley.com/profiles/tiago-olivoto/">
-    <span class="fab fa-mendeley fa-2x"></span>
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://www.mendeley.com/profiles/tiago-olivoto/">
+    <span class="fab fa fab fa-mendeley fa-2x"></span>
      
   </a>
 </li>
       </ul>
 </div>
-<!--/.nav-collapse -->
+
+    
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
+</nav><div class="container template-article">
 
-      
-
-      </header><script src="leaf_area_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Measure leaf area using leaf images</h1>
-                        <h4 class="author">Tiago Olivoto</h4>
+<div class="row">
+  <main id="main"><div class="page-header">
+      <img src="../logo.svg" class="logo" alt=""><h1>Measure leaf area using leaf images</h1>
+                        <h4 data-toc-skip class="author">Tiago Olivoto</h4>
             
-            <h4 class="date">2021-11-10</h4>
+            <h4 data-toc-skip class="date">2021-12-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/master/vignettes/leaf_area.Rmd"><code>vignettes/leaf_area.Rmd</code></a></small>
-      <div class="hidden name"><code>leaf_area.Rmd</code></div>
-
+      <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/leaf_area.Rmd" class="external-link"><code>vignettes/leaf_area.Rmd</code></a></small>
+      <div class="d-none name"><code>leaf_area.Rmd</code></div>
     </div>
 
     
     
-<div id="getting-started" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h1>
+<div class="section level1">
+<h1 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h1>
 <p>We can use <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to compute object features such as area, perimeter, radius, etc. This can be used, for example, to compute leaf area. Let’s compute the leaf area of <code>leaves</code> with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. First, we use <code>image_segmentation()</code> to identify candidate indexes to segment foreground (leaves) from background.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman">pliman</a></span><span class="op">)</span>
-<span class="co">#&gt; |=======================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.0.0)         |</span>
-<span class="co">#&gt; | Author: Tiago Olivoto                                 |</span>
-<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial  |</span>
-<span class="co">#&gt; | Visit 'https://bit.ly/pliman' for a complete tutorial |</span>
-<span class="co">#&gt; |=======================================================|</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span>
+<span class="co">#&gt; |==========================================================|</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.0.0)            |</span>
+<span class="co">#&gt; | Author: Tiago Olivoto                                    |</span>
+<span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial     |</span>
+<span class="co">#&gt; | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |</span>
+<span class="co">#&gt; |==========================================================|</span>
 <span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/TiagoOlivoto/pliman/master/vignettes/imgs"</span>
 <span class="va">leaves</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/utils_image.html">image_import</a></span><span class="op">(</span><span class="st">"leaves2.jpg"</span>,
@@ -196,9 +157,9 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf4-1.png" width="768"></p>
 <p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the <code>NB</code> index here (default option in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>). The measurement of the leaf area in this approach can be done in two main ways: 1) using an object of known area, and 2) knowing the image resolution in dpi (dots per inch).</p>
-<div id="using-an-object-of-known-area" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-an-object-of-known-area" class="anchor"></a>Using an object of known area</h3>
+<div class="section level3">
+<h3 id="using-an-object-of-known-area">Using an object of known area<a class="anchor" aria-label="anchor" href="#using-an-object-of-known-area"></a>
+</h3>
 <ul>
 <li>Count the number of objects (leaves in this case)</li>
 </ul>
@@ -294,29 +255,29 @@
 <span class="co">#&gt; 22      1.719     6.426        2.666     2.240    1.290    3.439      3.312</span>
 <span class="co">#&gt; 23      6.947    39.753       50.583     6.965    0.275   13.895     14.308</span>
 <span class="co">#&gt;    minor_axis eccentricity  theta solidity circularity</span>
-<span class="co">#&gt; 1       0.835        0.837  1.529    0.998       1.005</span>
-<span class="co">#&gt; 2       0.687        0.548 -1.558    0.787       0.460</span>
-<span class="co">#&gt; 3       0.953        0.936 -1.510    0.941       0.556</span>
-<span class="co">#&gt; 4       0.551        0.788 -1.487    0.988       0.984</span>
-<span class="co">#&gt; 5       0.513        0.760 -1.392    0.965       0.935</span>
-<span class="co">#&gt; 6       0.456        0.572 -1.471    0.945       0.950</span>
-<span class="co">#&gt; 7       0.637        0.868  1.404    0.986       0.926</span>
-<span class="co">#&gt; 8       0.444        0.740 -1.329    0.970       0.928</span>
-<span class="co">#&gt; 9       0.423        0.633 -1.476    0.928       0.830</span>
-<span class="co">#&gt; 10      0.295        0.254 -1.563    1.005       0.818</span>
-<span class="co">#&gt; 11      0.410        0.812  1.568    0.987       1.015</span>
-<span class="co">#&gt; 12      0.379        0.635 -1.417    0.885       0.754</span>
-<span class="co">#&gt; 13      0.502        0.939 -1.103    0.949       0.629</span>
-<span class="co">#&gt; 14      0.441        0.934 -1.382    0.940       0.628</span>
-<span class="co">#&gt; 15      0.370        0.926  1.554    0.968       0.710</span>
-<span class="co">#&gt; 16      0.251        0.842  0.235    0.963       0.873</span>
-<span class="co">#&gt; 17      0.306        0.945  1.424    0.999       0.632</span>
-<span class="co">#&gt; 18      0.202        0.878 -0.519    0.936       0.748</span>
-<span class="co">#&gt; 19      0.170        0.859 -1.546    1.022       1.032</span>
-<span class="co">#&gt; 20      0.307        0.955  1.557    0.935       0.442</span>
-<span class="co">#&gt; 21      0.277        0.969 -1.429    0.903       0.484</span>
-<span class="co">#&gt; 22      0.166        0.896  1.421    1.027       0.935</span>
-<span class="co">#&gt; 23      0.719        1.000 -0.037    0.912       0.069</span>
+<span class="co">#&gt; 1       9.085        0.837  1.529    0.998       1.005</span>
+<span class="co">#&gt; 2      11.440        0.548 -1.558    0.787       0.460</span>
+<span class="co">#&gt; 3       6.677        0.936 -1.510    0.941       0.556</span>
+<span class="co">#&gt; 4       6.751        0.788 -1.487    0.988       0.984</span>
+<span class="co">#&gt; 5       6.630        0.760 -1.392    0.965       0.935</span>
+<span class="co">#&gt; 6       7.450        0.572 -1.471    0.945       0.950</span>
+<span class="co">#&gt; 7       6.297        0.868  1.404    0.986       0.926</span>
+<span class="co">#&gt; 8       5.946        0.740 -1.329    0.970       0.928</span>
+<span class="co">#&gt; 9       6.517        0.633 -1.476    0.928       0.830</span>
+<span class="co">#&gt; 10      5.676        0.254 -1.563    1.005       0.818</span>
+<span class="co">#&gt; 11      4.763        0.812  1.568    0.987       1.015</span>
+<span class="co">#&gt; 12      5.828        0.635 -1.417    0.885       0.754</span>
+<span class="co">#&gt; 13      3.449        0.939 -1.103    0.949       0.629</span>
+<span class="co">#&gt; 14      3.146        0.934 -1.382    0.940       0.628</span>
+<span class="co">#&gt; 15      2.772        0.926  1.554    0.968       0.710</span>
+<span class="co">#&gt; 16      2.704        0.842  0.235    0.963       0.873</span>
+<span class="co">#&gt; 17      1.984        0.945  1.424    0.999       0.632</span>
+<span class="co">#&gt; 18      1.928        0.878 -0.519    0.936       0.748</span>
+<span class="co">#&gt; 19      1.735        0.859 -1.546    1.022       1.032</span>
+<span class="co">#&gt; 20      1.809        0.955  1.557    0.935       0.442</span>
+<span class="co">#&gt; 21      1.373        0.969 -1.429    0.903       0.484</span>
+<span class="co">#&gt; 22      1.473        0.896  1.421    1.027       0.935</span>
+<span class="co">#&gt; 23      0.427        1.000 -0.037    0.912       0.069</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>,
@@ -324,50 +285,48 @@
               col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="co"># default is "white"</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf9-1.png" width="960"></p>
 </div>
-<div id="knowing-the-image-resolution-in-dpi-dots-per-inch" class="section level3">
-<h3 class="hasAnchor">
-<a href="#knowing-the-image-resolution-in-dpi-dots-per-inch" class="anchor"></a>knowing the image resolution in dpi (dots per inch)</h3>
+<div class="section level3">
+<h3 id="knowing-the-image-resolution-in-dpi-dots-per-inch">knowing the image resolution in dpi (dots per inch)<a class="anchor" aria-label="anchor" href="#knowing-the-image-resolution-in-dpi-dots-per-inch"></a>
+</h3>
 <p>When the image resolution is known, the measures in pixels obtained with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See the <a href="#dpi">dpi</a> section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the <code>dpi</code> argument of <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.8</span><span class="op">)</span>
 <span class="co"># compute the difference between the two methods</span>
-<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span> <span class="op">-</span> <span class="va">area2</span><span class="op">$</span><span class="va">area</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span> <span class="op">-</span> <span class="va">area2</span><span class="op">$</span><span class="va">area</span><span class="op">)</span>
 <span class="co">#&gt; [1] 7.724</span></code></pre></div>
 </div>
 </div>
-<div id="a-little-bit-more" class="section level1">
-<h1 class="hasAnchor">
-<a href="#a-little-bit-more" class="anchor"></a><i class="fas fa-scroll"></i> A little bit more!</h1>
+<div class="section level1">
+<h1 id="a-little-bit-more">
+<i class="fas fa-scroll"></i> A little bit more!<a class="anchor" aria-label="anchor" href="#a-little-bit-more"></a>
+</h1>
 <!-- inicio font awesome -->
 <script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script><blockquote>
-<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html">this link</a> you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip">here</a>. You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA">here</a>. <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!</p>
+<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this link</a> you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>. You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>. <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!</p>
 </blockquote>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
-  <p>Developed by <a href="https://olivoto.netlify.app/">Tiago Olivoto</a>.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p></p>
+<p>Developed by <a href="https://olivoto.netlify.app/" class="external-link">Tiago Olivoto</a>.</p>
 </div>
 
-<div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+<div class="pkgdown-footer-right">
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
 
+  
 
   </body>
 </html>
