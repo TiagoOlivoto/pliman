@@ -716,7 +716,7 @@ measure_disease <- function(img,
         jpeg(paste0(diretorio_processada, "/",
                     prefix,
                     name_ori, ".",
-                    extens_ori),
+                    "jpg"),
              width = dim(im2@.Data)[1],
              height = dim(im2@.Data)[2])
         if(marker != "point"){
