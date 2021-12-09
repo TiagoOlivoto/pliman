@@ -10,8 +10,8 @@ Authors@R:
 Description: Provides tools for image manipulation that will help you to
     quantify plant leaf area, disease severity, number of disease lesions,
     and obtain statistics of image objects such as grains, pods, pollen,
-    leaves, and more. Tools for segment images and create binary images
-    using the method of automatic threshold selection method proposed by
+    leaves, and more. Tools to segment images and create binary images
+    using the method of automatic threshold selection proposed by
     Otsu (1979) <doi:10.1109/tsmc.1979.4310076> are also provided.
 License: GPL (>= 3)
 URL: https://github.com/TiagoOlivoto/pliman
