@@ -7,6 +7,11 @@
 * `summary_index()` to summary the index either between and within objects.
 * `pliman` now exports the foward-pipe operator `%>%`. Code from [poorman](https://github.com/nathaneastwood/poorman/blob/master/R/pipe.R) package.
 
+## Minor changes
+* Deprecated functions in the last version (`count_objects()`, `image_show()`, `leaf_area()`, `objects_rgb()`, `prop_segmented()`, and `symptomatic_area()`) were removed.
+* Use Bootstrap 5 from [pkgdown 2.0.0](https://pkgdown.r-lib.org/news/index.html#bootstrap-2-0-0) in the package site.
+
+
 # pliman 1.0.0
 ## New functions
 * `analyze_objects()` is now used as the main function to compute the number and shape of objects.

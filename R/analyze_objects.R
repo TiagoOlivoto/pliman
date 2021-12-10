@@ -41,7 +41,6 @@
 #'   = "1"`) will select images that are named as 1.-, 2.-, and so on. An error
 #'   will be returned if the pattern matches any file that is not supported
 #'   (e.g., img1.pdf).
-#' @param img_pattern Deprecated. Use `pattern` instead.
 #' @param parallel If `TRUE` processes the images asynchronously (in parallel)
 #'   in separate R sessions running in the background on the same machine. It
 #'   may speed up the processing time, especially when `pattern` is used is
@@ -193,6 +192,10 @@
 #' @export
 #' @name analyze_objects
 #' @importFrom  utils install.packages
+#' @importFrom grDevices col2rgb dev.off jpeg png
+#' @importFrom graphics lines par points rect text
+#' @importFrom stats aggregate binomial glm kmeans predict sd
+#' @importFrom utils menu
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
@@ -216,7 +219,6 @@ analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
                             pattern = NULL,
-                            img_pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
                             watershed = TRUE,
@@ -261,10 +263,6 @@ analyze_objects <- function(img,
                             dir_processed = NULL,
                             verbose = TRUE){
   check_ebi()
-  if(!missing(img_pattern)){
-    warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.", call. = FALSE)
-    pattern <- img_pattern
-  }
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }

@@ -4,7 +4,6 @@
 \alias{utils_image}
 \alias{image_import}
 \alias{image_export}
-\alias{image_show}
 \alias{image_pliman}
 \title{Import and export images}
 \usage{
@@ -15,13 +14,10 @@ image_import(
   path = NULL,
   plot = FALSE,
   nrow = NULL,
-  ncol = NULL,
-  img_pattern = NULL
+  ncol = NULL
 )
 
 image_export(image, name, prefix = "", extension = NULL, subfolder = NULL, ...)
-
-image_show(image)
 
 image_pliman(image, plot = FALSE)
 }
@@ -51,8 +47,6 @@ informed in \code{image} argument.}
 
 \item{nrow, ncol}{Passed on to \code{\link[=image_combine]{image_combine()}}. The number of rows and
 columns to use in the composite image when \code{plot = TRUE}.}
-
-\item{img_pattern}{Deprecated. Use \code{pattern} instead.}
 
 \item{name}{An string specifying the name of the image. It can be either a
 character with the image name (e.g., "img1") or name and extension (e.g.,

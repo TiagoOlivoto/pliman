@@ -116,6 +116,11 @@
 <li>
 <code>pliman</code> now exports the foward-pipe operator <code>%&gt;%</code>. Code from <a href="https://github.com/nathaneastwood/poorman/blob/master/R/pipe.R" class="external-link">poorman</a> package.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="minor-changes-1-1-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-1-1-0"></a></h3>
+<ul><li>Deprecated functions in the last version (<code><a href="https://rdrr.io/pkg/pliman/man/count_objects.html" class="external-link">count_objects()</a></code>, <code><a href="https://rdrr.io/pkg/pliman/man/utils_image.html" class="external-link">image_show()</a></code>, <code><a href="https://rdrr.io/pkg/pliman/man/leaf_area.html" class="external-link">leaf_area()</a></code>, <code><a href="https://rdrr.io/pkg/pliman/man/objects_rgb.html" class="external-link">objects_rgb()</a></code>, <code><a href="https://rdrr.io/pkg/pliman/man/prop_segmented.html" class="external-link">prop_segmented()</a></code>, and <code><a href="https://rdrr.io/pkg/pliman/man/symptomatic_area.html" class="external-link">symptomatic_area()</a></code>) were removed.</li>
+<li>Use Bootstrap 5 from <a href="https://pkgdown.r-lib.org/news/index.html#bootstrap-2-0-0" class="external-link">pkgdown 2.0.0</a> in the package site.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="pliman-100">pliman 1.0.0<a class="anchor" aria-label="anchor" href="#pliman-100"></a></h2><p class="text-muted">CRAN release: 2021-11-09</p>
@@ -137,19 +142,19 @@
 <div class="section level3">
 <h3 id="deprecated-functions-1-0-0">Deprecated functions.<a class="anchor" aria-label="anchor" href="#deprecated-functions-1-0-0"></a></h3>
 <ul><li>
-<code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> will be depracated in the future. Now, to compute an index for each object use the <code>object_index</code> argument in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, for example, <code>analyze_objects(object_index = "B")</code>.</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/objects_rgb.html" class="external-link">objects_rgb()</a></code> will be depracated in the future. Now, to compute an index for each object use the <code>object_index</code> argument in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, for example, <code>analyze_objects(object_index = "B")</code>.</li>
 <li>
-<code><a href="../reference/leaf_area.html">leaf_area()</a></code> will be depracated in the future. Now, combine <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> with <code><a href="../reference/utils_measures.html">get_measures()</a></code> to obtain the area and shape of objects (leaves).</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/leaf_area.html" class="external-link">leaf_area()</a></code> will be depracated in the future. Now, combine <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> with <code><a href="../reference/utils_measures.html">get_measures()</a></code> to obtain the area and shape of objects (leaves).</li>
 <li>
-<code><a href="../reference/prop_segmented.html">prop_segmented()</a></code> is now deprecated in favour of <code><a href="../reference/image_segment.html">image_segment_iter()</a></code>.</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/prop_segmented.html" class="external-link">prop_segmented()</a></code> is now deprecated in favour of <code><a href="../reference/image_segment.html">image_segment_iter()</a></code>.</li>
 <li>
-<code><a href="../reference/count_lesions.html">count_lesions()</a></code> is now deprecated. Now, to compute the number and shape of lesions, use the argument <code>show_features = TRUE</code> in <code><a href="../reference/measure_disease.html">measure_disease()</a></code>.</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/count_lesions.html" class="external-link">count_lesions()</a></code> is now deprecated. Now, to compute the number and shape of lesions, use the argument <code>show_features = TRUE</code> in <code><a href="../reference/measure_disease.html">measure_disease()</a></code>.</li>
 <li>
-<code><a href="../reference/utils_image.html">image_show()</a></code> is now deprecated in favour of <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/utils_image.html" class="external-link">image_show()</a></code> is now deprecated in favour of <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-1-0-0">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-1-0-0"></a></h3>
-<ul><li>Include <code>fill_hull</code> argument in <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code> and <code><a href="../reference/count_lesions.html">count_lesions()</a></code>
+<ul><li>Include <code>fill_hull</code> argument in <code><a href="https://rdrr.io/pkg/pliman/man/symptomatic_area.html" class="external-link">symptomatic_area()</a></code> and <code><a href="https://rdrr.io/pkg/pliman/man/count_lesions.html" class="external-link">count_lesions()</a></code>
 </li>
 <li>Improve <code><a href="../reference/utils_transform.html">image_contrast()</a></code> function to avoid error regarding image resolution.</li>
 <li>New argument <code>subfolder</code> in <code><a href="../reference/utils_image.html">image_export()</a></code> to export an image to a subfolder.</li>
@@ -175,11 +180,11 @@
 <li>
 <code><a href="../reference/utils_objects.html">object_isolate()</a></code> to isolate an object from an image.</li>
 <li>
-<code><a href="../reference/prop_segmented.html">prop_segmented()</a></code> to perform (iterative) image segmentation with pixels proportion.</li>
+<code><a href="https://rdrr.io/pkg/pliman/man/prop_segmented.html" class="external-link">prop_segmented()</a></code> to perform (iterative) image segmentation with pixels proportion.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-0-3-0">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-0-3-0"></a></h3>
-<ul><li>New argument <code>filter</code> in <code><a href="../reference/count_objects.html">count_objects()</a></code> and <code><a href="../reference/prop_segmented.html">prop_segmented()</a></code>.</li>
+<ul><li>New argument <code>filter</code> in <code><a href="https://rdrr.io/pkg/pliman/man/count_objects.html" class="external-link">count_objects()</a></code> and <code><a href="https://rdrr.io/pkg/pliman/man/prop_segmented.html" class="external-link">prop_segmented()</a></code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

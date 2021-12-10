@@ -10,7 +10,6 @@ analyze_objects(
   foreground = NULL,
   background = NULL,
   pattern = NULL,
-  img_pattern = NULL,
   parallel = FALSE,
   workers = NULL,
   watershed = TRUE,
@@ -78,8 +77,6 @@ directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
 will be imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-, 2.-, and so on. An error
 will be returned if the pattern matches any file that is not supported
 (e.g., img1.pdf).}
-
-\item{img_pattern}{Deprecated. Use \code{pattern} instead.}
 
 \item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel)
 in separate R sessions running in the background on the same machine. It

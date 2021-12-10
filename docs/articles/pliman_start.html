@@ -127,7 +127,7 @@
       <img src="../logo.svg" class="logo" alt=""><h1>Plant IMage Analysis</h1>
                         <h4 data-toc-skip class="author">Tiago Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2021-12-06</h4>
+            <h4 data-toc-skip class="date">2021-12-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/pliman_start.Rmd" class="external-link"><code>vignettes/pliman_start.Rmd</code></a></small>
       <div class="d-none name"><code>pliman_start.Rmd</code></div>
@@ -141,8 +141,8 @@
 <p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. The package will help you to:</p>
 <ul>
 <li>Get object statistics (number, area, perimeter, etc.) with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</li>
-<li>Measure disease severity with <code><a href="../reference/symptomatic_area.html">symptomatic_area()</a></code>.</li>
-<li>Get the RGB values for each object in an image with <code><a href="../reference/objects_rgb.html">objects_rgb()</a></code>.</li>
+<li>Measure disease severity with <code><a href="https://rdrr.io/pkg/pliman/man/symptomatic_area.html" class="external-link">symptomatic_area()</a></code>.</li>
+<li>Get the RGB values for each object in an image with <code><a href="https://rdrr.io/pkg/pliman/man/objects_rgb.html" class="external-link">objects_rgb()</a></code>.</li>
 <li>Get object measures with <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</li>
 <li>Plot objec measures with <code><a href="../reference/utils_measures.html">plot_measures()</a></code>.</li>
 </ul>
@@ -270,7 +270,7 @@
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <pre><code><span class="co"># $severity</span>
 <span class="co">#    healthy symptomatic</span>
-<span class="co"># 1 88.72031    11.27969</span>
+<span class="co"># 1 89.12643    10.87357</span>
 <span class="co"># </span>
 <span class="co"># $shape</span>
 <span class="co"># NULL</span>
@@ -284,7 +284,7 @@
 <div class="section level1">
 <h1 id="rgb-values-for-objects">RGB values for objects<a class="anchor" aria-label="anchor" href="#rgb-values-for-objects"></a>
 </h1>
-<p>The function <code><a href="../reference/objects_rgb.html">objects_rgb()</a></code> can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for</p>
+<p>The function <code><a href="https://rdrr.io/pkg/pliman/man/objects_rgb.html" class="external-link">objects_rgb()</a></code> can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soy_green.jpg"</span><span class="op">)</span>
 <span class="co"># Segment the foreground (grains) using the normalized blue index</span>

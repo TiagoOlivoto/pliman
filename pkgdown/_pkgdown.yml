@@ -8,6 +8,10 @@ template:
   bootstrap: 5
   params:
     ganalytics: G-VWN5YL53DP
+  bslib:
+    primary: "#0054AD"
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
 
 toc:
   depth: 3
@@ -105,7 +109,6 @@ reference:
       - palettes
       - image_segment
       - image_to_mat
-      - prop_segmented
       - plot.image_index
 
 
@@ -113,10 +116,7 @@ reference:
     desc: "Analyze objects in an image"
     contents:
       - analyze_objects
-      - count_lesions
-      - count_objects
       - utils_measures
-      - objects_rgb
       - pliman_images
       - utils_objects
       - tune_tolerance
@@ -125,17 +125,10 @@ reference:
       - utils_polygon
 
 
-  - title: "Leaf area"
-    desc: "Calculates the leaf area using an image with leaves and a template with a known area"
-    contents:
-      - leaf_area
-
-
   - title: "Symptomatic area"
     desc: "Calculates the percentage of symptomatic leaf area based in a sample or entire leaf based on provided color palettes samples"
     contents:
       - measure_disease
-      - symptomatic_area
       - sad
 
 

@@ -1,5 +1,5 @@
 ## Release summary
-This is a major release (1.0.0) that includes new features, bug corrections, and minor improvements. Please,  see `NEWS.md` for additional information.
+This is a minor release (1.1.0) that includes new features, bug corrections, and minor improvements. Please,  see `NEWS.md` for additional information.
 
 
 ## Test environments

@@ -24,7 +24,6 @@ measure_disease(
   topn_lower = NULL,
   topn_upper = NULL,
   randomize = TRUE,
-  nrows = "deprecated",
   nsample = 3000,
   watershed = FALSE,
   lesion_size = "medium",
@@ -118,8 +117,6 @@ known area or use \code{lower_limit = 0} to select all objects (not advised).}
 
 \item{randomize}{Randomize the lines before training the model? Defaults to
 \code{TRUE}.}
-
-\item{nrows}{Deprecated. Use \code{nsamples} instead.}
 
 \item{nsample}{The number of sample pixels to be used in training step.
 Defaults to \code{3000}.}

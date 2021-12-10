@@ -84,7 +84,6 @@
 #'   `topn_upper` selects the `n` lesions with the largest area.
 #' @param randomize Randomize the lines before training the model? Defaults to
 #'   `TRUE`.
-#' @param nrows Deprecated. Use `nsamples` instead.
 #' @param nsample The number of sample pixels to be used in training step.
 #'   Defaults to `3000`.
 #' @param watershed If `TRUE` (Default) implements the Watershed Algorithm to
@@ -198,7 +197,6 @@ measure_disease <- function(img,
                             topn_lower = NULL,
                             topn_upper = NULL,
                             randomize = TRUE,
-                            nrows = "deprecated",
                             nsample = 3000,
                             watershed = FALSE,
                             lesion_size = "medium",
@@ -224,10 +222,6 @@ measure_disease <- function(img,
                             dir_processed = NULL,
                             verbose = TRUE){
   check_ebi()
-  if(nrows != "deprecated"){
-    warning("Argument 'nrows' was deprecated. Use 'nsample' instead.", call. = FALSE)
-    nsample <- nrows
-  }
   if(!missing(img) & !missing(pattern)){
     stop("Only one of `img` or `pattern` arguments can be used.", call. = FALSE)
   }

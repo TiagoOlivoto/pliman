@@ -92,7 +92,6 @@ image_combine <- function(...,
 #'   = "1"`) will select images that are named as 1.-, 2.-, and so on. An error
 #'   will be returned if the pattern matches any file that is not supported
 #'   (e.g., img1.pdf).
-#' @param img_pattern Deprecated. Use `pattern` instead.
 #' @param subfolder Optional character string indicating a subfolder within the
 #'   current working directory to save the image(s). If the folder doesn't
 #'   exist, it will be created.
@@ -127,13 +126,7 @@ image_import <- function(image,
                          path = NULL,
                          plot = FALSE,
                          nrow = NULL,
-                         ncol = NULL,
-                         img_pattern = NULL){
-  if(!missing(img_pattern)){
-    warning("Argument 'img_pattern' is deprecated. Use 'pattern' instead.",
-            call. = FALSE)
-    pattern <- img_pattern
-  }
+                         ncol = NULL){
   check_ebi()
   valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF")
   if(!is.null(pattern)){
@@ -260,16 +253,6 @@ image_export <- function(image,
     }
     name <- paste0(dir_out, "/", filname, ".", extens)
     EBImage::writeImage(image, name)
-  }
-}
-#' @export
-#' @name utils_image
-image_show <- function(image){
-  warning("'image_show()' is deprecated as of {pliman} 0.4.0. Use 'plot()' instead.", call. = FALSE)
-  if(any(class(image) != "Image")){
-    grid.raster(image)
-  } else{
-    plot(image)
   }
 }
 #' @export
