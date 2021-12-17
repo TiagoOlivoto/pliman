@@ -137,7 +137,11 @@ get_measures <- function(object,
     }
     terms <- as.formula(measure)
     var <- as.character(terms[[2]])
-    value <- as.numeric(terms[[3]])
+    if(exists(as.character(terms[[3]]))){
+      value <- eval(terms[[3]], envir = parent.frame())
+    } else{
+      value <- as.numeric(terms[[3]])
+    }
     measures <- c("area", "perimeter", "radius_mean", "radius_min",  "radius_max", "radius_ratio")
     if(!var %in% measures){
       stop("The left-hand side of 'measure' must be one of ", paste(measures, collapse = ", "), call. = FALSE)
@@ -174,6 +178,7 @@ get_measures <- function(object,
       res$major_axis <- res$major_axis * px_side
       res$minor_axis <- res$minor_axis * px_side
     }
+    res <- res[which(res$id != id),]
     if(verbose == TRUE){
       cat("-----------------------------------------\n")
       cat(paste0("measures corrected with:\nobject id: ", id, "\n", var,

@@ -1,3 +1,8 @@
+# pliman (development version)
+## Minor changes
+* `get_measures()` now remove known objects from the results when using the `id` argument.
+* The right-hand of argument `measure` in `get_measures()` now accepts a numeric object stored in the global environment.
+
 # pliman 1.1.0
 ## New functions
 * `measure_disease_iter()` to measure disease in an interactive section.

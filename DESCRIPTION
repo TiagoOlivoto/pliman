@@ -1,6 +1,6 @@
 Package: pliman
 Title: Tools for Plant Image Analysis
-Version: 1.1.0
+Version: 1.1.0.9000
 Authors@R: 
     person(given = "Tiago",
            family = "Olivoto",
