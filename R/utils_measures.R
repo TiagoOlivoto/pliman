@@ -137,7 +137,7 @@ get_measures <- function(object,
     }
     terms <- as.formula(measure)
     var <- as.character(terms[[2]])
-    if(exists(as.character(terms[[3]]))){
+    if(exists(as.character(terms[[3]]), envir = parent.frame())){
       value <- eval(terms[[3]], envir = parent.frame())
     } else{
       value <- as.numeric(terms[[3]])

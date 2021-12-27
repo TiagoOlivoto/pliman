@@ -1,7 +1,11 @@
 # pliman (development version)
+## New functions
+* `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.
+
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.
 * The right-hand of argument `measure` in `get_measures()` now accepts a numeric object stored in the global environment.
+
 
 # pliman 1.1.0
 ## New functions

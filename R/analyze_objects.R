@@ -3,6 +3,8 @@
 #' * [analyze_objects()] provides tools for counting and extracting object
 #' features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 #' more at **Details** section.
+#' * [analyze_objects_iter()] provides an iterative section to measure object
+#' features using an object with a known area.
 #' * [plot.anal_obj()] Produces an histogram for the R, G, and B values when
 #' argument `object_index` is used in the function [analyze_objects()].
 #'
@@ -31,6 +33,20 @@
 #'pattern names that are stored in the current working directory or in the
 #'subdirectory informed in `dir_original`'. To speed up the computation time,
 #'one can set `parallel = TRUE`.
+#'
+#' [analyze_objects_iter()] can be used to process several images using an
+#' object with a known area as a template. In this case, all the images in the
+#' current working directory that matches the `pattern` will be processed. For
+#' each image, the function will compute the features for the objects and show
+#' the identification (id) of each object. The user only needs to inform which
+#' is the id of the known object. Then, given the `known_area`, all the measures
+#' will be adjusted. In the end, a data.frame with the adjusted measures will be
+#' returned. This is useful when the images are taken at different heights. In
+#' such cases, the image resolution cannot be conserved. Consequently, the
+#' measures cannot be adjusted using the argument `dpi` from [get_measures()],
+#' since each image will have a different resolution. NOTE: This will only work
+#' in an interactive section.
+#'
 #' @param img The image to be analyzed.
 #' @param foreground A color palette of the foreground (optional).
 #' @param background A color palette of the background (optional).
@@ -149,6 +165,12 @@
 #'   `"C:/Desktop/imgs"`, or a subfolder within the current working directory,
 #'   e.g., `"/imgs"`.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
+#' @param known_area The known area of the template object.
+#' @param ... Depends on the function:
+#' * For [analyze_objects_iter()], further arguments passed on to
+#' [analyze_objects()].
+#' * For [plot.anal_obj()], further argument passed on to [lattice::histogram()]
+#' or [lattice::densityplot()]
 #' @return `analyze_objects()` returns a list with the following objects:
 #'  * `results` A data frame with the following variables for each object in the
 #'  image:
@@ -179,6 +201,10 @@
 #'  for each pixel of each object.
 #'  * `object_index`: If `object_index` is used, returns the index computed for
 #'  each object.
+#'
+#'  `analyze_objects_iter()` returns a data.frame containing the features
+#'  described in the `results` object of [analyze_objects()].
+#'
 #' @references
 #' Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
 #' remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
@@ -754,8 +780,6 @@ analyze_objects <- function(img,
 #'   are recognized.
 #' @param facet Create a facet plot for each object when `which = "index"` is
 #'   used?. Defaults to `FALSE`.
-#' @param ... Further argument passed on to [lattice::histogram()] or
-#'   [lattice::densityplot()]
 #' @method plot anal_obj
 #' @importFrom lattice densityplot levelplot
 #' @export
@@ -845,5 +869,32 @@ plot.anal_obj <- function(x,
                   plot.points = FALSE,
                   ...)
     }
+  }
+}
+
+#' @export
+#' @name analyze_objects
+analyze_objects_iter <- function(pattern,
+                                 known_area,
+                                 verbose = TRUE,
+                                 ...){
+  if (interactive()) {
+    imgs <- list.files(pattern = pattern)
+    measures <- list()
+    for (i in 1:length(imgs)) {
+      tmp <-
+        analyze_objects(img = file_name(imgs[[i]]),
+                        marker = "id",
+                        ...)
+      object <- as.numeric(readline("Known object: "))
+      tmp <- get_measures(tmp,
+                          id = object,
+                          measure = area ~ known_area,
+                          verbose = verbose)
+      tmp$img <- file_name(imgs[[i]])
+      tmp <- tmp[, c(ncol(tmp), 1:ncol(tmp) - 1)]
+      measures[[i]] <- tmp
+    }
+    do.call(rbind, lapply(measures, function(x){x}))
   }
 }

@@ -3,6 +3,7 @@
 \name{analyze_objects}
 \alias{analyze_objects}
 \alias{plot.anal_obj}
+\alias{analyze_objects_iter}
 \title{Analyzes objects in an image}
 \usage{
 analyze_objects(
@@ -63,6 +64,8 @@ analyze_objects(
   facet = FALSE,
   ...
 )
+
+analyze_objects_iter(pattern, known_area, verbose = TRUE, ...)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -230,8 +233,15 @@ are recognized.}
 \item{facet}{Create a facet plot for each object when \code{which = "index"} is
 used?. Defaults to \code{FALSE}.}
 
-\item{...}{Further argument passed on to \code{\link[lattice:histogram]{lattice::histogram()}} or
-\code{\link[lattice:histogram]{lattice::densityplot()}}}
+\item{...}{Depends on the function:
+\itemize{
+\item For \code{\link[=analyze_objects_iter]{analyze_objects_iter()}}, further arguments passed on to
+\code{\link[=analyze_objects]{analyze_objects()}}.
+\item For \code{\link[=plot.anal_obj]{plot.anal_obj()}}, further argument passed on to \code{\link[lattice:histogram]{lattice::histogram()}}
+or \code{\link[lattice:histogram]{lattice::densityplot()}}
+}}
+
+\item{known_area}{The known area of the template object.}
 }
 \value{
 \code{analyze_objects()} returns a list with the following objects:
@@ -269,6 +279,9 @@ for each pixel of each object.
 each object.
 }
 
+\code{analyze_objects_iter()} returns a data.frame containing the features
+described in the \code{results} object of \code{\link[=analyze_objects]{analyze_objects()}}.
+
 \code{plot.anal_obj()} returns a \code{trellis} object containing the
 distribution of the pixels, optionally  for each object when \code{facet = TRUE}
 is used.
@@ -278,6 +291,8 @@ is used.
 \item \code{\link[=analyze_objects]{analyze_objects()}} provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 more at \strong{Details} section.
+\item \code{\link[=analyze_objects_iter]{analyze_objects_iter()}} provides an iterative section to measure object
+features using an object with a known area.
 \item \code{\link[=plot.anal_obj]{plot.anal_obj()}} Produces an histogram for the R, G, and B values when
 argument \code{object_index} is used in the function \code{\link[=analyze_objects]{analyze_objects()}}.
 }
@@ -307,6 +322,19 @@ By using \code{pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
 subdirectory informed in \code{dir_original}'. To speed up the computation time,
 one can set \code{parallel = TRUE}.
+
+\code{\link[=analyze_objects_iter]{analyze_objects_iter()}} can be used to process several images using an
+object with a known area as a template. In this case, all the images in the
+current working directory that matches the \code{pattern} will be processed. For
+each image, the function will compute the features for the objects and show
+the identification (id) of each object. The user only needs to inform which
+is the id of the known object. Then, given the \code{known_area}, all the measures
+will be adjusted. In the end, a data.frame with the adjusted measures will be
+returned. This is useful when the images are taken at different heights. In
+such cases, the image resolution cannot be conserved. Consequently, the
+measures cannot be adjusted using the argument \code{dpi} from \code{\link[=get_measures]{get_measures()}},
+since each image will have a different resolution. NOTE: This will only work
+in an interactive section.
 }
 \examples{
 \donttest{
