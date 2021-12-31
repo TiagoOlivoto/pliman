@@ -134,8 +134,8 @@ manipulate_files <- function(pattern,
   if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
     pattern <- "^[0-9].*$"
   }
-  old_files <- list.files(dir, pattern = "00")
-  old_files <- paste0(ifelse(nchar(dir) !=2,
+  old_files <- list.files(dir, pattern = pattern)
+  old_files <- paste0(ifelse(nchar(dir) != 2,
                              paste0(dir, "/"),
                              paste(dir)), old_files)
   names <- sapply(old_files, file_name)
