@@ -163,13 +163,23 @@ manipulate_files <- function(pattern,
   suffix <- ifelse(is.null(suffix), "", suffix)
   new_files <- paste0(save_to, prefix, sep, name, sep, suffix, ".", extens)
   a <- file.copy(from = old_files, to = new_files, overwrite = overwrite)
-  if(remove_original == TRUE){
-    invisible(file.remove(old_files))
+  if (remove_original == TRUE){
+    answer <- readline("Are you sure you want to delete the files? (y/n)")
+    while(!answer %in% c("y", "n")){
+      answer <- readline("Are you sure you want to delete the files? (y/n)")
+    }
+    if (answer == "y"){
+      invisible(file.remove(old_files))
+      if (verbose == TRUE){
+        if(remove_original == TRUE){
+          message(length(old_files), " files successfully deleted from '", dir, "'")
+        }
+      }
+    } else{
+      message("Nothing done.")
+    }
   }
   if(verbose == TRUE){
-    if(remove_original == TRUE){
-      message(length(old_files), " files successfully deleted from '", dir, "'")
-    }
     if(all(a) == TRUE){
       message(length(a), " files successfully copied to '", save_to, "'")
     }
@@ -195,3 +205,31 @@ pliman_indexes_eq <- function(){
                             mustWork = TRUE),
            header = T, sep = ";")$Equation
 }
+
+
+#' Add leading zeros to a numeric sequence
+#'
+#' Add `n` leading zeros to a numeric sequence. This is useful to create a
+#' character vector to rename files in a folder.
+#'
+#' @param x A numeric vector or a list of numeric vectors.
+#' @param n The number of leading zeros to add. Defaults to `3`.
+#'
+#' @return A character vector or a list of character vectors.
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' leading_zeros(1:5)
+#' leading_zeros(list(a = 1:3,
+#'                    b = 1:5),
+#'               n = 2)
+leading_zeros <- function(x, n = 3){
+  if(is.list(x)){
+    lapply(x, leading_zeros, n)
+  } else{
+    expr <-   paste0("%0.", n, "d")
+    sprintf(expr, x)
+  }
+}
+
