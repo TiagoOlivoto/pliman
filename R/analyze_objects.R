@@ -674,6 +674,7 @@ analyze_objects <- function(img,
       }
       invisible(results)
     }
+
   if(missing(pattern)){
     help_count(img, foreground, background, resize, fill_hull, threshold, filter,
                tolerance , extension, randomize, nrows, show_image, show_original,
@@ -740,6 +741,27 @@ analyze_objects <- function(img,
                           id =  names(results[i]))[,c(3, 1, 2)]
               })
       )
+    if(!is.null(object_index)){
+      object_rgb <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["object_rgb"]],
+                            img =  names(results[i]))
+                })
+        )
+      object_rgb <- object_rgb[, c(ncol(object_rgb), 1:ncol(object_rgb) - 1)]
+      object_index <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["object_index"]],
+                            img =  names(results[i]))
+                })
+        )
+      object_index <- object_index[, c(ncol(object_index), 1:ncol(object_index) - 1)]
+    } else{
+      object_rgb <- NULL
+      object_index <- NULL
+    }
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
@@ -747,6 +769,7 @@ analyze_objects <- function(img,
                           img =  names(results[i]))
               })
       )
+
     if("img" %in% colnames(results)){
       results <- results[, c(ncol(results), 1:ncol(results) - 1)]
     }
@@ -763,7 +786,9 @@ analyze_objects <- function(img,
       structure(
         list(statistics = stats,
              count = summ,
-             results = results),
+             results = results,
+             object_rgb = object_rgb,
+             object_index = object_index),
         class = "anal_obj_ls"
       )
     )
@@ -898,3 +923,297 @@ analyze_objects_iter <- function(pattern,
     do.call(rbind, lapply(measures, function(x){x}))
   }
 }
+
+
+# analyze_objects_temp <- function (img,
+#                                   img_leaf,
+#                                   img_background,
+#                                   img_template,
+#                                   area_template,
+#                                   resize = FALSE,
+#                                   parallel = FALSE,
+#                                   workers = NULL,
+#                                   img_pattern = NULL,
+#                                   lower_size = NULL,
+#                                   upper_size = NULL,
+#                                   randomize = TRUE,
+#                                   nrows = 10000,
+#                                   show_image = TRUE,
+#                                   show_original = TRUE,
+#                                   show_background = TRUE,
+#                                   col_background = NULL,
+#                                   col_leaf = "green",
+#                                   text_col = "black",
+#                                   text_size = 1,
+#                                   text_digits = 2,
+#                                   save_image = FALSE,
+#                                   dir_original = NULL,
+#                                   dir_processed = NULL,
+#                                   verbose = TRUE){
+#   if (is.null(dir_original)) {
+#     diretorio_original <- paste("./", sep = "")
+#   }
+#   else {
+#     diretorio_original <- paste("./", dir_original,
+#                                 sep = "")
+#   }
+#   if (is.null(dir_processed)) {
+#     diretorio_processada <- paste("./", sep = "")
+#   }
+#   else {
+#     diretorio_processada <- paste("./", dir_processed,
+#                                   sep = "")
+#   }
+#   help_area <- function(img, img_leaf, img_background, img_template,
+#                         area_template, lower_size, upper_size, randomize, nrows,
+#                         show_image, show_original, show_background, col_background,
+#                         text_col, text_size, text_digits, save_image, dir_original,
+#                         dir_processed) {
+#     if (is.character(img)) {
+#       all_files <- sapply(list.files(diretorio_original),
+#                           file_name)
+#       check_names_dir(img, all_files, diretorio_original)
+#       imag <- list.files(diretorio_original, pattern = paste0("^",
+#                                                               img, "\\."))
+#       name_ori <- file_name(imag)
+#       extens_ori <- file_extension(imag)
+#       img <- image_import(paste(diretorio_original, "/",
+#                                 name_ori, ".", extens_ori, sep = ""))
+#       if (resize != FALSE) {
+#         img <- image_resize(img, resize)
+#       }
+#     }
+#     else {
+#       name_ori <- match.call()[[2]]
+#       extens_ori <- "jpg"
+#     }
+#     if (is.character(img_leaf)) {
+#       all_files <- sapply(list.files(diretorio_original),
+#                           file_name)
+#       check_names_dir(img_leaf, all_files, diretorio_original)
+#       imag <- list.files(diretorio_original, pattern = img_leaf)
+#       name <- file_name(imag)
+#       extens <- file_extension(imag)
+#       img_leaf <- image_import(paste(diretorio_original,
+#                                      "/", name, ".", extens, sep = ""))
+#       if (resize != FALSE) {
+#         img_leaf <- image_resize(img_leaf, resize)
+#       }
+#     }
+#     if (is.character(img_template)) {
+#       all_files <- sapply(list.files(diretorio_original),
+#                           file_name)
+#       check_names_dir(img_template, all_files, diretorio_original)
+#       imag <- list.files(diretorio_original, pattern = img_template)
+#       name <- file_name(imag)
+#       extens <- file_extension(imag)
+#       img_template <- image_import(paste(diretorio_original,
+#                                          "/", name, ".", extens, sep = ""))
+#       if (resize != FALSE) {
+#         img_template <- image_resize(img_template, resize)
+#       }
+#     }
+#     if (is.character(img_background)) {
+#       all_files <- sapply(list.files(diretorio_original),
+#                           file_name)
+#       check_names_dir(img_background, all_files, diretorio_original)
+#       imag <- list.files(diretorio_original, pattern = img_background)
+#       name <- file_name(imag)
+#       extens <- file_extension(imag)
+#       img_background <- image_import(paste(diretorio_original,
+#                                            "/", name, ".", extens, sep = ""))
+#       if (resize != FALSE) {
+#         img_background <- image_resize(img_background,
+#                                        resize)
+#       }
+#     }
+#     original <- image_to_mat(img)
+#     leaf <- image_to_mat(img_leaf)
+#     template <- image_to_mat(img_template)
+#     background <- image_to_mat(img_background)
+#     background_resto <- transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),
+#     ][1:nrows, ], template$df_in[sample(1:nrow(template$df_in)),
+#     ][1:nrows, ], background$df_in[sample(1:nrow(background$df_in)),
+#     ][1:nrows, ]), Y = ifelse(CODE == "img_background",
+#                               1, 0))
+#     background_resto$CODE <- NULL
+#     modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+#                                     data = background_resto))
+#     pred1 <- round(predict(modelo1, newdata = original$df_in,
+#                            type = "response"), 0)
+#     plant_background <- matrix(pred1, ncol = ncol(original$R))
+#     plant_background <- image_correct(plant_background, perc = 0.009)
+#     plant_background[plant_background == 1] <- 2
+#     leaf_template <- transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),
+#     ][1:nrows, ], template$df_in[sample(1:nrow(template$df_in)),
+#     ][1:nrows, ]), Y = ifelse(CODE == "img_leaf",
+#                               0, 1))
+#     background_resto$CODE <- NULL
+#     modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+#                                     data = leaf_template))
+#     ID <- c(plant_background == 0)
+#     pred2 <- round(predict(modelo2, newdata = original$df_in[ID,
+#     ], type = "response"), 0)
+#     pred3 <- round(predict(modelo2, newdata = original$df_in,
+#                            type = "response"), 0)
+#     leaf_template <- matrix(pred3, ncol = ncol(original$R))
+#     leaf_template <- image_correct(leaf_template, perc = 0.009)
+#     plant_background[leaf_template == 1] <- 3
+#     mpred1 <- bwlabel(leaf_template == 1)
+#     shape_template <- cbind(data.frame(computeFeatures.shape(mpred1)),
+#                             data.frame(computeFeatures.moment(mpred1))[, 1:2])
+#     shape_template$area <- area_template
+#     shape_template <- shape_template[shape_template$s.area >=
+#                                        mean(shape_template$s.area), ]
+#     npix_ref <- shape_template[1, 1]
+#     mpred2 <- bwlabel(plant_background == 0)
+#     shape_leaf <- cbind(data.frame(computeFeatures.shape(mpred2)),
+#                         data.frame(computeFeatures.moment(mpred2))[, c(1,
+#                                                                        2)])
+#     shape_leaf$area <- shape_leaf$s.area * area_template/npix_ref
+#     if (!is.null(lower_size)) {
+#       shape_leaf <- shape_leaf[shape_leaf$area > lower_size,
+#       ]
+#     }
+#     else {
+#       shape_leaf <- shape_leaf[shape_leaf$area > mean(shape_leaf$area) *
+#                                  0.1, ]
+#     }
+#     if (!is.null(upper_size)) {
+#       shape_leaf <- shape_leaf[shape_leaf$area < upper_size,
+#       ]
+#       shape_template <- shape_template[shape_template$area <
+#                                          upper_size, ]
+#     }
+#     shape <- rbind(shape_leaf, shape_template)
+#     shape$id <- 1:nrow(shape)
+#     shape <- transform(shape[, c(10, 7, 8, 1, 9, 2:6)], label = paste(id,
+#                                                                       "|", round(area, text_digits), sep = ""))
+#     if (show_original == TRUE) {
+#       im2 <- img
+#       if (!is.null(col_background)) {
+#         col_background <- col2rgb(col_background)
+#         im2@.Data[, , 1][!ID] <- col_background[1]
+#         im2@.Data[, , 2][!ID] <- col_background[2]
+#         im2@.Data[, , 3][!ID] <- col_background[3]
+#       }
+#     }
+#     else {
+#       if (is.null(col_background)) {
+#         col_background <- col2rgb("white")
+#       }
+#       else {
+#         col_background <- col2rgb(col_background)
+#       }
+#       col_leaf <- col2rgb(col_leaf)
+#       im2 <- img
+#       im2@.Data[, , 1][ID] <- col_leaf[1]
+#       im2@.Data[, , 2][ID] <- col_leaf[2]
+#       im2@.Data[, , 3][ID] <- col_leaf[3]
+#       im2@.Data[, , 1][!ID] <- col_background[1]
+#       im2@.Data[, , 2][!ID] <- col_background[2]
+#       im2@.Data[, , 3][!ID] <- col_background[3]
+#     }
+#     if (show_image == TRUE) {
+#       image_show(im2)
+#       text(shape[, 2], shape[, 3], shape$label, col = text_col,
+#            cex = text_size)
+#     }
+#     if (save_image == TRUE) {
+#       if (dir.exists(diretorio_processada) == FALSE) {
+#         dir.create(diretorio_processada)
+#       }
+#       png(paste(diretorio_processada, "/proc_", name_ori,
+#                 ".", extens_ori, collapse = "", sep = ""),
+#           width = dim(im2@.Data)[1], height = dim(im2@.Data)[2])
+#       image_show(im2)
+#       text(shape[, 2], shape[, 3], shape$label, col = text_col,
+#            cex = text_size)
+#       dev.off()
+#     }
+#     shape <- transform(shape, radius_ratio = s.radius.max/s.radius.min)
+#     shape <- shape[, c(1:3, 5:7, 9:10, 8, 12, 11)]
+#     colnames(shape) <- c("id", "x", "y",
+#                          "area", "perimeter", "radius_mean",
+#                          "radius_min", "radius_max", "radius_sd",
+#                          "radius_ratio", "label")
+#     id_obj <- shape[which(shape$area == area_template), 1]
+#     class(shape) <- c("data.frame", "plm_la",
+#                       id_obj)
+#     return(shape)
+#   }
+#   if (missing(img_pattern)) {
+#     help_area(img, img_leaf, img_background, img_template,
+#               area_template, lower_size, upper_size, randomize,
+#               nrows, show_image, show_original, show_background,
+#               col_background, text_col, text_size, text_digits,
+#               save_image, dir_original, dir_processed)
+#   }
+#   else {
+#     if (img_pattern %in% c("0", "1", "2",
+#                            "3", "4", "5", "6", "7",
+#                            "8", "9")) {
+#       img_pattern <- "^[0-9].*$"
+#     }
+#     plants <- list.files(pattern = img_pattern, diretorio_original)
+#     extensions <- as.character(sapply(plants, file_extension))
+#     names_plant <- as.character(sapply(plants, file_name))
+#     if (length(grep(img_pattern, names_plant)) == 0) {
+#       stop(paste("'", img_pattern, "' pattern not found in '",
+#                  paste(getwd(), sub(".", "", diretorio_original),
+#                        sep = ""), "'", sep = ""),
+#            call. = FALSE)
+#     }
+#     if (!all(extensions %in% c("png", "jpeg",
+#                                "jpg", "tiff", "PNG", "JPEG",
+#                                "JPG", "TIFF"))) {
+#       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+#     }
+#     if (parallel == TRUE) {
+#       nworkers <- ifelse(is.null(workers), trunc(detectCores() *
+#                                                    0.9), workers)
+#       clust <- makeCluster(nworkers)
+#       clusterExport(clust, varlist = c("names_plant",
+#                                        "help_area", "file_name", "check_names_dir",
+#                                        "file_extension", "image_import",
+#                                        "image_binary", "watershed", "distmap",
+#                                        "computeFeatures.moment", "computeFeatures.shape",
+#                                        "colorLabels", "image_show", "image_to_mat",
+#                                        "image_correct", "bwlabel"), envir = environment())
+#       on.exit(stopCluster(clust))
+#       if (verbose == TRUE) {
+#         message("Image processing using multiple sessions (",
+#                 nworkers, "). Please wait.")
+#       }
+#       results <- parLapply(clust, names_plant, function(x) {
+#         help_area(x, img_leaf, img_background, img_template,
+#                   area_template, lower_size, upper_size, randomize,
+#                   nrows, show_image, show_original, show_background,
+#                   col_background, text_col, text_size, text_digits,
+#                   save_image, dir_original, dir_processed)
+#       })
+#     }
+#     else {
+#       results <- list()
+#       pb <- progress(max = length(plants), style = 4)
+#       for (i in 1:length(plants)) {
+#         if (verbose == TRUE) {
+#           run_progress(pb, actual = i, text = paste("Processing image",
+#                                                     names_plant[i]))
+#         }
+#         results[[i]] <- help_area(img = names_plant[i],
+#                                   img_leaf, img_background, img_template, area_template,
+#                                   lower_size, upper_size, randomize, nrows, show_image,
+#                                   show_original, show_background, col_background,
+#                                   text_col, text_size, text_digits, save_image,
+#                                   dir_original, dir_processed)
+#       }
+#     }
+#     names(results) <- names_plant
+#     results <- lapply(1:length(results), function(i) {
+#       res <- transform(results[[i]], img = names(results[i]))
+#       res[, c(ncol(res), 1:(ncol(res) - 1))]
+#     })
+#     return(do.call(rbind, results))
+#   }
+# }

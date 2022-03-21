@@ -5,7 +5,7 @@
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.
 * The right-hand of argument `measure` in `get_measures()` now accepts a numeric object stored in the global environment.
-
+* `analyze_objects()` now returns the objects `object_index` and `object_rgb` when the argument `pattern` is used. Thanks to [João Paulo Oliveira Ribeiro](https://www.researchgate.net/profile/Joao-Paulo-Ribeiro) for alerting me regarding this issue.
 
 # pliman 1.1.0
 ## New functions

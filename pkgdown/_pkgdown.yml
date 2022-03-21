@@ -88,6 +88,7 @@ reference:
     contents:
       - utils_file
       - pipe
+      - leading_zeros
 
 
   - title: "Utilities for image resolution"

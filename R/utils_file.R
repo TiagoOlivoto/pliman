@@ -155,7 +155,7 @@ manipulate_files <- function(pattern,
                       }))
     } else{
       name <- name
-      if(length(name) != length(names)){
+      if (length(name) != length(names)) {
         stop("The length of name must be equal to the number of files (", length(names), ").")
       }
     }
@@ -163,15 +163,15 @@ manipulate_files <- function(pattern,
   suffix <- ifelse(is.null(suffix), "", suffix)
   new_files <- paste0(save_to, prefix, sep, name, sep, suffix, ".", extens)
   a <- file.copy(from = old_files, to = new_files, overwrite = overwrite)
-  if (remove_original == TRUE){
+  if (remove_original == TRUE) {
     answer <- readline("Are you sure you want to delete the files? (y/n)")
-    while(!answer %in% c("y", "n")){
+    while (!answer %in% c("y", "n")) {
       answer <- readline("Are you sure you want to delete the files? (y/n)")
     }
-    if (answer == "y"){
+    if (answer == "y") {
       invisible(file.remove(old_files))
-      if (verbose == TRUE){
-        if(remove_original == TRUE){
+      if (verbose == TRUE) {
+        if (remove_original == TRUE) {
           message(length(old_files), " files successfully deleted from '", dir, "'")
         }
       }
@@ -179,11 +179,11 @@ manipulate_files <- function(pattern,
       message("Nothing done.")
     }
   }
-  if(verbose == TRUE){
-    if(all(a) == TRUE){
+  if (verbose == TRUE) {
+    if (all(a) == TRUE) {
       message(length(a), " files successfully copied to '", save_to, "'")
     }
-    if(any(a) == FALSE){
+    if (any(a) == FALSE) {
       warning("Failed to copy ", length(which(a == FALSE)), " files.", call. = FALSE)
     }
   }
@@ -192,17 +192,17 @@ manipulate_files <- function(pattern,
 #' @name utils_file
 #' @export
 pliman_indexes <- function(){
-  read.csv(file=system.file("indexes.csv",
-                            package = "pliman",
-                            mustWork = TRUE),
+  read.csv(file = system.file("indexes.csv",
+                              package = "pliman",
+                              mustWork = TRUE),
            header = T, sep = ";")$Index
 }
 #' @name utils_file
 #' @export
 pliman_indexes_eq <- function(){
-  read.csv(file=system.file("indexes.csv",
-                            package = "pliman",
-                            mustWork = TRUE),
+  read.csv(file = system.file("indexes.csv",
+                              package = "pliman",
+                              mustWork = TRUE),
            header = T, sep = ";")$Equation
 }
 
@@ -225,7 +225,7 @@ pliman_indexes_eq <- function(){
 #'                    b = 1:5),
 #'               n = 2)
 leading_zeros <- function(x, n = 3){
-  if(is.list(x)){
+  if (is.list(x)) {
     lapply(x, leading_zeros, n)
   } else{
     expr <-   paste0("%0.", n, "d")
