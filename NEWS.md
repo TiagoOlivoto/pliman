@@ -1,6 +1,9 @@
 # pliman (development version)
 ## New functions
 * `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.
+* `measure_disease_byl()` To measure disease severity 'by leaf' in an image with several leaves.
+* `object_split()` To split multiples objects in an image to a list of images.
+
 
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.
