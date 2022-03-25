@@ -1,0 +1,16 @@
+citHeader("Please, support this project by citing it in your publications!")
+  citEntry(key         = "Olivoto2022",
+           entry       = "Article",
+           author      = personList(person("Tiago", "Olivoto")),
+	         title       = "Lights, camera, pliman! An R package for plant image analysis",
+	         journal     = {"Methods in Ecology and Evolution"},
+	         volume      = {""},
+	         number      = {""},
+	         pages       = {"1-10"},
+	         year        = "2022",
+	         doi         = "10.1111/2041-210X.13803",
+	         textVersion =
+	         paste("Olivoto, T.(2020).",
+	               "Lights, camera, pliman! An R package for plant image analysis.",
+	               "Methods Ecol Evol. 00:1-10",
+	               "doi:10.1111/2041-210X.13803"))
