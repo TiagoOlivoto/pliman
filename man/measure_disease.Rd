@@ -45,6 +45,7 @@ measure_disease(
   marker_size = NULL,
   save_image = FALSE,
   prefix = "proc_",
+  name = NULL,
   dir_original = NULL,
   dir_processed = NULL,
   verbose = TRUE
@@ -182,6 +183,9 @@ given in \code{img}.}
 
 \item{prefix}{The prefix to be included in the processed images. Defaults to
 \code{"proc_"}.}
+
+\item{name}{The name of the image to save. Use this to overwrite the name of
+the image in \code{img}.}
 
 \item{dir_original, dir_processed}{The directory containing the original and
 processed images. Defaults to \code{NULL}. In this case, the function will

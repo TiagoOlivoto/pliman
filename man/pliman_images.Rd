@@ -11,6 +11,7 @@
 la_pattern, la_leaves, and soybean_touch.
 \item \code{la_leaf.jpg} A sample of the leaves in \code{la_leaves}
 \item \code{la_leaves.jpg} Tree leaves with a sample of known area.
+\item \code{mult_leaves.jpg} Three soybean leaflets with soybean rust symptoms.
 \item \code{objects_300dpi.jpg} An image with 300 dpi resolution.
 \item \code{potato_leaves.jpg} Three potato leaves, which were gathered from Gupta et
 al. (2020).

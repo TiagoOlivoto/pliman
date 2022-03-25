@@ -308,3 +308,116 @@ object_id <- function(image,
   }
 }
 
+
+
+
+#' Splits objects from an image into multiple images
+#'
+#' Using threshold-based segmentation, objects are first isolated from
+#' background. Then, a new image is created for each single object. A list of
+#' images is returned.
+#'
+#' @inheritParams analyze_objects
+#' @param keep_location A logical argument (defaults to `TRUE`). If `FALSE`, the
+#'   new image is created with the object in the exactly position of the
+#'   original image.
+#' @param col_background The background color in the new image. Defaults to
+#'   `white`. Use the built-in color names which `R` knows about (see
+#'   ?[grDevices::colors()]) or a numeric vector with R, G, and B intensities
+#'   (see ?[grDevices::rgb()]).
+#' @param ... Additional arguments passed on to [image_combine()]
+#' @return A list of objects of class `Image`.
+#' @export
+#' @seealso [analyze_objects()], [image_binary()]
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("la_leaves.jpg", plot = TRUE)
+#' imgs <- object_split(img)
+#'
+object_split <- function(img,
+                         index = "NB",
+                         lower_size = NULL,
+                         my_index = NULL,
+                         watershed = TRUE,
+                         invert = FALSE,
+                         fill_hull = FALSE,
+                         threshold = "Otsu",
+                         extension = NULL,
+                         tolerance = NULL,
+                         object_size = "medium",
+                         keep_location = FALSE,
+                         col_background = "white",
+                         show_image = TRUE,
+                         verbose = TRUE,
+                         ...){
+
+  img2 <- image_binary(img,
+                       index = index,
+                       my_index = my_index,
+                       invert = invert,
+                       fill_hull = fill_hull,
+                       threshold = threshold,
+                       resize = FALSE,
+                       show_image = FALSE)[[1]]
+  if(isTRUE(watershed)){
+    parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+    res <- length(img2)
+    parms2 <- parms[parms$object_size == object_size,]
+    rowid <-
+      which(sapply(as.character(parms2$resolution), function(x) {
+        eval(parse(text=x))}))
+    ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+    tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+    nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                tolerance = tol,
+                                ext = ext)
+  } else{
+    nmask <- EBImage::bwlabel(img2)
+  }
+  list_objects <- list()
+  objcts <-
+    sapply(1:max(nmask), function(i){
+      length(which(nmask == i))
+    })
+  av_area <- mean(objcts)
+  ifelse(!is.null(lower_size),
+         cutsize <- lower_size,
+         cutsize <-  av_area * 0.1)
+
+  ifelse(is.character(col_background),
+         col_background <- col2rgb(col_background) / 255,
+         col_background <- col_background / 255)
+  j <- 0
+  for(i in 1:max(nmask)){
+    tmp <- img
+    if(length(which(nmask == i)) > cutsize){
+      j <- j + 1
+      id = which(nmask != i)
+      tmp@.Data[, , 1][id] <- col_background[1]
+      tmp@.Data[, , 2][id] <- col_background[2]
+      tmp@.Data[, , 3][id] <- col_background[3]
+      if(isTRUE(keep_location)){
+        list_objects[[j]] <- tmp
+      } else{
+        list_objects[[j]] <- image_autocrop(tmp, plot = FALSE, index = "R")
+      }
+    }
+  }
+  names(list_objects) <- 1:length(list_objects)
+  if(isTRUE(verbose)){
+    cat("==============================\n")
+    cat("Summary of the procedure\n")
+    cat("==============================\n")
+    cat("Number of objects:", length(objcts), "\n")
+    cat("Average area     :", mean(objcts), "\n")
+    cat("Minimum area     :", min(objcts), "\n")
+    cat("Maximum area     :", max(objcts), "\n")
+    cat("Objects created  :", length(list_objects), "\n")
+    cat("==============================\n")
+  }
+  if(isTRUE(show_image)){
+    image_combine(list_objects, ...)
+  }
+  return(list_objects)
+}

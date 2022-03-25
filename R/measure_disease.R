@@ -131,6 +131,8 @@
 #'   given in `img`.
 #' @param prefix The prefix to be included in the processed images. Defaults to
 #'   `"proc_"`.
+#' @param name The name of the image to save. Use this to overwrite the name of
+#'   the image in `img`.
 #' @param dir_original,dir_processed The directory containing the original and
 #'   processed images. Defaults to `NULL`. In this case, the function will
 #'   search for the image `img` in the current working directory. After
@@ -218,6 +220,7 @@ measure_disease <- function(img,
                             marker_size = NULL,
                             save_image = FALSE,
                             prefix = "proc_",
+                            name = NULL,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
@@ -259,25 +262,46 @@ measure_disease <- function(img,
         extens_ori <- "jpg"
       }
       backg <- !is.null(col_background)
-      col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
-      col_lesions <- col2rgb(ifelse(is.null(col_lesions), "black", col_lesions))
-      col_leaf <- col2rgb(ifelse(is.null(col_leaf), "green", col_leaf))
+      # color for background
+      if (is.null(col_background)){
+        col_background <- col2rgb("white") / 255
+      } else{
+        ifelse(is.character(col_background),
+               col_background <- col2rgb(col_background) / 255,
+               col_background <- col_background / 255)
+      }
+      # color for lesions
+      if (is.null(col_lesions)){
+        col_lesions <- col2rgb("black") / 255
+      } else{
+        ifelse(is.character(col_lesions),
+               col_lesions <- col2rgb(col_lesions) / 255,
+               col_lesions <- col_lesions / 255)
+      }
+      # color for leaf
+      if (is.null(col_leaf)){
+        col_leaf <- col2rgb("green") / 255
+      } else{
+        ifelse(is.character(col_leaf),
+               col_leaf <- col2rgb(col_leaf) / 255,
+               col_leaf <- col_leaf / 255)
+      }
       if(!is.null(img_healthy) && !is.null(img_symptoms)){
         if(is.character(img_healthy)){
           all_files <- sapply(list.files(diretorio_original), file_name)
           imag <- list.files(diretorio_original, pattern = img_healthy)
           check_names_dir(img_healthy, all_files, diretorio_original)
-          name <- file_name(imag)
+          name_h <- file_name(imag)
           extens <- file_extension(imag)
-          img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          img_healthy <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
         }
         if(is.character(img_symptoms)){
           all_files <- sapply(list.files(diretorio_original), file_name)
           imag <- list.files(diretorio_original, pattern = img_symptoms)
           check_names_dir(img_symptoms, all_files, diretorio_original)
-          name <- file_name(imag)
+          name_s <- file_name(imag)
           extens <- file_extension(imag)
-          img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          img_symptoms <- image_import(paste(diretorio_original, "/", name_s, ".", extens, sep = ""))
         }
         original <-
           data.frame(CODE = "img",
@@ -373,9 +397,9 @@ measure_disease <- function(img,
             all_files <- sapply(list.files(diretorio_original), file_name)
             imag <- list.files(diretorio_original, pattern = img_background)
             check_names_dir(img_background, all_files, diretorio_original)
-            name <- file_name(imag)
+            name_b <- file_name(imag)
             extens <- file_extension(imag)
-            img_background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+            img_background <- image_import(paste(diretorio_original, "/", name_b, ".", extens, sep = ""))
           }
           fundo <-
             data.frame(CODE = "img_background",
@@ -707,9 +731,10 @@ measure_disease <- function(img,
         if(dir.exists(diretorio_processada) == FALSE){
           dir.create(diretorio_processada)
         }
+        name_img <- ifelse(is.null(name), name_ori, name)
         jpeg(paste0(diretorio_processada, "/",
                     prefix,
-                    name_ori, ".",
+                    name_img, ".",
                     "jpg"),
              width = dim(im2@.Data)[1],
              height = dim(im2@.Data)[2])
@@ -809,7 +834,7 @@ measure_disease <- function(img,
         do.call(rbind,
                 lapply(seq_along(results), function(i){
                   transform(results[[i]][["statistics"]],
-                            id =  names(results[i]))[,c(3, 1, 2)]
+                            img =  names(results[i]))[,c(3, 1, 2)]
                 })
         )
       shape <-
@@ -853,69 +878,34 @@ measure_disease_iter <- function(img,
                                  r = 5,
                                  ...){
   if(interactive()){
-  done <- "n"
-  plot(img)
-  while(done != "y"){
-    if(isTRUE(has_background)){
-      message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
-      back <- pick_palette(img,
+    done <- "n"
+    plot(img)
+    while(done != "y"){
+      if(isTRUE(has_background)){
+        message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
+        back <- pick_palette(img,
+                             r = r,
+                             verbose = FALSE,
+                             palette  = FALSE,
+                             plot = FALSE,
+                             col = "blue")
+      } else{
+        back <- NULL
+      }
+      message("Use the first mouse button to pick up LEAF colors. Press Est to exit")
+      leaf <- pick_palette(img,
                            r = r,
                            verbose = FALSE,
                            palette  = FALSE,
                            plot = FALSE,
-                           col = "blue")
-    } else{
-      back <- NULL
-    }
-    message("Use the first mouse button to pick up LEAF colors. Press Est to exit")
-    leaf <- pick_palette(img,
-                         r = r,
-                         verbose = FALSE,
-                         palette  = FALSE,
-                         plot = FALSE,
-                         col = "black")
-    message("Use the first mouse button to pick up DISEASE colors. Press Est to exit")
-    disease <- pick_palette(img,
-                            r = r,
-                            verbose = FALSE,
-                            palette  = FALSE,
-                            plot = FALSE,
-                            col = "red")
-    temp <-
-      measure_disease(img = img,
-                      img_healthy = leaf,
-                      img_symptoms = disease,
-                      img_background = back,
-                      ...)
-    done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-    while(!done %in% c("y", "n", "Y", "N")){
-      message("Please, select one of 'y/Y' or 'n/N'")
-      done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-    }
-    while(done != "y"){
-      plot(img)
-      npix <- length(leaf)/3
-      samples <- sample(1:npix, 5000)
-      if(isTRUE(has_background)){
-        message("Use the first mouse button to pick up BACKGROUND colors. Press Est to skip")
-        tback <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
-        back@.Data[,,1][samples] <-  tback@.Data[,,1][samples]
-        back@.Data[,,2][samples] <-  tback@.Data[,,2][samples]
-        back@.Data[,,3][samples] <-  tback@.Data[,,3][samples]
-      } else{
-        back <- NULL
-      }
-      message("Use the first mouse button to pick up LEAF colors. Press Est to skip")
-      tleaf <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
-      leaf@.Data[,,1][samples] <-  tleaf@.Data[,,1][samples]
-      leaf@.Data[,,2][samples] <-  tleaf@.Data[,,2][samples]
-      leaf@.Data[,,3][samples] <-  tleaf@.Data[,,3][samples]
-
-      message("Use the first mouse button to pick up DISEASE colors. Press Est to skip")
-      tdisease <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE)
-      disease@.Data[,,1][samples] <-  tdisease@.Data[,,1][samples]
-      disease@.Data[,,2][samples] <-  tdisease@.Data[,,2][samples]
-      disease@.Data[,,3][samples] <-  tdisease@.Data[,,3][samples]
+                           col = "black")
+      message("Use the first mouse button to pick up DISEASE colors. Press Est to exit")
+      disease <- pick_palette(img,
+                              r = r,
+                              verbose = FALSE,
+                              palette  = FALSE,
+                              plot = FALSE,
+                              col = "red")
       temp <-
         measure_disease(img = img,
                         img_healthy = leaf,
@@ -927,12 +917,47 @@ measure_disease_iter <- function(img,
         message("Please, select one of 'y/Y' or 'n/N'")
         done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
       }
-    }
+      while(done != "y"){
+        plot(img)
+        npix <- length(leaf)/3
+        samples <- sample(1:npix, 5000)
+        if(isTRUE(has_background)){
+          message("Use the first mouse button to pick up BACKGROUND colors. Press Est to skip")
+          tback <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
+          back@.Data[,,1][samples] <-  tback@.Data[,,1][samples]
+          back@.Data[,,2][samples] <-  tback@.Data[,,2][samples]
+          back@.Data[,,3][samples] <-  tback@.Data[,,3][samples]
+        } else{
+          back <- NULL
+        }
+        message("Use the first mouse button to pick up LEAF colors. Press Est to skip")
+        tleaf <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
+        leaf@.Data[,,1][samples] <-  tleaf@.Data[,,1][samples]
+        leaf@.Data[,,2][samples] <-  tleaf@.Data[,,2][samples]
+        leaf@.Data[,,3][samples] <-  tleaf@.Data[,,3][samples]
 
-  }
-  return(list(results = temp,
-              leaf = leaf,
-              disease = disease,
-              background = back))
+        message("Use the first mouse button to pick up DISEASE colors. Press Est to skip")
+        tdisease <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE)
+        disease@.Data[,,1][samples] <-  tdisease@.Data[,,1][samples]
+        disease@.Data[,,2][samples] <-  tdisease@.Data[,,2][samples]
+        disease@.Data[,,3][samples] <-  tdisease@.Data[,,3][samples]
+        temp <-
+          measure_disease(img = img,
+                          img_healthy = leaf,
+                          img_symptoms = disease,
+                          img_background = back,
+                          ...)
+        done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+        while(!done %in% c("y", "n", "Y", "N")){
+          message("Please, select one of 'y/Y' or 'n/N'")
+          done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
+        }
+      }
+
+    }
+    return(list(results = temp,
+                leaf = leaf,
+                disease = disease,
+                background = back))
   }
 }

@@ -45,10 +45,10 @@ run_progress <- function(pb,
          text = paste(text, paste(pb$leftd, '%s%s', pb$rightd, sep = ""), '% s%%', elapsed))
   )
   step <- round(actual / pb$max * (pb$width - temp$extra))
-    cat(sprintf(temp$text,
-                strrep(pb$char, step),
-                strrep(' ', pb$width - step - temp$extra),
-                round(actual / pb$max * 100, digits = digits)), "\r")
+  cat(sprintf(temp$text,
+              strrep(pb$char, step),
+              strrep(' ', pb$width - step - temp$extra),
+              round(actual / pb$max * 100, digits = digits)), "\r")
   if(actual == pb$max){
     cat("\n")
   }
@@ -91,20 +91,20 @@ image_correct <- function(image, perc){
 check_ebi <- function(){
   if(!requireNamespace("EBImage", quietly = TRUE)) {
     if(interactive() == TRUE){
-    inst <-
-    switch(menu(c("Yes", "No"), title = "Package {EBImage} required but not installed.\nDo you want to install it now?"),
-           "yes", "no")
-    if(inst == "yes"){
-      if(!requireNamespace("BiocManager", quietly = TRUE)) {
-        install.packages("BiocManager", quiet = TRUE)
+      inst <-
+        switch(menu(c("Yes", "No"), title = "Package {EBImage} required but not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        if(!requireNamespace("BiocManager", quietly = TRUE)) {
+          install.packages("BiocManager", quiet = TRUE)
+        }
+        BiocManager::install("EBImage",
+                             update = FALSE,
+                             ask = FALSE,
+                             quiet = TRUE)
+      } else{
+        message("To use {pliman}, first install {EBImage} following the directions at 'https://bioconductor.org/packages/EBImage'")
       }
-      BiocManager::install("EBImage",
-                           update = FALSE,
-                           ask = FALSE,
-                           quiet = TRUE)
-    } else{
-      message("To use {pliman}, first install {EBImage} following the directions at 'https://bioconductor.org/packages/EBImage'")
-    }
     }
   }
 }
@@ -115,5 +115,21 @@ get_rgb <- function(img, data_mask, index){
              R = img@.Data[,,1][which(data_mask == index)],
              G = img@.Data[,,2][which(data_mask == index)],
              B = img@.Data[,,3][which(data_mask == index)])
+}
+
+clear_td <- function(){
+  unlink(paste0(normalizePath(tempdir()), "/", dir(tempdir())), recursive = TRUE)
+}
+
+separate_col <- function(.data, col, into, sep = "_"){
+  var <- deparse(substitute(col))
+  df <- strsplit(.data[[var]], split = sep)
+  df <-
+    do.call(rbind,
+            lapply(df, function(x)x)) %>%
+    as.data.frame()
+  .data[[var]] <- NULL
+  names(df) <- into
+  return(cbind(df, .data))
 }
 

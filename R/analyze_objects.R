@@ -556,8 +556,32 @@ analyze_objects <- function(img,
       class(results) <- "anal_obj"
       if(show_image == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
-        col_background <- col2rgb(ifelse(is.null(col_background), "white", col_background))
-        col_foreground <- col2rgb(ifelse(is.null(col_foreground), "black", col_foreground))
+
+        # color for background
+        if (is.null(col_background)){
+          col_background <- col2rgb("white") / 255
+        } else{
+          ifelse(is.character(col_background),
+                 col_background <- col2rgb(col_background) / 255,
+                 col_background <- col_background / 255)
+        }
+        # color for lesions
+        if (is.null(col_foreground)){
+          col_foreground <- col2rgb("black") / 255
+        } else{
+          ifelse(is.character(col_foreground),
+                 col_foreground <- col2rgb(col_foreground) / 255,
+                 col_foreground <- col_foreground / 255)
+        }
+        # color for leaf
+        if (is.null(col_background)){
+          col_background <- col2rgb("white") / 255
+        } else{
+          ifelse(is.character(col_background),
+                 col_background <- col2rgb(col_background) / 255,
+                 col_background <- col_background / 255)
+        }
+
         if(show_original == TRUE & show_segmentation == FALSE){
           im2 <- img
           if(backg){

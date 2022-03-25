@@ -5,6 +5,7 @@
 #' la_pattern, la_leaves, and soybean_touch.
 #' * `la_leaf.jpg` A sample of the leaves in `la_leaves`
 #' * `la_leaves.jpg` Tree leaves with a sample of known area.
+#' * `mult_leaves.jpg` Three soybean leaflets with soybean rust symptoms.
 #' * `objects_300dpi.jpg` An image with 300 dpi resolution.
 #' * `potato_leaves.jpg` Three potato leaves, which were gathered from Gupta et
 #' al. (2020).
@@ -34,6 +35,7 @@ NULL
   packageStartupMessage("|==========================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")            |")
   packageStartupMessage("| Author: Tiago Olivoto                                    |")
+  packageStartupMessage("| Type 'citation('pliman')' to know how to cite pliman     |")
   packageStartupMessage("| Type 'vignette('pliman_start')' for a short tutorial     |")
   packageStartupMessage("| Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |")
   packageStartupMessage("|==========================================================|")
