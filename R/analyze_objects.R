@@ -573,14 +573,6 @@ analyze_objects <- function(img,
                  col_foreground <- col2rgb(col_foreground) / 255,
                  col_foreground <- col_foreground / 255)
         }
-        # color for leaf
-        if (is.null(col_background)){
-          col_background <- col2rgb("white") / 255
-        } else{
-          ifelse(is.character(col_background),
-                 col_background <- col2rgb(col_background) / 255,
-                 col_background <- col_background / 255)
-        }
 
         if(show_original == TRUE & show_segmentation == FALSE){
           im2 <- img
