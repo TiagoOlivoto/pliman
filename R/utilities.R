@@ -133,3 +133,33 @@ separate_col <- function(.data, col, into, sep = "_"){
   return(cbind(df, .data))
 }
 
+
+#' Random built-in color names
+#'
+#' Randomly chooses single or multiple built-in color names which R knows about.
+#' See more at [grDevices::colors()]
+#'
+#' @param n The number of color names. Defaults to 1.
+#' @param distinct Logical indicating if the colors returned should all be
+#'   distinct. Defaults to `FALSE`.
+#'
+#' @return A character vector of color names
+#' @importFrom grDevices colors
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' random_color(n = 3)
+random_color <- function(n = 1, distinct = FALSE){
+  return(sample(colors(distinct = distinct), n))
+}
+
+
+col_to_rgb <- function(color, default = "white")
+if (is.null(col_background)){
+  col_background <- col2rgb("white") / 255
+} else{
+  ifelse(is.character(col_background),
+         col_background <- col2rgb(col_background) / 255,
+         col_background <- col_background / 255)
+}

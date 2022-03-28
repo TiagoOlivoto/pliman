@@ -10,6 +10,8 @@ analyze_objects(
   img,
   foreground = NULL,
   background = NULL,
+  reference = NULL,
+  reference_area = NULL,
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -73,6 +75,14 @@ analyze_objects_iter(pattern, known_area, verbose = TRUE, ...)
 \item{foreground}{A color palette of the foreground (optional).}
 
 \item{background}{A color palette of the background (optional).}
+
+\item{reference}{A color palette for a reference object (optional). This is
+useful to adjust measures when images are not obtained with standard
+resolution (e.g., field images). See more in the details section.}
+
+\item{reference_area}{The known area of the reference objects. The measures
+of all the objects in the image will be corrected using the same unit of
+the area informed here.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working
@@ -314,9 +324,12 @@ foreground pixels in \code{img} are set to a unique object. This is faster
 (specially for a large number of objects) but is not able to segment touching
 objects.
 
-If color palettes samples are provided, a general
-linear model (binomial family) fitted to the RGB values is used to segment
-fore- and background.
+If color palettes are provided, a general linear model (binomial family)
+fitted to the RGB values is used to segment fore- and background. If a color
+palette for a \code{reference} object with a known area (\code{reference_area}) is
+informed. The measures of the objects in the image will be corrected
+considering the unit of measure informed in \code{reference_area}. Sample palettes
+can be produced with \code{\link[=image_palette]{image_palette()}}.
 
 By using \code{pattern} it is possible to process several images with common
 pattern names that are stored in the current working directory or in the

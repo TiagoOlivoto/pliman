@@ -120,6 +120,7 @@ reference:
       - utils_measures
       - pliman_images
       - utils_objects
+      - random_color
       - tune_tolerance
       - plot.anal_obj
       - summary_index
@@ -130,6 +131,8 @@ reference:
     desc: "Calculates the percentage of symptomatic leaf area based in a sample or entire leaf based on provided color palettes samples"
     contents:
       - measure_disease
+      - measure_disease_iter
+      - measure_disease_byl
       - sad
 
 

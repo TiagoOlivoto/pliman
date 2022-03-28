@@ -300,7 +300,7 @@ plot_measures <- function(object,
       }
       text(x = object[,2],
            y = object[,3],
-           labels = round(index[object$id , which(colnames(index) == measure)], digits),
+           labels = round(index[which(index$id == object$id), which(colnames(index) == measure)], digits),
            col = col,
            cex = size,
            ...)

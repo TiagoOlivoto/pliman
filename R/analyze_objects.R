@@ -25,9 +25,12 @@
 #'(specially for a large number of objects) but is not able to segment touching
 #'objects.
 #'
-#'If color palettes samples are provided, a general
-#'linear model (binomial family) fitted to the RGB values is used to segment
-#'fore- and background.
+#'If color palettes are provided, a general linear model (binomial family)
+#'fitted to the RGB values is used to segment fore- and background. If a color
+#'palette for a `reference` object with a known area (`reference_area`) is
+#'informed. The measures of the objects in the image will be corrected
+#'considering the unit of measure informed in `reference_area`. Sample palettes
+#'can be produced with [image_palette()].
 #'
 #'By using `pattern` it is possible to process several images with common
 #'pattern names that are stored in the current working directory or in the
@@ -50,6 +53,12 @@
 #' @param img The image to be analyzed.
 #' @param foreground A color palette of the foreground (optional).
 #' @param background A color palette of the background (optional).
+#' @param reference A color palette for a reference object (optional). This is
+#'   useful to adjust measures when images are not obtained with standard
+#'   resolution (e.g., field images). See more in the details section.
+#' @param reference_area The known area of the reference objects. The measures
+#'   of all the objects in the image will be corrected using the same unit of
+#'   the area informed here.
 #' @param pattern A pattern of file name used to identify images to be imported.
 #'   For example, if `pattern = "im"` all images in the current working
 #'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
@@ -244,6 +253,8 @@
 analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
+                            reference = NULL,
+                            reference_area = NULL,
                             pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
@@ -345,7 +356,130 @@ analyze_objects <- function(img,
         }
         img <- image_filter(img, size = filter)
       }
-      if(!is.null(foreground) && !is.null(background)){
+      # when reference is not used
+      if(is.null(reference)){
+        if(!is.null(foreground) && !is.null(background)){
+          if(is.character(foreground)){
+            all_files <- sapply(list.files(diretorio_original), file_name)
+            imag <- list.files(diretorio_original, pattern = foreground)
+            check_names_dir(foreground, all_files, diretorio_original)
+            name <- file_name(imag)
+            extens <- file_extension(imag)
+            foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          }
+          if(is.character(background)){
+            all_files <- sapply(list.files(diretorio_original), file_name)
+            imag <- list.files(diretorio_original, pattern = background)
+            check_names_dir(background, all_files, diretorio_original)
+            name <- file_name(imag)
+            extens <- file_extension(imag)
+            background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          }
+          original <-
+            data.frame(CODE = "img",
+                       R = c(img@.Data[,,1]),
+                       G = c(img@.Data[,,2]),
+                       B = c(img@.Data[,,3]))
+          foreground <-
+            data.frame(CODE = "foreground",
+                       R = c(foreground@.Data[,,1]),
+                       G = c(foreground@.Data[,,2]),
+                       B = c(foreground@.Data[,,3]))
+          background <-
+            data.frame(CODE = "background",
+                       R = c(background@.Data[,,1]),
+                       G = c(background@.Data[,,2]),
+                       B = c(background@.Data[,,3]))
+          back_fore <-
+            transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
+                            background[sample(1:nrow(background)),][1:nrows,]),
+                      Y = ifelse(CODE == "background", 0, 1))
+          modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
+          pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
+          foreground_background <- matrix(pred1, ncol = dim(img)[[2]])
+          foreground_background <- image_correct(foreground_background, perc = 0.02)
+          ID <- c(foreground_background == 1)
+          ID2 <- c(foreground_background == 0)
+          if(isTRUE(watershed)){
+            parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+            res <- length(foreground_background)
+            parms2 <- parms[parms$object_size == object_size,]
+            rowid <-
+              which(sapply(as.character(parms2$resolution), function(x) {
+                eval(parse(text=x))}))
+            ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+            tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+            nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
+                                        tolerance = tol,
+                                        ext = ext)
+          } else{
+            nmask <- EBImage::bwlabel(foreground_background)
+          }
+
+        } else{
+          img2 <- image_binary(img,
+                               index = index,
+                               my_index = my_index,
+                               invert = invert,
+                               fill_hull = fill_hull,
+                               threshold = threshold,
+                               resize = FALSE,
+                               show_image = FALSE)[[1]]
+          if(isTRUE(watershed)){
+            parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+            res <- length(img2)
+            parms2 <- parms[parms$object_size == object_size,]
+            rowid <-
+              which(sapply(as.character(parms2$resolution), function(x) {
+                eval(parse(text=x))}))
+            ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+            tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+            nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                        tolerance = tol,
+                                        ext = ext)
+          } else{
+            nmask <- EBImage::bwlabel(img2)
+          }
+          ID <- which(img2 == 1)
+          ID2 <- which(img2 == 0)
+        }
+        if(isTRUE(fill_hull)){
+          nmask <- EBImage::fillHull(nmask)
+        }
+
+        shape <-
+          cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
+                data.frame(EBImage::computeFeatures.moment(nmask))
+          )
+        object_contour <- EBImage::ocontour(nmask)
+        ch <- conv_hull(object_contour)
+        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
+        shape <- transform(shape,
+                           id = 1:nrow(shape),
+                           radius_ratio = s.radius.max / s.radius.min,
+                           diam_mean = s.radius.mean * 2,
+                           diam_min = s.radius.min * 2,
+                           diam_max = s.radius.max * 2,
+                           area_ch =   area_ch,
+                           solidity = s.area / area_ch,
+                           circularity = 4*pi*(s.area / s.perimeter^2),
+                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
+        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
+                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
+                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
+                           "m.theta", "solidity",  "circularity")]
+        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
+                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
+                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
+                             "theta", "solidity", "circularity")
+      } else{
+        # when reference is used
+        if(is.null(foreground) | is.null(background)){
+          stop("When a reference object is used, color palettes must be informed in `foreground` and `background` arguments.", call. = FALSE)
+        }
+        if(is.null(reference_area)){
+          stop("A known area must be declared when a template is used.", call. = FALSE)
+        }
         if(is.character(foreground)){
           all_files <- sapply(list.files(diretorio_original), file_name)
           imag <- list.files(diretorio_original, pattern = foreground)
@@ -353,6 +487,14 @@ analyze_objects <- function(img,
           name <- file_name(imag)
           extens <- file_extension(imag)
           foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+        }
+        if(is.character(reference)){
+          all_files <- sapply(list.files(diretorio_original), file_name)
+          imag <- list.files(diretorio_original, pattern = reference)
+          check_names_dir(reference, all_files, diretorio_original)
+          name <- file_name(imag)
+          extens <- file_extension(imag)
+          reference <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
         if(is.character(background)){
           all_files <- sapply(list.files(diretorio_original), file_name)
@@ -362,6 +504,7 @@ analyze_objects <- function(img,
           extens <- file_extension(imag)
           background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
         }
+
         original <-
           data.frame(CODE = "img",
                      R = c(img@.Data[,,1]),
@@ -377,83 +520,104 @@ analyze_objects <- function(img,
                      R = c(background@.Data[,,1]),
                      G = c(background@.Data[,,2]),
                      B = c(background@.Data[,,3]))
+        template <-
+          data.frame(CODE = "template",
+                     R = c(reference@.Data[,,1]),
+                     G = c(reference@.Data[,,2]),
+                     B = c(reference@.Data[,,3]))
+        # segment back and foreground
         back_fore <-
           transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
+                          template[sample(1:nrow(template)),][1:nrows,],
                           background[sample(1:nrow(background)),][1:nrows,]),
                     Y = ifelse(CODE == "background", 0, 1))
-        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
-        pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
-        foreground_background <- matrix(pred1, ncol = dim(img)[[2]])
-        foreground_background <- image_correct(foreground_background, perc = 0.02)
-        ID <- c(foreground_background == 1)
-        ID2 <- c(foreground_background == 0)
+
+        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+                                        data = back_fore))
+        pred1 <- round(predict(modelo1, newdata = original, type = "response"), 0)
+        plant_background <- matrix(pred1, ncol = dim(img)[[2]])
+        if(isTRUE(fill_hull)){
+          plant_background <- EBImage::fillHull(plant_background)
+        }
+        plant_background[plant_background == 1] <- 2
+
+        # segment objects and template
+        leaf_template <-
+          transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
+                          template[sample(1:nrow(template)),][1:nrows,]),
+                    Y = ifelse(CODE == "foreground", 0, 1))
+
+        modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
+                                        data = leaf_template))
+
+        pred2 <- round(predict(modelo2, newdata = original, type = "response"), 0)
+        leaf_template <- matrix(pred2, ncol = dim(img)[[2]])
+        plant_background[leaf_template == 1] <- 3
+
         if(isTRUE(watershed)){
           parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-          res <- length(foreground_background)
+          res <- nrow(original)
           parms2 <- parms[parms$object_size == object_size,]
           rowid <-
             which(sapply(as.character(parms2$resolution), function(x) {
               eval(parse(text=x))}))
           ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
           tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-          nmask <- EBImage::watershed(EBImage::distmap(foreground_background),
+          nmask <- EBImage::watershed(EBImage::distmap(plant_background),
                                       tolerance = tol,
                                       ext = ext)
         } else{
-          nmask <- EBImage::bwlabel(foreground_background)
+          nmask <- EBImage::bwlabel(plant_background)
         }
-      } else{
-        img2 <- image_binary(img,
-                             index = index,
-                             my_index = my_index,
-                             invert = invert,
-                             fill_hull = fill_hull,
-                             threshold = threshold,
-                             resize = FALSE,
-                             show_image = FALSE)[[1]]
-        if(isTRUE(watershed)){
-          parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-          res <- length(img2)
-          parms2 <- parms[parms$object_size == object_size,]
-          rowid <-
-            which(sapply(as.character(parms2$resolution), function(x) {
-              eval(parse(text=x))}))
-          ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-          tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-          nmask <- EBImage::watershed(EBImage::distmap(img2),
-                                      tolerance = tol,
-                                      ext = ext)
-        } else{
-          nmask <- EBImage::bwlabel(img2)
-        }
-        ID <- which(img2 == 1)
-        ID2 <- which(img2 == 0)
+
+        ID <-  which(plant_background == 2)
+        ID2 <- which(plant_background != 2)
+
+        shape <-
+          cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
+                data.frame(EBImage::computeFeatures.moment(nmask))
+          )
+        npix_ref <- length(which(leaf_template == 1))
+        id_ref <- which.min(abs(shape$s.area - npix_ref))
+        object_contour <- EBImage::ocontour(nmask)
+        ch <- conv_hull(object_contour)
+        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
+        shape <- transform(shape,
+                           id = 1:nrow(shape),
+                           radius_ratio = s.radius.max / s.radius.min,
+                           diam_mean = s.radius.mean * 2,
+                           diam_min = s.radius.min * 2,
+                           diam_max = s.radius.max * 2,
+                           area_ch =   area_ch,
+                           solidity = s.area / area_ch,
+                           circularity = 4*pi*(s.area / s.perimeter^2),
+                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))[-id_ref,]
+        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
+                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
+                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
+                           "m.theta", "solidity",  "circularity")]
+        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
+                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
+                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
+                             "theta", "solidity", "circularity")
+        # correct measures based on the area of the reference object
+        px_side <- sqrt(reference_area / npix_ref)
+        corrected <- shape$area * reference_area / npix_ref
+        shape$area <- corrected
+        shape$area_ch <- shape$area_ch * px_side^2
+        shape$perimeter <- shape$perimeter * px_side
+        shape$radius_mean <- shape$radius_mean * px_side
+        shape$radius_min <- shape$radius_min * px_side
+        shape$radius_max <- shape$radius_max * px_side
+        shape$diam_mean <- shape$diam_mean * px_side
+        shape$diam_min <- shape$diam_min * px_side
+        shape$diam_max <- shape$diam_max * px_side
+        shape$major_axis <- shape$major_axis * px_side
+        shape$minor_axis <- shape$minor_axis * px_side
+
       }
-      shape <-
-        cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
-              data.frame(EBImage::computeFeatures.moment(nmask))
-        )
-      object_contour <- EBImage::ocontour(nmask)
-      ch <- conv_hull(object_contour)
-      area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
-      shape <- transform(shape,
-                         id = 1:nrow(shape),
-                         radius_ratio = s.radius.max / s.radius.min,
-                         diam_mean = s.radius.mean * 2,
-                         diam_min = s.radius.min * 2,
-                         diam_max = s.radius.max * 2,
-                         area_ch =   area_ch,
-                         solidity = s.area / area_ch,
-                         circularity = 4*pi*(s.area / s.perimeter^2),
-                         minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
-      shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
-                         "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
-                         "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
-                         "m.theta", "solidity",  "circularity")]
-      colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
-                           "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
-                           "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
-                           "theta", "solidity", "circularity")
+
+
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
       }
@@ -482,11 +646,18 @@ analyze_objects <- function(img,
         shape <- shape[shape$circularity < upper_circ, ]
       }
       object_contour <- object_contour[shape$id]
+      ch <- ch[shape$id]
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
         }
-        ind_formula <- object_index
+        ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+        if(object_index %in% ind$Index){
+          ind_formula <- ind[which(ind$Index == object_index), 2]
+        } else{
+          ind_formula <- object_index
+        }
+        ind_name <- object_index
         data_mask <- nmask@.Data
         get_rgb <- function(img, data_mask, index){
           data.frame(id = index,
@@ -535,7 +706,7 @@ analyze_objects <- function(img,
                   lapply(indexes, data.frame)
           )
         indexes <- data.frame(cbind(id = object_rgb$id, indexes))
-        colnames(indexes) <- c("id", ind_formula)
+        colnames(indexes) <- c("id", ind_name)
         indexes <- aggregate(. ~ id, indexes, mean, na.rm = TRUE)
       } else{
         object_rgb <- NULL
@@ -554,6 +725,8 @@ analyze_objects <- function(img,
                       object_rgb = object_rgb,
                       object_index = indexes)
       class(results) <- "anal_obj"
+
+
       if(show_image == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
 
@@ -941,295 +1114,3 @@ analyze_objects_iter <- function(pattern,
 }
 
 
-# analyze_objects_temp <- function (img,
-#                                   img_leaf,
-#                                   img_background,
-#                                   img_template,
-#                                   area_template,
-#                                   resize = FALSE,
-#                                   parallel = FALSE,
-#                                   workers = NULL,
-#                                   img_pattern = NULL,
-#                                   lower_size = NULL,
-#                                   upper_size = NULL,
-#                                   randomize = TRUE,
-#                                   nrows = 10000,
-#                                   show_image = TRUE,
-#                                   show_original = TRUE,
-#                                   show_background = TRUE,
-#                                   col_background = NULL,
-#                                   col_leaf = "green",
-#                                   text_col = "black",
-#                                   text_size = 1,
-#                                   text_digits = 2,
-#                                   save_image = FALSE,
-#                                   dir_original = NULL,
-#                                   dir_processed = NULL,
-#                                   verbose = TRUE){
-#   if (is.null(dir_original)) {
-#     diretorio_original <- paste("./", sep = "")
-#   }
-#   else {
-#     diretorio_original <- paste("./", dir_original,
-#                                 sep = "")
-#   }
-#   if (is.null(dir_processed)) {
-#     diretorio_processada <- paste("./", sep = "")
-#   }
-#   else {
-#     diretorio_processada <- paste("./", dir_processed,
-#                                   sep = "")
-#   }
-#   help_area <- function(img, img_leaf, img_background, img_template,
-#                         area_template, lower_size, upper_size, randomize, nrows,
-#                         show_image, show_original, show_background, col_background,
-#                         text_col, text_size, text_digits, save_image, dir_original,
-#                         dir_processed) {
-#     if (is.character(img)) {
-#       all_files <- sapply(list.files(diretorio_original),
-#                           file_name)
-#       check_names_dir(img, all_files, diretorio_original)
-#       imag <- list.files(diretorio_original, pattern = paste0("^",
-#                                                               img, "\\."))
-#       name_ori <- file_name(imag)
-#       extens_ori <- file_extension(imag)
-#       img <- image_import(paste(diretorio_original, "/",
-#                                 name_ori, ".", extens_ori, sep = ""))
-#       if (resize != FALSE) {
-#         img <- image_resize(img, resize)
-#       }
-#     }
-#     else {
-#       name_ori <- match.call()[[2]]
-#       extens_ori <- "jpg"
-#     }
-#     if (is.character(img_leaf)) {
-#       all_files <- sapply(list.files(diretorio_original),
-#                           file_name)
-#       check_names_dir(img_leaf, all_files, diretorio_original)
-#       imag <- list.files(diretorio_original, pattern = img_leaf)
-#       name <- file_name(imag)
-#       extens <- file_extension(imag)
-#       img_leaf <- image_import(paste(diretorio_original,
-#                                      "/", name, ".", extens, sep = ""))
-#       if (resize != FALSE) {
-#         img_leaf <- image_resize(img_leaf, resize)
-#       }
-#     }
-#     if (is.character(img_template)) {
-#       all_files <- sapply(list.files(diretorio_original),
-#                           file_name)
-#       check_names_dir(img_template, all_files, diretorio_original)
-#       imag <- list.files(diretorio_original, pattern = img_template)
-#       name <- file_name(imag)
-#       extens <- file_extension(imag)
-#       img_template <- image_import(paste(diretorio_original,
-#                                          "/", name, ".", extens, sep = ""))
-#       if (resize != FALSE) {
-#         img_template <- image_resize(img_template, resize)
-#       }
-#     }
-#     if (is.character(img_background)) {
-#       all_files <- sapply(list.files(diretorio_original),
-#                           file_name)
-#       check_names_dir(img_background, all_files, diretorio_original)
-#       imag <- list.files(diretorio_original, pattern = img_background)
-#       name <- file_name(imag)
-#       extens <- file_extension(imag)
-#       img_background <- image_import(paste(diretorio_original,
-#                                            "/", name, ".", extens, sep = ""))
-#       if (resize != FALSE) {
-#         img_background <- image_resize(img_background,
-#                                        resize)
-#       }
-#     }
-#     original <- image_to_mat(img)
-#     leaf <- image_to_mat(img_leaf)
-#     template <- image_to_mat(img_template)
-#     background <- image_to_mat(img_background)
-#     background_resto <- transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),
-#     ][1:nrows, ], template$df_in[sample(1:nrow(template$df_in)),
-#     ][1:nrows, ], background$df_in[sample(1:nrow(background$df_in)),
-#     ][1:nrows, ]), Y = ifelse(CODE == "img_background",
-#                               1, 0))
-#     background_resto$CODE <- NULL
-#     modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
-#                                     data = background_resto))
-#     pred1 <- round(predict(modelo1, newdata = original$df_in,
-#                            type = "response"), 0)
-#     plant_background <- matrix(pred1, ncol = ncol(original$R))
-#     plant_background <- image_correct(plant_background, perc = 0.009)
-#     plant_background[plant_background == 1] <- 2
-#     leaf_template <- transform(rbind(leaf$df_in[sample(1:nrow(leaf$df_in)),
-#     ][1:nrows, ], template$df_in[sample(1:nrow(template$df_in)),
-#     ][1:nrows, ]), Y = ifelse(CODE == "img_leaf",
-#                               0, 1))
-#     background_resto$CODE <- NULL
-#     modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
-#                                     data = leaf_template))
-#     ID <- c(plant_background == 0)
-#     pred2 <- round(predict(modelo2, newdata = original$df_in[ID,
-#     ], type = "response"), 0)
-#     pred3 <- round(predict(modelo2, newdata = original$df_in,
-#                            type = "response"), 0)
-#     leaf_template <- matrix(pred3, ncol = ncol(original$R))
-#     leaf_template <- image_correct(leaf_template, perc = 0.009)
-#     plant_background[leaf_template == 1] <- 3
-#     mpred1 <- bwlabel(leaf_template == 1)
-#     shape_template <- cbind(data.frame(computeFeatures.shape(mpred1)),
-#                             data.frame(computeFeatures.moment(mpred1))[, 1:2])
-#     shape_template$area <- area_template
-#     shape_template <- shape_template[shape_template$s.area >=
-#                                        mean(shape_template$s.area), ]
-#     npix_ref <- shape_template[1, 1]
-#     mpred2 <- bwlabel(plant_background == 0)
-#     shape_leaf <- cbind(data.frame(computeFeatures.shape(mpred2)),
-#                         data.frame(computeFeatures.moment(mpred2))[, c(1,
-#                                                                        2)])
-#     shape_leaf$area <- shape_leaf$s.area * area_template/npix_ref
-#     if (!is.null(lower_size)) {
-#       shape_leaf <- shape_leaf[shape_leaf$area > lower_size,
-#       ]
-#     }
-#     else {
-#       shape_leaf <- shape_leaf[shape_leaf$area > mean(shape_leaf$area) *
-#                                  0.1, ]
-#     }
-#     if (!is.null(upper_size)) {
-#       shape_leaf <- shape_leaf[shape_leaf$area < upper_size,
-#       ]
-#       shape_template <- shape_template[shape_template$area <
-#                                          upper_size, ]
-#     }
-#     shape <- rbind(shape_leaf, shape_template)
-#     shape$id <- 1:nrow(shape)
-#     shape <- transform(shape[, c(10, 7, 8, 1, 9, 2:6)], label = paste(id,
-#                                                                       "|", round(area, text_digits), sep = ""))
-#     if (show_original == TRUE) {
-#       im2 <- img
-#       if (!is.null(col_background)) {
-#         col_background <- col2rgb(col_background)
-#         im2@.Data[, , 1][!ID] <- col_background[1]
-#         im2@.Data[, , 2][!ID] <- col_background[2]
-#         im2@.Data[, , 3][!ID] <- col_background[3]
-#       }
-#     }
-#     else {
-#       if (is.null(col_background)) {
-#         col_background <- col2rgb("white")
-#       }
-#       else {
-#         col_background <- col2rgb(col_background)
-#       }
-#       col_leaf <- col2rgb(col_leaf)
-#       im2 <- img
-#       im2@.Data[, , 1][ID] <- col_leaf[1]
-#       im2@.Data[, , 2][ID] <- col_leaf[2]
-#       im2@.Data[, , 3][ID] <- col_leaf[3]
-#       im2@.Data[, , 1][!ID] <- col_background[1]
-#       im2@.Data[, , 2][!ID] <- col_background[2]
-#       im2@.Data[, , 3][!ID] <- col_background[3]
-#     }
-#     if (show_image == TRUE) {
-#       image_show(im2)
-#       text(shape[, 2], shape[, 3], shape$label, col = text_col,
-#            cex = text_size)
-#     }
-#     if (save_image == TRUE) {
-#       if (dir.exists(diretorio_processada) == FALSE) {
-#         dir.create(diretorio_processada)
-#       }
-#       png(paste(diretorio_processada, "/proc_", name_ori,
-#                 ".", extens_ori, collapse = "", sep = ""),
-#           width = dim(im2@.Data)[1], height = dim(im2@.Data)[2])
-#       image_show(im2)
-#       text(shape[, 2], shape[, 3], shape$label, col = text_col,
-#            cex = text_size)
-#       dev.off()
-#     }
-#     shape <- transform(shape, radius_ratio = s.radius.max/s.radius.min)
-#     shape <- shape[, c(1:3, 5:7, 9:10, 8, 12, 11)]
-#     colnames(shape) <- c("id", "x", "y",
-#                          "area", "perimeter", "radius_mean",
-#                          "radius_min", "radius_max", "radius_sd",
-#                          "radius_ratio", "label")
-#     id_obj <- shape[which(shape$area == area_template), 1]
-#     class(shape) <- c("data.frame", "plm_la",
-#                       id_obj)
-#     return(shape)
-#   }
-#   if (missing(img_pattern)) {
-#     help_area(img, img_leaf, img_background, img_template,
-#               area_template, lower_size, upper_size, randomize,
-#               nrows, show_image, show_original, show_background,
-#               col_background, text_col, text_size, text_digits,
-#               save_image, dir_original, dir_processed)
-#   }
-#   else {
-#     if (img_pattern %in% c("0", "1", "2",
-#                            "3", "4", "5", "6", "7",
-#                            "8", "9")) {
-#       img_pattern <- "^[0-9].*$"
-#     }
-#     plants <- list.files(pattern = img_pattern, diretorio_original)
-#     extensions <- as.character(sapply(plants, file_extension))
-#     names_plant <- as.character(sapply(plants, file_name))
-#     if (length(grep(img_pattern, names_plant)) == 0) {
-#       stop(paste("'", img_pattern, "' pattern not found in '",
-#                  paste(getwd(), sub(".", "", diretorio_original),
-#                        sep = ""), "'", sep = ""),
-#            call. = FALSE)
-#     }
-#     if (!all(extensions %in% c("png", "jpeg",
-#                                "jpg", "tiff", "PNG", "JPEG",
-#                                "JPG", "TIFF"))) {
-#       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
-#     }
-#     if (parallel == TRUE) {
-#       nworkers <- ifelse(is.null(workers), trunc(detectCores() *
-#                                                    0.9), workers)
-#       clust <- makeCluster(nworkers)
-#       clusterExport(clust, varlist = c("names_plant",
-#                                        "help_area", "file_name", "check_names_dir",
-#                                        "file_extension", "image_import",
-#                                        "image_binary", "watershed", "distmap",
-#                                        "computeFeatures.moment", "computeFeatures.shape",
-#                                        "colorLabels", "image_show", "image_to_mat",
-#                                        "image_correct", "bwlabel"), envir = environment())
-#       on.exit(stopCluster(clust))
-#       if (verbose == TRUE) {
-#         message("Image processing using multiple sessions (",
-#                 nworkers, "). Please wait.")
-#       }
-#       results <- parLapply(clust, names_plant, function(x) {
-#         help_area(x, img_leaf, img_background, img_template,
-#                   area_template, lower_size, upper_size, randomize,
-#                   nrows, show_image, show_original, show_background,
-#                   col_background, text_col, text_size, text_digits,
-#                   save_image, dir_original, dir_processed)
-#       })
-#     }
-#     else {
-#       results <- list()
-#       pb <- progress(max = length(plants), style = 4)
-#       for (i in 1:length(plants)) {
-#         if (verbose == TRUE) {
-#           run_progress(pb, actual = i, text = paste("Processing image",
-#                                                     names_plant[i]))
-#         }
-#         results[[i]] <- help_area(img = names_plant[i],
-#                                   img_leaf, img_background, img_template, area_template,
-#                                   lower_size, upper_size, randomize, nrows, show_image,
-#                                   show_original, show_background, col_background,
-#                                   text_col, text_size, text_digits, save_image,
-#                                   dir_original, dir_processed)
-#       }
-#     }
-#     names(results) <- names_plant
-#     results <- lapply(1:length(results), function(i) {
-#       res <- transform(results[[i]], img = names(results[i]))
-#       res[, c(ncol(res), 1:(ncol(res) - 1))]
-#     })
-#     return(do.call(rbind, results))
-#   }
-# }
