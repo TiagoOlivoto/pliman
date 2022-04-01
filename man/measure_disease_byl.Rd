@@ -143,12 +143,12 @@ leaves. Arguments \code{img} to \code{keep_location} are passed on to \code{\lin
 Arguments \code{dir_original} to \code{...} are passed on to \code{\link[=measure_disease]{measure_disease()}}.
 }
 \examples{
-
+library(pliman)
 img <- image_pliman("mult_leaves.jpg", plot = TRUE)
 sev <-
-  measure_disease_byl(img = img,
-                      index_lb = "B",
-                      index_dh = "NGRDI")
+ measure_disease_byl(img = img,
+                     index_lb = "B",
+                     index_dh = "NGRDI")
 sev$severity
 
 

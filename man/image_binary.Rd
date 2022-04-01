@@ -9,7 +9,7 @@ image_binary(
   index = NULL,
   my_index = NULL,
   threshold = "Otsu",
-  resize = 30,
+  resize = FALSE,
   fill_hull = FALSE,
   re = NULL,
   nir = NULL,

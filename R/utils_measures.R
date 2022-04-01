@@ -300,7 +300,7 @@ plot_measures <- function(object,
       }
       text(x = object[,2],
            y = object[,3],
-           labels = round(index[which(index$id == object$id), which(colnames(index) == measure)], digits),
+           labels = round(index[which(index$id %in% object$id), which(colnames(index) == measure)], digits),
            col = col,
            cex = size,
            ...)
@@ -314,11 +314,13 @@ plot_measures <- function(object,
 
 #' Summary an object index
 #'
-#' Performs a report of the index between and within objects when `object_index`
-#' argument is used in `analyze_objects()`. By using a cut point, the number and
-#' proportion of objects with mean value of `index` bellow and above `cut_point`
-#' are returned. Additionaly, the number and proportion of pixels bellow and
-#' above the cutpoint is shown for each object (id).
+#' If more than one index is available, the function performs a Principal
+#' Component Analysis and produces a plot showing the contribution of the
+#' indexes to the PC1 (see [pca()]). If an index is declared in
+#' `index` and a cut point in `cut_point`, the number and proportion of objects
+#' with mean value of `index` bellow and above `cut_point` are returned.
+#' Additionaly, the number and proportion of pixels bellow and above the
+#' cutpoint is shown for each object (id).
 #'
 #' @param object An object computed with [analyze_objects()].
 #' @param index The index desired, e.g., `"B"`. Note that these value must match
@@ -327,7 +329,11 @@ plot_measures <- function(object,
 #' @param select_higher If `FALSE` (default) selects the objects with `index`
 #'   smaller than the `cut_point`. Use `select_higher = TRUE` to select the
 #'   objects with `index` higher than `cut_point`.
-#'
+#' @param plot Shows the contribution plot when more than one index is
+#'   available? Defaults to `TRUE`.
+#' @param type The type of plot to produce. Defaults to `"var"`. See more at
+#'   [get_biplot()].
+#' @param ... Further arguments passed on to [get_biplot()].
 #' @return A list with the following elements:
 #' * `ids` The identification of selected objects.
 #' * `between_id` A data frame with the following columns
@@ -345,7 +351,9 @@ plot_measures <- function(object,
 #'    `cut_point`.
 #'    - `greater_ratio` The proportion of pixels with values greater than
 #'    `cut_point`.
-#' @importFrom stats setNames
+#' * `pca_res` An object computed with [pca()]
+#' @importFrom stats prcomp setNames
+#' @importFrom graphics abline barplot
 #' @export
 #' @name summary_index
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -358,55 +366,78 @@ plot_measures <- function(object,
 #'
 #' summary_index(anal, index = "G", cut_point = 0.5)
 summary_index <- function(object,
-                         index,
-                         cut_point,
-                         select_higher = FALSE){
+                          index = NULL,
+                          cut_point = NULL,
+                          select_higher = FALSE,
+                          plot = TRUE,
+                          type = "var",
+                          ...){
   if(is.null(object$object_index)){
     stop("'object' was not computed using the `object_index` argument.")
   }
   coords <- object$results[2:3]
   obj_in <- object$object_index
 
-  if(isFALSE(select_higher)){
-    ids <- which(obj_in[[index]] <= cut_point)
+  if(!is.null(index)){
+
+    if(isFALSE(select_higher)){
+      ids <- which(obj_in[[index]] <= cut_point)
+    } else{
+      ids <- which(obj_in[[index]] >= cut_point)
+    }
+    temp <- object$object_rgb
+    indexes <-
+      do.call(rbind,
+              lapply(  by(temp,
+                          INDICES = temp$id,
+                          FUN = function(x){
+                            x[[index]] <= cut_point
+                          }
+              ), data.frame)
+      )
+    res <-
+      transform(temp,
+                threshold = ifelse(indexes[[1]] == TRUE, "less", "greater"),
+                n = 1:nrow(indexes)) %>%
+      aggregate(n ~ id + threshold, FUN = length, data = .) %>%
+      reshape(direction = "wide",
+              timevar = "threshold",
+              idvar = "id",
+              v.names = "n") %>%
+      as.data.frame() %>%
+      setNames(c("id", "n_greater", "n_less")) %>%
+      transform(less_ratio = round(n_less / (n_less  + n_greater), 3),
+                greater_ratio = 1 - round(n_less / (n_less  + n_greater), 3))
+
+    between_id = data.frame(
+      n = nrow(obj_in),
+      nsel = length(ids),
+      prop = length(ids) / nrow(obj_in),
+      mean_index_sel = mean(obj_in[[index]][ids]),
+      mean_index_nsel = mean(obj_in[[index]][!obj_in$id %in% ids])
+    )
+    within_id = cbind(coords, res)[, c(3, 1, 2, 5, 4, 6, 7)]
+
   } else{
-    ids <- which(obj_in[[index]] >= cut_point)
+    ids <- NULL
+    between_id <- NULL
+    within_id <- NULL
   }
 
-  temp <- object$object_rgb
-  indexes <-
-    do.call(rbind,
-            lapply(  by(temp,
-                        INDICES = temp$id,
-                        FUN = function(x){
-                          x[[index]] <= cut_point
-                        }
-            ), data.frame)
-    )
-  res <-
-    transform(temp,
-              threshold = ifelse(indexes[[1]] == TRUE, "less", "greater"),
-              n = 1:nrow(indexes)) %>%
-    aggregate(n ~ id + threshold, FUN = length, data = .) %>%
-    reshape(direction = "wide",
-            timevar = "threshold",
-            idvar = "id",
-            v.names = "n") %>%
-    as.data.frame() %>%
-    setNames(c("id", "n_greater", "n_less")) %>%
-    transform(less_ratio = round(n_less / (n_less  + n_greater), 3),
-              greater_ratio = 1 - round(n_less / (n_less  + n_greater), 3))
+  obj_in_pca <- column_to_rownames(obj_in, "id")
+  if (ncol(obj_in_pca) >  1){
+    pca_res <- pca(obj_in_pca)
+    if (isTRUE(plot)){
+      plot(pca_res, type = type, ...)
+    }
+  } else{
+    pca <- NULL
+    pca_res <- NULL
+  }
 
-
-  list(ids = ids,
-       between_id = data.frame(
-         n = nrow(obj_in),
-         nsel = length(ids),
-         prop = length(ids) / nrow(obj_in),
-         mean_index_sel = mean(obj_in[[index]][ids]),
-         mean_index_nsel = mean(obj_in[[index]][!obj_in$id %in% ids])
-       ),
-       within_id = cbind(coords, res)[, c(3, 1, 2, 5, 4, 6, 7)]
-  )
+  invisible(list(ids = ids,
+                 between_id = between_id,
+                 within_id = within_id,
+                 pca_res = pca_res))
 }
 

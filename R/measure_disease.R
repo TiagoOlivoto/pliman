@@ -653,6 +653,20 @@ measure_disease <- function(img,
           cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
                 data.frame(EBImage::computeFeatures.moment(nmask))
           )
+        object_contour <- EBImage::ocontour(nmask)
+        ch <- conv_hull(object_contour)
+        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
+        shape <- transform(shape,
+                           id = 1:nrow(shape),
+                           radius_ratio = s.radius.max / s.radius.min,
+                           diam_mean = s.radius.mean * 2,
+                           diam_min = s.radius.min * 2,
+                           diam_max = s.radius.max * 2,
+                           area_ch =   area_ch,
+                           solidity = s.area / area_ch,
+                           circularity = 4*pi*(s.area / s.perimeter^2),
+                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
+
         ifelse(!is.null(lower_size),
                shape <- shape[shape$s.area > lower_size, ],
                shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
@@ -665,13 +679,16 @@ measure_disease <- function(img,
         if(!is.null(topn_upper)){
           shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
         }
-        shape <- transform(data.frame(shape),
-                           id = 1:nrow(shape),
-                           radius_ratio = s.radius.max / s.radius.min)
-        shape <- shape[, c(12, 7, 8, 1:3, 5:6, 4, 13, 9:11)]
-        colnames(shape) <- c("id", "x", "y", "area", "perimeter", "radius_mean",
-                             "radius_min", "radius_max", "radius_sd", "radius_ratio",
-                             "major_axis", "eccentricity", "theta")
+
+        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
+                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
+                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
+                           "m.theta", "solidity",  "circularity")]
+        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
+                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
+                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
+                             "theta", "solidity", "circularity")
+
         stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
                                      "sd_area", "sum_area"),
                             value = c(length(shape$area),
@@ -696,6 +713,9 @@ measure_disease <- function(img,
         marker_size <- ifelse(is.null(marker_size), 0.9, marker_size)
       } else{
         show_mark <- FALSE
+      }
+      if(isTRUE(show_features) & isTRUE(show_contour)){
+        ocont <- object_contour[shape$id]
       }
       if(isTRUE(show_contour) & show_original == TRUE){
         ocont <- EBImage::ocontour(nmask)
@@ -841,9 +861,12 @@ measure_disease <- function(img,
         do.call(rbind,
                 lapply(seq_along(results), function(i){
                   transform(results[[i]][["shape"]],
-                            img =  names(results[i]))[, c(14, 1:13)]
+                            img =  names(results[i]))
                 })
         )
+      if("img" %in% colnames(shape)){
+        shape <- shape[, c(ncol(shape), 1:ncol(shape) - 1)]
+      }
     } else{
       shape <- NULL
       stats <- NULL
@@ -855,17 +878,21 @@ measure_disease <- function(img,
                           img =  names(results[i]))[, c(3, 1:2)]
               })
       )
-    return(list(severity = severity,
-                shape = shape,
-                stats = stats,
-                parms = list(
-                  pattern = pattern,
-                  img_healthy = img_healthy,
-                  img_symptoms = img_symptoms,
-                  img_background = img_background,
-                  dir_original = diretorio_original,
-                  dir_processed = diretorio_processada,
-                  save_image = save_image))
+    return(
+      structure(
+        list(severity = severity,
+             shape = shape,
+             stats = stats,
+             parms = list(
+               pattern = pattern,
+               img_healthy = img_healthy,
+               img_symptoms = img_symptoms,
+               img_background = img_background,
+               dir_original = diretorio_original,
+               dir_processed = diretorio_processada,
+               save_image = save_image)),
+        class = "plm_disease"
+      )
     )
   }
 }
@@ -953,7 +980,6 @@ measure_disease_iter <- function(img,
           done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
         }
       }
-
     }
     return(list(results = temp,
                 leaf = leaf,

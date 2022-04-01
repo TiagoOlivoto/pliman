@@ -30,12 +30,12 @@
 #' @export
 #'
 #' @examples
-#'
-#' img <- image_pliman("mult_leaves.jpg", plot = TRUE)
-#' sev <-
-#'   measure_disease_byl(img = img,
-#'                       index_lb = "B",
-#'                       index_dh = "NGRDI")
+#'library(pliman)
+#'img <- image_pliman("mult_leaves.jpg", plot = TRUE)
+#'sev <-
+#'  measure_disease_byl(img = img,
+#'                      index_lb = "B",
+#'                      index_dh = "NGRDI")
 #' sev$severity
 #'
 #'
@@ -163,7 +163,7 @@ measure_disease_byl <- function(img,
         do.call(rbind,
                 lapply(seq_along(results), function(i){
                   transform(results[[i]][["shape"]],
-                            img =  names(results[i]))[, c(14, 1:13)]
+                            img =  names(results[i]))
                 })
         ) |>
         separate_col(img, into = c("img", "leaf"), sep = "-")
@@ -175,7 +175,6 @@ measure_disease_byl <- function(img,
                 stats = stats,
                 shape = shape))
   }
-
 
   if(missing(pattern)){
     results <- help_byl(img)
@@ -241,12 +240,10 @@ measure_disease_byl <- function(img,
                       img_healthy = img_healthy,
                       img_symptoms = img_symptoms,
                       dir_original = diretorio_original,
-                      # dir_processed = diretorio_processada,
                       save_image = save_image))
   }
   return(results)
 }
-
 
 
 

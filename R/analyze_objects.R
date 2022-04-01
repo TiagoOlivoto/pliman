@@ -652,7 +652,7 @@ analyze_objects <- function(img,
           stop("`object_index` must be a character.", call. = FALSE)
         }
         ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-        if(object_index %in% ind$Index){
+        if(any(object_index %in% ind$Index)){
           ind_formula <- ind[which(ind$Index == object_index), 2]
         } else{
           ind_formula <- object_index

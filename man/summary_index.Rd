@@ -4,7 +4,15 @@
 \alias{summary_index}
 \title{Summary an object index}
 \usage{
-summary_index(object, index, cut_point, select_higher = FALSE)
+summary_index(
+  object,
+  index = NULL,
+  cut_point = NULL,
+  select_higher = FALSE,
+  plot = TRUE,
+  type = "var",
+  ...
+)
 }
 \arguments{
 \item{object}{An object computed with \code{\link[=analyze_objects]{analyze_objects()}}.}
@@ -17,6 +25,14 @@ the index(es) used in the argument \code{object_index} of \code{analyze_objects(
 \item{select_higher}{If \code{FALSE} (default) selects the objects with \code{index}
 smaller than the \code{cut_point}. Use \code{select_higher = TRUE} to select the
 objects with \code{index} higher than \code{cut_point}.}
+
+\item{plot}{Shows the contribution plot when more than one index is
+available? Defaults to \code{TRUE}.}
+
+\item{type}{The type of plot to produce. Defaults to \code{"var"}. See more at
+\code{\link[=get_biplot]{get_biplot()}}.}
+
+\item{...}{Further arguments passed on to \code{\link[=get_biplot]{get_biplot()}}.}
 }
 \value{
 A list with the following elements:
@@ -41,14 +57,17 @@ selected and non-selected objects, respectively.
 \item \code{greater_ratio} The proportion of pixels with values greater than
 \code{cut_point}.
 }
+\item \code{pca_res} An object computed with \code{\link[=pca]{pca()}}
 }
 }
 \description{
-Performs a report of the index between and within objects when \code{object_index}
-argument is used in \code{analyze_objects()}. By using a cut point, the number and
-proportion of objects with mean value of \code{index} bellow and above \code{cut_point}
-are returned. Additionaly, the number and proportion of pixels bellow and
-above the cutpoint is shown for each object (id).
+If more than one index is available, the function performs a Principal
+Component Analysis and produces a plot showing the contribution of the
+indexes to the PC1 (see \code{\link[=pca]{pca()}}). If an index is declared in
+\code{index} and a cut point in \code{cut_point}, the number and proportion of objects
+with mean value of \code{index} bellow and above \code{cut_point} are returned.
+Additionaly, the number and proportion of pixels bellow and above the
+cutpoint is shown for each object (id).
 }
 \examples{
 library(pliman)

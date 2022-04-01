@@ -1,8 +1,10 @@
 # pliman (development version)
 ## New functions
 * `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.
-* `measure_disease_byl()` To measure disease severity 'by leaf' in an image with several leaves.
-* `object_split()` To split multiples objects in an image to a list of images.
+* `measure_disease_byl()` to measure disease severity '`by` `l`eaf' in an image with several leaves.
+* `object_split()` to split multiples objects of an image into a list of images.
+* `pca()`, `plot.pca()`, `get_biplot()` as helper functions to perform Principal Component Analysis.
+* `rownames_to_column()`, `column_to_rownames()`, `separate_col()` as helper functions to manipulate data.
 
 
 ## Minor changes
@@ -11,6 +13,7 @@
 * `analyze_objects()` now returns the objects `object_index` and `object_rgb` when the argument `pattern` is used. Thanks to [João Paulo Oliveira Ribeiro](https://www.researchgate.net/profile/Joao-Paulo-Ribeiro) for alerting me regarding this issue.
 * New argument `reference` in `analyze_objects()` to adjust measures using a reference object in the image.
 * Argument `object_index` in `analyze_objects()` now recognizes the names of built-in indexes (see ?`pliman_indexes()`).
+
 
 # pliman 1.1.0
 ## New functions
