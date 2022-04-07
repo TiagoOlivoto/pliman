@@ -2446,9 +2446,17 @@ rgb_to_hsv <- function(object){
                      b = object[,3],
                      maxColorValue = 1))
   }
-  if (any(class(object) == "anal_obj")){
+  if (any(class(object)  %in% c("anal_obj", "anal_obj_ls"))){
     if(!is.null(object$object_rgb)){
       tmp <- object$object_rgb
+      if ("img" %in% colnames(tmp)){
+        hsv <- t(rgb2hsv(r = c(tmp[,3]),
+                         g = c(tmp[,4]),
+                         b = c(tmp[,5]),
+                         maxColorValue = 1))
+        hsv <- data.frame(cbind(tmp[,1:2], hsv))
+        colnames(hsv)[1:2] <- c("img", "id")
+      }
       hsv <- t(rgb2hsv(r = c(tmp[,2]),
                        g = c(tmp[,3]),
                        b = c(tmp[,4]),
@@ -2477,15 +2485,24 @@ rgb_to_lab <- function(object){
                       b = object[, 3])
     lab <- convertColor(rgb, from = "sRGB", to = "Lab")
   }
-  if (any(class(object) == "anal_obj")){
+  if (any(class(object)  %in% c("anal_obj", "anal_obj_ls"))){
     if(!is.null(object$object_rgb)){
       tmp <- object$object_rgb
-      rgb <- data.frame(r = tmp[, 2],
-                        g = tmp[, 3],
-                        b = tmp[, 4])
-      lab <- convertColor(rgb, from = "sRGB", to = "Lab")
-      lab <- data.frame(cbind(tmp[,1], lab))
-      colnames(lab)[1] <- "id"
+      if ("img" %in% colnames(tmp)){
+        rgb <- data.frame(r = tmp[, 3],
+                          g = tmp[, 4],
+                          b = tmp[, 5])
+        lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+        lab <- data.frame(cbind(tmp[,1:2], lab))
+        colnames(lab)[1:2] <- c("img", "id")
+      } else{
+        rgb <- data.frame(r = tmp[, 2],
+                          g = tmp[, 3],
+                          b = tmp[, 4])
+        lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+        lab <- data.frame(cbind(tmp[,1], lab))
+        colnames(lab)[1] <- "id"
+      }
     } else{
       stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
     }

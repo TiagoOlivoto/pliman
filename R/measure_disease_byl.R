@@ -85,7 +85,7 @@ measure_disease_byl <- function(img,
     }
 
     splits <- object_split(img,
-                           index = index,
+                           index = "NB",
                            my_index = my_index,
                            watershed = watershed,
                            invert = invert,
@@ -113,7 +113,7 @@ measure_disease_byl <- function(img,
       extens <- file_extension(imag)
       img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
     }
-    back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode='Color')
+    back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode = 'Color')
     results <- list()
     tmp_dir <- tempdir()
 
