@@ -2326,7 +2326,7 @@ image_palette <- function(image,
 #' * [dpi()] returns the computed dpi (dots per inch) given the known distance
 #' informed in the plot.
 #' @export
-#' @importFrom grDevices rgb2hsv
+#' @importFrom grDevices rgb2hsv convertColor
 #' @importFrom graphics locator
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @examples
@@ -2415,25 +2415,86 @@ distance <- function(image, plot = TRUE){
 
 
 
-#' Color spaces
+#' Convert between colour spaces
+#' @description
+#' * `rgb_to_hsv()` Transforms colors from RGB space (red/green/blue) into HSV
+#' space (hue/saturation/value).
+#' * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) into
+#' CIE-LAB space
 #'
-#' Convert RGB to LAB color space.
-#' @param image An image object.
+#' It is assumed that
+#' @param object An `Image` object, an object computed with
+#'   `analyze_objects()` with a valid `object_index` argument, or a
+#'   `data.frame/matrix`. For the last, a three-column data (R, G, and B, respectively)
+#'   is required.
 #' @export
+#' @name utils_colorspace
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
-#' @return A list containing the image in the new color space.
+#' @return A data frame with the columns of the converted color space
 #' @examples
 #' library(pliman)
-#'img <- image_pliman("sev_leaf.jpg")
-#'img2 <- rgb_to_hsv(img)
-#'image_combine(img, img2)
-rgb_to_hsv <- function(image){
-  hsv <- rgb2hsv(r = c(image[,,1]),
-                 g = c(image[,,2]),
-                 b = c(image[,,3]),
-                 maxColorValue = 1)
-  img <- EBImage::Image(array(c(hsv[1,], hsv[2,], hsv[3,]),
-                              c(dim(image)[1], dim(image)[2], 3)),
-                        colormode = "Color")
-  return(img)
+#' img <- image_pliman("sev_leaf.jpg")
+#' rgb_to_lab(img)
+#'
+#' # analyze the object and convert the pixels
+#' anal <- analyze_objects(img, object_index = "B")
+#' rgb_to_lab(anal)
+rgb_to_hsv <- function(object){
+  if (any(class(object) %in%  c("data.frame", "matrix"))){
+    hsv <- t(rgb2hsv(r = object[,1],
+                     g = object[,2],
+                     b = object[,3],
+                     maxColorValue = 1))
+  }
+  if (any(class(object) == "anal_obj")){
+    if(!is.null(object$object_rgb)){
+      tmp <- object$object_rgb
+      hsv <- t(rgb2hsv(r = c(tmp[,2]),
+                       g = c(tmp[,3]),
+                       b = c(tmp[,4]),
+                       maxColorValue = 1))
+      hsv <- data.frame(cbind(tmp[,1], hsv))
+      colnames(hsv)[1] <- "id"
+    } else{
+      stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
+    }
+  }
+  if (any(class(object) == "Image")){
+    hsv <- t(rgb2hsv(r = c(object[,,1]),
+                     g = c(object[,,2]),
+                     b = c(object[,,3]),
+                     maxColorValue = 1))
+  }
+  return(hsv)
+}
+
+#' @export
+#' @name utils_colorspace
+rgb_to_lab <- function(object){
+  if (any(class(object) %in%  c("data.frame", "matrix"))){
+    rgb <- data.frame(r = object[, 1],
+                      g = object[, 2],
+                      b = object[, 3])
+    lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+  }
+  if (any(class(object) == "anal_obj")){
+    if(!is.null(object$object_rgb)){
+      tmp <- object$object_rgb
+      rgb <- data.frame(r = tmp[, 2],
+                        g = tmp[, 3],
+                        b = tmp[, 4])
+      lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+      lab <- data.frame(cbind(tmp[,1], lab))
+      colnames(lab)[1] <- "id"
+    } else{
+      stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
+    }
+  }
+  if (any(class(object) == "Image")){
+    rgb <- data.frame(r = c(object[,,1]),
+                      g = c(object[,,2]),
+                      b = c(object[,,3]))
+    lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+  }
+  return(lab)
 }
