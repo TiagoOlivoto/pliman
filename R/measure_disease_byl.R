@@ -121,26 +121,49 @@ measure_disease_byl <- function(img,
       save_image <- FALSE
       clear_td()
     }
-    for(i in 1:length(splits)){
-      results[[paste0(name_ori, "-", i)]] <-
-        measure_disease(splits[[i]],
-                        img_healthy = img_healthy,
-                        img_background = back,
-                        img_symptoms = img_symptoms,
-                        show_image = FALSE,
-                        save_image = TRUE,
-                        show_features = show_features,
-                        dir_processed = tmp_dir,
-                        prefix = paste0(name_ori, "_", i),
-                        name = "",
-                        ...)
-    }
+    # for(i in 1:length(splits)){
+    #   results[[paste0( "-", i)]] <-
+    #     measure_disease(splits[[i]],
+    #                     img_healthy = "folha",
+    #                     img_symptoms = "doenca",
+    #                     img_background = back,
+    #                     show_image = FALSE,
+    #                     save_image = TRUE,
+    #                     show_features = F,
+    #                     dir_processed = tmp_dir,
+    #                     # prefix = paste0(name_ori, "_", i),
+    #                     name = "")
+    # }
+
+
+
+    clust <- makeCluster(trunc(detectCores()*.5))
+    clusterExport(clust,
+                  varlist = c("splits", "measure_disease", "tmp_dir",
+                              "name_ori", "img_healthy", "img_symptoms", "back", "show_features"),
+                  envir=environment())
+    on.exit(stopCluster(clust))
+    results <-
+      parLapply(clust, seq_along(splits),
+                function(i){
+                  measure_disease(splits[[i]],
+                                  img_healthy = img_healthy,
+                                  img_symptoms = img_symptoms,
+                                  img_background = back,
+                                  show_image = FALSE,
+                                  save_image = TRUE,
+                                  show_features = show_features,
+                                  dir_processed = tmp_dir,
+                                  prefix = paste0(name_ori, "_", i),
+                                  name = "",
+                                  ...)
+                })
+    names(results) <- paste0(name_ori, "-", 1:length(results))
     if(isTRUE(show_image)){
       imgs <- image_import(pattern = as.character(name_ori), path = tmp_dir)
       image_combine(imgs)
       clear_td()
     }
-
     severity <-
       do.call(rbind,
               lapply(seq_along(results), function(i){

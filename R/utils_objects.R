@@ -375,7 +375,7 @@ object_split <- function(img,
   } else{
     nmask <- EBImage::bwlabel(img2)
   }
-  list_objects <- list()
+
   objcts <-
     sapply(1:max(nmask), function(i){
       length(which(nmask == i))
@@ -384,26 +384,32 @@ object_split <- function(img,
   ifelse(!is.null(lower_size),
          cutsize <- lower_size,
          cutsize <-  av_area * 0.1)
-
   ifelse(is.character(col_background),
          col_background <- col2rgb(col_background) / 255,
          col_background <- col_background / 255)
-  j <- 0
-  for(i in 1:max(nmask)){
-    tmp <- img
-    if(length(which(nmask == i)) > cutsize){
-      j <- j + 1
-      id = which(nmask != i)
-      tmp@.Data[, , 1][id] <- col_background[1]
-      tmp@.Data[, , 2][id] <- col_background[2]
-      tmp@.Data[, , 3][id] <- col_background[3]
-      if(isTRUE(keep_location)){
-        list_objects[[j]] <- tmp
-      } else{
-        list_objects[[j]] <- image_autocrop(tmp, plot = FALSE, index = "R")
-      }
+  selected <- which(objcts > cutsize)
+
+  list_crop <- function(img, selected, keep_location, col_background){
+    id = which(nmask != selected)
+    img@.Data[, , 1][id] <- col_background[1]
+    img@.Data[, , 2][id] <- col_background[2]
+    img@.Data[, , 3][id] <- col_background[3]
+    if(!isTRUE(keep_location)){
+      image_autocrop(img, plot = FALSE, index = "R")
     }
   }
+
+  clust <- makeCluster(trunc(detectCores()*.5))
+  clusterExport(clust,
+                varlist = c("img", "nmask", "list_crop", "image_autocrop", "selected", "col_background"),
+                envir=environment())
+  on.exit(stopCluster(clust))
+  list_objects <-
+    parLapply(clust, seq_along(selected),
+              function(i){
+                list_crop(img, selected[i], keep_location, col_background)
+              })
+
   names(list_objects) <- 1:length(list_objects)
   if(isTRUE(verbose)){
     cat("==============================\n")
