@@ -4,8 +4,12 @@
 * `measure_disease_byl()` to measure disease severity '`by` `l`eaf' in an image with several leaves.
 * `object_split()` to split multiples objects of an image into a list of images.
 * `pca()`, `plot.pca()`, `get_biplot()` as helper functions to perform Principal Component Analysis.
-* `rownames_to_column()`, `column_to_rownames()`, `separate_col()` as helper functions to manipulate data.
+* `rownames_to_column()`, `column_to_rownames()`, `separate_col()`, `round_cols()` as helper functions to manipulate data.
 
+* A set of `poly_*()` function to analyze polygons. All of them are based on a set of coordinate points describing the edge of the object(s). See ?`utils_polygon` for more details.
+
+## New features
+* Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.
 
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.

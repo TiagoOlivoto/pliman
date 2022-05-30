@@ -267,18 +267,29 @@ image:
 \item \code{radius_min}, \code{radius_mean}, and \code{radius_max}: The minimum, mean, and
 maximum radius (in pixels), respectively.
 \item \code{radius_sd}: standard deviation of the mean radius (in pixels).
-\item \code{radius_ratio}: radius ratio given by \code{radius_max / radius_min}.
 \item \code{diam_min}, \code{diam_mean}, and \code{diam_max}: The minimum, mean, and
 maximum diameter (in pixels), respectively.
 \item \code{major_axis}, \code{minor_axis}: elliptical fit for major and minor axes (in
 pixels).
-\item \code{eccentricity}: elliptical eccentricity defined by
-sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
-line eccentricity is 1.
+\item \code{length}, \code{width} The length and width of objects (in pixels). These
+measures are obtained as the range of x and y coordinates after aligning
+each object with \code{poly_align()}.
+\item \code{radius_ratio}: radius ratio given by \code{radius_max / radius_min}.
+\item \code{eccentricity}: elliptical eccentricity computed using the
+ratio of the eigen values (inertia axes of coordinates).
 \item \code{theta}: object angle (in radians).
 \item \code{solidity}: object solidity given by \code{area / area_ch}.
-\item \code{circularity}: the object circularity given by \eqn{4*pi *(area /
-    perimeter^2)}.
+\item \code{convexity}: The convexity of the object computed using the ratio
+between the perimeter of the convex hull and the perimeter of the polygon.
+\item \code{elongation}: The elongation of the object computed as \code{1 - width / length}.
+\item \code{circularity}: The object circularity given by \code{perimeter ^ 2 / area}.
+\item \code{circularity_haralick}: The Haralick's circularity (CH), computed as
+\code{CH =  m/sd}, where \code{m} and \code{sd} are the mean and standard deviations
+from each pixels of the perimeter to the centroid of the object.
+\item \code{circularity_norm}: The normalized circularity (Cn), to be unity for a
+circle. This measure is computed as `Cn = perimeter ^ 2 / 4\emph{pi}area`` and
+is invariant under translation, rotation, scaling transformations, and
+dimensionless.
 }
 \item \code{statistics}: A data frame with the summary statistics for the area of the
 objects.
@@ -287,14 +298,11 @@ objects.
 for each pixel of each object.
 \item \code{object_index}: If \code{object_index} is used, returns the index computed for
 each object.
-}
-
-\code{analyze_objects_iter()} returns a data.frame containing the features
+\item \code{analyze_objects_iter()} returns a data.frame containing the features
 described in the \code{results} object of \code{\link[=analyze_objects]{analyze_objects()}}.
-
-\code{plot.anal_obj()} returns a \code{trellis} object containing the
-distribution of the pixels, optionally  for each object when \code{facet = TRUE}
-is used.
+\item \code{plot.anal_obj()} returns a \code{trellis} object containing the distribution
+of the pixels, optionally  for each object when \code{facet = TRUE} is used.
+}
 }
 \description{
 \itemize{
@@ -396,6 +404,13 @@ batatas): the influence of genetics, environment, and G×E. New Phytologist,
 Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
 \doi{10.5951/mathteacher.110.8.0631}
+
+Montero, R. S., Bribiesca, E., Santiago, R., & Bribiesca, E. (2009). State
+of the Art of Compactness and Circularity Measures. International
+Mathematical Forum, 4(27), 1305–1335.
+
+Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
+Computer Vision. 3rd ed. World Scientific.
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

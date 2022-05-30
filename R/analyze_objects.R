@@ -1,5 +1,5 @@
 #' Analyzes objects in an image
-#'
+#' @description
 #' * [analyze_objects()] provides tools for counting and extracting object
 #' features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 #' more at **Details** section.
@@ -184,25 +184,54 @@
 #'  * `results` A data frame with the following variables for each object in the
 #'  image:
 #'     - `id`:  object identification.
+#'
 #'     - `x`,`y`:  x and y coordinates for the center of mass of the object.
 #'     - `area`:  area of the object (in pixels).
+#'
 #'     - `area_ch`:  the area of the convex hull around object (in pixels).
 #'     - `perimeter`: perimeter (in pixels).
+#'
 #'     - `radius_min`, `radius_mean`, and `radius_max`: The minimum, mean, and
 #'     maximum radius (in pixels), respectively.
+#'
 #'     - `radius_sd`: standard deviation of the mean radius (in pixels).
-#'     - `radius_ratio`: radius ratio given by `radius_max / radius_min`.
+#'
 #'     - `diam_min`, `diam_mean`, and `diam_max`: The minimum, mean, and
 #'     maximum diameter (in pixels), respectively.
+#'
 #'     - `major_axis`, `minor_axis`: elliptical fit for major and minor axes (in
 #'     pixels).
-#'     - `eccentricity`: elliptical eccentricity defined by
-#'     sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
-#'     line eccentricity is 1.
+#'
+#'     - `length`, `width` The length and width of objects (in pixels). These
+#'     measures are obtained as the range of x and y coordinates after aligning
+#'     each object with `poly_align()`.
+#'
+#'     - `radius_ratio`: radius ratio given by `radius_max / radius_min`.
+#'
+#'     - `eccentricity`: elliptical eccentricity computed using the
+#'    ratio of the eigen values (inertia axes of coordinates).
+#'
 #'     - `theta`: object angle (in radians).
+#'
 #'     - `solidity`: object solidity given by `area / area_ch`.
-#'     - `circularity`: the object circularity given by \eqn{4*pi *(area /
-#'     perimeter^2)}.
+#'
+#'     - `convexity`: The convexity of the object computed using the ratio
+#'    between the perimeter of the convex hull and the perimeter of the polygon.
+#'
+#'     - `elongation`: The elongation of the object computed as `1 - width /
+#'    length`.
+#'
+#'     - `circularity`: The object circularity given by `perimeter ^ 2 / area`.
+#'
+#'     - `circularity_haralick`: The Haralick's circularity (CH), computed as
+#'     `CH =  m/sd`, where `m` and `sd` are the mean and standard deviations
+#'     from each pixels of the perimeter to the centroid of the object.
+#'
+#'     - `circularity_norm`: The normalized circularity (Cn), to be unity for a
+#'     circle. This measure is computed as `Cn = perimeter ^ 2 / 4*pi*area`` and
+#'     is invariant under translation, rotation, scaling transformations, and
+#'     dimensionless.
+#'
 #'  * `statistics`: A data frame with the summary statistics for the area of the
 #'  objects.
 #'  * `count`: If `pattern` is used, shows the number of objects in each image.
@@ -210,9 +239,11 @@
 #'  for each pixel of each object.
 #'  * `object_index`: If `object_index` is used, returns the index computed for
 #'  each object.
-#'
-#'  `analyze_objects_iter()` returns a data.frame containing the features
+#'  * `analyze_objects_iter()` returns a data.frame containing the features
 #'  described in the `results` object of [analyze_objects()].
+#'
+#'  * `plot.anal_obj()` returns a `trellis` object containing the distribution
+#'  of the pixels, optionally  for each object when `facet = TRUE` is used.
 #'
 #' @references
 #' Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
@@ -224,12 +255,19 @@
 #' and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
 #' \doi{10.5951/mathteacher.110.8.0631}
 #'
+#'  Montero, R. S., Bribiesca, E., Santiago, R., & Bribiesca, E. (2009). State
+#'  of the Art of Compactness and Circularity Measures. International
+#'  Mathematical Forum, 4(27), 1305–1335.
+#'
+#'  Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
+#'  Computer Vision. 3rd ed. World Scientific.
+#'
 #' @export
 #' @name analyze_objects
 #' @importFrom  utils install.packages
-#' @importFrom grDevices col2rgb dev.off jpeg png
+#' @importFrom grDevices col2rgb dev.off jpeg png rgb
 #' @importFrom graphics lines par points rect text
-#' @importFrom stats aggregate binomial glm kmeans predict sd
+#' @importFrom stats aggregate binomial glm kmeans predict sd runif dist var
 #' @importFrom utils menu
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -446,32 +484,11 @@ analyze_objects <- function(img,
         if(isTRUE(fill_hull)){
           nmask <- EBImage::fillHull(nmask)
         }
+        shape <- compute_measures(nmask)
+        object_contour <- shape$cont
+        ch <- shape$ch
+        shape <- shape$shape
 
-        shape <-
-          cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
-                data.frame(EBImage::computeFeatures.moment(nmask))
-          )
-        object_contour <- EBImage::ocontour(nmask)
-        ch <- conv_hull(object_contour)
-        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
-        shape <- transform(shape,
-                           id = 1:nrow(shape),
-                           radius_ratio = s.radius.max / s.radius.min,
-                           diam_mean = s.radius.mean * 2,
-                           diam_min = s.radius.min * 2,
-                           diam_max = s.radius.max * 2,
-                           area_ch =   area_ch,
-                           solidity = s.area / area_ch,
-                           circularity = 4*pi*(s.area / s.perimeter^2),
-                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
-        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
-                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
-                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
-                           "m.theta", "solidity",  "circularity")]
-        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
-                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
-                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
-                             "theta", "solidity", "circularity")
       } else{
         # when reference is used
         if(is.null(foreground) | is.null(background)){
@@ -573,50 +590,22 @@ analyze_objects <- function(img,
         ID <-  which(plant_background == 2)
         ID2 <- which(plant_background != 2)
 
-        shape <-
-          cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
-                data.frame(EBImage::computeFeatures.moment(nmask))
-          )
+        shape <- compute_measures(nmask)
+        object_contour <- shape$cont
+        ch <- shape$ch
+        shape <- shape$shape
         npix_ref <- length(which(leaf_template == 1))
-        id_ref <- which.min(abs(shape$s.area - npix_ref))
-        object_contour <- EBImage::ocontour(nmask)
-        ch <- conv_hull(object_contour)
-        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
-        shape <- transform(shape,
-                           id = 1:nrow(shape),
-                           radius_ratio = s.radius.max / s.radius.min,
-                           diam_mean = s.radius.mean * 2,
-                           diam_min = s.radius.min * 2,
-                           diam_max = s.radius.max * 2,
-                           area_ch =   area_ch,
-                           solidity = s.area / area_ch,
-                           circularity = 4*pi*(s.area / s.perimeter^2),
-                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))[-id_ref,]
-        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
-                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
-                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
-                           "m.theta", "solidity",  "circularity")]
-        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
-                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
-                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
-                             "theta", "solidity", "circularity")
+        id_ref <- which.min(abs(shape$area - npix_ref))
+        shape <- shape[-id_ref, ]
+
         # correct measures based on the area of the reference object
         px_side <- sqrt(reference_area / npix_ref)
-        corrected <- shape$area * reference_area / npix_ref
-        shape$area <- corrected
+        shape$area <- shape$area * px_side^2
         shape$area_ch <- shape$area_ch * px_side^2
-        shape$perimeter <- shape$perimeter * px_side
-        shape$radius_mean <- shape$radius_mean * px_side
-        shape$radius_min <- shape$radius_min * px_side
-        shape$radius_max <- shape$radius_max * px_side
-        shape$diam_mean <- shape$diam_mean * px_side
-        shape$diam_min <- shape$diam_min * px_side
-        shape$diam_max <- shape$diam_max * px_side
-        shape$major_axis <- shape$major_axis * px_side
-        shape$minor_axis <- shape$minor_axis * px_side
-
+        shape[6:17] <- apply(shape[6:17], 2, function(x){
+          x * px_side
+        })
       }
-
 
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
@@ -807,7 +796,7 @@ analyze_objects <- function(img,
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(isTRUE(show_chull)){
-              plot_contour(ch, col = "black")
+              plot_contour(ch |> poly_close(), col = "black")
             }
           } else{
             plot(im2)
@@ -997,9 +986,7 @@ analyze_objects <- function(img,
 #' @method plot anal_obj
 #' @importFrom lattice densityplot levelplot
 #' @export
-#' @return `plot.anal_obj()` returns a `trellis` object containing the
-#'   distribution of the pixels, optionally  for each object when `facet = TRUE`
-#'   is used.
+#'
 #' @examples
 #' \donttest{
 #' library(pliman)

@@ -80,11 +80,13 @@ respectively.}
 \itemize{
 \item For \code{get_measures()}, if \code{measure} is informed, the pixel values will be
 corrected by the value of the known object, given in the unit of the
-right-hand side of \code{measure}. If \code{dpi} is informed, then all the measures
-will be adjusted to the known \code{dpi}.
+right-hand side of \code{meae}. If \code{dpi} is informed, then all the measures
+will be adjusted to the knosurwn \code{dpi}.
+}
 \itemize{
 \item If applied to an object of class \code{anal_obj}, returns a data frame with the
 object \code{id} and the (corrected) measures.
+\itemize{
 \item If applied to an object of class \code{anal_obj_ls}, returns a list of class
 \code{measures_ls}, with two objects: (i) \code{results}, a data frame containing
 the identification of each image (img) and object within each image (id);
@@ -94,6 +96,8 @@ more than one object is detected in a given image, the number of objects
 deviation of the area (\code{area_sd}) will be computed. For the other measures
 (perimeter and radius), the mean values are presented.
 }
+}
+\itemize{
 \item \code{plot_measures()} returns a \code{NULL} object, drawing the text according to
 the x and y coordinates of the objects in \code{object}.
 }

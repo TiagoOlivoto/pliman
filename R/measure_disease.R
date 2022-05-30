@@ -594,7 +594,6 @@ measure_disease <- function(img,
                                            tolerance = tol,
                                            ext = ext)
         )
-        # return(nmask)
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
         if(show_image == TRUE | save_image == TRUE){
@@ -647,48 +646,25 @@ measure_disease <- function(img,
       healthy <- 100 - symptomatic
       severity <- data.frame(healthy = healthy,
                              symptomatic = symptomatic)
+      has_lesion <- max(nmask) > 0
+      if(isTRUE(show_features) & has_lesion){
 
-      if(isTRUE(show_features)){
-        shape <-
-          cbind(data.frame(EBImage::computeFeatures.shape(nmask)),
-                data.frame(EBImage::computeFeatures.moment(nmask))
-          )
-        object_contour <- EBImage::ocontour(nmask)
-        ch <- conv_hull(object_contour)
-        area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
-        shape <- transform(shape,
-                           id = 1:nrow(shape),
-                           radius_ratio = s.radius.max / s.radius.min,
-                           diam_mean = s.radius.mean * 2,
-                           diam_min = s.radius.min * 2,
-                           diam_max = s.radius.max * 2,
-                           area_ch =   area_ch,
-                           solidity = s.area / area_ch,
-                           circularity = 4*pi*(s.area / s.perimeter^2),
-                           minor_axis = m.majoraxis*sqrt(1-m.eccentricity^2))
-
+        shape <- compute_measures(nmask)
+        object_contour <- shape$cont
+        ch <- shape$ch
+        shape <- shape$shape
         ifelse(!is.null(lower_size),
-               shape <- shape[shape$s.area > lower_size, ],
-               shape <- shape[shape$s.area > mean(shape$s.area) * 0.1, ])
+               shape <- shape[shape$area > lower_size, ],
+               shape <- shape[shape$area > mean(shape$area) * 0.1, ])
         if(!is.null(upper_size)){
-          shape <- shape[shape$s.area < upper_size, ]
+          shape <- shape[shape$area < upper_size, ]
         }
         if(!is.null(topn_lower)){
-          shape <- shape[order(shape$s.area),][1:topn_lower,]
+          shape <- shape[order(shape$area),][1:topn_lower,]
         }
         if(!is.null(topn_upper)){
-          shape <- shape[order(shape$s.area, decreasing = TRUE),][1:topn_upper,]
+          shape <- shape[order(shape$area, decreasing = TRUE),][1:topn_upper,]
         }
-
-        shape <- shape[, c("id", "m.cx", "m.cy", "s.area", "area_ch", "s.perimeter", "s.radius.mean",
-                           "s.radius.min", "s.radius.max", "s.radius.sd", "radius_ratio", "diam_mean",
-                           "diam_min", "diam_max", "m.majoraxis", "minor_axis", "m.eccentricity",
-                           "m.theta", "solidity",  "circularity")]
-        colnames(shape) <- c("id", "x", "y", "area", "area_ch", "perimeter", "radius_mean",
-                             "radius_min", "radius_max", "radius_sd", "radius_ratio", "diam_mean",
-                             "diam_min", "diam_max", "major_axis", "minor_axis", "eccentricity",
-                             "theta", "solidity", "circularity")
-
         stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
                                      "sd_area", "sum_area"),
                             value = c(length(shape$area),
@@ -714,7 +690,7 @@ measure_disease <- function(img,
       } else{
         show_mark <- FALSE
       }
-      if(isTRUE(show_features) & isTRUE(show_contour)){
+      if(isTRUE(show_features) & isTRUE(show_contour) & has_lesion){
         ocont <- object_contour[shape$id]
       }
       if(isTRUE(show_contour) & show_original == TRUE){
@@ -723,7 +699,7 @@ measure_disease <- function(img,
       if(show_image == TRUE){
         if(marker != "point"){
           plot(im2)
-          if(show_features & show_mark){
+          if(show_features & show_mark & has_lesion){
             text(shape[,2],
                  shape[,3],
                  round(shape[, marker], 2),
@@ -735,7 +711,7 @@ measure_disease <- function(img,
           }
         } else{
           plot(im2)
-          if(show_features & show_mark){
+          if(show_features & show_mark & has_lesion){
             points(shape[,2],
                    shape[,3],
                    col = marker_col,
@@ -760,7 +736,7 @@ measure_disease <- function(img,
              height = dim(im2@.Data)[2])
         if(marker != "point"){
           plot(im2)
-          if(show_features & show_mark){
+          if(show_features & show_mark & has_lesion){
             text(shape[,2],
                  shape[,3],
                  round(shape[, marker], 2),
@@ -772,7 +748,7 @@ measure_disease <- function(img,
           }
         } else{
           plot(im2)
-          if(show_features & show_mark){
+          if(show_features & show_mark & has_lesion){
             points(shape[,2],
                    shape[,3],
                    col = marker_col,

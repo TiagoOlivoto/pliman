@@ -82,13 +82,9 @@ peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 new image is created with the object in the exactly position of the
 original image.}
 
-\item{dir_original}{The directory containing the original and
-processed images. Defaults to \code{NULL}. In this case, the function will
-search for the image \code{img} in the current working directory. After
-processing, when \code{save_image = TRUE}, the processed image will be also
-saved in such a directory. It can be either a full path, e.g.,
-\code{"C:/Desktop/imgs"}, or a subfolder within the current working directory,
-e.g., \code{"/imgs"}.}
+\item{dir_original}{The directory containing the original and processed images.
+Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
+current working directory.}
 
 \item{img_healthy}{A color palette of healthy areas.}
 
@@ -148,7 +144,8 @@ img <- image_pliman("mult_leaves.jpg", plot = TRUE)
 sev <-
  measure_disease_byl(img = img,
                      index_lb = "B",
-                     index_dh = "NGRDI")
+                     index_dh = "NGRDI",
+                     workers = 2)
 sev$severity
 
 

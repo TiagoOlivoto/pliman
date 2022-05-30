@@ -39,14 +39,14 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-2">
+    <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
   <a class="nav-link" href="../index.html">
@@ -60,6 +60,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
+    <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
     <a class="dropdown-item" href="../articles/analyze_objects.html">Analyze objects in an image</a>
     <a class="dropdown-item" href="../articles/leaf_area.html">Measure leaf area</a>
     <a class="dropdown-item" href="../articles/phytopatometry.html">Phytopatometry</a>
@@ -122,12 +123,15 @@
   </div>
 </nav><div class="container template-article">
 
+
+
+
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Phytopatometry in R with the package pliman</h1>
                         <h4 data-toc-skip class="author">Tiago Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2021-12-11</h4>
+            <h4 data-toc-skip class="date">2022-04-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/phytopatometry.Rmd" class="external-link"><code>vignettes/phytopatometry.Rmd</code></a></small>
       <div class="d-none name"><code>phytopatometry.Rmd</code></div>
@@ -135,18 +139,19 @@
 
     
     
-<div class="section level1">
-<h1 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
-</h1>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
 </div>
-<div class="section level1">
-<h1 id="single-images">Single images<a class="anchor" aria-label="anchor" href="#single-images"></a>
-</h1>
+<div class="section level2">
+<h2 id="single-images">Single images<a class="anchor" aria-label="anchor" href="#single-images"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |==========================================================|</span>
-<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.1.0)            |</span>
+<span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.2.0)            |</span>
 <span class="co">#&gt; | Author: Tiago Olivoto                                    |</span>
+<span class="co">#&gt; | Type 'citation('pliman')' to know how to cite pliman     |</span>
 <span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial     |</span>
 <span class="co">#&gt; | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |</span>
 <span class="co">#&gt; |==========================================================|</span>
@@ -160,9 +165,9 @@
 <span class="fu"><a href="../reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
 <p><img src="phytopatometry_files/figure-html/disease1-1.png" width="1152"></p>
 </div>
-<div class="section level1">
-<h1 id="image-palettes">Image palettes<a class="anchor" aria-label="anchor" href="#image-palettes"></a>
-</h1>
+<div class="section level2">
+<h2 id="image-palettes">Image palettes<a class="anchor" aria-label="anchor" href="#image-palettes"></a>
+</h2>
 <p>Sample palettes can be made by simply manually sampling small areas of representative images and producing a composite image that will represent each of the desired classes (background, healthy, and symptomatic tissues). Another way is to use the <code><a href="../reference/palettes.html">image_palette()</a></code> function to create sample color palettes</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/palettes.html">image_palette</a></span><span class="op">(</span><span class="va">img</span>, npal <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>
@@ -178,8 +183,8 @@
 <p><img src="phytopatometry_files/figure-html/disease2-1.png" width="960"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res</span><span class="op">$</span><span class="va">severity</span>
-<span class="co">#&gt;   healthy symptomatic</span>
-<span class="co">#&gt; 1 88.9993     11.0007</span></code></pre></div>
+<span class="co">#&gt;    healthy symptomatic</span>
+<span class="co">#&gt; 1 88.85318    11.14682</span></code></pre></div>
 <p>Alternatively, users can create a mask instead of showing the original image.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -200,11 +205,11 @@
 
 <span class="va">res2</span><span class="op">$</span><span class="va">severity</span>
 <span class="co">#&gt;    healthy symptomatic</span>
-<span class="co">#&gt; 1 89.42177    10.57823</span></code></pre></div>
+<span class="co">#&gt; 1 89.52527    10.47473</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="variations-in-image-palettes">Variations in image palettes<a class="anchor" aria-label="anchor" href="#variations-in-image-palettes"></a>
-</h1>
+<div class="section level2">
+<h2 id="variations-in-image-palettes">Variations in image palettes<a class="anchor" aria-label="anchor" href="#variations-in-image-palettes"></a>
+</h2>
 <p>The results may vary depending on how palettes are chosen and are subjective due to the researcher’s experience. In the following example, I show a second example with a variation in the color palettes, where only the necrotic area is assumed to be the diseased tissue. Therefore, the symptomatic area will be smaller than the previous one.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -224,12 +229,12 @@
 <p><img src="phytopatometry_files/figure-html/disease4-2.png" width="960"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res3</span><span class="op">$</span><span class="va">severity</span>
-<span class="co">#&gt;    healthy symptomatic</span>
-<span class="co">#&gt; 1 93.59112    6.408879</span></code></pre></div>
+<span class="co">#&gt;   healthy symptomatic</span>
+<span class="co">#&gt; 1 93.7701    6.229896</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="lesion-features">Lesion features<a class="anchor" aria-label="anchor" href="#lesion-features"></a>
-</h1>
+<div class="section level2">
+<h2 id="lesion-features">Lesion features<a class="anchor" aria-label="anchor" href="#lesion-features"></a>
+</h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res4</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/measure_disease.html">measure_disease</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
@@ -241,53 +246,91 @@
 <p><img src="phytopatometry_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res4</span><span class="op">$</span><span class="va">shape</span>
-<span class="co">#&gt;    id        x        y area perimeter radius_mean radius_min radius_max</span>
-<span class="co">#&gt; 1   1 222.2948 114.5885  960       169   22.079108  0.7835043  38.767075</span>
-<span class="co">#&gt; 2   2 190.6214 130.1154 1231       215   20.057778  1.7904621  38.663801</span>
-<span class="co">#&gt; 3   3 178.9375 213.9516 3617       401   49.837485  1.1931698  94.222357</span>
-<span class="co">#&gt; 4   4 210.7399 194.5400 1761       217   23.716881  1.5763670  42.119603</span>
-<span class="co">#&gt; 5   5 264.1000 193.6000  130        38    6.018896  4.2975384   7.843562</span>
-<span class="co">#&gt; 6   6 120.6235 202.3412   85        29    4.764471  3.2292510   6.038422</span>
-<span class="co">#&gt; 9   7 211.8628 329.1882  882       123   17.877896  7.3877571  30.237301</span>
-<span class="co">#&gt; 11  8 281.3281 324.8633  256        53    8.838631  5.4952324  12.481285</span>
-<span class="co">#&gt; 12  9 347.9771 335.8969  262        54    8.935616  5.6321875  12.396955</span>
-<span class="co">#&gt; 13 10 184.7328 385.5600 1834       163   24.938035 12.0220982  37.688221</span>
-<span class="co">#&gt; 14 11 334.4745 370.2847  137        38    6.238229  4.3579456   8.410026</span>
-<span class="co">#&gt; 15 12 250.6716 377.4925  134        37    6.359633  3.3393420   8.967802</span>
-<span class="co">#&gt; 17 13 173.4016 450.2818 2186       235   28.344963 12.5846882  46.523294</span>
-<span class="co">#&gt; 20 14 108.9227 465.0628  207        57    8.012669  3.4861110  12.275149</span>
-<span class="co">#&gt; 22 15 123.8629 493.3668  897       112   17.445020  9.3626279  27.366851</span>
-<span class="co">#&gt; 23 16 150.0804 521.2864 1257       140   20.782409 10.6625513  32.361860</span>
-<span class="co">#&gt;     radius_sd radius_ratio major_axis eccentricity       theta</span>
-<span class="co">#&gt; 1  11.2244311    49.479080   89.86495    0.9792251  1.39689332</span>
-<span class="co">#&gt; 2   8.8719984    21.594314   71.79989    0.8920490  1.49109854</span>
-<span class="co">#&gt; 3  25.3636087    78.968107  190.71690    0.9785593  1.16759570</span>
-<span class="co">#&gt; 4  10.0315969    26.719415   80.87058    0.8465399  1.27700016</span>
-<span class="co">#&gt; 5   1.0072635     1.825129   15.53860    0.7091755  0.06423295</span>
-<span class="co">#&gt; 6   0.8153877     1.869914   12.38446    0.6869883  0.11255328</span>
-<span class="co">#&gt; 9   6.2862796     4.092893   55.93356    0.9273418  1.54103872</span>
-<span class="co">#&gt; 11  1.9136754     2.271293   24.28904    0.8244441 -0.47555967</span>
-<span class="co">#&gt; 12  1.9407631     2.201091   24.59377    0.8249780  0.98116441</span>
-<span class="co">#&gt; 13  7.4853060     3.134912   75.45401    0.9068672  1.20500061</span>
-<span class="co">#&gt; 14  1.1644608     1.929814   16.43287    0.7429737  0.71296232</span>
-<span class="co">#&gt; 15  1.5849202     2.685500   18.38356    0.8563692 -0.76948291</span>
-<span class="co">#&gt; 17  9.7311394     3.696817   87.67233    0.8522661  0.97798292</span>
-<span class="co">#&gt; 20  2.5364616     3.521158   22.69119    0.7906133  0.01225073</span>
-<span class="co">#&gt; 22  5.4881348     2.922988   53.41278    0.9130101 -0.29202060</span>
-<span class="co">#&gt; 23  5.9427049     3.035095   58.75824    0.8613246 -0.06366696</span>
+<span class="co">#&gt;    id        x        y area area_ch perimeter radius_mean radius_min</span>
+<span class="co">#&gt; 1   1 222.3200 114.8915 1078    1354 195.02439   22.622320  0.3879698</span>
+<span class="co">#&gt; 2   2 191.0465 130.9993 1398    1834 250.13708   20.816980  0.9115061</span>
+<span class="co">#&gt; 3   3 179.0911 214.2961 3799    6151 473.83052   50.153350  1.8504276</span>
+<span class="co">#&gt; 4   4 210.7824 194.3954 1889    2397 255.30866   24.361582  1.0244344</span>
+<span class="co">#&gt; 5   5 264.3901 193.5745  141     128  44.14214    6.283114  4.3903794</span>
+<span class="co">#&gt; 6   6 120.5048 202.2571  105      93  37.14214    5.369155  3.1265135</span>
+<span class="co">#&gt; 8   8 146.3421 261.9737   76      66  31.14214    4.518687  2.8793778</span>
+<span class="co">#&gt; 9   9 211.9611 328.8445  952     996 148.29646   18.564561  7.5563305</span>
+<span class="co">#&gt; 11 11 281.1884 325.3116  292     281  67.11270    9.392671  5.1446472</span>
+<span class="co">#&gt; 12 12 348.0472 335.8679  318     304  70.11270    9.861862  6.1025745</span>
+<span class="co">#&gt; 14 14 184.7266 385.2943 1920    2025 196.82338   25.505155 12.5783993</span>
+<span class="co">#&gt; 15 15 334.3902 370.4390  164     151  48.45584    6.959686  4.3740240</span>
+<span class="co">#&gt; 16 16 250.8000 377.2937  160     149  48.11270    6.921074  4.0697051</span>
+<span class="co">#&gt; 18 18 173.1822 450.1723 2327    3171 280.66400   29.156662 13.0207269</span>
+<span class="co">#&gt; 21 21 110.4505 464.9932  293     313  77.52691    9.429993  4.4465365</span>
+<span class="co">#&gt; 22 22 123.5759 493.3818  969     965 134.29646   18.058149  9.9428271</span>
+<span class="co">#&gt; 23 23 150.0900 521.1082 1322    1407 164.19596   21.391398 11.4118322</span>
+<span class="co">#&gt;    radius_max  radius_sd  diam_mean   diam_min  diam_max major_axis minor_axis</span>
+<span class="co">#&gt; 1   39.265190 11.2033995  45.244640  0.7759396  78.53038   89.92293  19.547251</span>
+<span class="co">#&gt; 2   39.529290  9.0458326  41.633960  1.8230122  79.05858   73.27615  34.169006</span>
+<span class="co">#&gt; 3   94.946302 25.4258199 100.306701  3.7008551 189.89260  191.18214  40.018484</span>
+<span class="co">#&gt; 4   42.288501 10.2093933  48.723164  2.0488688  84.57700   81.29199  44.116065</span>
+<span class="co">#&gt; 5    8.254035  1.1383451  12.566228  8.7807588  16.50807   16.35498  11.486895</span>
+<span class="co">#&gt; 6    7.088418  1.1048155  10.738310  6.2530269  14.17684   14.47091   9.641739</span>
+<span class="co">#&gt; 8    6.071429  0.7591856   9.037375  5.7587555  12.14286   11.77168   8.445906</span>
+<span class="co">#&gt; 9   30.734757  6.5387369  37.129121 15.1126611  61.46951   58.09637  21.748324</span>
+<span class="co">#&gt; 11  13.419930  2.2028868  18.785342 10.2892943  26.83986   26.45570  14.410864</span>
+<span class="co">#&gt; 12  13.122849  2.0126248  19.723723 12.2051489  26.24570   26.44841  15.643535</span>
+<span class="co">#&gt; 14  38.056061  7.4536320  51.010311 25.1567985  76.11212   76.23840  32.959442</span>
+<span class="co">#&gt; 15   9.743799  1.4887588  13.919371  8.7480480  19.48760   18.78902  11.606923</span>
+<span class="co">#&gt; 16   9.568830  1.6841106  13.842149  8.1394103  19.13766   19.74888  10.679937</span>
+<span class="co">#&gt; 18  47.893313  9.9327403  58.313325 26.0414538  95.78663   90.36439  46.241547</span>
+<span class="co">#&gt; 21  13.993915  2.8866110  18.859987  8.8930729  27.98783   28.23184  14.839813</span>
+<span class="co">#&gt; 22  27.645878  5.5348654  36.116299 19.8856542  55.29176   54.90169  22.877127</span>
+<span class="co">#&gt; 23  32.812383  6.1031635  42.782796 22.8236644  65.62477   60.08143  30.640548</span>
+<span class="co">#&gt;       length     width radius_ratio eccentricity       theta  solidity</span>
+<span class="co">#&gt; 1   76.91705 22.900564   101.206826   0.07810929  1.39732904 0.7961595</span>
+<span class="co">#&gt; 2   67.23683 37.516507    43.367006   0.29896954  1.46956082 0.7622683</span>
+<span class="co">#&gt; 3  185.33819 45.833118    51.310467   0.05691535  1.16508703 0.6176232</span>
+<span class="co">#&gt; 4   74.77468 46.858803    41.279852   0.35579958  1.27672571 0.7880684</span>
+<span class="co">#&gt; 5   15.54012 11.561576     1.880028   0.54288657  0.08021884 1.1015625</span>
+<span class="co">#&gt; 6   13.07730  8.900085     2.267196   0.53688851  0.08862697 1.1290323</span>
+<span class="co">#&gt; 8   11.04127  8.280951     2.108590   0.54838504  0.51366230 1.1515152</span>
+<span class="co">#&gt; 9   60.41754 23.822754     4.067418   0.19131109  1.53935203 0.9558233</span>
+<span class="co">#&gt; 11  25.55295 15.282359     2.608523   0.37895490 -0.44127446 1.0391459</span>
+<span class="co">#&gt; 12  25.91936 15.809918     2.150379   0.40833033  0.96409333 1.0460526</span>
+<span class="co">#&gt; 14  73.65268 34.888159     3.025509   0.27327778  1.20347917 0.9481481</span>
+<span class="co">#&gt; 15  18.41044 11.400367     2.227651   0.41693554  0.76514046 1.0860927</span>
+<span class="co">#&gt; 16  17.67939 10.607173     2.351234   0.37523236 -0.76466324 1.0738255</span>
+<span class="co">#&gt; 18  88.50779 54.147243     3.678237   0.31210588  0.99334471 0.7338379</span>
+<span class="co">#&gt; 21  27.00476 15.056036     3.147149   0.33015965  0.01068920 0.9361022</span>
+<span class="co">#&gt; 22  54.09908 23.127730     2.780485   0.25269803 -0.29144428 1.0041451</span>
+<span class="co">#&gt; 23  63.07881 33.160667     2.875295   0.29582221 -0.04361889 0.9395878</span>
+<span class="co">#&gt;    convexity elongation circularity circularity_haralick circularity_norm</span>
+<span class="co">#&gt; 1  0.6048877  0.7022693    35.28248             2.019237         3.054178</span>
+<span class="co">#&gt; 2  0.5795753  0.4420245    44.75577             2.301279         3.865720</span>
+<span class="co">#&gt; 3  0.5061129  0.7527055    59.09854             1.972536         4.968400</span>
+<span class="co">#&gt; 4  0.6235010  0.3733333    34.50636             2.386193         2.920642</span>
+<span class="co">#&gt; 5  0.8510376  0.2560178    13.81935             5.519516         1.297564</span>
+<span class="co">#&gt; 6  0.9366701  0.3194249    13.13846             4.859775         1.261841</span>
+<span class="co">#&gt; 8  0.8939243  0.2500000    12.76096             5.952019         1.265194</span>
+<span class="co">#&gt; 9  0.8204392  0.6056981    23.10067             2.839166         1.974117</span>
+<span class="co">#&gt; 11 0.9054369  0.4019336    15.42505             4.263801         1.370654</span>
+<span class="co">#&gt; 12 0.9049613  0.3900343    15.45846             4.900000         1.367784</span>
+<span class="co">#&gt; 14 0.7860454  0.5263151    20.17679             3.421843         1.679993</span>
+<span class="co">#&gt; 15 0.8657432  0.3807660    14.31688             4.674824         1.315813</span>
+<span class="co">#&gt; 16 0.7295288  0.4000260    14.46770             4.109632         1.325241</span>
+<span class="co">#&gt; 18 0.6797235  0.3882206    33.85143             2.935410         2.840924</span>
+<span class="co">#&gt; 21 0.8424647  0.4424673    20.51339             3.266804         1.857453</span>
+<span class="co">#&gt; 22 0.9182622  0.5724931    18.61253             3.262618         1.576302</span>
+<span class="co">#&gt; 23 0.8472435  0.4742979    20.39358             3.504969         1.716347</span>
 <span class="va">res4</span><span class="op">$</span><span class="va">statistics</span>
-<span class="co">#&gt;        stat      value</span>
-<span class="co">#&gt; 1         n    16.0000</span>
-<span class="co">#&gt; 2  min_area    85.0000</span>
-<span class="co">#&gt; 3 mean_area   989.7500</span>
-<span class="co">#&gt; 4  max_area  3617.0000</span>
-<span class="co">#&gt; 5   sd_area   982.8429</span>
-<span class="co">#&gt; 6  sum_area 15836.0000</span></code></pre></div>
+<span class="co">#&gt;        stat     value</span>
+<span class="co">#&gt; 1         n    17.000</span>
+<span class="co">#&gt; 2  min_area    76.000</span>
+<span class="co">#&gt; 3 mean_area  1011.941</span>
+<span class="co">#&gt; 4  max_area  3799.000</span>
+<span class="co">#&gt; 5   sd_area  1023.611</span>
+<span class="co">#&gt; 6  sum_area 17203.000</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="a-little-bit-more">
+<div class="section level2">
+<h2 id="a-little-bit-more">
 <i class="fas fa-scroll"></i> A little bit more!<a class="anchor" aria-label="anchor" href="#a-little-bit-more"></a>
-</h1>
+</h2>
 <!-- inicio font awesome -->
 <script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script><blockquote>
 <p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this link</a> you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>. You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>. <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!</p>
@@ -306,7 +349,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
     </footer>

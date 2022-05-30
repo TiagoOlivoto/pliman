@@ -1,6 +1,6 @@
 #' Utilities for object measures
 #'
-#' * `get_measures()` computes object measures (area, perimeter, radius) by using
+#'* `get_measures()` computes object measures (area, perimeter, radius) by using
 #'either a known resolution (dpi) or an object with known measurements.
 #' * `plot_measures()` draws the object measures given in an object to the
 #' current plot. The object identification (`"id"`) is drawn by default.
@@ -43,10 +43,10 @@
 #' @return
 #' * For `get_measures()`, if `measure` is informed, the pixel values will be
 #' corrected by the value of the known object, given in the unit of the
-#' right-hand side of `measure`. If `dpi` is informed, then all the measures
-#' will be adjusted to the known `dpi`.
+#' right-hand side of `meae`. If `dpi` is informed, then all the measures
+#' will be adjusted to the knosurwn `dpi`.
 #'
-#'    -  If applied to an object of class `anal_obj`, returns a data frame with the
+#' -  If applied to an object of class `anal_obj`, returns a data frame with the
 #' object `id` and the (corrected) measures.
 #'    - If applied to an object of class `anal_obj_ls`, returns a list of class
 #'    `measures_ls`, with two objects: (i) `results`, a data frame containing
@@ -119,10 +119,10 @@ get_measures <- function(object,
       cat("-----------------------------------------\n")
     }
   }
-  if(any(class(object) == "objects_rgb")){
+  if(any(inherits(object, "objects_rgb"))){
     res <- object[["objects"]]
   }
-  if(class(object) == "plm_disease"){
+  if(class(object)  %in%  c("plm_disease", "plm_disease_byl")){
     res <- object$shape
   }
   if(!is.null(id) & !is.null(dpi)){
@@ -153,30 +153,31 @@ get_measures <- function(object,
       corrected <- values * value / id_val
       res$area <- corrected
       res$area_ch <- res$area_ch * px_side^2
-      res$perimeter <- res$perimeter * px_side
-      res$radius_mean <- res$radius_mean * px_side
-      res$radius_min <- res$radius_min * px_side
-      res$radius_max <- res$radius_max * px_side
-      res$diam_mean <- res$diam_mean * px_side
-      res$diam_min <- res$diam_min * px_side
-      res$diam_max <- res$diam_max * px_side
-      res$major_axis <- res$major_axis * px_side
-      res$minor_axis <- res$minor_axis * px_side
+      if(inherits(object, "plm_disease_byl")){
+        res[8:19] <- apply(res[8:19], 2, function(x){
+          x * px_side
+        })
+      } else{
+        res[6:17] <- apply(res[6:17], 2, function(x){
+          x * px_side
+        })
+      }
+
     }
     if(var != "area"){
       id_val <- res[which(res$id == id), var]
       px_side <- value / id_val
       res$area <- res$area * px_side^2
       res$area_ch <- res$area_ch * px_side^2
-      res$perimeter <- res$perimeter * px_side
-      res$radius_mean <- res$radius_mean * px_side
-      res$radius_min <- res$radius_min * px_side
-      res$radius_max <- res$radius_max * px_side
-      res$diam_mean <- res$diam_mean * px_side
-      res$diam_min <- res$diam_min * px_side
-      res$diam_max <- res$diam_max * px_side
-      res$major_axis <- res$major_axis * px_side
-      res$minor_axis <- res$minor_axis * px_side
+      if(inherits(object, "plm_disease_byl")){
+        res[8:19] <- apply(res[8:19], 2, function(x){
+          x * px_side
+        })
+      } else{
+        res[6:17] <- apply(res[6:17], 2, function(x){
+          x * px_side
+        })
+      }
     }
     res <- res[which(res$id != id),]
     if(verbose == TRUE){
@@ -193,66 +194,111 @@ get_measures <- function(object,
     dpc <- dpi * 1 / 2.54
     res$area <- res$area * 1/dpc^2
     res$area_ch <- res$area_ch * 1/dpc^2
-    res$perimeter <- res$perimeter / dpc
-    res$radius_mean <- res$radius_mean / dpc
-    res$radius_min <- res$radius_min / dpc
-    res$radius_max <- res$radius_max / dpc
-    res$diam_mean <- res$diam_mean / dpc
-    res$diam_min <- res$diam_min / dpc
-    res$diam_max <- res$diam_max / dpc
-    res$major_axis <- res$major_axis / dpc
-    res$minor_axis <- res$minor_axis / dpc
+    if(inherits(object, "plm_disease_byl")){
+      res[8:19] <- apply(res[8:19], 2, pixels_to_cm, dpi = dpi)
+    } else{
+      res[6:17] <- apply(res[6:17], 2, pixels_to_cm, dpi = dpi)
+    }
   }
+
   if("img" %in% names(res)){
-    smr <-
-      do.call(cbind,
-              lapply(5:ncol(res), function(i){
-                if(i == 5){
-                  n <- aggregate(res[[i]] ~ img, res, length)[[2]]
-                  s <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
-                  a <- aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
-                  d <- aggregate(res[[i]] ~ img, res, sd, na.rm = TRUE)[2]
-                  cbind(n, s, a, d)
-                } else{
-                  aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
-                }
-              })
-      )
-    names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:ncol(res)]))
-    smr$img <- unique(res$img)
-    smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
-    smr$area_sd[is.na(smr$area_sd)] <- 0
-    merg <- smr
-    merg$img = sapply(strsplit(as.character(merg$img), sep), "[", 1)
-    mergt <-
-      do.call(cbind,
-              lapply(2:ncol(merg), function(i){
-                if(i %in% 2:3){
-                  aggregate(merg[[i]] ~ img, merg, sum, na.rm = TRUE)[2]
-                } else{
-                  aggregate(merg[[i]] ~ img, merg, mean, na.rm = TRUE)[2]
-                }
-              })
-      )
-    mergt$img <- unique(merg$img)
-    mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
-    names(mergt) <- names(smr)
-    smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
-    res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
-    rownames(res) <- NULL
-    mergt[,3:ncol(mergt)] <- apply(mergt[,3:ncol(mergt)], 2, round, digits)
-    out <-
-      list(results = res,
-           summary = smr,
-           merge = mergt)
+    if(class(object) != "plm_disease_byl"){
+      smr <-
+        do.call(cbind,
+                lapply(5:ncol(res), function(i){
+                  if(i == 5){
+                    n <- aggregate(res[[i]] ~ img, res, length)[[2]]
+                    s <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                    a <- aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                    d <- aggregate(res[[i]] ~ img, res, sd, na.rm = TRUE)[2]
+                    cbind(n, s, a, d)
+                  } else{
+                    aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                  }
+                })
+        )
+      names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:ncol(res)]))
+      smr$img <- unique(res$img)
+      smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
+      smr$area_sd[is.na(smr$area_sd)] <- 0
+      merg <- smr
+      merg$img = sapply(strsplit(as.character(merg$img), sep), "[", 1)
+      mergt <-
+        do.call(cbind,
+                lapply(2:ncol(merg), function(i){
+                  if(i %in% 2:3){
+                    aggregate(merg[[i]] ~ img, merg, sum, na.rm = TRUE)[2]
+                  } else{
+                    aggregate(merg[[i]] ~ img, merg, mean, na.rm = TRUE)[2]
+                  }
+                })
+        )
+      mergt$img <- unique(merg$img)
+      mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
+      names(mergt) <- names(smr)
+      smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
+      res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
+      rownames(res) <- NULL
+      mergt[,3:ncol(mergt)] <- apply(mergt[,3:ncol(mergt)], 2, round, digits)
+      out <-
+        list(results = res,
+             summary = smr,
+             merge = mergt)
+    }
+
+    if(inherits(object, "plm_disease_byl")){
+      smr <-
+        do.call(cbind,
+                lapply(6:ncol(res), function(i){
+                  if(i == 6){
+                    n <- aggregate(res[[i]] ~ img, res, length)[[2]]
+                    s <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                    a <- aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                    d <- aggregate(res[[i]] ~ img, res, sd, na.rm = TRUE)[2]
+                    cbind(n, s, a, d)
+                  } else{
+                    aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                  }
+                })
+        )
+      names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[7:ncol(res)]))
+      smr$img <- unique(res$img)
+      smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
+      smr$area_sd[is.na(smr$area_sd)] <- 0
+      merg <- smr
+      merg$img = sapply(strsplit(as.character(merg$img), sep), "[", 1)
+      mergt <-
+        do.call(cbind,
+                lapply(2:ncol(merg), function(i){
+                  if(i %in% 2:3){
+                    aggregate(merg[[i]] ~ img, merg, sum, na.rm = TRUE)[2]
+                  } else{
+                    aggregate(merg[[i]] ~ img, merg, mean, na.rm = TRUE)[2]
+                  }
+                })
+        )
+      mergt$img <- unique(merg$img)
+      mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
+      names(mergt) <- names(smr)
+      smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
+      res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
+      rownames(res) <- NULL
+      mergt[,3:ncol(mergt)] <- apply(mergt[,3:ncol(mergt)], 2, round, digits)
+      out <-
+        list(results = res,
+             summary = smr,
+             merge = mergt)
+
+    }
     class(out) <- c("measures_ls")
     return(out)
   } else{
-    res[,2:ncol(res)] <- apply(res[,2:ncol(res)], 2, round, digits)
+    res <- round_cols(res, digits = digits)
     class(res) <- c("data.frame", "measures")
     return(res)
   }
 }
+
 
 #' @name utils_measures
 #' @export
@@ -267,12 +313,12 @@ plot_measures <- function(object,
                           ...){
   if("measures"  %in% class(object)){
     object <- object
-  } else if(class(object) == "anal_obj"){
+  } else if(inherits(object, "anal_obj")){
     index <- object$object_index
     object <- object$results
-  } else if(class(object) == "objects_rgb"){
+  } else if(inherits(object, "objects_rgb")){
     object <- object$objects
-  } else if(class(object) == "plm_disease"){
+  } else if(inherits(object, "plm_disease")){
     object <- object$shape
   } else{
     stop("Object of ivalid class.")
@@ -309,7 +355,6 @@ plot_measures <- function(object,
     }
   }
 }
-
 
 
 #' Summary an object index
@@ -376,8 +421,7 @@ summary_index <- function(object,
     stop("'object' was not computed using the `object_index` argument.")
   }
   coords <- object$results[2:3]
-  obj_in <- object$object_index
-
+  obj_in <- check_inf(object$object_index)
   if(!is.null(index)){
 
     if(isFALSE(select_higher)){
@@ -441,3 +485,145 @@ summary_index <- function(object,
                  pca_res = pca_res))
 }
 
+names_measures <- function(){
+  c("id",
+    "x",
+    "y",
+    "area",
+    "area_ch",
+    "perimeter",
+    "radius_mean",
+    "radius_min",
+    "radius_max",
+    "radius_sd",
+    "diam_mean",
+    "diam_min",
+    "diam_max",
+    "major_axis",
+    "minor_axis",
+    "length",
+    "width",
+    "radius_ratio",
+    "eccentricity",
+    "theta",
+    "solidity",
+    "convexity",
+    "elongation",
+    "circularity",
+    "circularity_haralick",
+    "circularity_norm")
+}
+
+## helper function to compute the measures based on a mask
+compute_measures <- function(mask){
+  ocont <- EBImage::ocontour(mask)
+  valid <- which(sapply(ocont, length) > 4)
+  shape <-
+    cbind(data.frame(EBImage::computeFeatures.shape(mask)),
+          data.frame(EBImage::computeFeatures.moment(mask))
+    )[valid, ]
+  ocont <- ocont[valid]
+  ch <- conv_hull(ocont)
+  area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
+  shape$s.perimeter = poly_perimeter(ocont)
+  lw <- poly_lw(ocont)
+  shape <- transform(shape,
+                     id = 1:nrow(shape),
+                     radius_ratio = s.radius.max / s.radius.min,
+                     diam_mean = s.radius.mean * 2,
+                     diam_min = s.radius.min * 2,
+                     diam_max = s.radius.max * 2,
+                     length = lw[, 1],
+                     width = lw[, 2],
+                     area_ch =   area_ch,
+                     solidity = s.area / area_ch,
+                     convexity = poly_convexity(ocont),
+                     elongation = poly_elongation(ocont),
+                     circularity = s.perimeter ^ 2 / s.area,
+                     circularity_haralick = s.radius.mean / s.radius.sd,
+                     circularity_norm = poly_circularity_norm(ocont),
+                     minor_axis = m.majoraxis*sqrt(1 - m.eccentricity^2),
+                     m.eccentricity = poly_eccentricity(ocont))
+  shape <- shape[, c("id",
+                     "m.cx",
+                     "m.cy",
+                     "s.area",
+                     "area_ch",
+                     "s.perimeter",
+                     "s.radius.mean",
+                     "s.radius.min",
+                     "s.radius.max",
+                     "s.radius.sd",
+                     "diam_mean",
+                     "diam_min",
+                     "diam_max",
+                     "m.majoraxis",
+                     "minor_axis",
+                     "length",
+                     "width",
+                     "radius_ratio",
+                     "m.eccentricity",
+                     "m.theta",
+                     "solidity",
+                     "convexity",
+                     "elongation",
+                     "circularity",
+                     "circularity_haralick",
+                     "circularity_norm")]
+  colnames(shape) <- names_measures()
+  return(list(shape = shape,
+              cont = ocont,
+              ch = ch))
+}
+
+
+
+
+# Helper functions to apply stats on a list
+
+#' These functions applies common statistics to a list of objects, returning a
+#' numeric vector.
+#'
+#' @param x A data.frame or matrix with numeric values.
+#' @param ... Further arguments passed on to the R base function (e.g, mean(),
+#'   sd(), etc.)
+#'
+#' @return A numeric vector.
+#' @export
+#' @name utils_stats
+#' @examples
+#' mean_list(list(a = 1:10, b = 2:20))
+mean_list <- function(x, ...) {
+  if (inherits(x, "list")) {
+    sapply(x, mean, ...)
+  } else{
+    mean(x, ...)
+  }
+}
+#' @export
+#' @name utils_stats
+sd_list <- function(x, ...) {
+  if (inherits(x, "list")) {
+    sapply(x, sd, ...)
+  } else{
+    sd(x, ...)
+  }
+}
+#' @export
+#' @name utils_stats
+max_list <- function(x, ...) {
+  if (inherits(x, "list")) {
+    sapply(x, max, ...)
+  } else{
+    max(x, ...)
+  }
+}
+#' @export
+#' @name utils_stats
+min_list <- function(x, ...) {
+  if (inherits(x, "list")) {
+    sapply(x, min, ...)
+  } else{
+    min(x, ...)
+  }
+}

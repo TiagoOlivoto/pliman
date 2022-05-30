@@ -16,6 +16,7 @@
 ^vignettes/leaf_area\.Rmd$
 ^vignettes/segmentation\.Rmd$
 ^vignettes/phytopatometry\.Rmd$
+^vignettes/polygons\.Rmd$
 ^CODE_OF_CONDUCT\.md$
 ^\.github$
 ^cran-comments\.md$

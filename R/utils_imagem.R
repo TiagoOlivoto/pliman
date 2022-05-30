@@ -199,7 +199,7 @@ image_export <- function(image,
                          "img_mat_list", "palette_list")){
     image <- lapply(image, function(x){x[[1]]})
   }
-  if(class(image) == "segment_list"){
+  if(inherits(image, "segment_list")){
     image <- lapply(image, function(x){x[[1]][[1]]})
   }
   if(is.list(image)){
@@ -421,7 +421,7 @@ image_crop <- function(image,
                        workers = NULL,
                        verbose = TRUE,
                        plot = FALSE){
-  check_ebi()
+  # check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -468,11 +468,10 @@ image_crop <- function(image,
       w <- round(cord$x[[1]], 0):round(cord$x[[2]], 0)
       h <- round(cord$y[[1]], 0):round(cord$y[[2]], 0)
       cord <- apply(data.frame(do.call(rbind, cord)), 2, round, digits = 0)
-      rownames(cord) <- c("width", "height")
-      colnames(cord) <- c("min", "max")
       image@.Data <- image@.Data[w, h, ]
       if(isTRUE(verbose)){
-        print(cord)
+        cat(paste0("width = ", cord[1, 1], ":", cord[1, 2]), "\n")
+        cat(paste0("height = ", cord[2, 1], ":", cord[2, 2]), "\n")
       }
     }
     if (isTRUE(plot)) {
@@ -1827,7 +1826,7 @@ image_segment <- function(image,
                           workers = NULL,
                           verbose = TRUE){
   check_ebi()
-  if(class(image) == "img_segment"){
+  if(inherits(image, "img_segment")){
     image <- image[[1]][["image"]]
   }
   if(is.list(image)){

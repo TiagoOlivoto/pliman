@@ -4,6 +4,8 @@
 analyze_objects() provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 more at Details section.
+analyze_objects_iter() provides an iterative section to measure object
+features using an object with a known area.
 plot.anal_obj() Produces an histogram for the R, G, and B values when
 argument object_index is used in the function analyze_objects().
 
@@ -12,6 +14,8 @@ argument object_index is used in the function analyze_objects().
 analyze_objects() provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 more at Details section.
+analyze_objects_iter() provides an iterative section to measure object
+features using an object with a known area.
 plot.anal_obj() Produces an histogram for the R, G, and B values when
 argument object_index is used in the function analyze_objects().
 
@@ -32,14 +36,14 @@ argument object_index is used in the function analyze_objects().
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-2">
+    <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../index.html">
     <span class="fa fa-home"></span>
@@ -52,6 +56,7 @@ argument object_index is used in the function analyze_objects().
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
+    <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
     <a class="dropdown-item" href="../articles/analyze_objects.html">Analyze objects in an image</a>
     <a class="dropdown-item" href="../articles/leaf_area.html">Measure leaf area</a>
     <a class="dropdown-item" href="../articles/phytopatometry.html">Phytopatometry</a>
@@ -121,6 +126,8 @@ argument object_index is used in the function analyze_objects().
 <ul><li><p><code>analyze_objects()</code> provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
 more at <strong>Details</strong> section.</p></li>
+<li><p><code>analyze_objects_iter()</code> provides an iterative section to measure object
+features using an object with a known area.</p></li>
 <li><p><code>plot.anal_obj()</code> Produces an histogram for the R, G, and B values when
 argument <code>object_index</code> is used in the function <code>analyze_objects()</code>.</p></li>
 </ul></div>
@@ -131,6 +138,8 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
   <span class="va">img</span>,
   foreground <span class="op">=</span> <span class="cn">NULL</span>,
   background <span class="op">=</span> <span class="cn">NULL</span>,
+  reference <span class="op">=</span> <span class="cn">NULL</span>,
+  reference_area <span class="op">=</span> <span class="cn">NULL</span>,
   pattern <span class="op">=</span> <span class="cn">NULL</span>,
   parallel <span class="op">=</span> <span class="cn">FALSE</span>,
   workers <span class="op">=</span> <span class="cn">NULL</span>,
@@ -185,7 +194,9 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
   type <span class="op">=</span> <span class="st">"density"</span>,
   facet <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+<span class="op">)</span>
+
+<span class="fu">analyze_objects_iter</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">known_area</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -196,6 +207,14 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <dd><p>A color palette of the foreground (optional).</p></dd>
 <dt>background</dt>
 <dd><p>A color palette of the background (optional).</p></dd>
+<dt>reference</dt>
+<dd><p>A color palette for a reference object (optional). This is
+useful to adjust measures when images are not obtained with standard
+resolution (e.g., field images). See more in the details section.</p></dd>
+<dt>reference_area</dt>
+<dd><p>The known area of the reference objects. The measures
+of all the objects in the image will be corrected using the same unit of
+the area informed here.</p></dd>
 <dt>pattern</dt>
 <dd><p>A pattern of file name used to identify images to be imported.
 For example, if <code>pattern = "im"</code> all images in the current working
@@ -356,8 +375,13 @@ are recognized.</p></dd>
 <dd><p>Create a facet plot for each object when <code>which = "index"</code> is
 used?. Defaults to <code>FALSE</code>.</p></dd>
 <dt>...</dt>
-<dd><p>Further argument passed on to <code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::histogram()</a></code> or
-<code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::densityplot()</a></code></p></dd>
+<dd><p>Depends on the function:</p><ul><li><p>For <code>analyze_objects_iter()</code>, further arguments passed on to
+<code>analyze_objects()</code>.</p></li>
+<li><p>For <code>plot.anal_obj()</code>, further argument passed on to <code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::histogram()</a></code>
+or <code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::densityplot()</a></code></p></li>
+</ul></dd>
+<dt>known_area</dt>
+<dd><p>The known area of the template object.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -370,18 +394,29 @@ image:</p><ul><li><p><code>id</code>:  object identification.</p></li>
 <li><p><code>radius_min</code>, <code>radius_mean</code>, and <code>radius_max</code>: The minimum, mean, and
 maximum radius (in pixels), respectively.</p></li>
 <li><p><code>radius_sd</code>: standard deviation of the mean radius (in pixels).</p></li>
-<li><p><code>radius_ratio</code>: radius ratio given by <code>radius_max / radius_min</code>.</p></li>
 <li><p><code>diam_min</code>, <code>diam_mean</code>, and <code>diam_max</code>: The minimum, mean, and
 maximum diameter (in pixels), respectively.</p></li>
 <li><p><code>major_axis</code>, <code>minor_axis</code>: elliptical fit for major and minor axes (in
 pixels).</p></li>
-<li><p><code>eccentricity</code>: elliptical eccentricity defined by
-sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
-line eccentricity is 1.</p></li>
+<li><p><code>length</code>, <code>width</code> The length and width of objects (in pixels). These
+measures are obtained as the range of x and y coordinates after aligning
+each object with <code><a href="utils_polygon.html">poly_align()</a></code>.</p></li>
+<li><p><code>radius_ratio</code>: radius ratio given by <code>radius_max / radius_min</code>.</p></li>
+<li><p><code>eccentricity</code>: elliptical eccentricity computed using the
+ratio of the eigen values (inertia axes of coordinates).</p></li>
 <li><p><code>theta</code>: object angle (in radians).</p></li>
 <li><p><code>solidity</code>: object solidity given by <code>area / area_ch</code>.</p></li>
-<li><p><code>circularity</code>: the object circularity given by \(4*pi *(area /
-    perimeter^2)\).</p></li>
+<li><p><code>convexity</code>: The convexity of the object computed using the ratio
+between the perimeter of the convex hull and the perimeter of the polygon.</p></li>
+<li><p><code>elongation</code>: The elongation of the object computed as <code>1 - width / length</code>.</p></li>
+<li><p><code>circularity</code>: The object circularity given by <code>perimeter ^ 2 / area</code>.</p></li>
+<li><p><code>circularity_haralick</code>: The Haralick's circularity (CH), computed as
+<code>CH =  m/sd</code>, where <code>m</code> and <code>sd</code> are the mean and standard deviations
+from each pixels of the perimeter to the centroid of the object.</p></li>
+<li><p><code>circularity_norm</code>: The normalized circularity (Cn), to be unity for a
+circle. This measure is computed as `Cn = perimeter ^ 2 / 4<em>pi</em>area`` and
+is invariant under translation, rotation, scaling transformations, and
+dimensionless.</p></li>
 </ul></li>
 <li><p><code>statistics</code>: A data frame with the summary statistics for the area of the
 objects.</p></li>
@@ -390,9 +425,11 @@ objects.</p></li>
 for each pixel of each object.</p></li>
 <li><p><code>object_index</code>: If <code>object_index</code> is used, returns the index computed for
 each object.</p></li>
-</ul><p><code>plot.anal_obj()</code> returns a <code>trellis</code> object containing the
-distribution of the pixels, optionally  for each object when <code>facet = TRUE</code>is used.</p>
-    </div>
+<li><p><code>analyze_objects_iter()</code> returns a data.frame containing the features
+described in the <code>results</code> object of <code>analyze_objects()</code>.</p></li>
+<li><p><code>plot.anal_obj()</code> returns a <code>trellis</code> object containing the distribution
+of the pixels, optionally  for each object when <code>facet = TRUE</code> is used.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>A binary image is first generated to segment the foreground and background.
@@ -409,13 +446,28 @@ of watershed segmentation.</p>
 foreground pixels in <code>img</code> are set to a unique object. This is faster
 (specially for a large number of objects) but is not able to segment touching
 objects.</p>
-<p>If color palettes samples are provided, a general
-linear model (binomial family) fitted to the RGB values is used to segment
-fore- and background.</p>
+<p>If color palettes are provided, a general linear model (binomial family)
+fitted to the RGB values is used to segment fore- and background. If a color
+palette for a <code>reference</code> object with a known area (<code>reference_area</code>) is
+informed. The measures of the objects in the image will be corrected
+considering the unit of measure informed in <code>reference_area</code>. Sample palettes
+can be produced with <code><a href="palettes.html">image_palette()</a></code>.</p>
 <p>By using <code>pattern</code> it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
 subdirectory informed in <code>dir_original</code>'. To speed up the computation time,
 one can set <code>parallel = TRUE</code>.</p>
+<p><code>analyze_objects_iter()</code> can be used to process several images using an
+object with a known area as a template. In this case, all the images in the
+current working directory that matches the <code>pattern</code> will be processed. For
+each image, the function will compute the features for the objects and show
+the identification (id) of each object. The user only needs to inform which
+is the id of the known object. Then, given the <code>known_area</code>, all the measures
+will be adjusted. In the end, a data.frame with the adjusted measures will be
+returned. This is useful when the images are taken at different heights. In
+such cases, the image resolution cannot be conserved. Consequently, the
+measures cannot be adjusted using the argument <code>dpi</code> from <code><a href="utils_measures.html">get_measures()</a></code>,
+since each image will have a different resolution. NOTE: This will only work
+in an interactive section.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -426,6 +478,11 @@ batatas): the influence of genetics, environment, and G×E. New Phytologist,
 <p>Lee, Y., &amp; Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
 doi: <a href="https://doi.org/10.5951/mathteacher.110.8.0631" class="external-link">10.5951/mathteacher.110.8.0631</a></p>
+<p>Montero, R. S., Bribiesca, E., Santiago, R., &amp; Bribiesca, E. (2009). State
+of the Art of Compactness and Circularity Measures. International
+Mathematical Forum, 4(27), 1305–1335.</p>
+<p>Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
+Computer Vision. 3rd ed. World Scientific.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -458,23 +515,29 @@ doi: <a href="https://doi.org/10.5951/mathteacher.110.8.0631" class="external-li
 <span class="r-plt img"><img src="analyze_objects-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="va">top</span><span class="op">$</span><span class="va">results</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    id        x         y area area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4 345.3566 105.78323 2445    2406       158    27.51343   24.68250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 11 468.9970  56.42549 2315    2275       155    26.76542   23.03064</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3 237.5917 339.82483 2312    2282       152    26.69878   23.96521</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5 406.9314  77.54909 2302    2264       153    26.64891   23.96546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 538.0561 401.89604 2299    2258       153    26.60716   24.95688</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    30.47116 1.7303597     1.234525  55.02687 49.36499 60.94232   60.92191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   30.78003 2.3489729     1.336482  53.53085 46.06129 61.56007   61.22955</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.04402 1.2334610     1.211924  53.39756 47.93042 58.08803   57.50966</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    29.63586 1.6395963     1.236607  53.29783 47.93092 59.27173   58.85962</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.40020 0.9346592     1.137971  53.21431 49.91376 56.80040   56.60376</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    minor_axis eccentricity      theta solidity circularity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    51.10462    0.5443558 -0.9908157 1.016209    1.230763</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   48.15734    0.6175840  1.2923197 1.017582    1.210870</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    51.24681    0.4538087 -0.5715211 1.013146    1.257507</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    49.81918    0.5325370  1.1444750 1.016784    1.235755</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    51.73299    0.4058277 -0.8382015 1.018158    1.234144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4 345.3566 105.78323 2445    2406  183.5097    27.51343   24.68250</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 11 468.9970  56.42549 2315    2275  179.2670    26.76542   23.03064</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3 237.5917 339.82483 2312    2282  178.3381    26.69878   23.96521</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5 406.9314  77.54909 2302    2264  178.0955    26.64891   23.96546</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 538.0561 401.89604 2299    2258  176.4386    26.60716   24.95688</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    30.47116 1.7303597  55.02687 49.36499 60.94232   60.92191   51.10462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   30.78003 2.3489729  53.53085 46.06129 61.56007   61.22955   48.15734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.04402 1.2334610  53.39756 47.93042 58.08803   57.50966   51.24681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    29.63586 1.6395963  53.29783 47.93092 59.27173   58.85962   49.81918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.40020 0.9346592  53.21431 49.91376 56.80040   56.60376   51.73299</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      length    width radius_ratio eccentricity      theta solidity convexity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  60.71775 50.97985     1.234525    0.7537291 -0.9908157 1.016209 0.9284178</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 61.37708 48.38264     1.336482    0.7000370  1.2923197 1.017582 0.8848026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.18726 51.75913     1.211924    0.8295448 -0.5715211 1.013146 0.9340676</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  59.06097 50.57092     1.236607    0.7770521  1.1444750 1.016784 0.8994081</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.53648 51.85138     1.137971    0.8577099 -0.8382015 1.018158 0.8864952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    elongation circularity circularity_haralick circularity_norm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.16037970    13.77333             15.90041         1.133123</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.21171485    13.88193             11.39452         1.143463</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.09491855    13.75626             21.64542         1.132403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.14375052    13.77845             16.25334         1.134654</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.08286873    13.54092             28.46723         1.115144</span>
 <span class="r-in"><span class="co"># }</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
@@ -512,7 +575,7 @@ doi: <a href="https://doi.org/10.5951/mathteacher.110.8.0631" class="external-li
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
     </footer></div>

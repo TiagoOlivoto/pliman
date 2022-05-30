@@ -20,31 +20,21 @@ object_split(
   col_background = "white",
   show_image = TRUE,
   verbose = TRUE,
+  workers = NULL,
   ...
 )
 }
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{index}{A character value specifying the target mode for
+\item{index, my_index}{A character value specifying the target mode for
 conversion to binary image when \code{foreground} and \code{background} are not
 declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
 more details.}
 
-\item{lower_size}{Lower and upper limits for size for the image
-analysis. Plant images often contain dirt and dust. To prevent dust from
-affecting the image analysis, objects with lesser than 10\% of the mean of
-all objects are removed. Upper limit is set to \code{NULL}, i.e., no upper
-limit used. One can set a known area or use \code{lower_limit = 0} to select all
-objects (not advised). Objects that matches the size of a given range of
-sizes can be selected by setting up the two arguments. For example, if
-\code{lower_size = 120} and \code{upper_size = 140}, objects with size greater than
-or equal 120 and less than or equal 140 will be considered.}
-
-\item{my_index}{A character value specifying the target mode for
-conversion to binary image when \code{foreground} and \code{background} are not
-declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
-more details.}
+\item{lower_size}{Plant images often contain dirt and dust. To prevent dust from
+affecting the image analysis, objects with lesser than 10\% of the mean of all objects
+are removed. Set \code{lower_limit = 0} to keep all the objects.}
 
 \item{watershed}{If \code{TRUE} (default) performs watershed-based object
 detection. This will detect objects even when they are touching one other.
@@ -94,6 +84,9 @@ original image.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
+\item{workers}{A positive numeric scalar or a function specifying the maximum
+number of parallel processes that can be active at the same time.}
+
 \item{...}{Additional arguments passed on to \code{\link[=image_combine]{image_combine()}}}
 }
 \value{
@@ -107,7 +100,7 @@ images is returned.
 \examples{
 library(pliman)
 img <- image_pliman("la_leaves.jpg", plot = TRUE)
-imgs <- object_split(img)
+imgs <- object_split(img, workers = 2) # set to NULL to use 50\% of the cores
 
 }
 \seealso{

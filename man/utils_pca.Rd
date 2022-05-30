@@ -84,7 +84,8 @@ principal component: (cos2 * 100) / (total cos2 of the component)
 \code{\link[stats:prcomp]{stats::prcomp()}}, but returns more results such as data, scores,
 contributions and quality of measurements for individuals and variables.
 \item \code{get_biplot()}: Produces a biplot for an object computed with \code{pca()}.
-\item \code{plot.pca()}: Produces several types of plots, depending on the \code{type} and \code{which} arguments
+\item \code{plot.pca()}: Produces several types of plots, depending on the \code{type} and \code{which}
+arguments.
 \itemize{
 \item \code{type = "var"} Produces a barplot with the contribution (\code{which =  "contrib"}), qualitity of adjustment \code{which = "cos2"}, and a scatter plot
 with coordinates (\code{which = "coord"}) for the variables.

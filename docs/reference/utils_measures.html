@@ -30,14 +30,14 @@ current plot. The object identification ("id") is drawn by default.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-2">
+    <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../index.html">
     <span class="fa fa-home"></span>
@@ -50,6 +50,7 @@ current plot. The object identification ("id") is drawn by default.
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
+    <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
     <a class="dropdown-item" href="../articles/analyze_objects.html">Analyze objects in an image</a>
     <a class="dropdown-item" href="../articles/leaf_area.html">Measure leaf area</a>
     <a class="dropdown-item" href="../articles/phytopatometry.html">Phytopatometry</a>
@@ -199,10 +200,10 @@ respectively.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <ul><li><p>For <code>get_measures()</code>, if <code>measure</code> is informed, the pixel values will be
 corrected by the value of the known object, given in the unit of the
-right-hand side of <code>measure</code>. If <code>dpi</code> is informed, then all the measures
-will be adjusted to the known <code>dpi</code>.</p><ul><li><p>If applied to an object of class <code>anal_obj</code>, returns a data frame with the
-object <code>id</code> and the (corrected) measures.</p></li>
-<li><p>If applied to an object of class <code>anal_obj_ls</code>, returns a list of class
+right-hand side of <code>meae</code>. If <code>dpi</code> is informed, then all the measures
+will be adjusted to the knosurwn <code>dpi</code>.</p></li>
+</ul><ul><li><p>If applied to an object of class <code>anal_obj</code>, returns a data frame with the
+object <code>id</code> and the (corrected) measures.</p><ul><li><p>If applied to an object of class <code>anal_obj_ls</code>, returns a list of class
 <code>measures_ls</code>, with two objects: (i) <code>results</code>, a data frame containing
 the identification of each image (img) and object within each image (id);
 and (ii) <code>summary</code> a data frame containing the values for each image. If
@@ -211,7 +212,7 @@ more than one object is detected in a given image, the number of objects
 deviation of the area (<code>area_sd</code>) will be computed. For the other measures
 (perimeter and radius), the mean values are presented.</p></li>
 </ul></li>
-<li><p><code>plot_measures()</code> returns a <code>NULL</code> object, drawing the text according to
+</ul><ul><li><p><code>plot_measures()</code> returns a <code>NULL</code> object, drawing the text according to
 the x and y coordinates of the objects in <code>object</code>.</p></li>
 </ul></div>
     <div class="section level2">
@@ -241,20 +242,25 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class="r-in"><span class="co"># Get object measures by declaring the known resolution in dots per inch</span></span>
 <span class="r-in"><span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu">get_measures</span><span class="op">(</span><span class="va">results</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   id        x        y   area area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1  669.000  798.000 99.982  99.813    39.920       5.732      4.994</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000 24.996  24.911    19.947       2.864      2.491</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339  7.050   7.044     8.551       1.494      1.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498  7.984   7.934    11.904       1.671      0.993</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      7.058    74.266        1.413    11.464    9.989   14.117     11.546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528    37.117        1.416     5.728    4.983    7.055      5.778</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.567        1.017     2.988    2.963    3.013      2.997</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224    49.872        2.239     3.341    1.987    4.448      4.614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   minor_axis eccentricity theta solidity circularity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     11.546        0.002 0.785    1.002       0.788</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      5.768        0.058 1.571    1.003       0.789</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      2.995        0.036 0.028    1.001       1.212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.307        0.866 0.000    1.006       0.708</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1  669.000  798.000 99.982  99.813    39.929       5.732      4.994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000 24.996  24.911    19.946       2.864      2.491</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339  7.050   7.044     9.953       1.494      1.481</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498  7.984   7.934    11.917       1.671      0.993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis length</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      7.058     0.629    11.464    9.989   14.117     11.546     11.546 14.117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528     0.314     5.728    4.983    7.055      5.778      5.768  4.995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.005     2.988    2.963    3.013      2.997      2.995  2.999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224     0.422     3.341    1.987    4.448      4.614      2.307  3.988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    width radius_ratio eccentricity theta solidity convexity elongation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 14.111        1.413        0.999 0.785    1.002     0.751      0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  4.987        1.416        0.997 1.571    1.003     0.750      0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  2.999        1.017        0.990 0.028    1.001     0.919      0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.990        2.239        0.350 0.000    1.006     0.835      0.501</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      15.946                9.116            1.271</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.051              311.159            1.124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.786                3.956            1.424</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Calculated diagonal of the object 1</span></span>
 <span class="r-in"><span class="co"># 10 * sqrt(2) = 14.14</span></span>
@@ -273,24 +279,25 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object id: 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> area     : 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Total    : 140.037 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Average  : 35.009 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total    : 40.037 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Average  : 13.346 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   id        x        y    area area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1  669.000  798.000 100.000  99.831    39.924       5.733      4.995</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000  25.000  24.915    19.949       2.864      2.492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339   7.051   7.046     8.552       1.494      1.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498   7.986   7.935    11.905       1.671      0.994</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd radius_ratio diam_mean diam_min diam_max major_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      7.059    74.266        1.413    11.465    9.989   14.118     11.547</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528    37.117        1.416     5.728    4.983    7.056      5.778</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.567        1.017     2.989    2.963    3.013      2.997</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224    49.872        2.239     3.341    1.987    4.448      4.614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   minor_axis eccentricity theta solidity circularity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     11.547        0.002 0.785    1.002       0.788</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      5.769        0.058 1.571    1.003       0.789</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      2.995        0.036 0.028    1.001       1.212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.307        0.866 0.000    1.006       0.708</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id        x        y   area area_ch perimeter radius_mean radius_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000 25.000  24.915    19.948       2.864      2.492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339  7.051   7.046     9.954       1.494      1.481</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498  7.986   7.935    11.918       1.671      0.994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis length</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528     0.314     5.728    4.983    7.056      5.778      5.769  4.996</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.005     2.989    2.963    3.013      2.997      2.995  2.999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224     0.422     3.341    1.987    4.448      4.614      2.307  3.988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   width radius_ratio eccentricity theta solidity convexity elongation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 4.987        1.416        0.997 1.571    1.003     0.750      0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2.999        1.017        0.990 0.028    1.001     0.919      0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.990        2.239        0.350 0.000    1.006     0.835      0.501</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.051              311.159            1.124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.786                3.956            1.424</span>
 <span class="r-in"><span class="co"># }</span></span>
 </code></pre></div>
     </div>
@@ -303,7 +310,7 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
     </footer></div>

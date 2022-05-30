@@ -33,6 +33,8 @@ navbar:
         href: articles/manipulation.html
       - text: "Image segmentation"
         href: articles/segmentation.html
+      - text: "Polygons"
+        href: articles/polygons.html
       - text: "Analyze objects in an image"
         href: articles/analyze_objects.html
       - text: "Measure leaf area"
@@ -82,6 +84,7 @@ reference:
     contents:
       - utils_transform
       - rgb_to_hsv
+      - apply_fun_to_imgs
 
   - title: "Utilities for files"
     desc: "Provides utilities for manipulating files"
@@ -95,6 +98,13 @@ reference:
     desc: "Provides utilities for conversions between size (cm) and resolution (dpi) "
     contents:
       - utils_dpi
+
+  - title: "Utilities for shapes"
+    desc: "Provides utilities for construction of know shapes such as circles, squares, triangles, rectangles, and polygons. Several `poly_*` functions are provided to handle polygons' coordinates"
+    contents:
+      - utils_polygon
+      - utils_polygon_plot
+      - utils_shapes
 
   - title: "Utilities for image points"
     desc: "Opens an iterative section to count objects, extract pixel intensity and create image palettes manually. "
@@ -125,6 +135,7 @@ reference:
       - plot.anal_obj
       - summary_index
       - utils_polygon
+      - object_split
 
 
   - title: "Symptomatic area"
@@ -134,5 +145,15 @@ reference:
       - measure_disease_iter
       - measure_disease_byl
       - sad
+
+
+  - title: "Misc"
+    desc: "Miscellaneous Functions"
+    contents:
+      - separate_col
+      - utils_pca
+      - utils_rows_cols
+      - utils_stats
+
 
 

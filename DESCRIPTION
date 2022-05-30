@@ -22,13 +22,14 @@ Suggests:
     BiocManager,
     EBImage,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rstudioapi
 VignetteBuilder: 
     knitr
 biocViews:
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports: 
     lattice

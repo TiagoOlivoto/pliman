@@ -11,6 +11,9 @@
 #'
 #' @inheritParams object_split
 #' @inheritParams measure_disease
+#' @param dir_original The directory containing the original and processed images.
+#'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
+#'   current working directory.
 #' @param index,my_index A character value specifying the target mode for
 #'   conversion to binary to segment the leaves from background. Defaults to "B"
 #'   (blue). See [image_index()] for more details. Personalized indexes can be
@@ -35,7 +38,8 @@
 #'sev <-
 #'  measure_disease_byl(img = img,
 #'                      index_lb = "B",
-#'                      index_dh = "NGRDI")
+#'                      index_dh = "NGRDI",
+#'                      workers = 2)
 #' sev$severity
 #'
 #'
@@ -85,7 +89,7 @@ measure_disease_byl <- function(img,
     }
 
     splits <- object_split(img,
-                           index = "NB",
+                           index = index,
                            my_index = my_index,
                            watershed = watershed,
                            invert = invert,
@@ -96,7 +100,8 @@ measure_disease_byl <- function(img,
                            object_size = object_size,
                            keep_location = keep_location,
                            show_image = FALSE,
-                           verbose = FALSE)
+                           verbose = FALSE,
+                           workers = workers)
     if (is.character(img_healthy)){
       all_files <- sapply(list.files(diretorio_original), file_name)
       imag <- list.files(diretorio_original, pattern = img_healthy)
@@ -116,28 +121,12 @@ measure_disease_byl <- function(img,
     back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode = 'Color')
     results <- list()
     tmp_dir <- tempdir()
-
     if(isTRUE(show_image)){
       save_image <- FALSE
       clear_td()
     }
-    # for(i in 1:length(splits)){
-    #   results[[paste0( "-", i)]] <-
-    #     measure_disease(splits[[i]],
-    #                     img_healthy = "folha",
-    #                     img_symptoms = "doenca",
-    #                     img_background = back,
-    #                     show_image = FALSE,
-    #                     save_image = TRUE,
-    #                     show_features = F,
-    #                     dir_processed = tmp_dir,
-    #                     # prefix = paste0(name_ori, "_", i),
-    #                     name = "")
-    # }
-
-
-
-    clust <- makeCluster(trunc(detectCores()*.5))
+    workers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+    clust <- makeCluster(workers)
     clusterExport(clust,
                   varlist = c("splits", "measure_disease", "tmp_dir",
                               "name_ori", "img_healthy", "img_symptoms", "back", "show_features"),
@@ -172,31 +161,46 @@ measure_disease_byl <- function(img,
               })
       ) |>
       separate_col(img, into = c("img", "leaf"), sep = "-")
-
     if(isTRUE(show_features)){
       stats <-
         do.call(rbind,
                 lapply(seq_along(results), function(i){
-                  transform(results[[i]][["statistics"]],
-                            img =  names(results[i]))[,c(3, 1, 2)]
+                  if(is.null(results[[i]][["statistics"]])){
+                    res <- data.frame(stat = "NA", value = 0)
+                  } else{
+                    res <- results[[i]][["statistics"]]
+                  }
+                  transform(res, img =  names(results[i]))[,c(3, 1, 2)]
                 })
         ) |>
         separate_col(img, into = c("img", "leaf"), sep = "-")
       shape <-
         do.call(rbind,
                 lapply(seq_along(results), function(i){
-                  transform(results[[i]][["shape"]],
-                            img =  names(results[i]))
+                  if(is.null(results[[i]][["shape"]])){
+                    names <- names_measures()
+                    res <- data.frame(matrix(nrow = 1, ncol = length(names)))
+                    res[1, ] <- 0
+                    colnames(res) <- names
+                  } else{
+                    res <- results[[i]][["shape"]]
+                  }
+                  transform(res, img =  names(results[i]))
                 })
         ) |>
         separate_col(img, into = c("img", "leaf"), sep = "-")
+
     } else{
       shape <- NULL
       stats <- NULL
     }
-    return(list(severity = severity,
-                stats = stats,
-                shape = shape))
+    return(
+      structure(
+        list(severity = severity,
+             stats = stats,
+             shape = shape),
+        class = "plm_disease_byl")
+    )
   }
 
   if(missing(pattern)){
@@ -265,7 +269,9 @@ measure_disease_byl <- function(img,
                       dir_original = diretorio_original,
                       save_image = save_image))
   }
-  return(results)
+  return(structure(
+    results, class = "plm_disease_byl"
+  ))
 }
 
 

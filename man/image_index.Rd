@@ -134,6 +134,4 @@ histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}
-
-Tiago Olivoto \email{tiagoolivoto@gmail.com}
 }

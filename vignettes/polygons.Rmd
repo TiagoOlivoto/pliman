@@ -1,0 +1,270 @@
+---
+title: "Analyzing polygons with pliman"
+author: "Tiago Olivoto"
+date: "`r Sys.Date()`"
+always_allow_html: yes
+output: rmarkdown::html_vignette
+fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Analyzing polygons with pliman}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  rmarkdown.html_vignette.check_title = FALSE,
+  fig.width = 7
+)
+```
+
+# Getting started
+
+> A `polygon` is a plane figure that is described by a finite number of straight-line segments connected to form a closed polygonal chain (Singer, 1993)^[Singer, M.H. 1993. A general approach to moment calculation for polygons and line segments. Pattern Recognition 26(7): 1019–1028. doi: 10.1016/0031-3203(93)90003-F].
+
+Given the above, we may conclude that image objects can be expressed as polygons with `n` vertices. `pliman` has a set of useful functions (`draw_*()`) to draw common shapes such as circles, squares, triangles, rectangles and `n`-tagons. Another group of `poly_*()` functions can be used to analyze polygons. Let's start with a simple example, related to the area and perimeter of a square.
+
+```{r fig.height=6}
+library(pliman)
+square <- draw_square(side = 1)
+poly_area(square)
+poly_perimeter(square)
+```
+
+Now, Let's see what happens when we start with a hexagon and increase the number of sides up to 1000.
+
+```{r fig.height=6}
+shapes <- list(side6 <- draw_n_tagon(6, plot = FALSE),
+               side12 <- draw_n_tagon(12, plot = FALSE),
+               side24 <- draw_n_tagon(24, plot = FALSE),
+               side100 <- draw_n_tagon(100, plot = FALSE),
+               side500 <- draw_n_tagon(500, plot = FALSE),
+               side100 <- draw_n_tagon(1000, plot = FALSE))
+plot_polygon(shapes, merge = FALSE)
+
+poly_area(shapes)
+poly_perimeter(shapes)
+```
+
+
+Note that when $n \to \infty$, the sum of sides becomes the circumference of the circle, given by $2\pi r$, and the area becomes  $\pi r^2$. This is cool, but `pliman` is mainly designed to analyze plant image analysis. So, why would we use polygons? Let's see how we can use these functions to obtain useful information.
+
+
+```{r fig.width=8, fig.height=6}
+link <- "https://raw.githubusercontent.com/TiagoOlivoto/tiagoolivoto/master/static/tutorials/pliman_lca/imgs/leaves.jpg"
+leaves <- image_import(link, plot = TRUE)
+cont <- object_contour(leaves, watershed = FALSE, index = "HI")
+
+# plotting the polygon
+plot_polygon(cont)
+```
+
+# Object measures
+Nice! We can use the contour of any object to obtain useful information related to its shape. To reduce the amount of output, I will only use five samples: 2, 4, 13, 24, and 35.
+```{r fig.height=6}
+cont <- cont[c("2", "4", "13", "24", "35")]
+plot_polygon(cont)
+```
+
+In the current version of `pliman`, you will be able to compute the following measures. For more details, see Chen & Wang (2005)^[Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and Computer Vision. 3rd ed. World Scientific.], Claude (2008)^[Claude, J. 2008. Morphometrics with R. Springer.], and Montero et al. 2009^[Montero, R.S., E. Bribiesca, R. Santiago, and E. Bribiesca. 2009. State of the Art of Compactness and Circularity Measures. International Mathematical Forum 4(27): 1305–1335].
+
+## Area
+
+The area of a shape is computed using Shoelace Formula (Lee and Lim, 2017)^[Lee, Y., and W. Lim. 2017. Shoelace Formula: Connecting the Area of a Polygon and the Vector Cross Product. The Mathematics Teacher 110(8): 631–636. doi: 10.5951/MATHTEACHER.110.8.0631.], as follows
+
+$$
+A=\frac{1}{2}\left|\sum_{i=1}^{n}\left(x_{i} y_{i+1}-x_{i+1}y_{i}\right)\right|
+$$
+```{r fig.height=6}
+poly_area(cont)
+```
+
+
+## Perimeter
+The perimeter is computed as the sum of the euclidean distance between every point of a shape. The distances can be obtained with `poly_distpts()`.
+
+```{r}
+poly_perimeter(cont)
+
+# perimeter of a circle with radius equals to 2
+circle <- draw_circle(radius = 2, plot = FALSE)
+poly_perimeter(circle)
+
+# check the result
+2*pi*2
+```
+
+
+## Radius
+
+The radius of a pixel in the object contour is computed as its distance to the object centroid (also called as ‘center of mass’). These distances can be obtained with `poly_centdist()`. The average, maximum and minimum radius can be obtained.
+
+```{r}
+dists <- poly_centdist(cont)
+
+# statistics for the radius
+mean_list(dists)
+min_list(dists)
+max_list(dists)
+sd_list(dists)
+
+# average radius of the circle above
+poly_centdist(circle) |> mean_list()
+```
+
+
+
+## Length and width
+
+The length and width of an object are computed with `poly_lw()` as the difference between the maximum and minimum of `x` and `y` coordinates after the object has been aligned with `poly_align()`.
+
+```{r fig.height=6}
+aligned <- poly_align(cont)
+
+# compute length and width
+poly_lw(cont)
+```
+
+## Circularity, eccentricity, caliper, and elongation
+
+Circularity measure (Montero et al. 2009)^[Montero, R.S., E. Bribiesca, R. Santiago, and E. Bribiesca. 2009. State of the Art of Compactness and Circularity Measures. International Mathematical Forum 4(27): 1305–1335] is also called shape compactness, or roundness measure of an object. It is given by $C = P^2 / A$, where $P$ is the perimeter and $A$ is the area of the object.
+
+```{r}
+poly_circularity(cont)
+```
+
+Since the above measure is dependent on the scale, the normalized circularity can be used. In this case, it is assumed to be unity for a circle. This measure is invariant under translation, rotation, scaling transformations, and dimensionless. It is given by: $Cn = P^2 / 4 \pi A$
+
+```{r}
+poly_circularity_norm(cont)
+
+# normalized circularity for different shapes
+draw_square(plot = FALSE) |> poly_circularity_norm()
+draw_circle(plot = FALSE) |> poly_circularity_norm()
+```
+
+
+`poly_circularity_haralick()` computes the Haralick's circularity (CH). The method is based on the computation of all the Euclidean distances from the object centroid to each boundary pixel. With this set of distances, the mean ($m$) and the standard deviation ($s$) are computed. These statistical parameters are used on a ratio that calculates the circularity, CH, of a shape, as $CH =  m/sd$
+
+```{r}
+poly_circularity_haralick(cont)
+```
+
+`poly_convexity()` Computes the convexity of a shape using a ratio between the perimeter of the convex hull and the perimeter of the polygon.
+
+```{r}
+poly_convexity(cont)
+```
+
+
+`poly_eccentricity()` Computes the eccentricity of a shape using the ratio of the eigenvalues (inertia axes of coordinates).
+
+```{r}
+poly_eccentricity(cont)
+```
+
+
+`poly_elongation()` Computes the elongation of a shape as `1 - width / length`
+
+```{r}
+poly_elongation(cont)
+```
+
+
+`poly_caliper()` Computes the caliper (Also called the Feret's diameter).
+
+```{r}
+poly_caliper(cont)
+```
+
+
+Users can use the function `poly_measures()` to compute most of the object measures in a single call.
+
+```{r}
+(measures <- poly_measures(cont))
+```
+
+If the image resolution is known, then, the measures can be corrected with `get_measures()`. The image resolution can be obtained using a known distance in the image. In the example, the white square has a side of 5 cm. So, using `dpi()` the resolution can be obtained. In this case, the dpi is ~50.
+
+```{r}
+(measures_cor <- get_measures(measures, dpi = 50))
+```
+
+
+
+# A little bit more!
+
+Some useful functions can be used to manipulate coordinates. In the following example, I will show some features implemented in `pliman`. Just for simplicity, I will use only object 2.
+
+
+```{r}
+o2 <- cont[["2"]]
+plot_polygon(o2)
+```
+
+## Rotate polygons
+
+ `poly_rotate()` can be used to rotate the polygon coordinates by a `angle` (0-360 degrees) in the trigonometric direction (anti-clockwise).
+ 
+```{r fig.width=4, fig.height=4}
+rot <- poly_rotate(o2, angle = 45)
+```
+ 
+
+## Flip polygons
+`poly_flip_x()` and `poly_flip_y()` can be used to flip shapes along the x and y axis, respectively.
+
+```{r fig.width=8, fig.height=4}
+flip <- list(
+  fx = poly_flip_x(o2),
+  fy = poly_flip_y(o2)
+)
+plot_polygon(flip, merge = FALSE, aspect_ratio = 1)
+```
+ 
+
+## Sample points 
+
+`poly_sample()` samples `n` coordinates among existing points, and `poly_sample_prop()` samples a proportion of coordinates among existing. 
+
+```{r fig.width=4, fig.height=4}
+
+# sample 50 coordinates
+poly_sample(o2, n = 50) |> plot_polygon()
+
+# sample 10% of the coordinates
+poly_sample_prop(o2, prop = 0.1) |> plot_polygon()
+```
+ 
+
+## Smooth polygons
+
+`poly_smooth()` smooths a polygon contour by combining sampling `prop` coordinate points and interpolating them using `vertices` vertices.
+
+```{r fig.width=8, fig.height=2.66}
+smooths <- 
+  list(
+    s1 <- poly_smooth(o2, prop = 0.2, plot = FALSE),
+    s2 <- poly_smooth(o2, prop = 0.1, plot = FALSE),
+    s1 <- poly_smooth(o2, prop = 0.05, plot = FALSE)
+  )
+plot_polygon(smooths, merge = FALSE, ncol = 3)
+```
+
+## Add noise to a polygon
+
+`poly_jitter()` adds a small amount of noise to a set of point coordinates. See `base::jitter()` for more details.
+
+```{r fig.width=4, fig.height=4}
+poly_jitter(o2, noise_x = 5, noise_y = 5) |> plot_polygon()
+```
+
+# <i class="fas fa-scroll"></i> A little bit more!
+
+<!-- inicio font awesome -->
+<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
+
+> At [this link](https://tiagoolivoto.github.io/paper_pliman/code.html) you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded [here](https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip). You can also find a talk (Portuguese language) about {pliman} [here](https://www.youtube.com/watch?v=ElvUVlPocgA). <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!
+

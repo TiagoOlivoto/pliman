@@ -16,14 +16,14 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-2">
+    <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../index.html">
     <span class="fa fa-home"></span>
@@ -36,6 +36,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
+    <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
     <a class="dropdown-item" href="../articles/analyze_objects.html">Analyze objects in an image</a>
     <a class="dropdown-item" href="../articles/leaf_area.html">Measure leaf area</a>
     <a class="dropdown-item" href="../articles/phytopatometry.html">Phytopatometry</a>
@@ -100,6 +101,32 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="pliman-development-version">pliman (development version)<a class="anchor" aria-label="anchor" href="#pliman-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-development-version">New functions<a class="anchor" aria-label="anchor" href="#new-functions-development-version"></a></h3>
+<ul><li><p><code><a href="../reference/analyze_objects.html">analyze_objects_iter()</a></code> to execute an interactive section of <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</p></li>
+<li><p><code><a href="../reference/measure_disease_byl.html">measure_disease_byl()</a></code> to measure disease severity ‘<code>by</code> <code>l</code>eaf’ in an image with several leaves.</p></li>
+<li><p><code><a href="../reference/object_split.html">object_split()</a></code> to split multiples objects of an image into a list of images.</p></li>
+<li><p><code><a href="../reference/utils_pca.html">pca()</a></code>, <code><a href="../reference/utils_pca.html">plot.pca()</a></code>, <code><a href="../reference/utils_pca.html">get_biplot()</a></code> as helper functions to perform Principal Component Analysis.</p></li>
+<li><p><code><a href="../reference/utils_rows_cols.html">rownames_to_column()</a></code>, <code><a href="../reference/utils_rows_cols.html">column_to_rownames()</a></code>, <code><a href="../reference/separate_col.html">separate_col()</a></code>, <code><a href="../reference/utils_rows_cols.html">round_cols()</a></code> as helper functions to manipulate data.</p></li>
+<li><p>A set of <code>poly_*()</code> function to analyze polygons. All of them are based on a set of coordinate points describing the edge of the object(s). See ?<code>utils_polygon</code> for more details.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Several measures were added in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. The function now wraps some <code>poly_*()</code> functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-changes-development-version">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/utils_measures.html">get_measures()</a></code> now remove known objects from the results when using the <code>id</code> argument.</li>
+<li>The right-hand of argument <code>measure</code> in <code><a href="../reference/utils_measures.html">get_measures()</a></code> now accepts a numeric object stored in the global environment.</li>
+<li>
+<code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> now returns the objects <code>object_index</code> and <code>object_rgb</code> when the argument <code>pattern</code> is used. Thanks to <a href="https://www.researchgate.net/profile/Joao-Paulo-Ribeiro" class="external-link">João Paulo Oliveira Ribeiro</a> for alerting me regarding this issue.</li>
+<li>New argument <code>reference</code> in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to adjust measures using a reference object in the image.</li>
+<li>Argument <code>object_index</code> in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> now recognizes the names of built-in indexes (see ?<code><a href="../reference/utils_file.html">pliman_indexes()</a></code>).</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="pliman-110">pliman 1.1.0<a class="anchor" aria-label="anchor" href="#pliman-110"></a></h2><p class="text-muted">CRAN release: 2021-12-10</p>
 <div class="section level3">
 <h3 id="new-functions-1-1-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-1-1-0"></a></h3>
@@ -133,7 +160,7 @@
 <li>
 <code><a href="../reference/image_segment.html">image_segment_iter()</a></code> is used to performs iterative image segmentation.</li>
 <li>
-<code><a href="../reference/utils_polygon.html">conv_hull()</a></code>, <code><a href="../reference/utils_polygon.html">poly_area()</a></code>, <code><a href="../reference/utils_polygon.html">poly_mass()</a></code>, <code><a href="../reference/utils_polygon.html">poly_spline()</a></code>, <code><a href="../reference/utils_polygon.html">plot_contour()</a></code>, and <code><a href="../reference/utils_polygon.html">plot_ellipse()</a></code> as utilities for analyzing polygons.</li>
+<code><a href="../reference/utils_polygon.html">conv_hull()</a></code>, <code><a href="../reference/utils_polygon.html">poly_area()</a></code>, <code><a href="../reference/utils_polygon.html">poly_mass()</a></code>, <code><a href="../reference/utils_polygon.html">poly_spline()</a></code>, <code><a href="../reference/utils_polygon_plot.html">plot_contour()</a></code>, and <code><a href="../reference/utils_polygon_plot.html">plot_ellipse()</a></code> as utilities for analyzing polygons.</li>
 <li>
 <code><a href="../reference/utils_dpi.html">dpi()</a></code> to compute the resolution (dots per inch) of an image.</li>
 <li>
@@ -204,7 +231,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
     </footer></div>

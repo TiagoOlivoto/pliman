@@ -318,6 +318,9 @@ object_id <- function(image,
 #' images is returned.
 #'
 #' @inheritParams analyze_objects
+#' @param lower_size Plant images often contain dirt and dust. To prevent dust from
+#'   affecting the image analysis, objects with lesser than 10% of the mean of all objects
+#'   are removed. Set `lower_limit = 0` to keep all the objects.
 #' @param keep_location A logical argument (defaults to `TRUE`). If `FALSE`, the
 #'   new image is created with the object in the exactly position of the
 #'   original image.
@@ -325,6 +328,8 @@ object_id <- function(image,
 #'   `white`. Use the built-in color names which `R` knows about (see
 #'   ?[grDevices::colors()]) or a numeric vector with R, G, and B intensities
 #'   (see ?[grDevices::rgb()]).
+#' @param workers A positive numeric scalar or a function specifying the maximum
+#'   number of parallel processes that can be active at the same time.
 #' @param ... Additional arguments passed on to [image_combine()]
 #' @return A list of objects of class `Image`.
 #' @export
@@ -333,7 +338,7 @@ object_id <- function(image,
 #' @examples
 #' library(pliman)
 #' img <- image_pliman("la_leaves.jpg", plot = TRUE)
-#' imgs <- object_split(img)
+#' imgs <- object_split(img, workers = 2) # set to NULL to use 50% of the cores
 #'
 object_split <- function(img,
                          index = "NB",
@@ -350,6 +355,7 @@ object_split <- function(img,
                          col_background = "white",
                          show_image = TRUE,
                          verbose = TRUE,
+                         workers = NULL,
                          ...){
 
   img2 <- image_binary(img,
@@ -398,8 +404,8 @@ object_split <- function(img,
       image_autocrop(img, plot = FALSE, index = "R")
     }
   }
-
-  clust <- makeCluster(trunc(detectCores()*.5))
+  nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+  clust <- makeCluster(nworkers)
   clusterExport(clust,
                 varlist = c("img", "nmask", "list_crop", "image_autocrop", "selected", "col_background"),
                 envir=environment())

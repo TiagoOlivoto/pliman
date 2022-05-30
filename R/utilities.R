@@ -8,8 +8,12 @@
 #' column.
 #' * `remove_rownames()`: Remove the row names of `.data`.
 #'
+#' * `round_cols()` Rounds the values of all numeric variables to the specified
+#' number of decimal places (default 2).
+#'
 #' @param .data A data frame
 #' @param var Name of column to use for rownames.
+#' @param digits The number of significant figures. Defaults to `2.`
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @export
@@ -29,7 +33,6 @@ column_to_rownames <- function(.data, var = "rowname"){
   if(!var %in% colnames(df)){
     stop("Variable '", var, "' not in data.", call. = FALSE)
   }
-  rownames(df) <- df[[var]]
   df[[var]] <- NULL
   df
 }
@@ -51,6 +54,14 @@ remove_rownames <- function(.data){
   .data
 }
 
+#' @name utils_rows_cols
+#' @export
+round_cols <- function(.data, digits = 2){
+  num_col <- which(sapply(.data,  is.numeric))
+  .data[num_col] <- apply(.data[num_col], 2, round, digits  = digits)
+  return(.data)
+}
+
 
 
 #' Utilities for Principal Component Axis analysis
@@ -59,7 +70,8 @@ remove_rownames <- function(.data){
 #' [stats::prcomp()], but returns more results such as data, scores,
 #' contributions and quality of measurements for individuals and variables.
 #' * `get_biplot()`: Produces a biplot for an object computed with `pca()`.
-#' * `plot.pca()`: Produces several types of plots, depending on the `type` and `which` arguments
+#' * `plot.pca()`: Produces several types of plots, depending on the `type` and `which`
+#' arguments.
 #'    - `type = "var"` Produces a barplot with the contribution (`which =
 #'    "contrib"`), qualitity of adjustment `which = "cos2"`, and a scatter plot
 #'    with coordinates (`which = "coord"`) for the variables.
@@ -545,6 +557,18 @@ get_rgb <- function(img, data_mask, index){
              B = img@.Data[,,3][which(data_mask == index)])
 }
 
+# check for infinite values
+check_inf <- function(data){
+  indx <- apply(data, 2, function(x){
+    any(is.na(x) | is.infinite(x))
+  })
+  if(any(indx) == TRUE){
+    warning("Columns ", paste(colnames(data[indx]), collapse = ", "), " with infinite/NA values removed.", call. = FALSE)
+  }
+  data[,colnames(data[!indx])]
+}
+
+
 clear_td <- function(){
   unlink(paste0(normalizePath(tempdir()), "/", dir(tempdir())), recursive = TRUE)
 }
@@ -582,6 +606,7 @@ separate_col <- function(.data, col, into, sep = "[^[:alnum:]]+"){
 }
 
 
+
 #' Random built-in color names
 #'
 #' Randomly chooses single or multiple built-in color names which R knows about.
@@ -602,3 +627,47 @@ random_color <- function(n = 1, distinct = FALSE){
   return(sample(colors(distinct = distinct), n))
 }
 
+
+
+
+
+#' Set the Working Directory quicky
+#'
+#' It sets the working directory to the path of the current script.
+#'
+#' @param path Path components below the project root. Defaults to `NULL`. This means that
+#'   the directory will be set to the path of the file.
+#' @return A message showing the current working directory
+#' @export
+#'
+#' @examples
+#'
+#' \dontrun{
+#' set_wd_here()
+#' }
+set_wd_here <- function(path = NULL){
+  if(!requireNamespace("rstudioapi", quietly = TRUE)) {
+    if(interactive() == TRUE){
+      inst <-
+        switch(menu(c("Yes", "No"), title = "Package {rstudioapi} required but not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        install.packages("rstudioapi", quiet = TRUE)
+      } else{
+        message("To use `set_wd_here()`, first install {rstudioapi}.")
+      }
+    }
+  } else{
+    dir_path <- dirname(rstudioapi::getSourceEditorContext()$path)
+    if(!is.null(path)){
+      dir_path <- paste0(dir_path, "/", path)
+    }
+    d <- try(setwd(dir_path), TRUE)
+    if(inherits(d, "try-error")){
+      stop("Cannot change working directory to '", dir_path, "'.", call. = FALSE)
+    } else{
+
+    message("Working directory set to '", dir_path, "'")
+    }
+  }
+}
