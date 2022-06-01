@@ -636,8 +636,9 @@ random_color <- function(n = 1, distinct = FALSE){
 #' It sets the working directory to the path of the current script.
 #'
 #' @param path Path components below the project root. Defaults to `NULL`. This means that
-#'   the directory will be set to the path of the file.
-#' @return A message showing the current working directory
+#'   the directory will be set to the path of the file. If the path doesn't exist, the
+#'   user will be asked if he wants to create such a folder.
+#' @return A message showing the current working directory.
 #' @export
 #'
 #' @examples
@@ -658,15 +659,21 @@ set_wd_here <- function(path = NULL){
       }
     }
   } else{
-    dir_path <- dirname(rstudioapi::getSourceEditorContext()$path)
+    dir_path <- dirname(rstudioapi::documentPath())
     if(!is.null(path)){
       dir_path <- paste0(dir_path, "/", path)
     }
     d <- try(setwd(dir_path), TRUE)
     if(inherits(d, "try-error")){
-      stop("Cannot change working directory to '", dir_path, "'.", call. = FALSE)
+      cat(paste0("Cannot change working directory to '", dir_path, "'."))
+      done <- readline(prompt = "Do you want to create this folder now? (y/n) ")
+      if(done == "y"){
+       dir.create(dir_path)
+       message("Directory '", dir_path, "' created.")
+       setwd(dir_path)
+       message("Working directory set to '", dir_path, "'")
+      }
     } else{
-
     message("Working directory set to '", dir_path, "'")
     }
   }
