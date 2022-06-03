@@ -56,8 +56,8 @@ the \code{merge} object the object measures (sum of area and mean of all the
 other measures) of all images that share the same filename prefix, defined
 as the part of the filename preceding the first hyphen (-) or underscore
 (_) (no hyphen or underscore is required). For example, the measures of
-images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
-single image information (L1). This feature allows the user to treat
+images named \verb{L1-1.jpeg}, \verb{L1-2.jpeg}, and \verb{L1-3.jpeg} would be combined
+into a single image information (L1). This feature allows the user to treat
 multiple images as belonging to a single sample, if desired. Defaults to
 \code{sep = "\\\\_|-"}.}
 

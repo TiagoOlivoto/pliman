@@ -13,6 +13,9 @@ measure_disease(
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
+  har_nbins = 32,
+  har_scales = 1,
+  har_band = 1,
   resize = FALSE,
   fill_hull = TRUE,
   index_lb = NULL,
@@ -75,6 +78,15 @@ number of sections is set up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
+
+\item{har_nbins}{An integer indicating the number of bins using to compute
+the Haralick matrix. Defaults to 32. See Details}
+
+\item{har_scales}{A integer vector indicating the number of scales to use to
+compute the Haralick features. See Details.}
+
+\item{har_band}{The band to compute the Haralick features (1 = R, 2 = G, 3 =
+B). Defaults to 1.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -258,6 +270,11 @@ click and continues until the user press Esc. Then, a new sampling process is
 performed to sample the color of healthy tissues and then diseased tissues.
 The generated palettes are then passed on to measure_disease(). All the
 arguments of such function can be passed using the ... (three dots).
+
+When \code{show_features = TRUE}, the function computes a total of 36 lesion
+features (23 shape features and 13 texture features). The Haralick texture
+features for each object based on a gray-level co-occurrence matrix (Haralick
+et al. 1979). See more details in \code{\link[=analyze_objects]{analyze_objects()}}.
 }
 \examples{
 \donttest{

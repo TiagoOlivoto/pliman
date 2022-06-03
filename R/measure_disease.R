@@ -35,6 +35,10 @@
 #'The generated palettes are then passed on to measure_disease(). All the
 #'arguments of such function can be passed using the ... (three dots).
 #'
+#' When `show_features = TRUE`, the function computes a total of 36 lesion
+#' features (23 shape features and 13 texture features). The Haralick texture
+#' features for each object based on a gray-level co-occurrence matrix (Haralick
+#' et al. 1979). See more details in [analyze_objects()].
 #'
 #' @param img The image to be analyzed.
 #' @param img_healthy A color palette of healthy areas.
@@ -51,6 +55,12 @@
 #'   number of sections is set up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
+#' @param har_nbins An integer indicating the number of bins using to compute
+#'   the Haralick matrix. Defaults to 32. See Details
+#' @param har_scales A integer vector indicating the number of scales to use to
+#'   compute the Haralick features. See Details.
+#' @param har_band The band to compute the Haralick features (1 = R, 2 = G, 3 =
+#'   B). Defaults to 1.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
@@ -188,6 +198,9 @@ measure_disease <- function(img,
                             pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
+                            har_nbins = 32,
+                            har_scales = 1,
+                            har_band = 1,
                             resize = FALSE,
                             fill_hull = TRUE,
                             index_lb = NULL,
@@ -649,7 +662,11 @@ measure_disease <- function(img,
       has_lesion <- max(nmask) > 0
       if(isTRUE(show_features) & has_lesion){
 
-        shape <- compute_measures(nmask)
+        shape <- compute_measures(mask = nmask,
+                                  img = img,
+                                  har_nbins = har_nbins,
+                                  har_scales = har_scales,
+                                  har_band = har_band)
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape

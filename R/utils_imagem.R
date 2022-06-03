@@ -1228,6 +1228,40 @@ image_contrast <- function(image,
   }
 }
 
+#' Create an `Image` object of a given color
+#'
+#' image_create() can be used to create an `Image` object with a desired color and size.
+#'
+#' @param color either a color name (as listed by [grDevices::colors()]), or a hexadecimal
+#'   string of the form `"#rrggbb"`.
+#' @param width,heigth The width and heigth of the image in pixel units.
+#' @param plot Plots the image after creating it? Defaults to `FALSE`.
+#'
+#' @return An object of class `Image`.
+#' @export
+#'
+#' @examples
+#' image_create("red")
+#' image_create("#009E73", width = 300, heigth = 100)
+
+image_create <- function(color,
+                         width = 200,
+                         heigth = 200,
+                         plot = FALSE){
+  width <- as.integer(width)
+  heigth <- as.integer(heigth)
+  rgb <- col2rgb(color) / 255
+  r <- rep(rgb[1], width*heigth)
+  g <- rep(rgb[2], width*heigth)
+  b <- rep(rgb[3], width*heigth)
+  img <- EBImage::Image(c(r, g, b),
+                        dim = c(width, heigth, 3),
+                        colormode = "color")
+  if(isTRUE(plot)){
+    plot(img)
+  }
+  return(img)
+}
 
 #' Creates a binary image
 #'
@@ -2236,7 +2270,7 @@ image_to_mat <- function(image,
 #'
 #'# runs only in an iterative section
 #' if(FALSE){
-#' image_palette_pick(img)
+#' pick_palette(img)
 #' }
 #'}
 image_palette <- function(image,

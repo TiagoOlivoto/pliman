@@ -50,6 +50,20 @@
 #' since each image will have a different resolution. NOTE: This will only work
 #' in an interactive section.
 #'
+#' The function computes 13 Haralick texture features for each object based on a
+#' gray-level co-occurrence matrix (Haralick et al. 1979). Haralick features
+#' depend on the configuration of the parameters  `har_nbins` and `har_scales`.
+#' `har_nbins` controls the number of bins used to compute the Haralick matrix.
+#' A smaller `har_nbins` can give more accurate estimates of the correlation
+#' because the number of events per bin is higher. While a higher value will
+#' give more sensitivity. `har_scales` controls the number of scales used to
+#' compute the Haralick features. Since Haralick features compute the
+#' correlation of intensities of neighboring pixels it is possible to identify
+#' textures with different scales, e.g., a texture that is repeated every two
+#' pixels or 10 pixels. By default, the Haralick features are computed with the
+#' R band. To chance this default, use the argument `har_band`. For example,
+#' `har_band = 2` will compute the features with the green band.
+#'
 #' @param img The image to be analyzed.
 #' @param foreground A color palette of the foreground (optional).
 #' @param background A color palette of the background (optional).
@@ -81,6 +95,12 @@
 #'   If `FALSE`, all pixels for each connected set of foreground pixels are set
 #'   to a unique object. This is faster but is not able to segment touching
 #'   objects.
+#' @param har_nbins An integer indicating the number of bins using to compute
+#'   the Haralick matrix. Defaults to 32. See Details
+#' @param har_scales A integer vector indicating the number of scales to use to
+#'   compute the Haralick features. See Details.
+#' @param har_band The band to compute the Haralick features (1 = R, 2 = G, 3 =
+#'   B). Defaults to 1.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value of range 0-100 (proportion of the size of the original
 #'   image).
@@ -232,6 +252,32 @@
 #'     is invariant under translation, rotation, scaling transformations, and
 #'     dimensionless.
 #'
+#'     - `asm`: The angular second-moment feature.
+#'
+#'     - `con`: The contrast feature
+#'
+#'     - `cor`: Correlation measures the linear dependency of gray levels of
+#'     neighboring pixels.
+#'
+#'     - `var`: The variance of gray levels pixels.
+#'
+#'     - `idm`: The Inverse Difference Moment (IDM), i.e., the local
+#'     homogeneity.
+#'
+#'     - `sav`: The Sum Average.
+#'
+#'     - `sva`: The Sum Variance.
+#'
+#'     - `sen`: Sum Entropy.
+#'
+#'     - `dva`: Difference Variance.
+#'
+#'     - `den`: Difference Entropy
+#'
+#'     - `f12`: Difference Variance.
+#'
+#'     - `f13`: The angular second-moment feature.
+#'
 #'  * `statistics`: A data frame with the summary statistics for the area of the
 #'  objects.
 #'  * `count`: If `pattern` is used, shows the number of objects in each image.
@@ -250,6 +296,10 @@
 #' remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
 #' batatas): the influence of genetics, environment, and G×E. New Phytologist,
 #' 225(5), 2183–2195. \doi{10.1111/NPH.16286}
+#'
+#' Haralick, R.M., K. Shanmugam, and I. Dinstein. 1973. Textural Features for Image
+#' Classification. IEEE Transactions on Systems, Man, and Cybernetics SMC-3(6): 610–621.
+#' \doi{10.1109/TSMC.1973.4309314}
 #'
 #' Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 #' and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
@@ -297,6 +347,9 @@ analyze_objects <- function(img,
                             parallel = FALSE,
                             workers = NULL,
                             watershed = TRUE,
+                            har_nbins = 32,
+                            har_scales = 1,
+                            har_band = 1,
                             resize = FALSE,
                             trim = FALSE,
                             fill_hull = FALSE,
@@ -363,8 +416,7 @@ analyze_objects <- function(img,
   help_count <-
     function(img, foreground, background, resize, fill_hull, threshold, filter, tolerance, extension,
              randomize, nrows, show_image, show_original, show_background, marker,
-             marker_col, marker_size, save_image, prefix,
-             dir_original, dir_processed, verbose){
+             marker_col, marker_size, save_image, prefix, dir_original, dir_processed, verbose){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -484,7 +536,11 @@ analyze_objects <- function(img,
         if(isTRUE(fill_hull)){
           nmask <- EBImage::fillHull(nmask)
         }
-        shape <- compute_measures(nmask)
+        shape <- compute_measures(mask = nmask,
+                                  img = img,
+                                  har_nbins = har_nbins,
+                                  har_scales = har_scales,
+                                  har_band = har_band)
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape
@@ -590,7 +646,11 @@ analyze_objects <- function(img,
         ID <-  which(plant_background == 2)
         ID2 <- which(plant_background != 2)
 
-        shape <- compute_measures(nmask)
+        shape <- compute_measures(mask = nmask,
+                                  img = img,
+                                  har_nbins = har_nbins,
+                                  har_scales = har_scales,
+                                  har_band = har_band)
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape

@@ -57,7 +57,7 @@ image_combine(pal)
 
 # runs only in an iterative section
 if(FALSE){
-image_palette_pick(img)
+pick_palette(img)
 }
 }
 }

@@ -27,8 +27,8 @@
 #'   other measures) of all images that share the same filename prefix, defined
 #'   as the part of the filename preceding the first hyphen (-) or underscore
 #'   (_) (no hyphen or underscore is required). For example, the measures of
-#'   images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
-#'   single image information (L1). This feature allows the user to treat
+#'   images named `L1-1.jpeg`, `L1-2.jpeg`, and `L1-3.jpeg` would be combined
+#'   into a single image information (L1). This feature allows the user to treat
 #'   multiple images as belonging to a single sample, if desired. Defaults to
 #'   `sep = "\\_|-"`.
 #' @param hjust,vjust A numeric value to adjust the labels horizontally and
@@ -511,16 +511,34 @@ names_measures <- function(){
     "elongation",
     "circularity",
     "circularity_haralick",
-    "circularity_norm")
+    "circularity_norm",
+    "asm",
+    "con",
+    "cor",
+    "var",
+    "idm",
+    "sav",
+    "sva",
+    "sen",
+    "ent",
+    "dva",
+    "den",
+    "f12",
+    "f13")
 }
 
 ## helper function to compute the measures based on a mask
-compute_measures <- function(mask){
+compute_measures <- function(mask,
+                             img,
+                             har_nbins = 32,
+                             har_scales = 1,
+                             har_band = 1){
   ocont <- EBImage::ocontour(mask)
   valid <- which(sapply(ocont, length) > 4)
   shape <-
-    cbind(data.frame(EBImage::computeFeatures.shape(mask)),
-          data.frame(EBImage::computeFeatures.moment(mask))
+    cbind(
+      data.frame(EBImage::computeFeatures.shape(mask)),
+      data.frame(EBImage::computeFeatures.moment(mask))
     )[valid, ]
   ocont <- ocont[valid]
   ch <- conv_hull(ocont)
@@ -544,6 +562,12 @@ compute_measures <- function(mask){
                      circularity_norm = poly_circularity_norm(ocont),
                      minor_axis = m.majoraxis*sqrt(1 - m.eccentricity^2),
                      m.eccentricity = poly_eccentricity(ocont))
+  hal <- data.frame(
+    EBImage::computeFeatures.haralick(mask,
+                                      img[,,har_band],
+                                      haralick.nbins = har_nbins,
+                                      haralick.scales = har_scales)
+  )
   shape <- shape[, c("id",
                      "m.cx",
                      "m.cy",
@@ -570,14 +594,12 @@ compute_measures <- function(mask){
                      "circularity",
                      "circularity_haralick",
                      "circularity_norm")]
+  shape <- cbind(shape, hal[valid, ])
   colnames(shape) <- names_measures()
   return(list(shape = shape,
               cont = ocont,
               ch = ch))
 }
-
-
-
 
 # Helper functions to apply stats on a list
 

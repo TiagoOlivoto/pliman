@@ -16,6 +16,9 @@ analyze_objects(
   parallel = FALSE,
   workers = NULL,
   watershed = TRUE,
+  har_nbins = 32,
+  har_scales = 1,
+  har_band = 1,
   resize = FALSE,
   trim = FALSE,
   fill_hull = FALSE,
@@ -108,6 +111,15 @@ detection. This will detect objects even when they are touching one other.
 If \code{FALSE}, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.}
+
+\item{har_nbins}{An integer indicating the number of bins using to compute
+the Haralick matrix. Defaults to 32. See Details}
+
+\item{har_scales}{A integer vector indicating the number of scales to use to
+compute the Haralick features. See Details.}
+
+\item{har_band}{The band to compute the Haralick features (1 = R, 2 = G, 3 =
+B). Defaults to 1.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -290,6 +302,20 @@ from each pixels of the perimeter to the centroid of the object.
 circle. This measure is computed as `Cn = perimeter ^ 2 / 4\emph{pi}area`` and
 is invariant under translation, rotation, scaling transformations, and
 dimensionless.
+\item \code{asm}: The angular second-moment feature.
+\item \code{con}: The contrast feature
+\item \code{cor}: Correlation measures the linear dependency of gray levels of
+neighboring pixels.
+\item \code{var}: The variance of gray levels pixels.
+\item \code{idm}: The Inverse Difference Moment (IDM), i.e., the local
+homogeneity.
+\item \code{sav}: The Sum Average.
+\item \code{sva}: The Sum Variance.
+\item \code{sen}: Sum Entropy.
+\item \code{dva}: Difference Variance.
+\item \code{den}: Difference Entropy
+\item \code{f12}: Difference Variance.
+\item \code{f13}: The angular second-moment feature.
 }
 \item \code{statistics}: A data frame with the summary statistics for the area of the
 objects.
@@ -356,6 +382,20 @@ such cases, the image resolution cannot be conserved. Consequently, the
 measures cannot be adjusted using the argument \code{dpi} from \code{\link[=get_measures]{get_measures()}},
 since each image will have a different resolution. NOTE: This will only work
 in an interactive section.
+
+The function computes 13 Haralick texture features for each object based on a
+gray-level co-occurrence matrix (Haralick et al. 1979). Haralick features
+depend on the configuration of the parameters  \code{har_nbins} and \code{har_scales}.
+\code{har_nbins} controls the number of bins used to compute the Haralick matrix.
+A smaller \code{har_nbins} can give more accurate estimates of the correlation
+because the number of events per bin is higher. While a higher value will
+give more sensitivity. \code{har_scales} controls the number of scales used to
+compute the Haralick features. Since Haralick features compute the
+correlation of intensities of neighboring pixels it is possible to identify
+textures with different scales, e.g., a texture that is repeated every two
+pixels or 10 pixels. By default, the Haralick features are computed with the
+R band. To chance this default, use the argument \code{har_band}. For example,
+\code{har_band = 2} will compute the features with the green band.
 }
 \examples{
 \donttest{
@@ -400,6 +440,10 @@ Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
 remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
 batatas): the influence of genetics, environment, and G×E. New Phytologist,
 225(5), 2183–2195. \doi{10.1111/NPH.16286}
+
+Haralick, R.M., K. Shanmugam, and I. Dinstein. 1973. Textural Features for Image
+Classification. IEEE Transactions on Systems, Man, and Cybernetics SMC-3(6): 610–621.
+\doi{10.1109/TSMC.1973.4309314}
 
 Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
