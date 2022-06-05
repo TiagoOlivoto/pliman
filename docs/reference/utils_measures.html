@@ -176,8 +176,8 @@ the <code>merge</code> object the object measures (sum of area and mean of all t
 other measures) of all images that share the same filename prefix, defined
 as the part of the filename preceding the first hyphen (-) or underscore
 (_) (no hyphen or underscore is required). For example, the measures of
-images named L1-1.jpeg, L1-2.jpeg, and L1-3.jpeg would be combined into a
-single image information (L1). This feature allows the user to treat
+images named <code>L1-1.jpeg</code>, <code>L1-2.jpeg</code>, and <code>L1-3.jpeg</code> would be combined
+into a single image information (L1). This feature allows the user to treat
 multiple images as belonging to a single sample, if desired. Defaults to
 <code>sep = "\\_|-"</code>.</p></dd>
 <dt>verbose</dt>
@@ -244,23 +244,28 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   id        x        y   area area_ch perimeter radius_mean radius_min</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  1  669.000  798.000 99.982  99.813    39.929       5.732      4.994</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000 24.996  24.911    19.946       2.864      2.491</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339  7.050   7.044     9.953       1.494      1.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498  7.984   7.934    11.917       1.671      0.993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.583 1296.320  7.049   7.050    10.085       1.494      1.482</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.504  939.004  7.951   7.900    11.915       1.669      0.988</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis length</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1      7.058     0.629    11.464    9.989   14.117     11.546     11.546 14.117</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528     0.314     5.728    4.983    7.055      5.778      5.768  4.995</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.005     2.988    2.963    3.013      2.997      2.995  2.999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224     0.422     3.341    1.987    4.448      4.614      2.307  3.988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.511     0.004     2.988    2.963    3.022      2.998      2.994  3.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.227     0.424     3.338    1.977    4.453      4.614      2.297  3.990</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    width radius_ratio eccentricity theta solidity convexity elongation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 14.111        1.413        0.999 0.785    1.002     0.751      0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 14.111        1.413        0.999 0.784    1.002     0.750      0.000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  4.987        1.416        0.997 1.571    1.003     0.750      0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  2.999        1.017        0.990 0.028    1.001     0.919      0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.990        2.239        0.350 0.000    1.006     0.835      0.501</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      15.946                9.116            1.271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.051              311.159            1.124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.786                3.956            1.424</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3.000        1.020        0.984 0.055    1.000     0.908      0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.985        2.253        0.347 0.000    1.006     0.835      0.502</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm   asm   con   cor   var</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      15.946                9.116            1.271 0.946 0.045 0.722 1.081</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271 0.913 0.051 0.732 1.095</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.428              362.586            1.154 0.819 0.106 0.822 1.298</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.854                3.938            1.430 0.849 0.083 0.789 1.197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     idm    sav     sva   sen   ent   dva   den   f12   f13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.994 21.931 478.222 0.069 0.075 0.045 0.029 0.679 0.273</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.987 21.900 475.289 0.107 0.116 0.051 0.054 0.518 0.280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.972 21.769 465.764 0.213 0.241 0.106 0.100 0.535 0.402</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.978 21.812 469.379 0.163 0.183 0.083 0.081 0.559 0.364</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Calculated diagonal of the object 1</span></span>
 <span class="r-in"><span class="co"># 10 * sqrt(2) = 14.14</span></span>
@@ -279,25 +284,29 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object id: 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> area     : 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Total    : 40.037 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Average  : 13.346 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total    : 40.002 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Average  : 13.334 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   id        x        y   area area_ch perimeter radius_mean radius_min</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1737.502  453.000 25.000  24.915    19.948       2.864      2.492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.590 1296.339  7.051   7.046     9.954       1.494      1.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.496  939.498  7.986   7.935    11.918       1.671      0.994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1737.583 1296.320  7.050   7.051    10.085       1.494      1.482</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1737.504  939.004  7.952   7.902    11.916       1.669      0.989</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis length</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2      3.528     0.314     5.728    4.983    7.056      5.778      5.769  4.996</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.506     0.005     2.989    2.963    3.013      2.997      2.995  2.999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.224     0.422     3.341    1.987    4.448      4.614      2.307  3.988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.511     0.004     2.988    2.964    3.022      2.998      2.994  3.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      2.227     0.424     3.338    1.977    4.454      4.615      2.298  3.990</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   width radius_ratio eccentricity theta solidity convexity elongation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 4.987        1.416        0.997 1.571    1.003     0.750      0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2.999        1.017        0.990 0.028    1.001     0.919      0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.990        2.239        0.350 0.000    1.006     0.835      0.501</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.051              311.159            1.124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.786                3.956            1.424</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 3.000        1.020        0.984 0.055    1.000     0.908      0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.985        2.253        0.347 0.000    1.006     0.835      0.502</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   circularity circularity_haralick circularity_norm   asm   con   cor   var</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      15.917                9.113            1.271 0.913 0.051 0.732 1.095</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      14.428              362.586            1.154 0.819 0.106 0.822 1.298</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      17.854                3.938            1.430 0.849 0.083 0.789 1.197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     idm    sav     sva   sen   ent   dva   den   f12   f13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.987 21.900 475.289 0.107 0.116 0.051 0.054 0.518 0.280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.972 21.769 465.764 0.213 0.241 0.106 0.100 0.535 0.402</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.978 21.812 469.379 0.163 0.183 0.083 0.081 0.559 0.364</span>
 <span class="r-in"><span class="co"># }</span></span>
 </code></pre></div>
     </div>
@@ -310,7 +319,7 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

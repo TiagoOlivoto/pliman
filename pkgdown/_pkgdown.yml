@@ -78,6 +78,7 @@ reference:
     contents:
       - utils_image
       - image_combine
+      - image_create
 
   - title: "Image transformation"
     desc: "Performs spatial transformations such as rotation, reflection, and resizing"
@@ -154,6 +155,7 @@ reference:
       - utils_pca
       - utils_rows_cols
       - utils_stats
+      - set_wd_here
 
 
 

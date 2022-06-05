@@ -129,9 +129,10 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Plant IMage Analysis</h1>
-                        <h4 data-toc-skip class="author">Tiago Olivoto</h4>
+                        <h4 data-toc-skip class="author">Tiago
+Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2022-04-30</h4>
+            <h4 data-toc-skip class="date">2022-06-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/pliman_start.Rmd" class="external-link"><code>vignettes/pliman_start.Rmd</code></a></small>
       <div class="d-none name"><code>pliman_start.Rmd</code></div>
@@ -142,11 +143,17 @@
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. The package will help you to:</p>
+<p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age
+<strong>an</strong>alysis) is designed to analyze plant images,
+especially related to leaf analysis. You provide color palettes, tell
+<code>pliman</code> what each one represents, and it takes care of the
+details. The package will help you to:</p>
 <ul>
-<li>Get object statistics (number, area, perimeter, etc.) with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</li>
+<li>Get object statistics (number, area, perimeter, etc.) with
+<code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</li>
 <li>Measure disease severity with <code>symptomatic_area()</code>.</li>
-<li>Get the RGB values for each object in an image with <code>objects_rgb()</code>.</li>
+<li>Get the RGB values for each object in an image with
+<code>objects_rgb()</code>.</li>
 <li>Get object measures with <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</li>
 <li>Plot objec measures with <code><a href="../reference/utils_measures.html">plot_measures()</a></code>.</li>
 </ul>
@@ -154,8 +161,16 @@
 <div class="section level2">
 <h2 id="leaf-area">Leaf area<a class="anchor" aria-label="anchor" href="#leaf-area"></a>
 </h2>
-<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> can be used to measure the leaf area in an image. The pixel area can be adjusted to metric units (cm) in two ways: (i) Using an object of known area to correct the measures or (ii) knowing the image resolution in dpi (dots per inch).</p>
-<p>To show the first approach, first we count the number of objects and plot an object id using the argument <code>marker = "text"</code> of the function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. This allows for the further adjustment of the leaf area using the known object, that in this case is the leaf square, with 4 cm<span class="math inline">\(^2\)</span>.</p>
+<p>The function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> can be used to measure
+the leaf area in an image. The pixel area can be adjusted to metric
+units (cm) in two ways: (i) Using an object of known area to correct the
+measures or (ii) knowing the image resolution in dpi (dots per
+inch).</p>
+<p>To show the first approach, first we count the number of objects and
+plot an object id using the argument <code>marker = "text"</code> of the
+function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. This allows for the further
+adjustment of the leaf area using the known object, that in this case is
+the leaf square, with 4 cm<span class="math inline">\(^2\)</span>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span>
 <span class="co"># |==========================================================|</span>
@@ -172,7 +187,8 @@
 <ul>
 <li>Adjust the leaf area by the area of the known object</li>
 </ul>
-<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf area using object 6.</p>
+<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf
+area using object 6.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">area</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>,
@@ -183,74 +199,93 @@
 <span class="co"># object id: 6</span>
 <span class="co"># area     : 4</span>
 <span class="co"># -----------------------------------------</span>
-<span class="co"># Total    : 145.331 </span>
-<span class="co"># Average  : 29.066 </span>
+<span class="co"># Total    : 143.892 </span>
+<span class="co"># Average  : 28.778 </span>
 <span class="co"># -----------------------------------------</span>
 <span class="va">area</span>
 <span class="co">#   id       x       y   area area_ch perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 537.380 498.981 41.716  41.895    26.144       3.695      2.768      5.279</span>
-<span class="co"># 2  2 438.655 165.253 35.724  35.858    23.447       3.386      2.891      4.590</span>
-<span class="co"># 3  3 110.862 477.018 31.584  32.438    23.816       3.284      2.389      4.897</span>
-<span class="co"># 4  4 178.467 174.227 27.697  28.096    21.545       3.039      2.311      4.405</span>
-<span class="co"># 5  5 315.232 434.602  8.608   8.614    11.625       1.664      1.319      2.271</span>
+<span class="co"># 1  1 537.376 498.970 41.294  41.558    26.275       3.681      2.750      5.246</span>
+<span class="co"># 2  2 438.661 165.230 35.365  35.539    23.561       3.376      2.869      4.529</span>
+<span class="co"># 3  3 110.861 477.020 31.264  32.131    23.860       3.272      2.371      4.858</span>
+<span class="co"># 4  4 178.421 174.224 27.435  27.910    21.763       3.027      2.308      4.385</span>
+<span class="co"># 5  5 315.229 434.660  8.535   8.580    11.725       1.659      1.301      2.254</span>
 <span class="co">#   radius_sd diam_mean diam_min diam_max major_axis minor_axis length width</span>
-<span class="co"># 1     0.659     7.391    5.536   10.558      9.196      5.904  9.719 6.178</span>
-<span class="co"># 2     0.417     6.772    5.782    9.181      7.891      5.823  8.554 5.968</span>
-<span class="co"># 3     0.654     6.569    4.779    9.794      7.989      5.207  9.112 5.418</span>
-<span class="co"># 4     0.522     6.077    4.623    8.810      7.242      5.005  8.044 5.173</span>
-<span class="co"># 5     0.263     3.328    2.639    4.542      4.095      2.697  4.361 2.802</span>
+<span class="co"># 1     0.654     7.363    5.499   10.492      9.147      5.875  9.661 6.154</span>
+<span class="co"># 2     0.417     6.752    5.739    9.058      7.852      5.794  8.506 5.935</span>
+<span class="co"># 3     0.653     6.544    4.741    9.715      7.946      5.181  9.088 5.413</span>
+<span class="co"># 4     0.518     6.055    4.615    8.770      7.209      4.980  7.996 5.170</span>
+<span class="co"># 5     0.260     3.317    2.603    4.508      4.074      2.688  4.341 2.788</span>
 <span class="co">#   radius_ratio eccentricity  theta solidity convexity elongation circularity</span>
-<span class="co"># 1        1.907        0.503  1.538    0.996     0.900      0.364      16.385</span>
-<span class="co"># 2        1.588        0.642 -1.533    0.996     0.927      0.302      15.389</span>
-<span class="co"># 3        2.050        0.445  1.545    0.974     0.914      0.405      17.958</span>
-<span class="co"># 4        1.906        0.512  1.539    0.986     0.907      0.357      16.759</span>
-<span class="co"># 5        1.721        0.533 -1.467    0.999     0.894      0.358      15.699</span>
-<span class="co">#   circularity_haralick circularity_norm</span>
-<span class="co"># 1                5.607            1.315</span>
-<span class="co"># 2                8.113            1.235</span>
-<span class="co"># 3                5.020            1.443</span>
-<span class="co"># 4                5.816            1.347</span>
-<span class="co"># 5                6.324            1.271</span>
+<span class="co"># 1        1.908        0.496  1.538    0.994     0.888      0.363      16.718</span>
+<span class="co"># 2        1.578        0.625 -1.532    0.995     0.917      0.302      15.696</span>
+<span class="co"># 3        2.049        0.440  1.545    0.973     0.903      0.404      18.210</span>
+<span class="co"># 4        1.900        0.506  1.540    0.983     0.896      0.353      17.264</span>
+<span class="co"># 5        1.732        0.525 -1.467    0.995     0.904      0.358      16.108</span>
+<span class="co">#   circularity_haralick circularity_norm   asm   con   cor    var   idm    sav</span>
+<span class="co"># 1                5.628            1.342 0.085 1.082 0.958 13.989 0.741 17.008</span>
+<span class="co"># 2                8.088            1.260 0.042 1.489 0.900  8.443 0.671 19.693</span>
+<span class="co"># 3                5.014            1.464 0.057 1.158 0.922  8.395 0.718 16.890</span>
+<span class="co"># 4                5.847            1.388 0.097 1.013 0.951 11.265 0.753 17.519</span>
+<span class="co"># 5                6.372            1.305 0.034 1.375 0.919  9.517 0.665 20.290</span>
+<span class="co">#       sva   sen   ent   dva   den   f12   f13</span>
+<span class="co"># 1 299.801 1.231 1.482 1.082 0.446 0.464 0.769</span>
+<span class="co"># 2 367.339 1.279 1.625 1.489 0.500 0.367 0.720</span>
+<span class="co"># 3 273.271 1.242 1.528 1.158 0.462 0.421 0.746</span>
+<span class="co"># 4 307.604 1.162 1.393 1.013 0.430 0.446 0.742</span>
+<span class="co"># 5 393.011 1.308 1.657 1.375 0.496 0.390 0.743</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>, measure <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></code></pre></div>
 <p><img src="pliman_start_files/figure-html/leaf6-1.png" width="480"></p>
-<p>When the image resolution is known, we can the image dpi (dots per inch) to correct the pixel units given by <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to metric units. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See a brief tutorial <a href="https://www.youtube.com/watch?v=Rh10_pLgeng" class="external-link">here</a>.</p>
+<p>When the image resolution is known, we can the image dpi (dots per
+inch) to correct the pixel units given by <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>
+to metric units. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute
+the dpi of an image, provided that the size of any object is known. See
+a brief tutorial <a href="https://www.youtube.com/watch?v=Rh10_pLgeng" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">84</span><span class="op">)</span>
 <span class="co">#   id       x       y   area area_ch perimeter radius_mean radius_min radius_max</span>
-<span class="co"># 1  1 537.380 498.981 40.823  40.997    25.863       3.656      2.738      5.222</span>
-<span class="co"># 2  2 438.655 165.253 34.959  35.090    23.195       3.350      2.860      4.541</span>
-<span class="co"># 3  3 110.862 477.018 30.908  31.743    23.559       3.249      2.364      4.844</span>
-<span class="co"># 4  4 178.467 174.227 27.104  27.494    21.313       3.006      2.286      4.357</span>
-<span class="co"># 5  5 315.232 434.602  8.424   8.429    11.500       1.646      1.305      2.247</span>
-<span class="co"># 6  6 313.445 655.336  3.914   3.923     7.948       1.113      0.919      1.356</span>
+<span class="co"># 1  1 537.376 498.970 40.881  41.143    26.143       3.663      2.736      5.220</span>
+<span class="co"># 2  2 438.661 165.230 35.011  35.184    23.443       3.359      2.855      4.506</span>
+<span class="co"># 3  3 110.861 477.020 30.951  31.810    23.741       3.255      2.359      4.833</span>
+<span class="co"># 4  4 178.421 174.224 27.161  27.631    21.654       3.012      2.296      4.363</span>
+<span class="co"># 5  5 315.229 434.660  8.449   8.494    11.666       1.650      1.295      2.243</span>
+<span class="co"># 6  6 313.484 655.372  3.960   3.987     8.121       1.120      0.922      1.371</span>
 <span class="co">#   radius_sd diam_mean diam_min diam_max major_axis minor_axis length width</span>
-<span class="co"># 1     0.652     7.311    5.476   10.445      9.097      5.840  9.614 6.112</span>
-<span class="co"># 2     0.413     6.700    5.720    9.082      7.806      5.760  8.462 5.904</span>
-<span class="co"># 3     0.647     6.498    4.727    9.689      7.903      5.151  9.013 5.360</span>
-<span class="co"># 4     0.517     6.012    4.573    8.715      7.164      4.951  7.957 5.118</span>
-<span class="co"># 5     0.260     3.292    2.610    4.493      4.051      2.668  4.314 2.772</span>
-<span class="co"># 6     0.117     2.226    1.839    2.712      2.368      2.191  2.173 2.029</span>
+<span class="co"># 1     0.651     7.326    5.471   10.439      9.101      5.845  9.613 6.123</span>
+<span class="co"># 2     0.415     6.718    5.710    9.012      7.813      5.765  8.463 5.905</span>
+<span class="co"># 3     0.649     6.511    4.718    9.666      7.906      5.155  9.043 5.386</span>
+<span class="co"># 4     0.515     6.024    4.592    8.726      7.173      4.955  7.956 5.144</span>
+<span class="co"># 5     0.259     3.301    2.590    4.485      4.053      2.675  4.320 2.774</span>
+<span class="co"># 6     0.118     2.240    1.845    2.742      2.380      2.207  2.197 2.030</span>
 <span class="co">#   radius_ratio eccentricity  theta solidity convexity elongation circularity</span>
-<span class="co"># 1        1.907        0.503  1.538    0.996     0.900      0.364      16.385</span>
-<span class="co"># 2        1.588        0.642 -1.533    0.996     0.927      0.302      15.389</span>
-<span class="co"># 3        2.050        0.445  1.545    0.974     0.914      0.405      17.958</span>
-<span class="co"># 4        1.906        0.512  1.539    0.986     0.907      0.357      16.759</span>
-<span class="co"># 5        1.721        0.533 -1.467    0.999     0.894      0.358      15.699</span>
-<span class="co"># 6        1.475        0.891 -1.550    0.998     0.825      0.066      16.138</span>
-<span class="co">#   circularity_haralick circularity_norm</span>
-<span class="co"># 1                5.607            1.315</span>
-<span class="co"># 2                8.113            1.235</span>
-<span class="co"># 3                5.020            1.443</span>
-<span class="co"># 4                5.816            1.347</span>
-<span class="co"># 5                6.324            1.271</span>
-<span class="co"># 6                9.531            1.323</span></code></pre></div>
+<span class="co"># 1        1.908        0.496  1.538    0.994     0.888      0.363      16.718</span>
+<span class="co"># 2        1.578        0.625 -1.532    0.995     0.917      0.302      15.696</span>
+<span class="co"># 3        2.049        0.440  1.545    0.973     0.903      0.404      18.210</span>
+<span class="co"># 4        1.900        0.506  1.540    0.983     0.896      0.353      17.264</span>
+<span class="co"># 5        1.732        0.525 -1.467    0.995     0.904      0.358      16.108</span>
+<span class="co"># 6        1.486        0.893 -1.556    0.993     0.821      0.076      16.654</span>
+<span class="co">#   circularity_haralick circularity_norm   asm   con   cor    var   idm    sav</span>
+<span class="co"># 1                5.628            1.342 0.085 1.082 0.958 13.989 0.741 17.008</span>
+<span class="co"># 2                8.088            1.260 0.042 1.489 0.900  8.443 0.671 19.693</span>
+<span class="co"># 3                5.014            1.464 0.057 1.158 0.922  8.395 0.718 16.890</span>
+<span class="co"># 4                5.847            1.388 0.097 1.013 0.951 11.265 0.753 17.519</span>
+<span class="co"># 5                6.372            1.305 0.034 1.375 0.919  9.517 0.665 20.290</span>
+<span class="co"># 6                9.481            1.365 0.057 1.165 0.830  4.422 0.679 15.340</span>
+<span class="co">#       sva   sen   ent   dva   den   f12   f13</span>
+<span class="co"># 1 299.801 1.231 1.482 1.082 0.446 0.464 0.769</span>
+<span class="co"># 2 367.339 1.279 1.625 1.489 0.500 0.367 0.720</span>
+<span class="co"># 3 273.271 1.242 1.528 1.158 0.462 0.421 0.746</span>
+<span class="co"># 4 307.604 1.162 1.393 1.013 0.430 0.446 0.742</span>
+<span class="co"># 5 393.011 1.308 1.657 1.375 0.496 0.390 0.743</span>
+<span class="co"># 6 214.725 1.121 1.439 1.165 0.468 0.297 0.628</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="counting-crop-grains">Counting crop grains<a class="anchor" aria-label="anchor" href="#counting-crop-grains"></a>
 </h2>
-<p>Here, we will count the grains in the image <code>soybean_touch.jpg</code>. This image has a cyan background and contains 30 soybean grains that touch with each other.</p>
+<p>Here, we will count the grains in the image
+<code>soybean_touch.jpg</code>. This image has a cyan background and
+contains 30 soybean grains that touch with each other.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">soy</span><span class="op">)</span>
@@ -265,8 +300,17 @@
 <div class="section level2">
 <h2 id="disease-severity">Disease severity<a class="anchor" aria-label="anchor" href="#disease-severity"></a>
 </h2>
-<p>The function <code><a href="../reference/measure_disease.html">measure_disease()</a></code> is used to compute the percentage of symptomatic leaf area in a sample or entire leaf based on provided color palettes samples. A general linear model (binomial family) fitted to the RGB values is used to segment the lesions from the healthy leaf. If a pallet of background is provided, the function takes care of the details to isolate it before computing the number and area of lesions.</p>
-<p>The next example computes the symptomatic area of a soybean leaf. The proportion of the healthy and symptomatic areas is given as the proportion of the total leaf area, after segmenting the leaf from the background (blue).</p>
+<p>The function <code><a href="../reference/measure_disease.html">measure_disease()</a></code> is used to compute the
+percentage of symptomatic leaf area in a sample or entire leaf based on
+provided color palettes samples. A general linear model (binomial
+family) fitted to the RGB values is used to segment the lesions from the
+healthy leaf. If a pallet of background is provided, the function takes
+care of the details to isolate it before computing the number and area
+of lesions.</p>
+<p>The next example computes the symptomatic area of a soybean leaf. The
+proportion of the healthy and symptomatic areas is given as the
+proportion of the total leaf area, after segmenting the leaf from the
+background (blue).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span>
 <span class="va">healthy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span>
@@ -285,7 +329,7 @@
 <p><img src="pliman_start_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <pre><code><span class="co"># $severity</span>
 <span class="co">#    healthy symptomatic</span>
-<span class="co"># 1 89.43782    10.56218</span>
+<span class="co"># 1 89.36066    10.63934</span>
 <span class="co"># </span>
 <span class="co"># $shape</span>
 <span class="co"># NULL</span>
@@ -299,7 +343,8 @@
 <div class="section level2">
 <h2 id="rgb-values-for-objects">RGB values for objects<a class="anchor" aria-label="anchor" href="#rgb-values-for-objects"></a>
 </h2>
-<p>The function <code>objects_rgb()</code> can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for</p>
+<p>The function <code>objects_rgb()</code> can be used to get the Red
+Green and Blue (RGB) for objects in an image. Here, the RGB for</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soy_green.jpg"</span><span class="op">)</span>
 <span class="co"># Segment the foreground (grains) using the normalized blue index</span>
@@ -323,8 +368,10 @@
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
 <ul>
-<li><p>If you encounter a clear bug, please file a minimal reproducible example on <a href="https://github.com/TiagoOlivoto/pliman/issues" class="external-link">github</a></p></li>
-<li><p>Suggestions and criticisms to improve the quality and usability of the package are welcome!</p></li>
+<li><p>If you encounter a clear bug, please file a minimal reproducible
+example on <a href="https://github.com/TiagoOlivoto/pliman/issues" class="external-link">github</a></p></li>
+<li><p>Suggestions and criticisms to improve the quality and usability
+of the package are welcome!</p></li>
 </ul>
 </div>
 <div class="section level2">
@@ -333,7 +380,12 @@
 </h2>
 <!-- inicio font awesome -->
 <script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script><blockquote>
-<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this link</a> you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>. You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>. <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!</p>
+<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this
+link</a> you will find more examples on how to use {pliman} to analyze
+plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>.
+You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>.
+<i class="far fa-lightbulb"></i>Lights,
+<i class="fas fa-camera"></i>camera, {pliman}!</p>
 </blockquote>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -349,7 +401,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer>

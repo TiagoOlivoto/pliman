@@ -52,6 +52,9 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/analyze_objects.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/apply_fun_to_imgs.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/count_lesions.html</loc>
   </url>
   <url>
@@ -62,6 +65,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_combine.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_create.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_index.html</loc>
@@ -119,6 +125,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/separate_col.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/set_wd_here.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/summary_index.html</loc>

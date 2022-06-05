@@ -142,6 +142,9 @@ the needed color palettes.</p></li>
   pattern <span class="op">=</span> <span class="cn">NULL</span>,
   parallel <span class="op">=</span> <span class="cn">FALSE</span>,
   workers <span class="op">=</span> <span class="cn">NULL</span>,
+  har_nbins <span class="op">=</span> <span class="fl">32</span>,
+  har_scales <span class="op">=</span> <span class="fl">1</span>,
+  har_band <span class="op">=</span> <span class="fl">1</span>,
   resize <span class="op">=</span> <span class="cn">FALSE</span>,
   fill_hull <span class="op">=</span> <span class="cn">TRUE</span>,
   index_lb <span class="op">=</span> <span class="cn">NULL</span>,
@@ -207,6 +210,15 @@ number of sections is set up to 70% of available cores.</p></dd>
 <dt>workers</dt>
 <dd><p>A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.</p></dd>
+<dt>har_nbins</dt>
+<dd><p>An integer indicating the number of bins using to compute
+the Haralick matrix. Defaults to 32. See Details</p></dd>
+<dt>har_scales</dt>
+<dd><p>A integer vector indicating the number of scales to use to
+compute the Haralick features. See Details.</p></dd>
+<dt>har_band</dt>
+<dd><p>The band to compute the Haralick features (1 = R, 2 = G, 3 =
+B). Defaults to 1.</p></dd>
 <dt>resize</dt>
 <dd><p>Resize the image before processing? Defaults to <code>FALSE</code>. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -373,6 +385,10 @@ click and continues until the user press Esc. Then, a new sampling process is
 performed to sample the color of healthy tissues and then diseased tissues.
 The generated palettes are then passed on to measure_disease(). All the
 arguments of such function can be passed using the ... (three dots).</p>
+<p>When <code>show_features = TRUE</code>, the function computes a total of 36 lesion
+features (23 shape features and 13 texture features). The Haralick texture
+features for each object based on a gray-level co-occurrence matrix (Haralick
+et al. 1979). See more details in <code><a href="analyze_objects.html">analyze_objects()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -412,7 +428,7 @@ arguments of such function can be passed using the ... (three dots).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

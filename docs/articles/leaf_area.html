@@ -129,9 +129,10 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Measure leaf area using leaf images</h1>
-                        <h4 data-toc-skip class="author">Tiago Olivoto</h4>
+                        <h4 data-toc-skip class="author">Tiago
+Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2022-04-30</h4>
+            <h4 data-toc-skip class="date">2022-06-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/leaf_area.Rmd" class="external-link"><code>vignettes/leaf_area.Rmd</code></a></small>
       <div class="d-none name"><code>leaf_area.Rmd</code></div>
@@ -142,7 +143,12 @@
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>We can use <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to compute object features such as area, perimeter, radius, etc. This can be used, for example, to compute leaf area. Let’s compute the leaf area of <code>leaves</code> with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. First, we use <code>image_segmentation()</code> to identify candidate indexes to segment foreground (leaves) from background.</p>
+<p>We can use <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to compute object features
+such as area, perimeter, radius, etc. This can be used, for example, to
+compute leaf area. Let’s compute the leaf area of <code>leaves</code>
+with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. First, we use
+<code>image_segmentation()</code> to identify candidate indexes to
+segment foreground (leaves) from background.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span>
 <span class="co">#&gt; |==========================================================|</span>
@@ -161,25 +167,42 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf4-1.png" width="768"></p>
-<p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the <code>NB</code> index here (default option in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>). The measurement of the leaf area in this approach can be done in two main ways: 1) using an object of known area, and 2) knowing the image resolution in dpi (dots per inch).</p>
+<p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two
+possible candidates to segment the leaves from the background. We will
+use the <code>NB</code> index here (default option in
+<code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>). The measurement of the leaf area in
+this approach can be done in two main ways: 1) using an object of known
+area, and 2) knowing the image resolution in dpi (dots per inch).</p>
 <div class="section level4">
 <h4 id="using-an-object-of-known-area">Using an object of known area<a class="anchor" aria-label="anchor" href="#using-an-object-of-known-area"></a>
 </h4>
 <ul>
 <li>Count the number of objects (leaves in this case)</li>
 </ul>
-<p>Here, we use the argument <code>marker = "id"</code> of the function <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to obtain the identification of each object (leaf), allowing for further adjustment of the leaf area.</p>
+<p>Here, we use the argument <code>marker = "id"</code> of the function
+<code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> to obtain the identification of each
+object (leaf), allowing for further adjustment of the leaf area.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf5-1.png" width="960"></p>
-<p>Note that “holes” in some leaves resulted in the segmentation of one leaf in more than one object (e.g., 5, 8, 22, 25, 18, 28). This will not affect the total leaf area, but the area of individual leaves and the average leaf area. This can be solved by either setting the argument <code>fill_hull = TRUE</code> or <code>watershed = FALSE</code> (To don’t implement the watershed-based object segmentation). Let’s see how much better we can go.</p>
+<p>Note that “holes” in some leaves resulted in the segmentation of one
+leaf in more than one object (e.g., 5, 8, 22, 25, 18, 28). This will not
+affect the total leaf area, but the area of individual leaves and the
+average leaf area. This can be solved by either setting the argument
+<code>fill_hull = TRUE</code> or <code>watershed = FALSE</code> (To
+don’t implement the watershed-based object segmentation). Let’s see how
+much better we can go.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
                   marker <span class="op">=</span> <span class="st">"id"</span>,
                   fill_hull <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf6-1.png" width="960"></p>
-<p>Almost there! Due to the morphology of the leaf composed by objects 2 and 23, it was segmented into two objects. This can be solved by setting the argument <code>object_size = "large"</code> that will change the default (medium) values for <code>tolerance</code> and <code>extension</code> arguments.</p>
+<p>Almost there! Due to the morphology of the leaf composed by objects 2
+and 23, it was segmented into two objects. This can be solved by setting
+the argument <code>object_size = "large"</code> that will change the
+default (medium) values for <code>tolerance</code> and
+<code>extension</code> arguments.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">count</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
@@ -187,16 +210,20 @@
                   fill_hull <span class="op">=</span> <span class="cn">TRUE</span>,
                   object_size <span class="op">=</span> <span class="st">"large"</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf7-1.png" width="960"></p>
-<p>When the objects are not touching each other, the argument <code>watershed = FALSE</code> would be a better option.</p>
+<p>When the objects are not touching each other, the argument
+<code>watershed = FALSE</code> would be a better option.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">leaves</span>,
                 watershed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf8-1.png" width="960"></p>
-<p>And here we are! Now, all leaves were identified correctly, but all measures were given in pixel units. The next step is to convert these measures to metric units.</p>
+<p>And here we are! Now, all leaves were identified correctly, but all
+measures were given in pixel units. The next step is to convert these
+measures to metric units.</p>
 <ul>
 <li>Convert the leaf area by the area of the known object</li>
 </ul>
-<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf area using object 10, a square with a side of 5 cm (25 cm<span class="math inline">\(^2\)</span>).</p>
+<p>The function <code><a href="../reference/utils_measures.html">get_measures()</a></code> is used to adjust the leaf
+area using object 10, a square with a side of 5 cm (25 cm<span class="math inline">\(^2\)</span>).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">area</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>,
@@ -207,102 +234,125 @@
 <span class="co">#&gt; object id: 10</span>
 <span class="co">#&gt; area     : 25</span>
 <span class="co">#&gt; -----------------------------------------</span>
-<span class="co">#&gt; Total    : 797.014 </span>
-<span class="co">#&gt; Average  : 36.228 </span>
+<span class="co">#&gt; Total    : 653.542 </span>
+<span class="co">#&gt; Average  : 29.706 </span>
 <span class="co">#&gt; -----------------------------------------</span>
 <span class="va">area</span>
-<span class="co">#&gt;    id        x       y    area area_ch perimeter radius_mean radius_min</span>
-<span class="co">#&gt; 1   1  276.129 221.430 117.823 118.100    44.740       6.256      4.469</span>
-<span class="co">#&gt; 2   2  912.046 191.121 112.962 143.620    64.355       5.959      3.425</span>
-<span class="co">#&gt; 3   3  117.277 501.002  94.569 100.538    52.785       6.267      2.653</span>
-<span class="co">#&gt; 4   4  533.671 164.067  57.425  58.129    31.751       4.360      3.140</span>
-<span class="co">#&gt; 5   5  690.167 172.731  52.138  54.020    30.774       4.231      3.103</span>
-<span class="co">#&gt; 6   6  224.914 751.209  50.626  53.551    30.982       4.051      2.918</span>
-<span class="co">#&gt; 7   7 1047.062 424.418  61.884  62.790    33.826       4.626      2.986</span>
-<span class="co">#&gt; 8   8  865.070 761.262  39.607  40.831    26.750       3.664      2.631</span>
-<span class="co">#&gt; 9   9  871.498 486.609  37.911  40.834    28.095       3.574      2.419</span>
-<span class="co">#&gt; 11 11  967.756 628.918  30.204  30.613    22.974       3.189      2.378</span>
-<span class="co">#&gt; 12 12  597.344 378.935  28.379  32.082    25.760       3.144      1.962</span>
-<span class="co">#&gt; 13 13  503.668 584.456  25.792  27.186    27.027       3.447      1.585</span>
-<span class="co">#&gt; 14 14  385.436 423.892  20.684  21.997    23.354       2.974      1.402</span>
-<span class="co">#&gt; 15 15  423.393 176.371  15.518  16.028    18.962       2.455      1.170</span>
-<span class="co">#&gt; 16 16  847.125 626.891  10.441  10.837    14.372       1.924      1.256</span>
-<span class="co">#&gt; 17 17  712.599 457.976   9.118   9.131    15.099       1.950      0.777</span>
-<span class="co">#&gt; 18 18  353.365 740.398   5.830   6.231    11.636       1.533      0.872</span>
-<span class="co">#&gt; 19 19  641.395 535.291   4.603   4.505     8.621       1.213      0.839</span>
-<span class="co">#&gt; 20 20  738.920 711.817   8.089   8.646    17.202       1.900      0.492</span>
-<span class="co">#&gt; 21 21  344.537 602.703   5.370   5.946    13.358       1.621      0.344</span>
-<span class="co">#&gt; 22 22  714.360 576.056   3.788   3.690     8.165       1.120      0.645</span>
-<span class="co">#&gt; 23 23  473.760 785.686   4.252   4.661    28.625       3.482      0.137</span>
+<span class="co">#&gt;    id        x       y   area area_ch perimeter radius_mean radius_min</span>
+<span class="co">#&gt; 1   1  276.092 221.359 96.733  97.084    40.777       5.680      4.047</span>
+<span class="co">#&gt; 2   2  911.970 191.176 93.229 118.407    59.377       5.409      3.124</span>
+<span class="co">#&gt; 3   3  117.320 500.760 77.966  82.956    49.297       5.643      2.439</span>
+<span class="co">#&gt; 4   4  533.623 164.162 47.427  49.289    30.448       4.036      2.891</span>
+<span class="co">#&gt; 5   5  690.121 172.854 43.012  44.735    28.516       3.847      2.804</span>
+<span class="co">#&gt; 6   6  224.868 751.219 41.660  44.172    28.160       3.679      2.688</span>
+<span class="co">#&gt; 7   7 1047.119 424.365 50.920  51.671    30.995       4.206      2.716</span>
+<span class="co">#&gt; 8   8  865.058 761.335 32.623  33.758    24.792       3.331      2.377</span>
+<span class="co">#&gt; 9   9  871.465 486.611 31.446  33.853    25.829       3.253      2.207</span>
+<span class="co">#&gt; 11 11  606.064 664.150 20.515  20.413    18.093       2.569      2.176</span>
+<span class="co">#&gt; 12 12  597.368 378.910 23.383  26.419    23.527       2.847      1.788</span>
+<span class="co">#&gt; 13 13  503.671 584.431 21.367  22.473    24.742       3.118      1.464</span>
+<span class="co">#&gt; 14 14  385.428 423.933 17.144  18.196    21.724       2.710      1.317</span>
+<span class="co">#&gt; 15 15  423.385 176.413 12.869  13.490    17.615       2.261      1.081</span>
+<span class="co">#&gt; 16 16  847.044 626.804  8.665   9.035    13.207       1.761      1.135</span>
+<span class="co">#&gt; 17 17  712.490 457.606  7.683   7.718    13.944       1.792      0.723</span>
+<span class="co">#&gt; 18 18  353.545 740.339  4.868   5.282    11.113       1.425      0.803</span>
+<span class="co">#&gt; 19 19  641.414 535.379  3.813   3.760     7.981       1.101      0.749</span>
+<span class="co">#&gt; 20 20  738.928 711.737  6.855   0.010     0.640       0.085      0.015</span>
+<span class="co">#&gt; 21 21  344.663 602.140  4.558   5.213    13.618       1.613      0.248</span>
+<span class="co">#&gt; 22 22  714.281 575.989  3.162   3.108     7.562       1.034      0.574</span>
+<span class="co">#&gt; 23 23  473.920 785.710  3.646   3.913    26.281       3.214      0.122</span>
 <span class="co">#&gt;    radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
-<span class="co">#&gt; 1       9.246     1.363    12.513    8.938   18.492     16.615      9.085</span>
-<span class="co">#&gt; 2       8.575     1.043    11.919    6.849   17.150     13.672     11.440</span>
-<span class="co">#&gt; 3      10.691     2.336    12.534    5.306   21.383     18.979      6.677</span>
-<span class="co">#&gt; 4       6.364     0.817     8.719    6.280   12.728     10.962      6.751</span>
-<span class="co">#&gt; 5       6.413     0.833     8.461    6.207   12.825     10.207      6.630</span>
-<span class="co">#&gt; 6       5.930     0.600     8.101    5.836   11.859      9.086      7.450</span>
-<span class="co">#&gt; 7       7.148     1.191     9.252    5.972   14.296     12.675      6.297</span>
-<span class="co">#&gt; 8       5.519     0.707     7.327    5.263   11.037      8.835      5.946</span>
-<span class="co">#&gt; 9       5.417     0.733     7.149    4.839   10.834      8.419      6.517</span>
-<span class="co">#&gt; 11      4.727     0.681     6.377    4.756    9.454      8.160      4.763</span>
-<span class="co">#&gt; 12      4.982     0.763     6.287    3.924    9.963      7.543      5.828</span>
-<span class="co">#&gt; 13      5.942     1.320     6.894    3.171   11.885      9.993      3.449</span>
-<span class="co">#&gt; 14      5.099     1.122     5.949    2.805   10.197      8.773      3.146</span>
-<span class="co">#&gt; 15      4.095     0.844     4.909    2.340    8.190      7.356      2.772</span>
-<span class="co">#&gt; 16      3.026     0.508     3.849    2.512    6.051      5.006      2.704</span>
-<span class="co">#&gt; 17      3.415     0.747     3.901    1.555    6.831      6.087      1.984</span>
-<span class="co">#&gt; 18      2.624     0.500     3.066    1.744    5.247      4.024      1.928</span>
-<span class="co">#&gt; 19      1.754     0.288     2.426    1.679    3.507      3.384      1.735</span>
-<span class="co">#&gt; 20      3.533     0.828     3.801    0.984    7.066      6.118      1.809</span>
-<span class="co">#&gt; 21      2.997     0.750     3.243    0.688    5.994      5.516      1.373</span>
-<span class="co">#&gt; 22      1.719     0.323     2.240    1.290    3.439      3.312      1.473</span>
-<span class="co">#&gt; 23      6.947     1.997     6.965    0.275   13.895     14.308      0.427</span>
+<span class="co">#&gt; 1       8.435     1.236    11.360    8.094   16.871     15.062      8.228</span>
+<span class="co">#&gt; 2       7.804     0.941    10.818    6.248   15.608     12.412     10.392</span>
+<span class="co">#&gt; 3       9.664     2.129    11.286    4.877   19.327     17.224      6.065</span>
+<span class="co">#&gt; 4       6.103     0.791     8.072    5.783   12.205      9.993      6.126</span>
+<span class="co">#&gt; 5       5.805     0.766     7.694    5.608   11.609      9.271      6.024</span>
+<span class="co">#&gt; 6       5.321     0.531     7.358    5.376   10.643      8.241      6.757</span>
+<span class="co">#&gt; 7       6.482     1.078     8.412    5.432   12.964     11.494      5.713</span>
+<span class="co">#&gt; 8       5.009     0.648     6.661    4.754   10.018      8.017      5.398</span>
+<span class="co">#&gt; 9       4.866     0.665     6.505    4.413    9.731      7.655      5.936</span>
+<span class="co">#&gt; 11      3.167     0.280     5.138    4.352    6.334      5.313      5.145</span>
+<span class="co">#&gt; 12      4.507     0.693     5.695    3.575    9.015      6.845      5.286</span>
+<span class="co">#&gt; 13      5.409     1.201     6.235    2.928   10.817      9.068      3.146</span>
+<span class="co">#&gt; 14      4.656     1.014     5.420    2.635    9.313      7.965      2.872</span>
+<span class="co">#&gt; 15      3.831     0.787     4.522    2.162    7.663      6.702      2.522</span>
+<span class="co">#&gt; 16      2.774     0.469     3.521    2.269    5.548      4.570      2.464</span>
+<span class="co">#&gt; 17      3.101     0.681     3.584    1.446    6.203      5.540      1.841</span>
+<span class="co">#&gt; 18      2.468     0.463     2.849    1.605    4.935      3.707      1.754</span>
+<span class="co">#&gt; 19      1.649     0.260     2.202    1.498    3.298      3.073      1.583</span>
+<span class="co">#&gt; 20      0.157     0.045     0.171    0.030    0.314      5.636      1.675</span>
+<span class="co">#&gt; 21      3.019     0.778     3.226    0.497    6.039      5.158      1.263</span>
+<span class="co">#&gt; 22      1.599     0.301     2.069    1.148    3.199      3.035      1.342</span>
+<span class="co">#&gt; 23      6.415     1.843     6.429    0.244   12.829     13.172      0.403</span>
 <span class="co">#&gt;    length  width radius_ratio eccentricity  theta solidity convexity elongation</span>
-<span class="co">#&gt; 1  17.666  9.344        2.069        0.399  1.529    0.998     0.915      0.471</span>
-<span class="co">#&gt; 2  15.731 13.275        2.504        0.834 -1.558    0.787     0.647      0.156</span>
-<span class="co">#&gt; 3  21.134  7.276        4.030        0.149 -1.510    0.941     0.831      0.656</span>
-<span class="co">#&gt; 4  11.897  6.944        2.027        0.448 -1.487    0.988     0.875      0.416</span>
-<span class="co">#&gt; 5  11.680  6.856        2.066        0.427 -1.392    0.965     0.914      0.413</span>
-<span class="co">#&gt; 6  10.161  7.577        2.032        0.628 -1.471    0.945     0.892      0.254</span>
-<span class="co">#&gt; 7  13.980  6.515        2.394        0.318  1.404    0.986     0.871      0.534</span>
-<span class="co">#&gt; 8   9.838  6.221        2.097        0.459 -1.329    0.970     0.841      0.368</span>
-<span class="co">#&gt; 9   9.277  7.006        2.239        0.600 -1.476    0.928     0.758      0.245</span>
-<span class="co">#&gt; 11  9.147  4.979        1.988        0.402  1.568    0.987     0.913      0.456</span>
-<span class="co">#&gt; 12  8.557  6.365        2.539        0.545 -1.417    0.885     0.832      0.256</span>
-<span class="co">#&gt; 13 11.678  3.802        3.748        0.119 -1.103    0.949     0.867      0.674</span>
-<span class="co">#&gt; 14 10.109  3.446        3.636        0.141 -1.382    0.940     0.929      0.659</span>
-<span class="co">#&gt; 15  8.186  2.921        3.500        0.182  1.554    0.968     0.868      0.643</span>
-<span class="co">#&gt; 16  5.768  2.777        2.409        0.302  0.235    0.963     0.921      0.519</span>
-<span class="co">#&gt; 17  6.726  2.060        4.394        0.138  1.424    0.999     0.880      0.694</span>
-<span class="co">#&gt; 18  4.919  1.965        3.009        0.191 -0.519    0.936     0.754      0.601</span>
-<span class="co">#&gt; 19  3.472  1.736        2.089        0.373 -1.546    1.022     0.837      0.500</span>
-<span class="co">#&gt; 20  6.993  1.950        7.179        0.107  1.557    0.935     0.829      0.721</span>
-<span class="co">#&gt; 21  5.860  1.533        8.712        0.082 -1.429    0.903     0.744      0.738</span>
-<span class="co">#&gt; 22  3.379  1.501        2.666        0.287  1.421    1.027     0.916      0.556</span>
-<span class="co">#&gt; 23 13.828  0.476       50.583        0.001 -0.037    0.912     0.700      0.966</span>
-<span class="co">#&gt;    circularity circularity_haralick circularity_norm</span>
-<span class="co">#&gt; 1       16.989                4.589            1.363</span>
-<span class="co">#&gt; 2       36.664                5.715            2.954</span>
-<span class="co">#&gt; 3       29.462                2.683            2.374</span>
-<span class="co">#&gt; 4       17.555                5.333            1.414</span>
-<span class="co">#&gt; 5       18.164                5.077            1.464</span>
-<span class="co">#&gt; 6       18.961                6.756            1.529</span>
-<span class="co">#&gt; 7       18.490                3.884            1.489</span>
-<span class="co">#&gt; 8       18.067                5.179            1.459</span>
-<span class="co">#&gt; 9       20.821                4.875            1.684</span>
-<span class="co">#&gt; 11      17.475                4.679            1.413</span>
-<span class="co">#&gt; 12      23.382                4.118            1.897</span>
-<span class="co">#&gt; 13      28.320                2.611            2.305</span>
-<span class="co">#&gt; 14      26.369                2.650            2.152</span>
-<span class="co">#&gt; 15      23.171                2.907            1.895</span>
-<span class="co">#&gt; 16      19.783                3.788            1.622</span>
-<span class="co">#&gt; 17      25.002                2.612            2.067</span>
-<span class="co">#&gt; 18      23.225                3.067            1.931</span>
-<span class="co">#&gt; 19      16.146                4.217            1.340</span>
-<span class="co">#&gt; 20      36.584                2.296            3.057</span>
-<span class="co">#&gt; 21      33.224                2.161            2.800</span>
-<span class="co">#&gt; 22      17.601                3.469            1.471</span>
-<span class="co">#&gt; 23     192.691                1.744           18.370</span>
+<span class="co">#&gt; 1  16.036  8.463        2.084        0.394  1.529    0.996     0.907      0.472</span>
+<span class="co">#&gt; 2  14.339 12.054        2.498        0.833 -1.556    0.787     0.634      0.159</span>
+<span class="co">#&gt; 3  19.176  6.617        3.963        0.151 -1.510    0.940     0.828      0.655</span>
+<span class="co">#&gt; 4  11.575  6.333        2.111        0.389 -1.487    0.962     0.854      0.453</span>
+<span class="co">#&gt; 5  10.640  6.215        2.070        0.422 -1.393    0.961     0.902      0.416</span>
+<span class="co">#&gt; 6   9.205  6.902        1.980        0.630 -1.474    0.943     0.887      0.250</span>
+<span class="co">#&gt; 7  12.655  5.908        2.387        0.314  1.404    0.985     0.881      0.533</span>
+<span class="co">#&gt; 8   8.973  5.661        2.107        0.456 -1.328    0.966     0.834      0.369</span>
+<span class="co">#&gt; 9   8.406  6.384        2.205        0.594 -1.476    0.929     0.833      0.241</span>
+<span class="co">#&gt; 11  4.826  4.694        1.455        0.953  1.559    1.005     0.856      0.027</span>
+<span class="co">#&gt; 12  7.745  5.765        2.521        0.541 -1.418    0.885     0.829      0.256</span>
+<span class="co">#&gt; 13 10.613  3.479        3.695        0.123 -1.104    0.951     0.877      0.672</span>
+<span class="co">#&gt; 14  9.160  3.160        3.535        0.143 -1.383    0.942     0.892      0.655</span>
+<span class="co">#&gt; 15  7.636  2.644        3.544        0.173  1.555    0.954     0.882      0.654</span>
+<span class="co">#&gt; 16  5.278  2.516        2.445        0.294  0.239    0.959     0.918      0.523</span>
+<span class="co">#&gt; 17  6.141  1.915        4.289        0.140  1.427    0.995     0.804      0.688</span>
+<span class="co">#&gt; 18  4.600  1.812        3.074        0.176 -0.513    0.922     0.701      0.606</span>
+<span class="co">#&gt; 19  3.186  1.606        2.202        0.382 -1.544    1.014     0.889      0.496</span>
+<span class="co">#&gt; 20  0.305  0.042       10.593        0.022  1.554  663.000     0.531      0.864</span>
+<span class="co">#&gt; 21  5.913  1.405       12.152        0.063 -1.425    0.874     0.621      0.762</span>
+<span class="co">#&gt; 22  3.140  1.364        2.787        0.270  1.421    1.017     0.913      0.566</span>
+<span class="co">#&gt; 23 12.746  0.443       52.685        0.001 -0.036    0.932     0.705      0.965</span>
+<span class="co">#&gt;    circularity circularity_haralick circularity_norm   asm   con   cor   var</span>
+<span class="co">#&gt; 1       17.189                4.596            1.379 0.320 0.313 0.643 1.438</span>
+<span class="co">#&gt; 2       37.817                5.750            3.048 0.206 0.396 0.692 1.643</span>
+<span class="co">#&gt; 3       31.170                2.650            2.512 0.080 0.679 0.905 4.566</span>
+<span class="co">#&gt; 4       19.547                5.105            1.577 0.211 0.472 0.666 1.706</span>
+<span class="co">#&gt; 5       18.905                5.022            1.524 0.188 0.503 0.748 1.997</span>
+<span class="co">#&gt; 6       19.035                6.929            1.535 0.080 0.849 0.794 3.056</span>
+<span class="co">#&gt; 7       18.867                3.900            1.519 0.258 0.297 0.759 1.615</span>
+<span class="co">#&gt; 8       18.841                5.139            1.522 0.132 0.684 0.663 2.015</span>
+<span class="co">#&gt; 9       21.216                4.890            1.716 0.182 0.739 0.607 1.939</span>
+<span class="co">#&gt; 11      15.958                9.167            1.296 0.648 0.664 0.380 1.536</span>
+<span class="co">#&gt; 12      23.672                4.107            1.921 0.047 3.055 0.525 4.213</span>
+<span class="co">#&gt; 13      28.652                2.596            2.332 0.169 0.482 0.805 2.238</span>
+<span class="co">#&gt; 14      27.529                2.674            2.248 0.139 0.491 0.834 2.478</span>
+<span class="co">#&gt; 15      24.112                2.873            1.973 0.109 0.503 0.828 2.464</span>
+<span class="co">#&gt; 16      20.130                3.757            1.652 0.036 3.991 0.707 7.819</span>
+<span class="co">#&gt; 17      25.307                2.633            2.091 0.080 1.540 0.788 4.638</span>
+<span class="co">#&gt; 18      25.370                3.076            2.115 0.055 3.113 0.287 3.183</span>
+<span class="co">#&gt; 19      16.705                4.240            1.386 0.086 1.382 0.574 2.624</span>
+<span class="co">#&gt; 20       0.060                1.888           10.504 0.124 0.824 0.814 3.215</span>
+<span class="co">#&gt; 21      40.685                2.074            3.446 0.206 0.488 0.599 1.609</span>
+<span class="co">#&gt; 22      18.087                3.431            1.513 0.128 0.721 0.877 3.937</span>
+<span class="co">#&gt; 23     189.440                1.744           17.958 0.072 1.278 0.641 2.777</span>
+<span class="co">#&gt;      idm    sav      sva   sen   ent   dva   den   f12   f13</span>
+<span class="co">#&gt; 1  0.866  9.386   78.435 0.611 0.716 0.313 0.274 0.274 0.451</span>
+<span class="co">#&gt; 2  0.844  5.744   27.286 0.733 0.861 0.396 0.301 0.310 0.520</span>
+<span class="co">#&gt; 3  0.805 16.090  237.045 1.141 1.329 0.679 0.360 0.486 0.758</span>
+<span class="co">#&gt; 4  0.836  5.385   23.966 0.736 0.879 0.472 0.318 0.290 0.508</span>
+<span class="co">#&gt; 5  0.828  4.937   20.543 0.807 0.960 0.503 0.329 0.333 0.564</span>
+<span class="co">#&gt; 6  0.756 14.127  178.998 1.027 1.270 0.849 0.406 0.331 0.629</span>
+<span class="co">#&gt; 7  0.865  8.172   57.939 0.704 0.800 0.297 0.267 0.363 0.547</span>
+<span class="co">#&gt; 8  0.777 11.632  119.368 0.862 1.078 0.684 0.382 0.247 0.512</span>
+<span class="co">#&gt; 9  0.779  7.605   49.621 0.778 0.978 0.739 0.385 0.198 0.440</span>
+<span class="co">#&gt; 11 0.920 53.806 2857.455 0.364 0.437 0.664 0.222 0.231 0.329</span>
+<span class="co">#&gt; 12 0.603 17.997  295.206 1.103 1.596 3.055 0.613 0.147 0.472</span>
+<span class="co">#&gt; 13 0.832 10.840  103.891 0.869 1.009 0.482 0.319 0.398 0.628</span>
+<span class="co">#&gt; 14 0.825  9.873   85.309 0.935 1.086 0.491 0.327 0.418 0.661</span>
+<span class="co">#&gt; 15 0.807  7.471   48.139 0.930 1.099 0.503 0.340 0.384 0.638</span>
+<span class="co">#&gt; 16 0.593 13.948  185.151 1.225 1.720 3.991 0.649 0.213 0.580</span>
+<span class="co">#&gt; 17 0.752 10.154   95.391 1.078 1.365 1.540 0.464 0.356 0.668</span>
+<span class="co">#&gt; 18 0.556 10.242   91.501 0.975 1.488 3.113 0.634 0.051 0.272</span>
+<span class="co">#&gt; 19 0.694 11.863  124.182 0.952 1.287 1.382 0.485 0.187 0.483</span>
+<span class="co">#&gt; 20 0.805  6.897   43.425 0.949 1.149 0.824 0.378 0.385 0.649</span>
+<span class="co">#&gt; 21 0.818  9.721   82.896 0.724 0.879 0.488 0.332 0.232 0.454</span>
+<span class="co">#&gt; 22 0.783 10.020   93.870 0.919 1.122 0.721 0.391 0.385 0.644</span>
+<span class="co">#&gt; 23 0.692 12.374  135.376 0.993 1.321 1.278 0.470 0.215 0.522</span>
 <span class="co"># plot the area to the segmented image</span>
 <span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>,
@@ -313,14 +363,21 @@
 <div class="section level4">
 <h4 id="knowing-the-image-resolution-in-dpi-dots-per-inch">knowing the image resolution in dpi (dots per inch)<a class="anchor" aria-label="anchor" href="#knowing-the-image-resolution-in-dpi-dots-per-inch"></a>
 </h4>
-<p>When the image resolution is known, the measures in pixels obtained with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the dpi of an image, provided that the size of any object is known. See the <a href="#dpi">dpi</a> section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the <code>dpi</code> argument of <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
+<p>When the image resolution is known, the measures in pixels obtained
+with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> are corrected by the image
+resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the
+dpi of an image, provided that the size of any object is known. See the
+<a href="#dpi">dpi</a> section for more details. In this case, the
+estimated resolution considering the calibration of object 10 was ~50.8
+DPIs. We inform this value in the <code>dpi</code> argument of
+<code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.8</span><span class="op">)</span>
 <span class="co"># compute the difference between the two methods</span>
 <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span> <span class="op">-</span> <span class="va">area2</span><span class="op">$</span><span class="va">area</span><span class="op">)</span>
 <span class="co">#&gt; Warning in area$area - area2$area: longer object length is not a multiple of</span>
 <span class="co">#&gt; shorter object length</span>
-<span class="co">#&gt; [1] 100.547</span></code></pre></div>
+<span class="co">#&gt; [1] -70.009</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -329,7 +386,12 @@
 </h2>
 <!-- inicio font awesome -->
 <script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script><blockquote>
-<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this link</a> you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>. You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>. <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!</p>
+<p>At <a href="https://tiagoolivoto.github.io/paper_pliman/code.html" class="external-link">this
+link</a> you will find more examples on how to use {pliman} to analyze
+plant images. Source code and images can be downloaded <a href="https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip" class="external-link">here</a>.
+You can also find a talk (Portuguese language) about {pliman} <a href="https://www.youtube.com/watch?v=ElvUVlPocgA" class="external-link">here</a>.
+<i class="far fa-lightbulb"></i>Lights,
+<i class="fas fa-camera"></i>camera, {pliman}!</p>
 </blockquote>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -345,7 +407,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer>

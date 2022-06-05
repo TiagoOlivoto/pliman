@@ -144,6 +144,9 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
   parallel <span class="op">=</span> <span class="cn">FALSE</span>,
   workers <span class="op">=</span> <span class="cn">NULL</span>,
   watershed <span class="op">=</span> <span class="cn">TRUE</span>,
+  har_nbins <span class="op">=</span> <span class="fl">32</span>,
+  har_scales <span class="op">=</span> <span class="fl">1</span>,
+  har_band <span class="op">=</span> <span class="fl">1</span>,
   resize <span class="op">=</span> <span class="cn">FALSE</span>,
   trim <span class="op">=</span> <span class="cn">FALSE</span>,
   fill_hull <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -240,6 +243,15 @@ detection. This will detect objects even when they are touching one other.
 If <code>FALSE</code>, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.</p></dd>
+<dt>har_nbins</dt>
+<dd><p>An integer indicating the number of bins using to compute
+the Haralick matrix. Defaults to 32. See Details</p></dd>
+<dt>har_scales</dt>
+<dd><p>A integer vector indicating the number of scales to use to
+compute the Haralick features. See Details.</p></dd>
+<dt>har_band</dt>
+<dd><p>The band to compute the Haralick features (1 = R, 2 = G, 3 =
+B). Defaults to 1.</p></dd>
 <dt>resize</dt>
 <dd><p>Resize the image before processing? Defaults to <code>FALSE</code>. Use a
 numeric value of range 0-100 (proportion of the size of the original
@@ -417,6 +429,20 @@ from each pixels of the perimeter to the centroid of the object.</p></li>
 circle. This measure is computed as `Cn = perimeter ^ 2 / 4<em>pi</em>area`` and
 is invariant under translation, rotation, scaling transformations, and
 dimensionless.</p></li>
+<li><p><code>asm</code>: The angular second-moment feature.</p></li>
+<li><p><code>con</code>: The contrast feature</p></li>
+<li><p><code>cor</code>: Correlation measures the linear dependency of gray levels of
+neighboring pixels.</p></li>
+<li><p><code>var</code>: The variance of gray levels pixels.</p></li>
+<li><p><code>idm</code>: The Inverse Difference Moment (IDM), i.e., the local
+homogeneity.</p></li>
+<li><p><code>sav</code>: The Sum Average.</p></li>
+<li><p><code>sva</code>: The Sum Variance.</p></li>
+<li><p><code>sen</code>: Sum Entropy.</p></li>
+<li><p><code>dva</code>: Difference Variance.</p></li>
+<li><p><code>den</code>: Difference Entropy</p></li>
+<li><p><code>f12</code>: Difference Variance.</p></li>
+<li><p><code>f13</code>: The angular second-moment feature.</p></li>
 </ul></li>
 <li><p><code>statistics</code>: A data frame with the summary statistics for the area of the
 objects.</p></li>
@@ -468,16 +494,32 @@ such cases, the image resolution cannot be conserved. Consequently, the
 measures cannot be adjusted using the argument <code>dpi</code> from <code><a href="utils_measures.html">get_measures()</a></code>,
 since each image will have a different resolution. NOTE: This will only work
 in an interactive section.</p>
+<p>The function computes 13 Haralick texture features for each object based on a
+gray-level co-occurrence matrix (Haralick et al. 1979). Haralick features
+depend on the configuration of the parameters  <code>har_nbins</code> and <code>har_scales</code>.
+<code>har_nbins</code> controls the number of bins used to compute the Haralick matrix.
+A smaller <code>har_nbins</code> can give more accurate estimates of the correlation
+because the number of events per bin is higher. While a higher value will
+give more sensitivity. <code>har_scales</code> controls the number of scales used to
+compute the Haralick features. Since Haralick features compute the
+correlation of intensities of neighboring pixels it is possible to identify
+textures with different scales, e.g., a texture that is repeated every two
+pixels or 10 pixels. By default, the Haralick features are computed with the
+R band. To chance this default, use the argument <code>har_band</code>. For example,
+<code>har_band = 2</code> will compute the features with the green band.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., &amp; Baucom, R. S. (2020). The
 remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
 batatas): the influence of genetics, environment, and G×E. New Phytologist,
-225(5), 2183–2195. doi: <a href="https://doi.org/10.1111/NPH.16286" class="external-link">10.1111/NPH.16286</a></p>
+225(5), 2183–2195. <a href="https://doi.org/10.1111/NPH.16286" class="external-link">doi:10.1111/NPH.16286</a></p>
+<p>Haralick, R.M., K. Shanmugam, and I. Dinstein. 1973. Textural Features for Image
+Classification. IEEE Transactions on Systems, Man, and Cybernetics SMC-3(6): 610–621.
+<a href="https://doi.org/10.1109/TSMC.1973.4309314" class="external-link">doi:10.1109/TSMC.1973.4309314</a></p>
 <p>Lee, Y., &amp; Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
-doi: <a href="https://doi.org/10.5951/mathteacher.110.8.0631" class="external-link">10.5951/mathteacher.110.8.0631</a></p>
+<a href="https://doi.org/10.5951/mathteacher.110.8.0631" class="external-link">doi:10.5951/mathteacher.110.8.0631</a></p>
 <p>Montero, R. S., Bribiesca, E., Santiago, R., &amp; Bribiesca, E. (2009). State
 of the Art of Compactness and Circularity Measures. International
 Mathematical Forum, 4(27), 1305–1335.</p>
@@ -499,11 +541,11 @@ Computer Vision. 3rd ed. World Scientific.</p>
 <span class="r-in"><span class="va">obj</span><span class="op">$</span><span class="va">statistics</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        stat      value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1         n    30.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  min_area  1366.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 mean_area  2057.3667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  max_area  2445.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   sd_area   230.5574</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  sum_area 61721.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  min_area  1368.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 mean_area  2056.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  max_area  2443.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   sd_area   230.0232</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  sum_area 61680.0000</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Enumerate the objects in the original image</span></span>
 <span class="r-in"><span class="co"># Return the top-5 grains with the largest area</span></span>
@@ -515,29 +557,41 @@ Computer Vision. 3rd ed. World Scientific.</p>
 <span class="r-plt img"><img src="analyze_objects-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="va">top</span><span class="op">$</span><span class="va">results</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    id        x         y area area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4 345.3566 105.78323 2445    2406  183.5097    27.51343   24.68250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 11 468.9970  56.42549 2315    2275  179.2670    26.76542   23.03064</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3 237.5917 339.82483 2312    2282  178.3381    26.69878   23.96521</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5 406.9314  77.54909 2302    2264  178.0955    26.64891   23.96546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 538.0561 401.89604 2299    2258  176.4386    26.60716   24.95688</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4 345.3348 105.75686 2443    2413  185.6102    27.49088   24.33975</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 10 469.0151  56.45596 2316    2283  181.6102    26.80966   23.15986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3 237.6504 339.80874 2311    2289  181.0244    26.69892   23.99281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   6 406.9631  77.42188 2304    2268  178.7817    26.62267   24.07772</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 538.0387 401.85037 2299    2270  178.1960    26.60974   24.95488</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    30.47116 1.7303597  55.02687 49.36499 60.94232   60.92191   51.10462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   30.78003 2.3489729  53.53085 46.06129 61.56007   61.22955   48.15734</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.04402 1.2334610  53.39756 47.93042 58.08803   57.50966   51.24681</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    29.63586 1.6395963  53.29783 47.93092 59.27173   58.85962   49.81918</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.40020 0.9346592  53.21431 49.91376 56.80040   56.60376   51.73299</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    30.53159 1.7565552  54.98177 48.67950 61.06318   60.93242   51.06310</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   31.18773 2.3381509  53.61931 46.31972 62.37547   61.18631   48.21792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.43448 1.2403149  53.39784 47.98561 58.86897   57.49117   51.25223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    30.03551 1.6644721  53.24535 48.15544 60.07101   58.94378   49.79657</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.70321 0.9453011  53.21949 49.90975 57.40641   56.45901   51.87605</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      length    width radius_ratio eccentricity      theta solidity convexity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  60.71775 50.97985     1.234525    0.7537291 -0.9908157 1.016209 0.9284178</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 61.37708 48.38264     1.336482    0.7000370  1.2923197 1.017582 0.8848026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.18726 51.75913     1.211924    0.8295448 -0.5715211 1.013146 0.9340676</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  59.06097 50.57092     1.236607    0.7770521  1.1444750 1.016784 0.8994081</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.53648 51.85138     1.137971    0.8577099 -0.8382015 1.018158 0.8864952</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    elongation circularity circularity_haralick circularity_norm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.16037970    13.77333             15.90041         1.133123</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.21171485    13.88193             11.39452         1.143463</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.09491855    13.75626             21.64542         1.132403</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.14375052    13.77845             16.25334         1.134654</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.08286873    13.54092             28.46723         1.115144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  61.02071 51.02434     1.254392    0.7539797 -0.9926965 1.012433 0.9145237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 61.03697 48.69446     1.346629    0.6824269  1.2961522 1.014455 0.8647999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.20133 51.98953     1.226805    0.8162596 -0.5648957 1.009611 0.9112384</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  59.50243 50.79021     1.247440    0.8034516  1.1344362 1.015873 0.8767728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.54173 52.42395     1.150204    0.8525173 -0.8413811 1.012775 0.8810137</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    elongation circularity circularity_haralick circularity_norm        asm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.16381943    14.10198             15.65045         1.161421 0.08691588</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.20221369    14.24104             11.46618         1.174075 0.08317829</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.09111329    14.17993             21.52592         1.168866 0.08484019</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.14641800    13.87279             15.99466         1.143415 0.08564560</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.07282731    13.81201             28.14949         1.138237 0.08863301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          con       cor      var       idm      sav      sva      sen      ent</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.7298578 0.9445076 7.576197 0.8011890 40.63760 1582.907 1.174546 1.358955</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.8342044 0.9426903 8.278044 0.7901221 42.45991 1731.949 1.184363 1.381620</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.7020281 0.9497252 7.981903 0.7941562 40.70983 1590.260 1.174603 1.357803</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.7496927 0.9508846 8.631946 0.7848458 42.70254 1753.433 1.185619 1.378303</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.6025756 0.9591354 8.372833 0.8067203 40.70896 1591.123 1.183855 1.355013</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          dva       den       f12       f13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.7298578 0.3847632 0.5436600 0.7984089</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.8342044 0.3970503 0.5197025 0.7880111</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.7020281 0.3861546 0.5354312 0.7933860</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.7496927 0.3950257 0.5277220 0.7922799</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.6025756 0.3644611 0.5598796 0.8070404</span>
 <span class="r-in"><span class="co"># }</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
@@ -575,7 +629,7 @@ Computer Vision. 3rd ed. World Scientific.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>
