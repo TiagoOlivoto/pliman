@@ -9,8 +9,13 @@
 status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental-1)
-![Downloads](http://cranlogs.r-pkg.org/badges/pliman) ![Total
-Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
+![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
 [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
 <!-- badges: end -->
 
@@ -79,12 +84,13 @@ grains.
 
 ``` r
 library(pliman)
-# |=======================================================|
-# | Tools for Plant Image Analysis (pliman 1.0.0)         |
-# | Author: Tiago Olivoto                                 |
-# | Type 'vignette('pliman_start')' for a short tutorial  |
-# | Visit 'https://bit.ly/pliman' for a complete tutorial |
-# |=======================================================|
+# |==========================================================|
+# | Tools for Plant Image Analysis (pliman 1.2.0)            |
+# | Author: Tiago Olivoto                                    |
+# | Type 'citation('pliman')' to know how to cite pliman     |
+# | Type 'vignette('pliman_start')' for a short tutorial     |
+# | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |
+# |==========================================================|
 img <-image_pliman("soybean_touch.jpg", plot = TRUE)
 soy <- analyze_objects(img, marker = "id")
 ```
@@ -95,11 +101,11 @@ soy <- analyze_objects(img, marker = "id")
 soy$statistics
 #        stat      value
 # 1         n    30.0000
-# 2  min_area  1366.0000
-# 3 mean_area  2057.3667
-# 4  max_area  2445.0000
-# 5   sd_area   230.5574
-# 6  sum_area 61721.0000
+# 2  min_area  1368.0000
+# 3 mean_area  2056.0000
+# 4  max_area  2443.0000
+# 5   sd_area   230.0232
+# 6  sum_area 61680.0000
 ```
 
 # Disease severity
@@ -127,7 +133,7 @@ sev <-
 ``` r
 sev$severity
 #    healthy symptomatic
-# 1 89.04464    10.95536
+# 1 88.95803    11.04197
 ```
 
 `pliman` takes the advantage of several powerful functions from [EBImage
