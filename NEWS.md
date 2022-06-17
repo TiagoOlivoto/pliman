@@ -11,6 +11,9 @@
 ## New features
 * Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.
 
+* Haralick's features that quantify pixel texture for image objects were included.
+
+
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.
 * The right-hand of argument `measure` in `get_measures()` now accepts a numeric object stored in the global environment.
