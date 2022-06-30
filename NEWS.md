@@ -8,10 +8,18 @@
 
 * A set of `poly_*()` function to analyze polygons. All of them are based on a set of coordinate points describing the edge of the object(s). See ?`utils_polygon` for more details.
 
+* `get_na_here()` and `set_na_here()` to deal with working directories.
+
+* `apply_fun_to_imgs()` to apply a function (or functions) to a set of images stored in the working directory.
+
+* `make_brush()`, `make_mask()`, and `image_segment_mask()` to create masks and segment images based on such a mask.
+
 ## New features
 * Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.
 
 * Haralick's features that quantify pixel texture for image objects were included.
+
+* `analyze_objects()`, `measure_disease()`, and `measure_disease_byl()` have now a `filter` argument that applies a median filtering in the binary mask. This is useful to reduce the noise in the segmentation of objects.
 
 
 ## Minor changes

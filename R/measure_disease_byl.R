@@ -47,9 +47,10 @@ measure_disease_byl <- function(img,
                                 index = "B",
                                 lower_size = NULL,
                                 my_index = NULL,
-                                watershed = FALSE,
+                                watershed = TRUE,
                                 invert = FALSE,
                                 fill_hull = FALSE,
+                                filter = 3,
                                 threshold = "Otsu",
                                 extension = NULL,
                                 tolerance = NULL,
@@ -75,7 +76,28 @@ measure_disease_byl <- function(img,
              dir_original,
              paste0("./", dir_original))
   }
-  help_byl <- function(img){
+  if (is.character(img_healthy)){
+    all_files <- sapply(list.files(getwd()), file_name)
+    imag <- list.files(getwd(), pattern = img_healthy)
+    check_names_dir(img_healthy, all_files, getwd())
+    name <- file_name(imag)
+    extens <- file_extension(imag)
+    img_healthy <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
+  }
+  if (is.character(img_symptoms)){
+    all_files <- sapply(list.files(getwd()), file_name)
+    imag <- list.files(getwd(), pattern = img_symptoms)
+    check_names_dir(img_symptoms, all_files, getwd())
+    name <- file_name(imag)
+    extens <- file_extension(imag)
+    img_symptoms <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
+  }
+  back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode = 'Color')
+
+  help_byl <- function(img,
+                       img_healthy,
+                       img_symptoms,
+                       back){
     if(is.character(img)){
       all_files <- sapply(list.files(diretorio_original), file_name)
       check_names_dir(img, all_files, diretorio_original)
@@ -94,6 +116,7 @@ measure_disease_byl <- function(img,
                            watershed = watershed,
                            invert = invert,
                            fill_hull = fill_hull,
+                           filter = filter,
                            threshold = threshold,
                            extension = extension,
                            tolerance = tolerance,
@@ -102,23 +125,6 @@ measure_disease_byl <- function(img,
                            show_image = FALSE,
                            verbose = FALSE,
                            workers = workers)
-    if (is.character(img_healthy)){
-      all_files <- sapply(list.files(diretorio_original), file_name)
-      imag <- list.files(diretorio_original, pattern = img_healthy)
-      check_names_dir(img_healthy, all_files, diretorio_original)
-      name <- file_name(imag)
-      extens <- file_extension(imag)
-      img_healthy <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
-    }
-    if (is.character(img_symptoms)){
-      all_files <- sapply(list.files(diretorio_original), file_name)
-      imag <- list.files(diretorio_original, pattern = img_symptoms)
-      check_names_dir(img_symptoms, all_files, diretorio_original)
-      name <- file_name(imag)
-      extens <- file_extension(imag)
-      img_symptoms <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
-    }
-    back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode = 'Color')
     results <- list()
     tmp_dir <- tempdir()
     if(isTRUE(show_image)){
@@ -145,6 +151,7 @@ measure_disease_byl <- function(img,
                                   dir_processed = tmp_dir,
                                   prefix = paste0(name_ori, "_", i),
                                   name = "",
+                                  filter = FALSE,
                                   ...)
                 })
     names(results) <- paste0(name_ori, "-", 1:length(results))
@@ -204,7 +211,7 @@ measure_disease_byl <- function(img,
   }
 
   if(missing(pattern)){
-    results <- help_byl(img)
+    results <- help_byl(img, img_healthy, img_symptoms, back)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -224,7 +231,7 @@ measure_disease_byl <- function(img,
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
       clusterExport(clust,
-                    varlist = c("names_plant", "help_byl"),
+                    varlist = c("names_plant", "help_byl", "img_healthy", "img_symptoms", "back"),
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
@@ -233,7 +240,7 @@ measure_disease_byl <- function(img,
       results <-
         parLapply(clust, names_plant,
                   function(x){
-                    help_byl(img  = x)
+                    help_byl(img  = x, img_healthy, img_symptoms, back)
                   })
     } else{
       results <- list()
@@ -243,7 +250,7 @@ measure_disease_byl <- function(img,
           run_progress(pb, actual = i,
                        text = paste("Processing image", names_plant[i]))
         }
-        results[[i]] <- help_byl(img  = names_plant[i])
+        results[[i]] <- help_byl(img  = names_plant[i], img_healthy, img_symptoms, back)
       }
     }
     names(results) <- names_plant
@@ -273,6 +280,7 @@ measure_disease_byl <- function(img,
     results, class = "plm_disease_byl"
   ))
 }
+
 
 
 

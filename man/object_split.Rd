@@ -12,6 +12,7 @@ object_split(
   watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
+  filter = 3,
   threshold = "Otsu",
   extension = NULL,
   tolerance = NULL,
@@ -50,6 +51,10 @@ useful to fill holes in objects that have portions with a color similar to
 the background. IMPORTANT: Objects touching each other can be combined into
 one single object, which may underestimate the number of objects in an
 image.}
+
+\item{filter}{Performs median filtering in the binary image? By default, a
+median filter of \code{size = 2} is applied. See more at \code{\link[=image_filter]{image_filter()}}. Set
+to \code{FALSE} to cancel median filtering.}
 
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.

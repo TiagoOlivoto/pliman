@@ -11,6 +11,7 @@ image_segment(
   my_index = NULL,
   threshold = "Otsu",
   fill_hull = FALSE,
+  filter = 2,
   re = NULL,
   nir = NULL,
   invert = FALSE,
@@ -61,6 +62,10 @@ For \code{image_segmentation_iter()}, use a vector (allows a mixed (numeric and
 character) type) with the same length of \code{nseg}.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
+
+\item{filter}{Performs median filtering. This can be useful to reduce the
+noise in produced palettes. Defaults to \code{TRUE}. See more at
+\code{\link[=image_filter]{image_filter()}}.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}

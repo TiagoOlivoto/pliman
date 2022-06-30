@@ -11,6 +11,7 @@ measure_disease(
   img_symptoms = NULL,
   img_background = NULL,
   pattern = NULL,
+  filter = 10,
   parallel = FALSE,
   workers = NULL,
   har_nbins = 32,
@@ -59,17 +60,27 @@ measure_disease_iter(img, has_background = TRUE, r = 5, ...)
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{img_healthy}{A color palette of healthy areas.}
+\item{img_healthy}{A color palette of healthy tissues.}
 
-\item{img_symptoms}{A color palette of lesioned areas.}
+\item{img_symptoms}{A color palette of lesioned tissues.}
 
-\item{img_background}{An optional color palette of the image background.}
+\item{img_background}{A color palette of the background (if exists). These
+arguments can be either an \code{Image} object stored in the global environment
+or a character value. If a chacarceter is used (eg., \code{img_healthy = "leaf"}), the function will search in the current working directory a valid
+image that contains "\verb{leaf"} in the name. Note that if two images matches
+this pattern, an error will occour.}
 
 \item{pattern}{A pattern of file name used to identify images to be
 processed. For example, if \code{pattern = "im"} all images that the name
 matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 Providing any number as pattern (e.g., \code{pattern = "1"}) will select
 images that are named as 1.-, 2.-, and so on.}
+
+\item{filter}{Performs median filtering in the binary image that segments the
+leaf from background? By default, a median filter of \code{size = 10} is applied.
+This is useful to reduce the noise and segment the leaf and background more
+accurately. See more at \code{\link[=image_filter]{image_filter()}}. Set to \code{FALSE} to cancel median
+filtering.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

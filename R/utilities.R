@@ -631,19 +631,23 @@ random_color <- function(n = 1, distinct = FALSE){
 
 
 
-#' Set the Working Directory quicky
+#' Set and get the Working Directory quicky
 #'
-#' It sets the working directory to the path of the current script.
+#' * [get_wd_here()] gets the working directory to the path of the current script.
+#' * [set_wd_here()] sets the working directory to the path of the current script.
 #'
 #' @param path Path components below the project root. Defaults to `NULL`. This means that
 #'   the directory will be set to the path of the file. If the path doesn't exist, the
 #'   user will be asked if he wants to create such a folder.
-#' @return A message showing the current working directory.
+#' @return
+#' * [get_wd_here()] returns a full-path directory name.
+#' * [get_wd_here()] returns a message showing the current working directory.
 #' @export
-#'
+#' @name utils_wd
 #' @examples
 #'
 #' \dontrun{
+#' get_wd_here()
 #' set_wd_here()
 #' }
 set_wd_here <- function(path = NULL){
@@ -676,5 +680,28 @@ set_wd_here <- function(path = NULL){
     } else{
     message("Working directory set to '", dir_path, "'")
     }
+  }
+}
+
+#' @export
+#' @name utils_wd
+get_wd_here <- function(path = NULL){
+  if(!requireNamespace("rstudioapi", quietly = TRUE)) {
+    if(interactive() == TRUE){
+      inst <-
+        switch(menu(c("Yes", "No"), title = "Package {rstudioapi} required but not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        install.packages("rstudioapi", quiet = TRUE)
+      } else{
+        message("To use `set_wd_here()`, first install {rstudioapi}.")
+      }
+    }
+  } else{
+    dir_path <- dirname(rstudioapi::documentPath())
+    if(!is.null(path)){
+      dir_path <- paste0(dir_path, "/", path)
+    }
+    dir_path
   }
 }

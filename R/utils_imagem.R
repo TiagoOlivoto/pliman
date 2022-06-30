@@ -1084,6 +1084,9 @@ image_filter <- function(image,
                          workers = NULL,
                          verbose = TRUE,
                          plot = FALSE){
+  if(size < 2){
+    stop("Using `size` < 2 will crash you R section. Please, consider using 2 or more.")
+  }
   check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
@@ -1286,6 +1289,9 @@ image_create <- function(color,
 #'   `resize = 30`, the resized image will have 30% of the size of original
 #'   image.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
+#' @param filter Performs median filtering in the binary image? By default, a
+#'   median filter of `size = 2` is applied. See more at [image_filter()]. Set
+#'   to `FALSE` to cancel median filtering.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -1320,6 +1326,7 @@ image_binary <- function(image,
                          threshold = "Otsu",
                          resize = FALSE,
                          fill_hull = FALSE,
+                         filter = 2,
                          re = NULL,
                          nir = NULL,
                          invert = FALSE,
@@ -1349,6 +1356,7 @@ image_binary <- function(image,
                        threshold,
                        resize,
                        fill_hull,
+                       filter,
                        re,
                        nir,
                        invert,
@@ -1363,6 +1371,7 @@ image_binary <- function(image,
                     threshold,
                     resize,
                     fill_hull,
+                    filter,
                     re,
                     nir,
                     invert,
@@ -1375,7 +1384,8 @@ image_binary <- function(image,
     bin_img <- function(imgs,
                         invert,
                         fill_hull,
-                        threshold){
+                        threshold,
+                        filter){
       no_inf <- imgs[!is.infinite(imgs)]
       if(threshold == "Otsu"){
         threshold <- EBImage::otsu(imgs, range = c(min(no_inf, na.rm = TRUE),
@@ -1409,10 +1419,14 @@ image_binary <- function(image,
           threshold <- readline("Selected threshold: ")
         }
       }
+
       if(invert == FALSE){
         imgs <- EBImage::Image(imgs < threshold)
       } else{
         imgs <- EBImage::Image(imgs > threshold)
+      }
+      if(is.numeric(filter) & filter > 1){
+        imgs <- EBImage::medianFilter(imgs, filter)
       }
       if(isTRUE(fill_hull)){
         imgs <- EBImage::fillHull(imgs)
@@ -1423,7 +1437,8 @@ image_binary <- function(image,
                    bin_img,
                    invert,
                    fill_hull,
-                   threshold)
+                   threshold,
+                   filter)
     if(show_image == TRUE){
       num_plots <- length(imgs)
       if (is.null(nrow) && is.null(ncol)){
@@ -1806,6 +1821,9 @@ plot.image_index <- function(x,
 #'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
 #'   character) type) with the same length of `nseg`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
+#' @param filter Performs median filtering. This can be useful to reduce the
+#'   noise in produced palettes. Defaults to `TRUE`. See more at
+#'   [image_filter()].
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -1850,6 +1868,7 @@ image_segment <- function(image,
                           my_index = NULL,
                           threshold = "Otsu",
                           fill_hull = FALSE,
+                          filter = 2,
                           re = NULL,
                           nir = NULL,
                           invert = FALSE,
@@ -1875,9 +1894,9 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, my_index, threshold, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, my_index, threshold, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, my_index, threshold, fill_hull, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, my_index, threshold, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
@@ -1905,6 +1924,7 @@ image_segment <- function(image,
                            threshold = threshold,
                            resize = FALSE,
                            fill_hull = fill_hull,
+                           filter = filter,
                            re = re,
                            nir = nir,
                            show_image = FALSE,
@@ -2175,6 +2195,15 @@ image_segment_iter <- function(image,
     }
   }
 }
+
+
+
+
+
+
+
+
+
 
 
 

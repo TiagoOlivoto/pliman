@@ -41,14 +41,24 @@
 #' et al. 1979). See more details in [analyze_objects()].
 #'
 #' @param img The image to be analyzed.
-#' @param img_healthy A color palette of healthy areas.
-#' @param img_symptoms A color palette of lesioned areas.
-#' @param img_background An optional color palette of the image background.
+#' @param img_healthy A color palette of healthy tissues.
+#' @param img_symptoms A color palette of lesioned tissues.
+#' @param img_background A color palette of the background (if exists). These
+#'   arguments can be either an `Image` object stored in the global environment
+#'   or a character value. If a chacarceter is used (eg., `img_healthy =
+#'   "leaf"`), the function will search in the current working directory a valid
+#'   image that contains "`leaf"` in the name. Note that if two images matches
+#'   this pattern, an error will occour.
 #' @param pattern A pattern of file name used to identify images to be
 #'   processed. For example, if `pattern = "im"` all images that the name
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `pattern = "1"`) will select
 #'   images that are named as 1.-, 2.-, and so on.
+#' @param filter Performs median filtering in the binary image that segments the
+#'   leaf from background? By default, a median filter of `size = 10` is applied.
+#'   This is useful to reduce the noise and segment the leaf and background more
+#'   accurately. See more at [image_filter()]. Set to `FALSE` to cancel median
+#'   filtering.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `pattern` is used is informed. The
@@ -196,6 +206,7 @@ measure_disease <- function(img,
                             img_symptoms = NULL,
                             img_background = NULL,
                             pattern = NULL,
+                            filter = 10,
                             parallel = FALSE,
                             workers = NULL,
                             har_nbins = 32,
@@ -257,6 +268,30 @@ measure_disease <- function(img,
              dir_processed,
              paste0("./", dir_processed))
   }
+  if(is.character(img_healthy)){
+    all_files <- sapply(list.files(getwd()), file_name)
+    imag <- list.files(getwd(), pattern = img_healthy)
+    check_names_dir(img_healthy, all_files, "")
+    name_h <- file_name(imag)
+    extens <- file_extension(imag)
+    img_healthy <- image_import(paste(getwd(), "/", name_h, ".", extens, sep = ""))
+  }
+  if(is.character(img_symptoms)){
+    all_files <- sapply(list.files(getwd()), file_name)
+    imag <- list.files(getwd(), pattern = img_symptoms)
+    check_names_dir(img_symptoms, all_files, "")
+    name_s <- file_name(imag)
+    extens <- file_extension(imag)
+    img_symptoms <- image_import(paste(getwd(), "/", name_s, ".", extens, sep = ""))
+  }
+  if(is.character(img_background)){
+    all_files <- sapply(list.files(getwd()), file_name)
+    imag <- list.files(getwd(), pattern = img_background)
+    check_names_dir(img_background, all_files, "")
+    name_b <- file_name(imag)
+    extens <- file_extension(imag)
+    img_background <- image_import(paste(getwd(), "/", name_b, ".", extens, sep = ""))
+  }
   help_count <-
     function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
              index_lb, index_dh, lesion_size, tolerance, extension,
@@ -300,22 +335,7 @@ measure_disease <- function(img,
                col_leaf <- col_leaf / 255)
       }
       if(!is.null(img_healthy) && !is.null(img_symptoms)){
-        if(is.character(img_healthy)){
-          all_files <- sapply(list.files(diretorio_original), file_name)
-          imag <- list.files(diretorio_original, pattern = img_healthy)
-          check_names_dir(img_healthy, all_files, diretorio_original)
-          name_h <- file_name(imag)
-          extens <- file_extension(imag)
-          img_healthy <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
-        }
-        if(is.character(img_symptoms)){
-          all_files <- sapply(list.files(diretorio_original), file_name)
-          imag <- list.files(diretorio_original, pattern = img_symptoms)
-          check_names_dir(img_symptoms, all_files, diretorio_original)
-          name_s <- file_name(imag)
-          extens <- file_extension(imag)
-          img_symptoms <- image_import(paste(diretorio_original, "/", name_s, ".", extens, sep = ""))
-        }
+
         original <-
           data.frame(CODE = "img",
                      R = c(img@.Data[,,1]),
@@ -406,14 +426,7 @@ measure_disease <- function(img,
             }
           }
         } else{
-          if(is.character(img_background)){
-            all_files <- sapply(list.files(diretorio_original), file_name)
-            imag <- list.files(diretorio_original, pattern = img_background)
-            check_names_dir(img_background, all_files, diretorio_original)
-            name_b <- file_name(imag)
-            extens <- file_extension(imag)
-            img_background <- image_import(paste(diretorio_original, "/", name_b, ".", extens, sep = ""))
-          }
+
           fundo <-
             data.frame(CODE = "img_background",
                        R = c(img_background@.Data[,,1]),
@@ -431,6 +444,9 @@ measure_disease <- function(img,
           ifelse(fill_hull == TRUE,
                  plant_background <- EBImage::fillHull(matrix(pred1, ncol = ncol_img)),
                  plant_background <- matrix(pred1, ncol = ncol_img))
+          if(is.numeric(filter) & filter > 1){
+            plant_background <- EBImage::medianFilter(plant_background, size = filter)
+          }
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
             transform(rbind(sadio[sample(1:nrow(sadio)),][1:nsample,],

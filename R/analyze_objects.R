@@ -65,14 +65,24 @@
 #' `har_band = 2` will compute the features with the green band.
 #'
 #' @param img The image to be analyzed.
-#' @param foreground A color palette of the foreground (optional).
-#' @param background A color palette of the background (optional).
+#' @param foreground,background A color palette for the foregrond and
+#'   background, respectively (optional). If a chacarceter is used (eg.,
+#'   `foreground = "fore"`), the function will search in the current working
+#'   directory a valid image that contains "fore" in the name.
 #' @param reference A color palette for a reference object (optional). This is
 #'   useful to adjust measures when images are not obtained with standard
 #'   resolution (e.g., field images). See more in the details section.
 #' @param reference_area The known area of the reference objects. The measures
 #'   of all the objects in the image will be corrected using the same unit of
 #'   the area informed here.
+#' @param back_fore_formula A character value to indicate the formula to be used
+#'   in the `glm` model to segment background (objects and reference) and
+#'   background. Defaults to `"G + B"`. This formula is optimized to segment
+#'   white backgrounds from green leaves and a blue reference object.
+#' @param fore_ref_formula A character value to indicate the formula to be used
+#'   in the `glm` model to segment objects and reference. Defaults to `"G / (R +
+#'   G + B)"`. This formula is optimized to segment green leaves from a blue
+#'   background.
 #' @param pattern A pattern of file name used to identify images to be imported.
 #'   For example, if `pattern = "im"` all images in the current working
 #'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
@@ -113,8 +123,9 @@
 #'   the background. IMPORTANT: Objects touching each other can be combined into
 #'   one single object, which may underestimate the number of objects in an
 #'   image.
-#' @param filter Performs median filtering after image processing? defaults to
-#'   `FALSE`. See more at [image_filter()].
+#' @param filter Performs median filtering in the binary image? By default, a
+#'   median filter of `size = 2` is applied. See more at [image_filter()]. Set
+#'   to `FALSE` to cancel median filtering.
 #' @param invert Inverts the binary image, if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
 #' @param object_size The size of the object. Used to automatically set up
@@ -343,6 +354,8 @@ analyze_objects <- function(img,
                             background = NULL,
                             reference = NULL,
                             reference_area = NULL,
+                            back_fore_formula = "G+B",
+                            fore_ref_formula = "R+G+B",
                             pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
@@ -371,7 +384,7 @@ analyze_objects <- function(img,
                             lower_circ = NULL,
                             upper_circ = NULL,
                             randomize = TRUE,
-                            nrows = 2000,
+                            nrows = 500,
                             show_image = TRUE,
                             show_original = TRUE,
                             show_chull = FALSE,
@@ -440,30 +453,30 @@ analyze_objects <- function(img,
         }
         img <- image_resize(img, resize)
       }
-      if(filter != FALSE){
-        if(!is.numeric(filter)){
-          stop("Argument `filter` must be numeric.", call. = FALSE)
-        }
-        img <- image_filter(img, size = filter)
-      }
+      # if(filter != FALSE){
+      #   if(!is.numeric(filter)){
+      #     stop("Argument `filter` must be numeric.", call. = FALSE)
+      #   }
+      #   img <- image_filter(img, size = filter)
+      # }
       # when reference is not used
       if(is.null(reference)){
         if(!is.null(foreground) && !is.null(background)){
           if(is.character(foreground)){
-            all_files <- sapply(list.files(diretorio_original), file_name)
-            imag <- list.files(diretorio_original, pattern = foreground)
-            check_names_dir(foreground, all_files, diretorio_original)
+            all_files <- sapply(list.files(getwd()), file_name)
+            imag <- list.files(getwd(), pattern = foreground)
+            check_names_dir(foreground, all_files, getwd())
             name <- file_name(imag)
             extens <- file_extension(imag)
-            foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+            foreground <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
           }
           if(is.character(background)){
-            all_files <- sapply(list.files(diretorio_original), file_name)
-            imag <- list.files(diretorio_original, pattern = background)
-            check_names_dir(background, all_files, diretorio_original)
+            all_files <- sapply(list.files(getwd()), file_name)
+            imag <- list.files(getwd(), pattern = background)
+            check_names_dir(background, all_files, getwd())
             name <- file_name(imag)
             extens <- file_extension(imag)
-            background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+            background <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
           }
           original <-
             data.frame(CODE = "img",
@@ -484,10 +497,17 @@ analyze_objects <- function(img,
             transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
                             background[sample(1:nrow(background)),][1:nrows,]),
                       Y = ifelse(CODE == "background", 0, 1))
-          modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"), data = back_fore))
+
+          formula <- as.formula(paste("Y ~ ", back_fore_formula))
+
+          modelo1 <- suppressWarnings(glm(formula,
+                                          family = binomial("logit"),
+                                          data = back_fore))
           pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
           foreground_background <- matrix(pred1, ncol = dim(img)[[2]])
-          foreground_background <- image_correct(foreground_background, perc = 0.02)
+          if(is.numeric(filter) & filter > 1){
+            foreground_background <- EBImage::medianFilter(foreground_background, size = filter)
+          }
           ID <- c(foreground_background == 1)
           ID2 <- c(foreground_background == 0)
           if(isTRUE(watershed)){
@@ -513,6 +533,7 @@ analyze_objects <- function(img,
                                invert = invert,
                                fill_hull = fill_hull,
                                threshold = threshold,
+                               filter = filter,
                                resize = FALSE,
                                show_image = FALSE)[[1]]
           if(isTRUE(watershed)){
@@ -554,28 +575,28 @@ analyze_objects <- function(img,
           stop("A known area must be declared when a template is used.", call. = FALSE)
         }
         if(is.character(foreground)){
-          all_files <- sapply(list.files(diretorio_original), file_name)
-          imag <- list.files(diretorio_original, pattern = foreground)
-          check_names_dir(foreground, all_files, diretorio_original)
+          all_files <- sapply(list.files(), file_name)
+          imag <- list.files(pattern = foreground)
+          check_names_dir(foreground, all_files, getwd())
           name <- file_name(imag)
           extens <- file_extension(imag)
-          foreground <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          foreground <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
         }
         if(is.character(reference)){
-          all_files <- sapply(list.files(diretorio_original), file_name)
-          imag <- list.files(diretorio_original, pattern = reference)
-          check_names_dir(reference, all_files, diretorio_original)
+          all_files <- sapply(list.files(getwd()), file_name)
+          imag <- list.files(getwd(), pattern = reference)
+          check_names_dir(reference, all_files, getwd())
           name <- file_name(imag)
           extens <- file_extension(imag)
-          reference <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          reference <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
         }
         if(is.character(background)){
-          all_files <- sapply(list.files(diretorio_original), file_name)
-          imag <- list.files(diretorio_original, pattern = background)
-          check_names_dir(background, all_files, diretorio_original)
+          all_files <- sapply(list.files(getwd()), file_name)
+          imag <- list.files(getwd(), pattern = background)
+          check_names_dir(background, all_files, getwd())
           name <- file_name(imag)
           extens <- file_extension(imag)
-          background <- image_import(paste(diretorio_original, "/", name, ".", extens, sep = ""))
+          background <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
         }
 
         original <-
@@ -604,29 +625,38 @@ analyze_objects <- function(img,
                           template[sample(1:nrow(template)),][1:nrows,],
                           background[sample(1:nrow(background)),][1:nrows,]),
                     Y = ifelse(CODE == "background", 0, 1))
+        formula_bf <- as.formula(paste("Y ~ ", "R+B"))
+        modelo <- suppressWarnings(glm(formula_bf,
+                                       family = binomial("probit"),
+                                       data = back_fore))
+        pred1 <- round(predict(modelo, newdata = original, type = "response"), 0)
 
-        modelo1 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
-                                        data = back_fore))
-        pred1 <- round(predict(modelo1, newdata = original, type = "response"), 0)
-        plant_background <- matrix(pred1, ncol = dim(img)[[2]])
-        if(isTRUE(fill_hull)){
-          plant_background <- EBImage::fillHull(plant_background)
-        }
-        plant_background[plant_background == 1] <- 2
-
-        # segment objects and template
-        leaf_template <-
+        df_leaf_template <-
           transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
                           template[sample(1:nrow(template)),][1:nrows,]),
-                    Y = ifelse(CODE == "foreground", 0, 1))
+                    Y = ifelse(CODE == "template", 1, 0))
 
-        modelo2 <- suppressWarnings(glm(Y ~ R + G + B, family = binomial("logit"),
-                                        data = leaf_template))
+        formula_lr <- as.formula(paste("Y ~ ", fore_ref_formula))
+        modelo2 <- suppressWarnings(glm(formula_lr,
+                                        family = binomial("probit"),
+                                        data = df_leaf_template))
 
-        pred2 <- round(predict(modelo2, newdata = original, type = "response"), 0)
-        leaf_template <- matrix(pred2, ncol = dim(img)[[2]])
-        plant_background[leaf_template == 1] <- 3
-
+        pred2 <- round(predict(modelo2,
+                               newdata = original[pred1 == 1, ],
+                               type = "response"), 0)
+        npix_ref <- length(which(pred2 == 1))
+        pred2[pred2 == 0] <- 2
+        pred1[pred1 == 1] <- pred2
+        mask <- matrix(pred1, ncol = dim(img)[[2]])
+        if(isTRUE(fill_hull)){
+          plant_background <- EBImage::fillHull(mask)
+        }
+        if(is.numeric(filter) & filter > 1){
+          mask <- EBImage::medianFilter(mask == 2, size = filter)
+        } else{
+          mask <- mask == 2
+        }
+        # mask <- EBImage::medianFilter(mask == 2, size = 3)
         if(isTRUE(watershed)){
           parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
           res <- nrow(original)
@@ -636,16 +666,14 @@ analyze_objects <- function(img,
               eval(parse(text=x))}))
           ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
           tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-          nmask <- EBImage::watershed(EBImage::distmap(plant_background),
+          nmask <- EBImage::watershed(EBImage::distmap(mask),
                                       tolerance = tol,
                                       ext = ext)
         } else{
-          nmask <- EBImage::bwlabel(plant_background)
+          nmask <- EBImage::bwlabel(mask)
         }
-
-        ID <-  which(plant_background == 2)
-        ID2 <- which(plant_background != 2)
-
+        ID <-  which(mask == 1) # IDs for foreground
+        ID2 <- which(mask == 0) # IDs for background
         shape <- compute_measures(mask = nmask,
                                   img = img,
                                   har_nbins = har_nbins,
@@ -654,9 +682,6 @@ analyze_objects <- function(img,
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape
-        npix_ref <- length(which(leaf_template == 1))
-        id_ref <- which.min(abs(shape$area - npix_ref))
-        shape <- shape[-id_ref, ]
 
         # correct measures based on the area of the reference object
         px_side <- sqrt(reference_area / npix_ref)

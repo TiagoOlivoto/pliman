@@ -9,9 +9,10 @@ measure_disease_byl(
   index = "B",
   lower_size = NULL,
   my_index = NULL,
-  watershed = FALSE,
+  watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
+  filter = 3,
   threshold = "Otsu",
   extension = NULL,
   tolerance = NULL,
@@ -58,6 +59,10 @@ the background. IMPORTANT: Objects touching each other can be combined into
 one single object, which may underestimate the number of objects in an
 image.}
 
+\item{filter}{Performs median filtering in the binary image? By default, a
+median filter of \code{size = 2} is applied. See more at \code{\link[=image_filter]{image_filter()}}. Set
+to \code{FALSE} to cancel median filtering.}
+
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
 If a numeric value is informed, this value will be used as a threshold.
@@ -86,9 +91,9 @@ original image.}
 Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
 current working directory.}
 
-\item{img_healthy}{A color palette of healthy areas.}
+\item{img_healthy}{A color palette of healthy tissues.}
 
-\item{img_symptoms}{A color palette of lesioned areas.}
+\item{img_symptoms}{A color palette of lesioned tissues.}
 
 \item{pattern}{A pattern of file name used to identify images to be
 processed. For example, if \code{pattern = "im"} all images that the name

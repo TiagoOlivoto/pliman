@@ -12,6 +12,8 @@ analyze_objects(
   background = NULL,
   reference = NULL,
   reference_area = NULL,
+  back_fore_formula = "G+B",
+  fore_ref_formula = "R+G+B",
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -40,7 +42,7 @@ analyze_objects(
   lower_circ = NULL,
   upper_circ = NULL,
   randomize = TRUE,
-  nrows = 2000,
+  nrows = 500,
   show_image = TRUE,
   show_original = TRUE,
   show_chull = FALSE,
@@ -75,9 +77,10 @@ analyze_objects_iter(pattern, known_area, verbose = TRUE, ...)
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{foreground}{A color palette of the foreground (optional).}
-
-\item{background}{A color palette of the background (optional).}
+\item{foreground, background}{A color palette for the foregrond and
+background, respectively (optional). If a chacarceter is used (eg.,
+\code{foreground = "fore"}), the function will search in the current working
+directory a valid image that contains "fore" in the name.}
 
 \item{reference}{A color palette for a reference object (optional). This is
 useful to adjust measures when images are not obtained with standard
@@ -86,6 +89,15 @@ resolution (e.g., field images). See more in the details section.}
 \item{reference_area}{The known area of the reference objects. The measures
 of all the objects in the image will be corrected using the same unit of
 the area informed here.}
+
+\item{back_fore_formula}{A character value to indicate the formula to be used
+in the \code{glm} model to segment background (objects and reference) and
+background. Defaults to \code{"G + B"}. This formula is optimized to segment
+white backgrounds from green leaves and a blue reference object.}
+
+\item{fore_ref_formula}{A character value to indicate the formula to be used
+in the \code{glm} model to segment objects and reference. Defaults to \code{"G / (R + G + B)"}. This formula is optimized to segment green leaves from a blue
+background.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working
@@ -136,8 +148,9 @@ the background. IMPORTANT: Objects touching each other can be combined into
 one single object, which may underestimate the number of objects in an
 image.}
 
-\item{filter}{Performs median filtering after image processing? defaults to
-\code{FALSE}. See more at \code{\link[=image_filter]{image_filter()}}.}
+\item{filter}{Performs median filtering in the binary image? By default, a
+median filter of \code{size = 2} is applied. See more at \code{\link[=image_filter]{image_filter()}}. Set
+to \code{FALSE} to cancel median filtering.}
 
 \item{invert}{Inverts the binary image, if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}

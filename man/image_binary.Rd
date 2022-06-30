@@ -11,6 +11,7 @@ image_binary(
   threshold = "Otsu",
   resize = FALSE,
   fill_hull = FALSE,
+  filter = 2,
   re = NULL,
   nir = NULL,
   invert = FALSE,
@@ -44,6 +45,10 @@ numeric value as the percentage of desired resizing. For example, if
 image.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
+
+\item{filter}{Performs median filtering in the binary image? By default, a
+median filter of \code{size = 2} is applied. See more at \code{\link[=image_filter]{image_filter()}}. Set
+to \code{FALSE} to cancel median filtering.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}

@@ -79,10 +79,11 @@ apply_fun_to_imgs <- function(pattern,
   help_apply <- function(img,
                          fun,
                          ...,
+                         diretorio_original,
                          diretorio_processada,
                          prefix,
                          suffix){
-    img_file <- image_import(img)
+    img_file <- image_import(img, path = diretorio_original)
     img_list <- list(img_file)
     names(img_list) <- paste0(prefix, img, suffix)
     res <- lapply(img_list, fun, ...)
@@ -92,7 +93,7 @@ apply_fun_to_imgs <- function(pattern,
   if(parallel == TRUE){
     clust <- makeCluster(workers)
     clusterExport(clust,
-                  varlist = c("imgs", "help_apply", "image_import", "fun"),
+                  varlist = c("imgs", "help_apply", "image_import", "fun", "image_segment_mask"),
                   envir=environment())
     on.exit(stopCluster(clust))
     if(verbose == TRUE){
@@ -104,6 +105,7 @@ apply_fun_to_imgs <- function(pattern,
                   help_apply(x,
                              fun,
                              ...,
+                             diretorio_original = diretorio_original,
                              diretorio_processada = diretorio_processada,
                              prefix = prefix,
                              suffix = suffix)
@@ -116,10 +118,12 @@ apply_fun_to_imgs <- function(pattern,
                    actual = i,
                    text = paste("Processing image", imgs[i]))
       help_apply(imgs[[i]],
-                 fun, ...,
+                 fun,
+                 ...,
+                 diretorio_original = diretorio_original,
                  diretorio_processada = diretorio_processada,
-                 prefix = prefix,
-                 suffix = suffix)
+                 prefix = "",
+                 suffix = "")
     }
   }
 }
