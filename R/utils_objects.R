@@ -17,6 +17,10 @@
 #' @param index The index to produce a binary image used to compute bounding
 #'   rectangle coordinates. See [image_binary()] for more details.
 #' @param invert Inverts the binary image, if desired. Defaults to `FALSE`.
+#' @param filter Performs median filtering in the binary image? See more at
+#'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
+#'   size of the median filtering. Larger values are effective at removing
+#'   noise, but adversely affect edges.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param watershed If `TRUE` (default) performs watershed-based object
 #'   detection. This will detect objects even when they are touching one other.
@@ -72,6 +76,7 @@ object_coord <- function(image,
                          index = "NB",
                          watershed = TRUE,
                          invert = FALSE,
+                         filter = FALSE,
                          fill_hull = FALSE,
                          threshold = "Otsu",
                          edge = 2,
@@ -132,6 +137,7 @@ object_coord <- function(image,
     img2 <- image_binary(image,
                          index = index,
                          invert = invert,
+                         filter = filter,
                          fill_hull = fill_hull,
                          threshold = threshold,
                          show_image = FALSE,
@@ -192,6 +198,7 @@ object_coord <- function(image,
 object_contour <- function(image,
                            index = "NB",
                            invert = FALSE,
+                           filter = FALSE,
                            fill_hull = FALSE,
                            threshold = "Otsu",
                            watershed = TRUE,
@@ -222,6 +229,7 @@ object_contour <- function(image,
     img2 <- image_binary(image,
                          index = index,
                          invert = invert,
+                         filter = filter,
                          fill_hull = fill_hull,
                          threshold = threshold,
                          show_image = FALSE,
@@ -347,7 +355,7 @@ object_split <- function(img,
                          watershed = TRUE,
                          invert = FALSE,
                          fill_hull = FALSE,
-                         filter = 3,
+                         filter = 2,
                          threshold = "Otsu",
                          extension = NULL,
                          tolerance = NULL,

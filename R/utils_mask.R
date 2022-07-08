@@ -71,11 +71,11 @@ make_mask <- function(image,
   nrbrush <- nrow(brush)
   # difference in number of rows
   difr <- nrim - nrbrush
-  nrbelow <- trunc(difr * (1 - rel_pos_y))
+  nrbelow <- trunc(difr * (1 - rel_pos_x))
   nrabove <- difr - nrbelow
   # difference in number of cols
   difcol <- ncim - nrbrush
-  ncolleft <- trunc(difcol * (1 - rel_pos_x))
+  ncolleft <- trunc(difcol * (1 - rel_pos_y))
   ncolrigth <- difcol - ncolleft
   # add the rows
   br2 <- rbind(brush, matrix(rep(0, nrow(brush) * nrbelow), ncol = nrow(brush)))

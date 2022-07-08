@@ -14,6 +14,7 @@ object_coord(
   index = "NB",
   watershed = TRUE,
   invert = FALSE,
+  filter = FALSE,
   fill_hull = FALSE,
   threshold = "Otsu",
   edge = 2,
@@ -29,6 +30,7 @@ object_contour(
   image,
   index = "NB",
   invert = FALSE,
+  filter = FALSE,
   fill_hull = FALSE,
   threshold = "Otsu",
   watershed = TRUE,
@@ -63,6 +65,11 @@ to a unique object. This is faster but is not able to segment touching
 objects.}
 
 \item{invert}{Inverts the binary image, if desired. Defaults to \code{FALSE}.}
+
+\item{filter}{Performs median filtering in the binary image? See more at
+\code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
+size of the median filtering. Larger values are effective at removing
+noise, but adversely affect edges.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
