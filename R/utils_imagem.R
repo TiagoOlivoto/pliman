@@ -1821,9 +1821,10 @@ plot.image_index <- function(x,
 #'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
 #'   character) type) with the same length of `nseg`.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
-#' @param filter Performs median filtering. This can be useful to reduce the
-#'   noise in produced palettes. Defaults to `TRUE`. See more at
-#'   [image_filter()].
+#' @param filter Performs median filtering in the binary image? See more at
+#'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
+#'   size of the median filtering. Larger values are effective at removing
+#'   noise, but adversely affect edges.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -1868,7 +1869,7 @@ image_segment <- function(image,
                           my_index = NULL,
                           threshold = "Otsu",
                           fill_hull = FALSE,
-                          filter = 2,
+                          filter = FALSE,
                           re = NULL,
                           nir = NULL,
                           invert = FALSE,

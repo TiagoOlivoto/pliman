@@ -11,7 +11,7 @@ image_segment(
   my_index = NULL,
   threshold = "Otsu",
   fill_hull = FALSE,
-  filter = 2,
+  filter = FALSE,
   re = NULL,
   nir = NULL,
   invert = FALSE,
@@ -63,9 +63,10 @@ character) type) with the same length of \code{nseg}.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
-\item{filter}{Performs median filtering. This can be useful to reduce the
-noise in produced palettes. Defaults to \code{TRUE}. See more at
-\code{\link[=image_filter]{image_filter()}}.}
+\item{filter}{Performs median filtering in the binary image? See more at
+\code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
+size of the median filtering. Larger values are effective at removing
+noise, but adversely affect edges.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}
