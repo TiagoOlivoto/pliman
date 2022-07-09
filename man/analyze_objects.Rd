@@ -42,7 +42,7 @@ analyze_objects(
   lower_circ = NULL,
   upper_circ = NULL,
   randomize = TRUE,
-  nrows = 500,
+  nrows = 1000,
   show_image = TRUE,
   show_original = TRUE,
   show_chull = FALSE,
