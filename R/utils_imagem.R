@@ -1289,9 +1289,11 @@ image_create <- function(color,
 #'   `resize = 30`, the resized image will have 30% of the size of original
 #'   image.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
-#' @param filter Performs median filtering in the binary image? By default, a
-#'   median filter of `size = 2` is applied. See more at [image_filter()]. Set
-#'   to `FALSE` to cancel median filtering.
+#' @param filter Performs median filtering in the binary image? (Defaults to
+#'   `FALSE`). Provide a positive integer > 1 to indicate the size of the median
+#'   filtering. Higher values are more efficient to remove noise in the
+#'   background but can dramatically impact the perimeter of objects, mainly for
+#'   irregular perimeters such as leaves with serrated edges.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -1326,7 +1328,7 @@ image_binary <- function(image,
                          threshold = "Otsu",
                          resize = FALSE,
                          fill_hull = FALSE,
-                         filter = 2,
+                         filter = FALSE,
                          re = NULL,
                          nir = NULL,
                          invert = FALSE,
