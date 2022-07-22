@@ -11,7 +11,7 @@ image_binary(
   threshold = "Otsu",
   resize = FALSE,
   fill_hull = FALSE,
-  filter = 2,
+  filter = FALSE,
   re = NULL,
   nir = NULL,
   invert = FALSE,
@@ -46,9 +46,11 @@ image.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
-\item{filter}{Performs median filtering in the binary image? By default, a
-median filter of \code{size = 2} is applied. See more at \code{\link[=image_filter]{image_filter()}}. Set
-to \code{FALSE} to cancel median filtering.}
+\item{filter}{Performs median filtering in the binary image? (Defaults to
+\code{FALSE}). Provide a positive integer > 1 to indicate the size of the median
+filtering. Higher values are more efficient to remove noise in the
+background but can dramatically impact the perimeter of objects, mainly for
+irregular perimeters such as leaves with serrated edges.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}
