@@ -142,21 +142,21 @@ analyze_objects(soy,
                 index = "NB") # default
 ```
 
-Users can also use the `topn_*` arguments to select the top `n` objects based on either smaller or largest areas. Let's see how to point out the 5 grains with the smallest area, showing the original grains in a blue background. We will also use the argument `my_index` to choose a personalized index to segment the image. Just for comparison, we will set up explicitly the normalized blue index by calling `my_index = "B/(R+G+B)"`.
+Users can also use the `topn_*` arguments to select the top `n` objects based on either smaller or largest areas. Let's see how to point out the 5 grains with the smallest area, showing the original grains in a blue background. We will also use the argument `index` to choose a personalized index to segment the image. Just for comparison, we will set up explicitly the normalized blue index by calling `index = "B/(R+G+B)"`.
 
 ```{r,fig.width=10, fig.height=5}
 analyze_objects(soy,
                 marker = "id",
                 topn_lower = 5,
                 col_background = "blue",
-                my_index = "B/(R+G+B)") # default
+                index = "B/(R+G+B)") # default
 ```
 
 
 
 # Using sample palettes
 
-Sometimes it is difficult to choose an image index that segments the image efficiently (even using `my_index` ). In `pliman` users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to `analyze_objects` which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let's see how the grains of the above image can be counted with this strategy.
+Sometimes it is difficult to choose an image index that segments the image efficiently (even using `index` ). In `pliman` users have an alternative image segmentation strategy that is using sample color palettes. In this case, users can say to `analyze_objects` which color palettes are to be used for background and foreground. A generalized linear model (binomial family) is then used to predict the value of each pixel (background or foreground). Let's see how the grains of the above image can be counted with this strategy.
 
 ```{r,fig.width=10, fig.height=5}
 analyze_objects(img = soy,

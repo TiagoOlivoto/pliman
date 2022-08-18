@@ -10,10 +10,10 @@ analyze_objects(
   img,
   foreground = NULL,
   background = NULL,
-  reference = NULL,
+  reference = FALSE,
   reference_area = NULL,
-  back_fore_formula = "G+B",
-  fore_ref_formula = "R+G+B",
+  back_fore_index = "R/(G/B)",
+  fore_ref_index = "B-R",
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -28,7 +28,6 @@ analyze_objects(
   invert = FALSE,
   object_size = "medium",
   index = "NB",
-  my_index = NULL,
   object_index = NULL,
   threshold = "Otsu",
   tolerance = NULL,
@@ -82,22 +81,25 @@ background, respectively (optional). If a chacarceter is used (eg.,
 \code{foreground = "fore"}), the function will search in the current working
 directory a valid image that contains "fore" in the name.}
 
-\item{reference}{A color palette for a reference object (optional). This is
-useful to adjust measures when images are not obtained with standard
-resolution (e.g., field images). See more in the details section.}
+\item{reference}{Logical to indicate if a reference object is present in the
+image. This is useful to adjust measures when images are not obtained with
+standard resolution (e.g., field images). See more in the details section.}
 
 \item{reference_area}{The known area of the reference objects. The measures
 of all the objects in the image will be corrected using the same unit of
 the area informed here.}
 
-\item{back_fore_formula}{A character value to indicate the formula to be used
-in the \code{glm} model to segment background (objects and reference) and
-background. Defaults to \code{"G + B"}. This formula is optimized to segment
-white backgrounds from green leaves and a blue reference object.}
+\item{back_fore_index}{A character value to indicate the index to segment the
+foreground (objects and reference) from the background. Defaults to
+\code{"R/(G/B)"}. This index is optimized to segment white backgrounds from
+green leaves and a blue reference object.}
 
-\item{fore_ref_formula}{A character value to indicate the formula to be used
-in the \code{glm} model to segment objects and reference. Defaults to \code{"G / (R + G + B)"}. This formula is optimized to segment green leaves from a blue
-background.}
+\item{fore_ref_index}{A character value to indicate the index to segment
+objects and the reference object. It can be either an available index in
+\code{pliman} (see \code{\link[=pliman_indexes]{pliman_indexes()}} or an own index computed with the R, G,
+and B bands. Defaults to \code{"B-R"}. This index is optimized to segment green
+leaves from a blue reference object after a white background has been
+removed.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working
@@ -153,18 +155,24 @@ image.}
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.}
 
-\item{invert}{Inverts the binary image, if desired. This is useful to process
-images with black background. Defaults to \code{FALSE}.}
+\item{invert}{Inverts the binary image if desired. This is useful to process
+images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
+is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
+\verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
+reference from the foreground using \code{back_fore_index} is performed using
+the default (not inverted), and the segmentation of objects from the
+reference is performed by inverting the selection (selecting pixels higher
+than the threshold).}
 
 \item{object_size}{The size of the object. Used to automatically set up
 \code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
 (e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
 peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
-\item{index, my_index}{A character value specifying the target mode for
-conversion to binary image when \code{foreground} and \code{background} are not
-declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
-more details.}
+\item{index}{A character value specifying the target mode for conversion to
+binary image when \code{foreground} and \code{background} are not declared. Defaults
+to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details. User can
+also calculate your own index using the bands names, e.g. \code{index = "R+B/G"}}
 
 \item{object_index}{Defaults to \code{FALSE}. If an index is informed, the average
 value for each object is returned. It can be the R, G, and B values or any

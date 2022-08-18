@@ -336,8 +336,6 @@ object_id <- function(image,
 #'   `white`. Use the built-in color names which `R` knows about (see
 #'   ?[grDevices::colors()]) or a numeric vector with R, G, and B intensities
 #'   (see ?[grDevices::rgb()]).
-#' @param workers A positive numeric scalar or a function specifying the maximum
-#'   number of parallel processes that can be active at the same time.
 #' @param ... Additional arguments passed on to [image_combine()]
 #' @return A list of objects of class `Image`.
 #' @export
@@ -346,12 +344,11 @@ object_id <- function(image,
 #' @examples
 #' library(pliman)
 #' img <- image_pliman("la_leaves.jpg", plot = TRUE)
-#' imgs <- object_split(img, workers = 2) # set to NULL to use 50% of the cores
+#' imgs <- object_split(img) # set to NULL to use 50% of the cores
 #'
 object_split <- function(img,
                          index = "NB",
                          lower_size = NULL,
-                         my_index = NULL,
                          watershed = TRUE,
                          invert = FALSE,
                          fill_hull = FALSE,
@@ -364,13 +361,11 @@ object_split <- function(img,
                          col_background = "white",
                          show_image = TRUE,
                          verbose = TRUE,
-                         workers = NULL,
                          ...){
 
   img2 <- image_binary(img,
                        filter = filter,
                        index = index,
-                       my_index = my_index,
                        invert = invert,
                        fill_hull = fill_hull,
                        threshold = threshold,
@@ -414,17 +409,11 @@ object_split <- function(img,
       image_autocrop(img, plot = FALSE, index = "R")
     }
   }
-  nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-  clust <- makeCluster(nworkers)
-  clusterExport(clust,
-                varlist = c("img", "nmask", "list_crop", "image_autocrop", "selected", "col_background"),
-                envir=environment())
-  on.exit(stopCluster(clust))
   list_objects <-
-    parLapply(clust, seq_along(selected),
-              function(i){
-                list_crop(img, selected[i], keep_location, col_background)
-              })
+    lapply(seq_along(selected),
+           function(i){
+             list_crop(img, selected[i], keep_location, col_background)
+           })
 
   names(list_objects) <- 1:length(list_objects)
   if(isTRUE(verbose)){

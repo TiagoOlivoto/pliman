@@ -12,7 +12,6 @@ tune_tolerance(
   grid = NULL,
   maxiter = 200,
   index = "NB",
-  my_index = NULL,
   plot = TRUE,
   fill_hull = FALSE,
   filter = FALSE,
@@ -36,7 +35,7 @@ from \code{actual} value is plotted.}
 
 \item{maxiter}{The maximum number of iterations. Default to 200.}
 
-\item{index, my_index}{A character value specifying the target mode for
+\item{index}{A character value specifying the target mode for
 conversion to binary image when \code{foreground} and \code{background} are not
 declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
 more details.}

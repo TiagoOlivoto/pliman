@@ -8,7 +8,6 @@ object_split(
   img,
   index = "NB",
   lower_size = NULL,
-  my_index = NULL,
   watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
@@ -21,17 +20,16 @@ object_split(
   col_background = "white",
   show_image = TRUE,
   verbose = TRUE,
-  workers = NULL,
   ...
 )
 }
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{index, my_index}{A character value specifying the target mode for
-conversion to binary image when \code{foreground} and \code{background} are not
-declared. Defaults to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for
-more details.}
+\item{index}{A character value specifying the target mode for conversion to
+binary image when \code{foreground} and \code{background} are not declared. Defaults
+to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details. User can
+also calculate your own index using the bands names, e.g. \code{index = "R+B/G"}}
 
 \item{lower_size}{Plant images often contain dirt and dust. To prevent dust from
 affecting the image analysis, objects with lesser than 10\% of the mean of all objects
@@ -43,8 +41,14 @@ If \code{FALSE}, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.}
 
-\item{invert}{Inverts the binary image, if desired. This is useful to process
-images with black background. Defaults to \code{FALSE}.}
+\item{invert}{Inverts the binary image if desired. This is useful to process
+images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
+is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
+\verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
+reference from the foreground using \code{back_fore_index} is performed using
+the default (not inverted), and the segmentation of objects from the
+reference is performed by inverting the selection (selecting pixels higher
+than the threshold).}
 
 \item{fill_hull}{Fill holes in the binary image? Defaults to \code{FALSE}. This is
 useful to fill holes in objects that have portions with a color similar to
@@ -90,9 +94,6 @@ original image.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
-\item{workers}{A positive numeric scalar or a function specifying the maximum
-number of parallel processes that can be active at the same time.}
-
 \item{...}{Additional arguments passed on to \code{\link[=image_combine]{image_combine()}}}
 }
 \value{
@@ -106,7 +107,7 @@ images is returned.
 \examples{
 library(pliman)
 img <- image_pliman("la_leaves.jpg", plot = TRUE)
-imgs <- object_split(img, workers = 2) # set to NULL to use 50\% of the cores
+imgs <- object_split(img) # set to NULL to use 50\% of the cores
 
 }
 \seealso{

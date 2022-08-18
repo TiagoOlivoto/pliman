@@ -317,6 +317,9 @@ image_pliman <- function(image, plot = FALSE){
 #' (x and y coordinates) around the image objects.
 #' * for [image_trim()], the number of pixels removed from the edges. By
 #' default, 20 pixels are removed from all the edges.
+#' @param filter Performs median filtering in the binary image. This is useful
+#'   to remove noise (like dust) and improve the image autocropping method. See
+#'   more at [image_filter()]. Set to `FALSE` to remove the median filtering.
 #' @param top,bottom,left,right The number of pixels removed from `top`,
 #'   `bottom`, `left`, and `right` when using [image_trim()].
 #' @param angle The rotation angle in degrees.
@@ -371,6 +374,7 @@ image_pliman <- function(image, plot = FALSE){
 image_autocrop <- function(image,
                            index = "NB",
                            edge = 5,
+                           filter = 3,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
@@ -402,7 +406,8 @@ image_autocrop <- function(image,
                               index = index,
                               id = NULL,
                               edge = edge,
-                              show_image = FALSE)
+                              show_image = FALSE,
+                              filter = filter)
     segmented <- image[conv_hull$row_min:conv_hull$row_max,
                        conv_hull$col_min:conv_hull$col_max,
                        1:3]
@@ -1277,13 +1282,16 @@ image_create <- function(color,
 #' @param index A character value (or a vector of characters) specifying the
 #'   target mode for conversion to binary image. See the available indexes with
 #'   [pliman_indexes()] and [image_index()] for more details.
-#' @param my_index User can calculate a different index using the band names,
-#'   e.g. `my_index = "R+B/G"`.
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
 #'   on Otsu's method is used to reduce the grayscale image to a binary image.
 #'   If a numeric value is informed, this value will be used as a threshold.
 #'   Inform any non-numeric value different than "Otsu" to iteratively chosen
 #'   the threshold based on a raster plot showing pixel intensity of the index.
+#' @param has_white_bg Logical indicating whether a white background is present.
+#'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
+#'   considered as `NA`. This may be useful to compute an image index for
+#'   objects that have, for example, a white background. In such cases, the
+#'   background will not be considered for the threshold computation.
 #' @param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'   numeric value as the percentage of desired resizing. For example, if
 #'   `resize = 30`, the resized image will have 30% of the size of original
@@ -1324,8 +1332,8 @@ image_create <- function(color,
 #'image_binary(img, index = c("R, G"))
 image_binary <- function(image,
                          index = NULL,
-                         my_index = NULL,
                          threshold = "Otsu",
+                         has_white_bg = FALSE,
                          resize = FALSE,
                          fill_hull = FALSE,
                          filter = FALSE,
@@ -1354,8 +1362,8 @@ image_binary <- function(image,
                        image,
                        image_binary,
                        index,
-                       my_index,
                        threshold,
+                       has_white_bg,
                        resize,
                        fill_hull,
                        filter,
@@ -1369,8 +1377,8 @@ image_binary <- function(image,
       res <- lapply(image,
                     image_binary,
                     index,
-                    my_index,
                     threshold,
+                    has_white_bg,
                     resize,
                     fill_hull,
                     filter,
@@ -1427,6 +1435,7 @@ image_binary <- function(image,
       } else{
         imgs <- EBImage::Image(imgs > threshold)
       }
+      imgs[which(is.na(imgs))] <- FALSE
       if(is.numeric(filter) & filter > 1){
         imgs <- EBImage::medianFilter(imgs, filter)
       }
@@ -1435,7 +1444,7 @@ image_binary <- function(image,
       }
       return(imgs)
     }
-    imgs <- lapply(image_index(image, index, my_index, resize, re, nir, show_image = FALSE, nrow, ncol),
+    imgs <- lapply(image_index(image, index, resize, re, nir, has_white_bg, show_image = FALSE, nrow, ncol, verbose = verbose),
                    bin_img,
                    invert,
                    fill_hull,
@@ -1512,9 +1521,8 @@ image_binary <- function(image,
 #'   target mode for conversion to binary image. Use [pliman_indexes()] or the
 #'   `details` section to see the available indexes.  Defaults to `NULL`
 #'   ((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
-#'   "NRGB" for normalized RGB, or "all" for all indexes.
-#' @param my_index User can calculate a different index using the bands names,
-#'   e.g. `my_index = "R+B/G"`.
+#'   "NRGB" for normalized RGB, or "all" for all indexes. User can also
+#'   calculate your own index using the bands names, e.g. `index = "R+B/G"`.
 #' @param resize Resize the image before processing? Defaults to `30`, which
 #'   resizes the image to 30% of the original size to speed up image processing.
 #'   Set `resize = FALSE` to keep the original size of the image.
@@ -1522,6 +1530,11 @@ image_binary <- function(image,
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
 #'   image file.
+#' @param has_white_bg Logical indicating whether a white background is present.
+#'   If TRUE, pixels that have R, G, and B values equals to 1 will be considered
+#'   as NA. This may be useful to compute an image index for objects that have,
+#'   for example, a white background. In such cases, the background will not be
+#'   considered for the threshold computation.
 #' @param show_image Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
@@ -1546,10 +1559,10 @@ image_binary <- function(image,
 #'image_index(img, index = c("R, NR"))
 image_index <- function(image,
                         index = NULL,
-                        my_index = NULL,
                         resize = FALSE,
                         re = NULL,
                         nir = NULL,
+                        has_white_bg = FALSE,
                         show_image = TRUE,
                         nrow = NULL,
                         ncol = NULL,
@@ -1569,9 +1582,9 @@ image_index <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_index, index, resize, re, nir, has_white_bg, show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_index, index, my_index, resize, re, nir, show_image, nrow, ncol)
+      res <- lapply(image, image_index, index, resize, re, nir, has_white_bg, show_image, nrow, ncol)
     }
     return(structure(res, class = "index_list"))
   } else{
@@ -1579,19 +1592,18 @@ image_index <- function(image,
       image <- image_resize(image, resize)
     }
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-    if(is.null(my_index)){
-      ifelse(is.null(index),
-             index <- c("R", "G", "B", "NR", "NG", "NB"),
-             if(index %in% c("RGB", "NRGB", "all")){
-               index <-  switch (index,
-                                 RGB = c("R", "G", "B"),
-                                 NRGB = c("NR", "NG", "NB"),
-                                 all = ind$Index
-               )} else{
-                 index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
-               })
-    } else{
-      index <- my_index
+
+    if(is.null(index)){
+      index <- c("R", "G", "B", "NR", "NG", "NB")
+    }else{
+      if(index %in% c("RGB", "NRGB", "all")){
+        index <-  switch (index,
+                          RGB = c("R", "G", "B"),
+                          NRGB = c("NR", "NG", "NB"),
+                          all = ind$Index
+        )} else{
+          index <- strsplit(index, "\\s*(,)\\s*")[[1]]
+        }
     }
     nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
     imgs <- list()
@@ -1607,8 +1619,10 @@ image_index <- function(image,
           )
         imgs[[i]] <- EBImage::channel(image, indx)
       } else{
-        if(is.null(my_index) & !indx %in% ind$Index){
-          stop(paste("Index '",indx,"' is not available in pliman",sep = ""), call. = FALSE)
+        if(!indx %in% ind$Index){
+          if(isTRUE(verbose)){
+            message(paste("Index '",indx,"' is not available. Trying to compute your own index.",sep = ""))
+          }
         }
         R <- try(image@.Data[,,1], TRUE)
         G <- try(image@.Data[,,2], TRUE)
@@ -1632,10 +1646,16 @@ image_index <- function(image,
             stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
           }
         }
-        if(is.null(my_index)){
+        if(isTRUE(has_white_bg)){
+          R[which(R == 1 & G == 1 & B == 1)] <- NA
+          G[which(R == 1 & G == 1 & B == 1)] <- NA
+          B[which(R == 1 & G == 1 & B == 1)] <- NA
+        }
+
+        if(indx %in% ind$Index){
           imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==indx]))))
         } else{
-          imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(my_index))))
+          imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(indx))))
         }
       }
     }
@@ -1665,6 +1685,7 @@ image_index <- function(image,
     invisible(structure(imgs, class = "image_index"))
   }
 }
+
 
 
 #' Plots an `image_index` object
@@ -1813,8 +1834,6 @@ plot.image_index <- function(x,
 #' * For `image_segment_iter()` a character or a vector of characters with the
 #' same length of `nseg`. It can be either an available index (described above)
 #' or any operation involving the RGB values (e.g., `"B/R+G"`).
-#' @param my_index User can calculate a different index using the bands names,
-#'   e.g. `my_index = "R+B/G"`.
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
 #'   on Otsu's method is used to reduce the grayscale image to a binary image.
 #'   If a numeric value is informed, this value will be used as a threshold.
@@ -1822,6 +1841,11 @@ plot.image_index <- function(x,
 #'   the threshold based on a raster plot showing pixel intensity of the index.
 #'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
 #'   character) type) with the same length of `nseg`.
+#' @param has_white_bg Logical indicating whether a white background is present.
+#'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
+#'   considered as `NA`. This may be useful to compute an image index for
+#'   objects that have, for example, a white background. In such cases, the
+#'   background will not be considered for the threshold computation.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param filter Performs median filtering in the binary image? See more at
 #'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
@@ -1868,8 +1892,8 @@ plot.image_index <- function(x,
 #'
 image_segment <- function(image,
                           index = NULL,
-                          my_index = NULL,
                           threshold = "Otsu",
+                          has_white_bg = FALSE,
                           fill_hull = FALSE,
                           filter = FALSE,
                           re = NULL,
@@ -1897,34 +1921,20 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, my_index, threshold, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, my_index, threshold, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-    if(is.null(my_index)){
-      ifelse(is.null(index),
-             index <- c("R", "G", "B", "NR", "NG", "NB"),
-             if(index %in% c("RGB", "NRGB", "all")){
-               index <-  switch (index,
-                                 RGB = c("R", "G", "B"),
-                                 NRGB = c("NR", "NG", "NB"),
-                                 all = ind$Index
-               )} else{
-                 index <- strsplit(index, "\\s*(\\s|,)\\s*")[[1]]
-               })
-    } else{
-      index <- my_index
-    }
     imgs <- list()
     for(i in 1:length(index)){
       indx <- index[[i]]
       img2 <- image_binary(image,
                            index = indx,
-                           my_index = my_index,
                            threshold = threshold,
+                           has_white_bg = has_white_bg,
                            resize = FALSE,
                            fill_hull = fill_hull,
                            filter = filter,
@@ -1975,10 +1985,11 @@ image_segment <- function(image,
 #' @export
 #' @name image_segment
 image_segment_iter <- function(image,
-                               nseg = 1,
+                               nseg = 2,
                                index = NULL,
                                invert = NULL,
                                threshold = NULL,
+                               has_white_bg = FALSE,
                                show_image = TRUE,
                                verbose = TRUE,
                                nrow = NULL,
@@ -1999,9 +2010,9 @@ image_segment_iter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, show_image, verbose, nrow, ncol,  ...)
+      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, show_image, verbose, nrow, ncol,  ...)
     } else{
-      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, show_image, verbose, nrow, ncol, ...)
+      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, show_image, verbose, nrow, ncol, ...)
     }
     results <-
       do.call(rbind, lapply(a, function(x){
@@ -2030,22 +2041,15 @@ image_segment_iter <- function(image,
         image_segment(image,
                       invert = invert[1],
                       index = "all",
+                      has_white_bg = has_white_bg,
                       ...)
         index <-
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
                  "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
-        my_index <- NULL
       } else{
         index <- index[1]
-        if(!index %in% avali_index){
-          my_index <- index
-          index <- NULL
-        } else{
-          my_index <- NULL
-          index <- index
-        }
       }
       my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[1]))),
                           as.character(threshold[1]),
@@ -2053,10 +2057,10 @@ image_segment_iter <- function(image,
       segmented <-
         image_segment(image,
                       index = index,
-                      my_index = my_index,
                       threshold = my_thresh,
                       invert = invert[1],
                       show_image = FALSE,
+                      has_white_bg = has_white_bg,
                       ...)
       total <- length(image)
       segm <- length(which(segmented[[1]][["image"]] != 1))
@@ -2083,19 +2087,11 @@ image_segment_iter <- function(image,
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
                  "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
-        my_index <- NULL
       } else{
         if(length(index) != nseg){
           stop("Length of 'index' must be equal 'nseg'.", call. = FALSE)
         }
         indx <- index[1]
-        if(!indx %in% avali_index){
-          my_index <- indx
-          indx <- NULL
-        } else{
-          my_index <- NULL
-          indx <- indx
-        }
       }
       if(is.null(invert)){
         invert <- rep(FALSE, nseg)
@@ -2115,10 +2111,10 @@ image_segment_iter <- function(image,
       first <-
         image_segment(image,
                       index = indx,
-                      my_index = my_index,
                       invert = invert[1],
                       threshold = my_thresh[1],
                       show_image = FALSE,
+                      has_white_bg = has_white_bg,
                       ...)
       segmented[[1]] <- first
       for (i in 2:(nseg)) {
@@ -2126,6 +2122,7 @@ image_segment_iter <- function(image,
           image_segment(first,
                         index = "all",
                         show_image = TRUE,
+                        has_white_bg = has_white_bg,
                         ncol = ncol,
                         nrow = nrow,
                         ...)
@@ -2137,16 +2134,8 @@ image_segment_iter <- function(image,
           if(is.null(indx)){
             break
           }
-          my_index <- NULL
         } else{
           indx <- index[i]
-          if(!indx %in% avali_index){
-            my_index <- indx
-            indx <- NULL
-          } else{
-            my_index <- NULL
-            indx <- indx
-          }
         }
         my_thresh <- ifelse(is.na(suppressWarnings(as.numeric(threshold[i]))),
                             as.character(threshold[i]),
@@ -2154,7 +2143,6 @@ image_segment_iter <- function(image,
         second <-
           image_segment(first,
                         index = indx,
-                        my_index = my_index,
                         threshold = my_thresh,
                         invert = invert[i],
                         show_image = FALSE,

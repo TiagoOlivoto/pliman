@@ -14,10 +14,10 @@
 #' @param dir_original The directory containing the original and processed images.
 #'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
 #'   current working directory.
-#' @param index,my_index A character value specifying the target mode for
+#' @param index A character value specifying the target mode for
 #'   conversion to binary to segment the leaves from background. Defaults to "B"
 #'   (blue). See [image_index()] for more details. Personalized indexes can be
-#'   informed in `my_index`, e.g., `my_index = "R*G/B`.
+#'   informed as, e.g., `index = "R*G/B`.
 #' @param lower_size To prevent dust from affecting object segmentation, objects
 #'   with lesser than `10%` of the mean of all objects are removed. . One can
 #'   set a known area or use `lower_limit = 0` to select all objects (not
@@ -46,7 +46,6 @@
 measure_disease_byl <- function(img,
                                 index = "B",
                                 lower_size = NULL,
-                                my_index = NULL,
                                 watershed = TRUE,
                                 invert = FALSE,
                                 fill_hull = FALSE,
@@ -112,7 +111,6 @@ measure_disease_byl <- function(img,
 
     splits <- object_split(img,
                            index = index,
-                           my_index = my_index,
                            watershed = watershed,
                            invert = invert,
                            fill_hull = fill_hull,
@@ -123,37 +121,36 @@ measure_disease_byl <- function(img,
                            object_size = object_size,
                            keep_location = keep_location,
                            show_image = FALSE,
-                           verbose = FALSE,
-                           workers = workers)
+                           verbose = FALSE)
     results <- list()
     tmp_dir <- tempdir()
     if(isTRUE(show_image)){
       save_image <- FALSE
       clear_td()
     }
-    workers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-    clust <- makeCluster(workers)
-    clusterExport(clust,
-                  varlist = c("splits", "measure_disease", "tmp_dir",
-                              "name_ori", "img_healthy", "img_symptoms", "back", "show_features"),
-                  envir=environment())
-    on.exit(stopCluster(clust))
+    # workers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+    # clust <- makeCluster(workers)
+    # clusterExport(clust,
+    #               varlist = c("splits", "measure_disease", "tmp_dir",
+    #                           "name_ori", "img_healthy", "img_symptoms", "back", "show_features"),
+    #               envir=environment())
+    # on.exit(stopCluster(clust))
     results <-
-      parLapply(clust, seq_along(splits),
-                function(i){
-                  measure_disease(splits[[i]],
-                                  img_healthy = img_healthy,
-                                  img_symptoms = img_symptoms,
-                                  img_background = back,
-                                  show_image = FALSE,
-                                  save_image = TRUE,
-                                  show_features = show_features,
-                                  dir_processed = tmp_dir,
-                                  prefix = paste0(name_ori, "_", i),
-                                  name = "",
-                                  filter = FALSE,
-                                  ...)
-                })
+      lapply(seq_along(splits),
+             function(i){
+               measure_disease(splits[[i]],
+                               img_healthy = img_healthy,
+                               img_symptoms = img_symptoms,
+                               img_background = back,
+                               show_image = FALSE,
+                               save_image = TRUE,
+                               show_features = show_features,
+                               dir_processed = tmp_dir,
+                               prefix = paste0(name_ori, "_", i),
+                               name = "",
+                               filter = FALSE,
+                               ...)
+             })
     names(results) <- paste0(name_ori, "-", 1:length(results))
     if(isTRUE(show_image)){
       imgs <- image_import(pattern = as.character(name_ori), path = tmp_dir)

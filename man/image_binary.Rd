@@ -7,8 +7,8 @@
 image_binary(
   image,
   index = NULL,
-  my_index = NULL,
   threshold = "Otsu",
+  has_white_bg = FALSE,
   resize = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
@@ -30,14 +30,17 @@ image_binary(
 target mode for conversion to binary image. See the available indexes with
 \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}} for more details.}
 
-\item{my_index}{User can calculate a different index using the band names,
-e.g. \code{my_index = "R+B/G"}.}
-
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
 If a numeric value is informed, this value will be used as a threshold.
 Inform any non-numeric value different than "Otsu" to iteratively chosen
 the threshold based on a raster plot showing pixel intensity of the index.}
+
+\item{has_white_bg}{Logical indicating whether a white background is present.
+If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be
+considered as \code{NA}. This may be useful to compute an image index for
+objects that have, for example, a white background. In such cases, the
+background will not be considered for the threshold computation.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value as the percentage of desired resizing. For example, if

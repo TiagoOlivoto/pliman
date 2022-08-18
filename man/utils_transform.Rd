@@ -26,6 +26,7 @@ image_autocrop(
   image,
   index = "NB",
   edge = 5,
+  filter = 3,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -204,6 +205,10 @@ image. If \code{edge = 0} the image will be cropped to create a bounding rectang
 \item for \code{\link[=image_trim]{image_trim()}}, the number of pixels removed from the edges. By
 default, 20 pixels are removed from all the edges.
 }}
+
+\item{filter}{Performs median filtering in the binary image. This is useful
+to remove noise (like dust) and improve the image autocropping method. See
+more at \code{\link[=image_filter]{image_filter()}}. Set to \code{FALSE} to remove the median filtering.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

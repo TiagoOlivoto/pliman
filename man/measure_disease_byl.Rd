@@ -8,7 +8,6 @@ measure_disease_byl(
   img,
   index = "B",
   lower_size = NULL,
-  my_index = NULL,
   watershed = TRUE,
   invert = FALSE,
   fill_hull = FALSE,
@@ -34,10 +33,10 @@ measure_disease_byl(
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{index, my_index}{A character value specifying the target mode for
+\item{index}{A character value specifying the target mode for
 conversion to binary to segment the leaves from background. Defaults to "B"
 (blue). See \code{\link[=image_index]{image_index()}} for more details. Personalized indexes can be
-informed in \code{my_index}, e.g., \verb{my_index = "R*G/B}.}
+informed as, e.g., \verb{index = "R*G/B}.}
 
 \item{lower_size}{To prevent dust from affecting object segmentation, objects
 with lesser than \verb{10\%} of the mean of all objects are removed. . One can
@@ -50,8 +49,14 @@ If \code{FALSE}, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.}
 
-\item{invert}{Inverts the binary image, if desired. This is useful to process
-images with black background. Defaults to \code{FALSE}.}
+\item{invert}{Inverts the binary image if desired. This is useful to process
+images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
+is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
+\verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
+reference from the foreground using \code{back_fore_index} is performed using
+the default (not inverted), and the segmentation of objects from the
+reference is performed by inverting the selection (selecting pixels higher
+than the threshold).}
 
 \item{fill_hull}{Fill holes in the binary image? Defaults to \code{FALSE}. This is
 useful to fill holes in objects that have portions with a color similar to

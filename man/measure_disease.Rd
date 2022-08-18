@@ -21,6 +21,7 @@ measure_disease(
   fill_hull = TRUE,
   index_lb = NULL,
   index_dh = "GLI",
+  has_white_bg = FALSE,
   threshold = NULL,
   invert = FALSE,
   lower_size = NULL,
@@ -114,6 +115,12 @@ considered in the computation of the severity.}
 \item{index_dh}{The index used to segment diseased from healthy tissues when
 \code{img_healthy} and \code{img_symptoms} are not declared. Defaults to \code{"GLI"}. See
 \code{\link[=image_index]{image_index()}} for more details.}
+
+\item{has_white_bg}{Logical indicating whether a white background is present.
+If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be
+considered as \code{NA}. This may be useful to compute an image index for
+objects that have, for example, a white background. In such cases, the
+background will not be considered for the threshold computation.}
 
 \item{threshold}{By default (\code{threshold = NULL}), a threshold value based on
 Otsu's method is used to reduce the grayscale image to a binary image. If a

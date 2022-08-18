@@ -61,7 +61,7 @@ Both functions segment the image based on the value of some image index, which m
 
 
 
-Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their index with the argument `my_index`.
+Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their own index by explicitly providing the formula. e.g., `index = "R-B"`.
 
 ```{r segmentation1 }
 library(pliman)

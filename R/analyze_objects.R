@@ -69,20 +69,22 @@
 #'   background, respectively (optional). If a chacarceter is used (eg.,
 #'   `foreground = "fore"`), the function will search in the current working
 #'   directory a valid image that contains "fore" in the name.
-#' @param reference A color palette for a reference object (optional). This is
-#'   useful to adjust measures when images are not obtained with standard
-#'   resolution (e.g., field images). See more in the details section.
+#' @param reference Logical to indicate if a reference object is present in the
+#'   image. This is useful to adjust measures when images are not obtained with
+#'   standard resolution (e.g., field images). See more in the details section.
 #' @param reference_area The known area of the reference objects. The measures
 #'   of all the objects in the image will be corrected using the same unit of
 #'   the area informed here.
-#' @param back_fore_formula A character value to indicate the formula to be used
-#'   in the `glm` model to segment background (objects and reference) and
-#'   background. Defaults to `"G + B"`. This formula is optimized to segment
-#'   white backgrounds from green leaves and a blue reference object.
-#' @param fore_ref_formula A character value to indicate the formula to be used
-#'   in the `glm` model to segment objects and reference. Defaults to `"G / (R +
-#'   G + B)"`. This formula is optimized to segment green leaves from a blue
-#'   background.
+#' @param back_fore_index A character value to indicate the index to segment the
+#'   foreground (objects and reference) from the background. Defaults to
+#'   `"R/(G/B)"`. This index is optimized to segment white backgrounds from
+#'   green leaves and a blue reference object.
+#' @param fore_ref_index A character value to indicate the index to segment
+#'   objects and the reference object. It can be either an available index in
+#'   `pliman` (see [pliman_indexes()] or an own index computed with the R, G,
+#'   and B bands. Defaults to `"B-R"`. This index is optimized to segment green
+#'   leaves from a blue reference object after a white background has been
+#'   removed.
 #' @param pattern A pattern of file name used to identify images to be imported.
 #'   For example, if `pattern = "im"` all images in the current working
 #'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
@@ -127,16 +129,22 @@
 #'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
 #'   size of the median filtering. Larger values are effective at removing
 #'   noise, but adversely affect edges.
-#' @param invert Inverts the binary image, if desired. This is useful to process
-#'   images with black background. Defaults to `FALSE`.
+#' @param invert Inverts the binary image if desired. This is useful to process
+#'   images with a black background. Defaults to `FALSE`. If `reference = TRUE`
+#'   is use, `invert` can be declared as a logical vector of length 2 (eg.,
+#'   `invert = c(FALSE, TRUE`). In this case, the segmentation of objects and
+#'   reference from the foreground using `back_fore_index` is performed using
+#'   the default (not inverted), and the segmentation of objects from the
+#'   reference is performed by inverting the selection (selecting pixels higher
+#'   than the threshold).
 #' @param object_size The size of the object. Used to automatically set up
 #'   `tolerance` and `extension` parameters. One of the following. `"small"`
 #'   (e.g, wheat grains), `"medium"` (e.g, soybean grains), `"large"`(e.g,
 #'   peanut grains), and `"elarge"` (e.g, soybean pods)`.
-#' @param index,my_index A character value specifying the target mode for
-#'   conversion to binary image when `foreground` and `background` are not
-#'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
-#'   more details.
+#' @param index A character value specifying the target mode for conversion to
+#'   binary image when `foreground` and `background` are not declared. Defaults
+#'   to `"NB"` (normalized blue). See [image_index()] for more details. User can
+#'   also calculate your own index using the bands names, e.g. `index = "R+B/G"`
 #' @param object_index Defaults to `FALSE`. If an index is informed, the average
 #'   value for each object is returned. It can be the R, G, and B values or any
 #'   operation involving them, e.g., `object_index = "R/B"`. In this case, it
@@ -353,10 +361,10 @@
 analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
-                            reference = NULL,
+                            reference = FALSE,
                             reference_area = NULL,
-                            back_fore_formula = "G+B",
-                            fore_ref_formula = "R+G+B",
+                            back_fore_index = "R/(G/B)",
+                            fore_ref_index = "B-R",
                             pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
@@ -371,7 +379,6 @@ analyze_objects <- function(img,
                             invert = FALSE,
                             object_size = "medium",
                             index = "NB",
-                            my_index = NULL,
                             object_index = NULL,
                             threshold = "Otsu",
                             tolerance = NULL,
@@ -454,14 +461,8 @@ analyze_objects <- function(img,
         }
         img <- image_resize(img, resize)
       }
-      # if(filter != FALSE){
-      #   if(!is.numeric(filter)){
-      #     stop("Argument `filter` must be numeric.", call. = FALSE)
-      #   }
-      #   img <- image_filter(img, size = filter)
-      # }
       # when reference is not used
-      if(is.null(reference)){
+      if(isFALSE(reference)){
         if(!is.null(foreground) && !is.null(background)){
           if(is.character(foreground)){
             all_files <- sapply(list.files(getwd()), file_name)
@@ -499,7 +500,7 @@ analyze_objects <- function(img,
                             background[sample(1:nrow(background)),][1:nrows,]),
                       Y = ifelse(CODE == "background", 0, 1))
 
-          formula <- as.formula(paste("Y ~ ", back_fore_formula))
+          formula <- as.formula(paste("Y ~ ", back_fore_index))
 
           modelo1 <- suppressWarnings(glm(formula,
                                           family = binomial("logit"),
@@ -530,7 +531,6 @@ analyze_objects <- function(img,
         } else{
           img2 <- image_binary(img,
                                index = index,
-                               my_index = my_index,
                                invert = invert,
                                fill_hull = fill_hull,
                                threshold = threshold,
@@ -569,98 +569,54 @@ analyze_objects <- function(img,
 
       } else{
         # when reference is used
-        if(is.null(foreground) | is.null(background)){
-          stop("When a reference object is used, color palettes must be informed in `foreground` and `background` arguments.", call. = FALSE)
-        }
         if(is.null(reference_area)){
           stop("A known area must be declared when a template is used.", call. = FALSE)
         }
-        if(is.character(foreground)){
-          all_files <- sapply(list.files(), file_name)
-          imag <- list.files(pattern = foreground)
-          check_names_dir(foreground, all_files, getwd())
-          name <- file_name(imag)
-          extens <- file_extension(imag)
-          foreground <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
-        }
-        if(is.character(reference)){
-          all_files <- sapply(list.files(getwd()), file_name)
-          imag <- list.files(getwd(), pattern = reference)
-          check_names_dir(reference, all_files, getwd())
-          name <- file_name(imag)
-          extens <- file_extension(imag)
-          reference <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
-        }
-        if(is.character(background)){
-          all_files <- sapply(list.files(getwd()), file_name)
-          imag <- list.files(getwd(), pattern = background)
-          check_names_dir(background, all_files, getwd())
-          name <- file_name(imag)
-          extens <- file_extension(imag)
-          background <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
-        }
-
-        original <-
-          data.frame(CODE = "img",
-                     R = c(img@.Data[,,1]),
-                     G = c(img@.Data[,,2]),
-                     B = c(img@.Data[,,3]))
-        foreground <-
-          data.frame(CODE = "foreground",
-                     R = c(foreground@.Data[,,1]),
-                     G = c(foreground@.Data[,,2]),
-                     B = c(foreground@.Data[,,3]))
-        background <-
-          data.frame(CODE = "background",
-                     R = c(background@.Data[,,1]),
-                     G = c(background@.Data[,,2]),
-                     B = c(background@.Data[,,3]))
-        template <-
-          data.frame(CODE = "template",
-                     R = c(reference@.Data[,,1]),
-                     G = c(reference@.Data[,,2]),
-                     B = c(reference@.Data[,,3]))
-        # segment back and foreground
-        back_fore <-
-          transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
-                          template[sample(1:nrow(template)),][1:nrows,],
-                          background[sample(1:nrow(background)),][1:nrows,]),
-                    Y = ifelse(CODE == "background", 0, 1))
-        formula_bf <- as.formula(paste("Y ~ ", "R+B"))
-        modelo <- suppressWarnings(glm(formula_bf,
-                                       family = binomial("probit"),
-                                       data = back_fore))
-        pred1 <- round(predict(modelo, newdata = original, type = "response"), 0)
-
-        df_leaf_template <-
-          transform(rbind(foreground[sample(1:nrow(foreground)),][1:nrows,],
-                          template[sample(1:nrow(template)),][1:nrows,]),
-                    Y = ifelse(CODE == "template", 1, 0))
-
-        formula_lr <- as.formula(paste("Y ~ ", fore_ref_formula))
-        modelo2 <- suppressWarnings(glm(formula_lr,
-                                        family = binomial("probit"),
-                                        data = df_leaf_template))
-
-        pred2 <- round(predict(modelo2,
-                               newdata = original[pred1 == 1, ],
-                               type = "response"), 0)
-        npix_ref <- length(which(pred2 == 1))
-        pred2[pred2 == 0] <- 2
-        pred1[pred1 == 1] <- pred2
-        mask <- matrix(pred1, ncol = dim(img)[[2]])
-        if(isTRUE(fill_hull)){
-          plant_background <- EBImage::fillHull(mask)
-        }
-        if(is.numeric(filter) & filter > 1){
-          mask <- EBImage::medianFilter(mask == 2, size = filter)
+        # segment back and fore
+        if(!isFALSE(invert)){
+          invert1 <- ifelse(length(invert) == 1, invert, invert[1])
         } else{
-          mask <- mask == 2
+          invert1 <- FALSE
         }
-        # mask <- EBImage::medianFilter(mask == 2, size = 3)
+        img_bf <-
+          image_binary(img,
+                       index = back_fore_index,
+                       filter = filter,
+                       invert = invert1,
+                       show_image = FALSE,
+                       verbose = FALSE)[[1]]
+        img3 <- img
+        img3@.Data[,,1][which(img_bf != 1)] <- 2
+        img3@.Data[,,2][which(img_bf != 1)] <- 2
+        img3@.Data[,,3][which(img_bf != 1)] <- 2
+        ID <-  which(img_bf == 1) # IDs for foreground
+        ID2 <- which(img_bf == 0) # IDs for background
+        # segment fore and ref
+        if(!isFALSE(invert)){
+          invert2 <- ifelse(length(invert) == 1, invert, invert[2])
+        } else{
+          invert2 <- FALSE
+        }
+        img4 <-
+          image_binary(img3,
+                       index = fore_ref_index,
+                       filter = filter,
+                       invert = invert2,
+                       show_image = FALSE,
+                       verbose = FALSE)[[1]]
+        mask <- img_bf
+        pix_ref <- which(img4 != 1)
+        img@.Data[,,1][pix_ref] <- 1
+        img@.Data[,,2][pix_ref] <- 0
+        img@.Data[,,3][pix_ref] <- 0
+        npix_ref <- length(pix_ref)
+        mask[pix_ref] <- 0
+        if(is.numeric(filter) & filter > 1){
+          mask <- EBImage::medianFilter(mask, size = filter)
+        }
         if(isTRUE(watershed)){
           parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-          res <- nrow(original)
+          res <- length(img)
           parms2 <- parms[parms$object_size == object_size,]
           rowid <-
             which(sapply(as.character(parms2$resolution), function(x) {
@@ -673,8 +629,6 @@ analyze_objects <- function(img,
         } else{
           nmask <- EBImage::bwlabel(mask)
         }
-        ID <-  which(mask == 1) # IDs for foreground
-        ID2 <- which(mask == 0) # IDs for background
         shape <- compute_measures(mask = nmask,
                                   img = img,
                                   har_nbins = har_nbins,
@@ -683,7 +637,6 @@ analyze_objects <- function(img,
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape
-
         # correct measures based on the area of the reference object
         px_side <- sqrt(reference_area / npix_ref)
         shape$area <- shape$area * px_side^2
@@ -871,6 +824,9 @@ analyze_objects <- function(img,
         if(show_image == TRUE){
           if(marker != "point"){
             plot(im2)
+            if(isTRUE(show_contour) & isTRUE(show_original)){
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
+            }
             if(show_mark){
               text(shape[, 2],
                    shape[, 3],
@@ -878,23 +834,20 @@ analyze_objects <- function(img,
                    col = marker_col,
                    cex = marker_size)
             }
-            if(isTRUE(show_contour) & isTRUE(show_original)){
-              plot_contour(object_contour, col = contour_col, lwd = contour_size)
-            }
             if(isTRUE(show_chull)){
               plot_contour(ch |> poly_close(), col = "black")
             }
           } else{
             plot(im2)
+            if(isTRUE(show_contour)  & isTRUE(show_original)){
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
+            }
             if(show_mark){
               points(shape[, 2],
                      shape[, 3],
                      col = marker_col,
                      pch = 16,
                      cex = marker_size)
-            }
-            if(isTRUE(show_contour)  & isTRUE(show_original)){
-              plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
         }
@@ -910,6 +863,9 @@ analyze_objects <- function(img,
               height = dim(im2@.Data)[2])
           if(marker != "point"){
             plot(im2)
+            if(isTRUE(show_contour) & isTRUE(show_original)){
+              plot_contour(object_contour, col = contour_col, lwd = contour_size)
+            }
             if(show_mark){
               text(shape[, 2],
                    shape[, 3],
@@ -917,20 +873,17 @@ analyze_objects <- function(img,
                    col = marker_col,
                    cex = marker_size)
             }
+          } else{
+            plot(im2)
             if(isTRUE(show_contour) & isTRUE(show_original)){
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
-          } else{
-            plot(im2)
             if(show_mark){
               points(shape[, 2],
                      shape[, 3],
                      col = marker_col,
                      pch = 16,
                      cex = marker_size)
-            }
-            if(isTRUE(show_contour) & isTRUE(show_original)){
-              plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
           }
           dev.off()

@@ -8,8 +8,8 @@
 image_segment(
   image,
   index = NULL,
-  my_index = NULL,
   threshold = "Otsu",
+  has_white_bg = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
   re = NULL,
@@ -25,10 +25,11 @@ image_segment(
 
 image_segment_iter(
   image,
-  nseg = 1,
+  nseg = 2,
   index = NULL,
   invert = NULL,
   threshold = NULL,
+  has_white_bg = FALSE,
   show_image = TRUE,
   verbose = TRUE,
   nrow = NULL,
@@ -50,9 +51,6 @@ same length of \code{nseg}. It can be either an available index (described above
 or any operation involving the RGB values (e.g., \code{"B/R+G"}).
 }}
 
-\item{my_index}{User can calculate a different index using the bands names,
-e.g. \code{my_index = "R+B/G"}.}
-
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
 If a numeric value is informed, this value will be used as a threshold.
@@ -60,6 +58,12 @@ Inform any non-numeric value different than \code{"Otsu"} to iteratively chosen
 the threshold based on a raster plot showing pixel intensity of the index.
 For \code{image_segmentation_iter()}, use a vector (allows a mixed (numeric and
 character) type) with the same length of \code{nseg}.}
+
+\item{has_white_bg}{Logical indicating whether a white background is present.
+If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be
+considered as \code{NA}. This may be useful to compute an image index for
+objects that have, for example, a white background. In such cases, the
+background will not be considered for the threshold computation.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 

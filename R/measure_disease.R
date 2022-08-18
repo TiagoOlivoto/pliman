@@ -83,6 +83,11 @@
 #' @param index_dh The index used to segment diseased from healthy tissues when
 #'   `img_healthy` and `img_symptoms` are not declared. Defaults to `"GLI"`. See
 #'   [image_index()] for more details.
+#' @param has_white_bg Logical indicating whether a white background is present.
+#'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
+#'   considered as `NA`. This may be useful to compute an image index for
+#'   objects that have, for example, a white background. In such cases, the
+#'   background will not be considered for the threshold computation.
 #' @param threshold By default (`threshold = NULL`), a threshold value based on
 #'   Otsu's method is used to reduce the grayscale image to a binary image. If a
 #'   numeric value is informed, this value will be used as a threshold. Inform
@@ -216,6 +221,7 @@ measure_disease <- function(img,
                             fill_hull = TRUE,
                             index_lb = NULL,
                             index_dh = "GLI",
+                            has_white_bg = FALSE,
                             threshold = NULL,
                             invert = FALSE,
                             lower_size = NULL,
@@ -294,7 +300,7 @@ measure_disease <- function(img,
   }
   help_count <-
     function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
-             index_lb, index_dh, lesion_size, tolerance, extension,
+             index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension,
              randomize, nsample, show_image, show_original, show_background,
              col_leaf, col_lesions, col_background,
              save_image, dir_original, dir_processed){
@@ -539,13 +545,6 @@ measure_disease <- function(img,
         ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
         if(!is.null(index_lb)){
           # segment leaf from background
-          if(!index_lb %in% ind$Index){
-            my_index_lb <- index_lb
-            index_lb <- NULL
-          } else{
-            my_index_lb <- NULL
-            index_lb <- index_lb
-          }
           if(is.null(threshold)){
             threshold1 <- "Otsu"
           } else{
@@ -561,7 +560,6 @@ measure_disease <- function(img,
           }
           seg <- image_segment(img,
                                index = index_lb,
-                               my_index = my_index_lb,
                                threshold = my_thresh,
                                invert = invert1,
                                show_image = FALSE,
@@ -570,13 +568,6 @@ measure_disease <- function(img,
           img <- seg[[1]][["image"]]
         }
         # segment disease from leaf
-        if(!index_dh %in% ind$Index){
-          my_index_dh <- index_dh
-          index_dh <- NULL
-        } else{
-          my_index_dh <- NULL
-          index_dh <- index_dh
-        }
         if(is.null(threshold)){
           threshold2 <- "Otsu"
         } else{
@@ -592,9 +583,9 @@ measure_disease <- function(img,
         }
         img2 <- image_binary(img,
                              index = index_dh,
-                             my_index = my_index_dh,
                              threshold = my_thresh2,
                              invert = invert2,
+                             has_white_bg = has_white_bg,
                              resize = FALSE,
                              show_image = FALSE)[[1]]
         img2@.Data[is.na(img2@.Data)] <- FALSE
@@ -803,7 +794,7 @@ measure_disease <- function(img,
 
   if(missing(pattern)){
     help_count(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
-               index_lb, index_dh, lesion_size, tolerance, extension, randomize,
+               index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                nsample, show_image, show_original, show_background, col_leaf,
                col_lesions, col_background, save_image, dir_original, dir_processed)
   } else{
@@ -836,7 +827,7 @@ measure_disease <- function(img,
                   function(x){
                     help_count(x,
                                img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
-                               index_lb, index_dh, lesion_size, tolerance, extension, randomize,
+                               index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                                nsample, show_image, show_original, show_background, col_leaf,
                                col_lesions, col_background, save_image, dir_original, dir_processed)
                   })
@@ -852,7 +843,7 @@ measure_disease <- function(img,
         results[[i]] <-
           help_count(img  = names_plant[i],
                      img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
-                     index_lb, index_dh, lesion_size, tolerance, extension, randomize,
+                     index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                      nsample, show_image, show_original, show_background, col_leaf,
                      col_lesions, col_background, save_image, dir_original, dir_processed)
       }
@@ -905,7 +896,6 @@ measure_disease <- function(img,
     )
   }
 }
-
 
 #' @name measure_disease
 #' @export

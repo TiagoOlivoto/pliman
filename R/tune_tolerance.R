@@ -24,7 +24,7 @@
 #'   values. When grid is informed, all combinations are tested and the residual
 #'   from `actual` value is plotted.
 #' @param maxiter The maximum number of iterations. Default to 200.
-#' @param index,my_index A character value specifying the target mode for
+#' @param index A character value specifying the target mode for
 #'   conversion to binary image when `foreground` and `background` are not
 #'   declared. Defaults to `"NB"` (normalized blue). See [image_index()] for
 #'   more details.
@@ -67,7 +67,6 @@ tune_tolerance <- function(img,
                            grid = NULL,
                            maxiter = 200,
                            index = "NB",
-                           my_index = NULL,
                            plot = TRUE,
                            fill_hull = FALSE,
                            filter = FALSE,
@@ -79,7 +78,6 @@ tune_tolerance <- function(img,
     bin <-
       image_binary(img,
                    index = index,
-                   my_index = my_index,
                    invert = invert,
                    fill_hull = fill_hull,
                    resize = FALSE,

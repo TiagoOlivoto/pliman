@@ -8,10 +8,10 @@
 image_index(
   image,
   index = NULL,
-  my_index = NULL,
   resize = FALSE,
   re = NULL,
   nir = NULL,
+  has_white_bg = FALSE,
   show_image = TRUE,
   nrow = NULL,
   ncol = NULL,
@@ -29,10 +29,8 @@ image_index(
 target mode for conversion to binary image. Use \code{\link[=pliman_indexes]{pliman_indexes()}} or the
 \code{details} section to see the available indexes.  Defaults to \code{NULL}
 ((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
-"NRGB" for normalized RGB, or "all" for all indexes.}
-
-\item{my_index}{User can calculate a different index using the bands names,
-e.g. \code{my_index = "R+B/G"}.}
+"NRGB" for normalized RGB, or "all" for all indexes. User can also
+calculate your own index using the bands names, e.g. \code{index = "R+B/G"}.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{30}, which
 resizes the image to 30\% of the original size to speed up image processing.
@@ -43,6 +41,12 @@ file.}
 
 \item{nir}{Respective position of the near-infrared band at the original
 image file.}
+
+\item{has_white_bg}{Logical indicating whether a white background is present.
+If TRUE, pixels that have R, G, and B values equals to 1 will be considered
+as NA. This may be useful to compute an image index for objects that have,
+for example, a white background. In such cases, the background will not be
+considered for the threshold computation.}
 
 \item{show_image}{Show image after processing?}
 
