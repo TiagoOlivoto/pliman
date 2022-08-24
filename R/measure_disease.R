@@ -562,6 +562,7 @@ measure_disease <- function(img,
                                index = index_lb,
                                threshold = my_thresh,
                                invert = invert1,
+                               filter = filter,
                                show_image = FALSE,
                                fill_hull = FALSE)
 

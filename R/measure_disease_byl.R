@@ -45,6 +45,8 @@
 #'
 measure_disease_byl <- function(img,
                                 index = "B",
+                                index_lb = "B",
+                                index_dh = "NGRDI",
                                 lower_size = NULL,
                                 watershed = TRUE,
                                 invert = FALSE,
@@ -96,7 +98,9 @@ measure_disease_byl <- function(img,
   help_byl <- function(img,
                        img_healthy,
                        img_symptoms,
-                       back){
+                       back,
+                       index_dh,
+                       index_lb){
     if(is.character(img)){
       all_files <- sapply(list.files(diretorio_original), file_name)
       check_names_dir(img, all_files, diretorio_original)
@@ -128,29 +132,41 @@ measure_disease_byl <- function(img,
       save_image <- FALSE
       clear_td()
     }
-    # workers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-    # clust <- makeCluster(workers)
-    # clusterExport(clust,
-    #               varlist = c("splits", "measure_disease", "tmp_dir",
-    #                           "name_ori", "img_healthy", "img_symptoms", "back", "show_features"),
-    #               envir=environment())
-    # on.exit(stopCluster(clust))
-    results <-
-      lapply(seq_along(splits),
-             function(i){
-               measure_disease(splits[[i]],
-                               img_healthy = img_healthy,
-                               img_symptoms = img_symptoms,
-                               img_background = back,
-                               show_image = FALSE,
-                               save_image = TRUE,
-                               show_features = show_features,
-                               dir_processed = tmp_dir,
-                               prefix = paste0(name_ori, "_", i),
-                               name = "",
-                               filter = FALSE,
-                               ...)
-             })
+    if(is.null(img_healthy)){
+      results <-
+        lapply(seq_along(splits),
+               function(i){
+                 measure_disease(splits[[i]],
+                                 index_dh = index_dh,
+                                 index_lb = index_lb,
+                                 show_image = FALSE,
+                                 save_image = TRUE,
+                                 show_features = show_features,
+                                 dir_processed = tmp_dir,
+                                 prefix = paste0(name_ori, "_", i),
+                                 name = "",
+                                 filter = FALSE,
+                                 ...)
+               })
+
+    } else{
+      results <-
+        lapply(seq_along(splits),
+               function(i){
+                 measure_disease(splits[[i]],
+                                 img_healthy = img_healthy,
+                                 img_symptoms = img_symptoms,
+                                 img_background = back,
+                                 show_image = FALSE,
+                                 save_image = TRUE,
+                                 show_features = show_features,
+                                 dir_processed = tmp_dir,
+                                 prefix = paste0(name_ori, "_", i),
+                                 name = "",
+                                 filter = FALSE,
+                                 ...)
+               })
+    }
     names(results) <- paste0(name_ori, "-", 1:length(results))
     if(isTRUE(show_image)){
       imgs <- image_import(pattern = as.character(name_ori), path = tmp_dir)
@@ -208,7 +224,7 @@ measure_disease_byl <- function(img,
   }
 
   if(missing(pattern)){
-    results <- help_byl(img, img_healthy, img_symptoms, back)
+    results <- help_byl(img, img_healthy, img_symptoms, back, index_dh, index_lb)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -237,7 +253,7 @@ measure_disease_byl <- function(img,
       results <-
         parLapply(clust, names_plant,
                   function(x){
-                    help_byl(img  = x, img_healthy, img_symptoms, back)
+                    help_byl(img  = x, img_healthy, img_symptoms, back, index_dh, index_lb)
                   })
     } else{
       results <- list()
@@ -247,7 +263,7 @@ measure_disease_byl <- function(img,
           run_progress(pb, actual = i,
                        text = paste("Processing image", names_plant[i]))
         }
-        results[[i]] <- help_byl(img  = names_plant[i], img_healthy, img_symptoms, back)
+        results[[i]] <- help_byl(img  = names_plant[i], img_healthy, img_symptoms, back, index_dh, index_lb)
       }
     }
     names(results) <- names_plant

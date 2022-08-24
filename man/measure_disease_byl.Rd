@@ -7,6 +7,8 @@
 measure_disease_byl(
   img,
   index = "B",
+  index_lb = "B",
+  index_dh = "NGRDI",
   lower_size = NULL,
   watershed = TRUE,
   invert = FALSE,
@@ -37,6 +39,14 @@ measure_disease_byl(
 conversion to binary to segment the leaves from background. Defaults to "B"
 (blue). See \code{\link[=image_index]{image_index()}} for more details. Personalized indexes can be
 informed as, e.g., \verb{index = "R*G/B}.}
+
+\item{index_lb}{The index used to segment the foreground (e.g., leaf) from
+the background. If not declared, the entire image area (pixels) will be
+considered in the computation of the severity.}
+
+\item{index_dh}{The index used to segment diseased from healthy tissues when
+\code{img_healthy} and \code{img_symptoms} are not declared. Defaults to \code{"GLI"}. See
+\code{\link[=image_index]{image_index()}} for more details.}
 
 \item{lower_size}{To prevent dust from affecting object segmentation, objects
 with lesser than \verb{10\%} of the mean of all objects are removed. . One can
