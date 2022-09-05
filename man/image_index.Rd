@@ -118,6 +118,7 @@ The following indexes are available in pliman.
 \item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}
 \item \code{SHP} Shape Index \code{2*(R-G-B)/(G-B)}
 \item \code{RI} Redness Index \code{R**2/(B*G**3)}
+\item \code{DGCI} Dark Green Color Index, based on HSB color space \code{60*((G - B) / (max(R, G, B) - min(R, G, B)))}
 }
 }
 \examples{

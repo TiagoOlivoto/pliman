@@ -715,6 +715,7 @@ analyze_objects <- function(img,
                     }))
         }
         object_rgb <- subset(object_rgb, id %in% shape$id)
+        object_rgb <- cbind(object_rgb, rgb_to_hsb(object_rgb[, 2:4]))
         # indexes by id
         indexes <-
           by(object_rgb,
@@ -723,7 +724,7 @@ analyze_objects <- function(img,
                data.frame(
                  do.call(cbind,
                          lapply(seq_along(ind_formula), function(i){
-                           data.frame(transform(x, index = eval(parse(text = ind_formula[i])))[,5])
+                           data.frame(transform(x, index = eval(parse(text = ind_formula[i])))[,8])
                          })
                  )
                )

@@ -2,11 +2,11 @@
 % Please edit documentation in R/utils_imagem.R
 \name{utils_colorspace}
 \alias{utils_colorspace}
-\alias{rgb_to_hsv}
+\alias{rgb_to_hsb}
 \alias{rgb_to_lab}
 \title{Convert between colour spaces}
 \usage{
-rgb_to_hsv(object)
+rgb_to_hsb(object)
 
 rgb_to_lab(object)
 }
@@ -21,8 +21,8 @@ A data frame with the columns of the converted color space
 }
 \description{
 \itemize{
-\item \code{rgb_to_hsv()} Transforms colors from RGB space (red/green/blue) into HSV
-space (hue/saturation/value).
+\item \code{rgb_to_hsb()} Transforms colors from RGB space (red/green/blue) into HSB
+space (hue/saturation/brightness).
 \item \code{rgb_to_lab()} Transforms colors from RGB space (red/green/blue) into
 CIE-LAB space
 }

@@ -1514,6 +1514,7 @@ image_binary <- function(image,
 #' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
 #' * `SHP` Shape Index `2*(R-G-B)/(G-B)`
 #' * `RI` Redness Index `R**2/(B*G**3)`
+#' * `DGCI` Dark Green Color Index, based on HSB color space `60*((G - B) / (max(R, G, B) - min(R, G, B)))`
 #'
 #' @name image_index
 #' @param image An image object.
@@ -1606,6 +1607,23 @@ image_index <- function(image,
         }
     }
     nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
+    hsb_ind <- as.character(ind$Index[ind$Band == "hsb"])
+
+    R <- try(image@.Data[,,1], TRUE)
+    G <- try(image@.Data[,,2], TRUE)
+    B <- try(image@.Data[,,3], TRUE)
+    test_band <- any(sapply(list(R, G, B), class) == "try-error")
+
+    if(any(index %in% hsb_ind)){
+      hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
+      h <- matrix(hsb$h, nrow = nrow(image), ncol = ncol(image))
+      s <- matrix(hsb$s, nrow = nrow(image), ncol = ncol(image))
+      b <- matrix(hsb$b, nrow = nrow(image), ncol = ncol(image))
+    }
+    if(isTRUE(test_band)){
+      stop("At least 3 bands (RGB) are necessary to calculate indices available in pliman.", call. = FALSE)
+    }
+
     imgs <- list()
     for(i in 1:length(index)){
       indx <- index[[i]]
@@ -1623,13 +1641,6 @@ image_index <- function(image,
           if(isTRUE(verbose)){
             message(paste("Index '",indx,"' is not available. Trying to compute your own index.",sep = ""))
           }
-        }
-        R <- try(image@.Data[,,1], TRUE)
-        G <- try(image@.Data[,,2], TRUE)
-        B <- try(image@.Data[,,3], TRUE)
-        test_band <- any(sapply(list(R, G, B), class) == "try-error")
-        if(isTRUE(test_band)){
-          stop("At least 3 bands (RGB) are necessary to calculate indices available in pliman.", call. = FALSE)
         }
         if(!is.null(re)|!is.null(nir)){
           if(indx %in% nir_ind & is.null(nir)){
@@ -1685,6 +1696,7 @@ image_index <- function(image,
     invisible(structure(imgs, class = "image_index"))
   }
 }
+
 
 
 
@@ -1928,6 +1940,18 @@ image_segment <- function(image,
     return(structure(res, class = "segment_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+    if(is.null(index)){
+      index <- c("R", "G", "B", "NR", "NG", "NB")
+    }else{
+      if(index %in% c("RGB", "NRGB", "all")){
+        index <-  switch (index,
+                          RGB = c("R", "G", "B"),
+                          NRGB = c("NR", "NG", "NB"),
+                          all = ind$Index
+        )} else{
+          index <- strsplit(index, "\\s*(,)\\s*")[[1]]
+        }
+    }
     imgs <- list()
     for(i in 1:length(index)){
       indx <- index[[i]]
@@ -2190,7 +2214,88 @@ image_segment_iter <- function(image,
 
 
 
+image_segment_manual <-  function(img,
+                                  type = c("select", "remove"),
+                                  resize = TRUE,
+                                  plot = TRUE){
+  plot(img)
+  message("Create a mask by clicking in the image")
+  stop <- FALSE
+  n <- 1e+06
+  coor <- NULL
+  a <- 0
+  while (isFALSE(stop)) {
+    if (a > 1) {
+      if (nrow(coor) > 1) {
+        lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
+                                                            1):nrow(coor), 2], col = col)
+      }
+    }
+    x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+    if (is.null(x)){
+      stop <- TRUE
+    }
+    coor <- rbind(coor, x)
+    a <- a + 1
+    if (a >= n) {
+      stop = TRUE
+    }
+  }
+  coor <- rbind(coor, coor[1, ])
+  mat <- NULL
+  for (i in 1:(nrow(coor) - 1)) {
+    c1<-  coor[i, ]
+    c2 <- coor[i + 1, ]
+    a <- c1[2]
+    b <- (c2[2] - c1[2])/(c2[1] - c1[1])
+    Xs <- round(c1[1], 0):round(c2[1], 0) - round(c1[1], 0)
+    Ys <- round(a + b * Xs, 0)
+    mat <- rbind(mat, cbind(Xs + round(c1[1], 0), Ys))
+    lines(Xs + round(c1[1], 0), Ys, col = col)
+  }
+  n = dim(img)
+  imF = matrix(0, n[1], n[2])
+  id = unique(mat[, 1])
+  for (i in id) {
+    coorr <- mat[mat[, 1] == i, ]
+    imF[i, min(coorr[, 2], na.rm = T):max(coorr[, 2], na.rm = T)] = 1
+  }
+  mask <- EBImage::fillHull(EBImage::bwlabel(imF))
+  # return(mask)
+  if(type[1] == "select"){
+    id <- mask != 1
+  } else{
+    id <- mask == 1
+  }
+  img@.Data[, , 1][id] = 1
+  img@.Data[, , 2][id] = 1
+  img@.Data[, , 3][id] = 1
 
+  if(isTRUE(resize)){
+    # get_coordinates <- function(data_mask, edge) {
+    nrows <- nrow(mask)
+    ncols <- ncol(mask)
+    a <- apply(mask, 2, function(x) {
+      any(x != 0)
+    })
+    col_min <- min(which(a == TRUE))
+    col_min <- ifelse(col_min < 1, 1, col_min)
+    col_max <- max(which(a == TRUE))
+    col_max <- ifelse(col_max > ncols, ncols, col_max)
+    b <- apply(mask, 1, function(x) {
+      any(x != 0)
+    })
+    row_min <- min(which(b == TRUE))
+    row_min <- ifelse(row_min < 1, 1, row_min)
+    row_max <- max(which(b == TRUE))
+    row_max <- ifelse(row_max > nrows, nrows, row_max)
+    img <- img[row_min:row_max, col_min:col_max, 1:3]
+  }
+  if(isTRUE(plot)){
+    plot(img)
+  }
+  return(list(img = img, mask = mask))
+}
 
 
 
@@ -2470,8 +2575,8 @@ distance <- function(image, plot = TRUE){
 
 #' Convert between colour spaces
 #' @description
-#' * `rgb_to_hsv()` Transforms colors from RGB space (red/green/blue) into HSV
-#' space (hue/saturation/value).
+#' * `rgb_to_hsb()` Transforms colors from RGB space (red/green/blue) into HSB
+#' space (hue/saturation/brightness).
 #' * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) into
 #' CIE-LAB space
 #'
@@ -2492,42 +2597,44 @@ distance <- function(image, plot = TRUE){
 #' # analyze the object and convert the pixels
 #' anal <- analyze_objects(img, object_index = "B")
 #' rgb_to_lab(anal)
-rgb_to_hsv <- function(object){
+rgb_to_hsb <- function(object){
   if (any(class(object) %in%  c("data.frame", "matrix"))){
-    hsv <- t(rgb2hsv(r = object[,1],
-                     g = object[,2],
-                     b = object[,3],
-                     maxColorValue = 1))
+    hsb <-
+      rgb_to_hsb_help(r = object[,1],
+                      g = object[,2],
+                      b = object[,3])
   }
   if (any(class(object)  %in% c("anal_obj", "anal_obj_ls"))){
     if(!is.null(object$object_rgb)){
       tmp <- object$object_rgb
       if ("img" %in% colnames(tmp)){
-        hsv <- t(rgb2hsv(r = c(tmp[,3]),
-                         g = c(tmp[,4]),
-                         b = c(tmp[,5]),
-                         maxColorValue = 1))
-        hsv <- data.frame(cbind(tmp[,1:2], hsv))
-        colnames(hsv)[1:2] <- c("img", "id")
+        hsb <-
+          rgb_to_hsb_help(r = c(tmp[,3]),
+                          g = c(tmp[,4]),
+                          b = c(tmp[,5]))
+        hsb <- data.frame(cbind(tmp[,1:2], hsb))
+        colnames(hsb)[1:2] <- c("img", "id")
       }
-      hsv <- t(rgb2hsv(r = c(tmp[,2]),
-                       g = c(tmp[,3]),
-                       b = c(tmp[,4]),
-                       maxColorValue = 1))
-      hsv <- data.frame(cbind(tmp[,1], hsv))
-      colnames(hsv)[1] <- "id"
+      hsb <-
+        rgb_to_hsb_help(r = c(tmp[,2]),
+                        g = c(tmp[,3]),
+                        b = c(tmp[,4]))
+      hsb <- data.frame(cbind(tmp[,1], hsb))
+      colnames(hsb)[1] <- "id"
     } else{
       stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
     }
   }
   if (any(class(object) == "Image")){
-    hsv <- t(rgb2hsv(r = c(object[,,1]),
-                     g = c(object[,,2]),
-                     b = c(object[,,3]),
-                     maxColorValue = 1))
+    hsb <-
+      rgb_to_hsb_help(r = c(object[,,1]),
+                      g = c(object[,,2]),
+                      b = c(object[,,3]))
   }
-  return(hsv)
+  return(hsb)
 }
+
+
 
 #' @export
 #' @name utils_colorspace

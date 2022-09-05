@@ -438,6 +438,36 @@ plot.pca <- function(x,
 
 
 
+
+################## used internaly
+# convert rgb to hsv
+rgb_to_hsb_help <-  function(r, g, b){
+  help_h <- function(r, g, b){
+    rgbvals <- c(r, g, b)
+    # hue
+    if(max(rgbvals) ==  rgbvals[1]){
+      h <- 60*((g - b) / (max(r, g, b) - min(r, g, b)))
+    }
+    if(max(rgbvals) ==  rgbvals[2]){
+      h <- 60*(2 + ((b - r) / (max(r, g, b) - min(r, g, b))))
+    }
+    if(max(rgbvals) ==  rgbvals[3]){
+      h <- 60*(4 + ((r - g) / (max(r, g, b) - min(r, g, b))))
+    }
+    return(h)
+  }
+  help_s <- function(r, g, b){
+    (max(r, g, b) - min(r, g, b)) / max(r, g, b) *100
+  }
+  help_b <- function(r, g, b){
+    max(r, g, b)  * 100
+  }
+  h <- mapply(help_h, r, g, b)
+  s <- mapply(help_s, r, g, b)
+  b <- mapply(help_b, r, g, b)
+  return(data.frame(h = h, s = s, b = b))
+}
+
 # Progress bar
 # used in metan R package
 # https://github.com/TiagoOlivoto/metan/blob/master/R/utils_progress.R
@@ -635,6 +665,7 @@ random_color <- function(n = 1, distinct = FALSE){
 #'
 #' * [get_wd_here()] gets the working directory to the path of the current script.
 #' * [set_wd_here()] sets the working directory to the path of the current script.
+#' * [open_wd_here()] Open the File Explorer at the directory path of the current script.
 #'
 #' @param path Path components below the project root. Defaults to `NULL`. This means that
 #'   the directory will be set to the path of the file. If the path doesn't exist, the
@@ -642,6 +673,7 @@ random_color <- function(n = 1, distinct = FALSE){
 #' @return
 #' * [get_wd_here()] returns a full-path directory name.
 #' * [get_wd_here()] returns a message showing the current working directory.
+#' * [open_wd_here()] Opens the File Explorer of the path returned by `get_wd_here()`.
 #' @export
 #' @name utils_wd
 #' @examples
@@ -649,6 +681,7 @@ random_color <- function(n = 1, distinct = FALSE){
 #' \dontrun{
 #' get_wd_here()
 #' set_wd_here()
+#' open_wd_here()
 #' }
 set_wd_here <- function(path = NULL){
   if(!requireNamespace("rstudioapi", quietly = TRUE)) {
@@ -672,13 +705,13 @@ set_wd_here <- function(path = NULL){
       cat(paste0("Cannot change working directory to '", dir_path, "'."))
       done <- readline(prompt = "Do you want to create this folder now? (y/n) ")
       if(done == "y"){
-       dir.create(dir_path)
-       message("Directory '", dir_path, "' created.")
-       setwd(dir_path)
-       message("Working directory set to '", dir_path, "'")
+        dir.create(dir_path)
+        message("Directory '", dir_path, "' created.")
+        setwd(dir_path)
+        message("Working directory set to '", dir_path, "'")
       }
     } else{
-    message("Working directory set to '", dir_path, "'")
+      message("Working directory set to '", dir_path, "'")
     }
   }
 }
@@ -705,3 +738,22 @@ get_wd_here <- function(path = NULL){
     dir_path
   }
 }
+#' @export
+#' @name utils_wd
+open_wd_here <- function(path = get_wd_here()){
+  if(!requireNamespace("utils", quietly = TRUE)) {
+    if(interactive() == TRUE){
+      inst <-
+        switch(menu(c("Yes", "No"), title = "Package {utils} required but not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        install.packages("utils", quiet = TRUE)
+      } else{
+        message("To use `open_wd_here()`, first install {utils}.")
+      }
+    }
+  } else{
+    utils::browseURL(url = path)
+  }
+}
+
