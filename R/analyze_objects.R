@@ -717,7 +717,7 @@ analyze_objects <- function(img,
         object_rgb <- subset(object_rgb, id %in% shape$id)
         object_rgb <- cbind(object_rgb, rgb_to_hsb(object_rgb[, 2:4]))
         # indexes by id
-        indexes <-
+        tmp <-
           by(object_rgb,
              INDICES = object_rgb$id,
              FUN = function(x){
@@ -730,11 +730,13 @@ analyze_objects <- function(img,
                )
              }
           )
-        indexes <-
+        tmp <-
           do.call(rbind,
-                  lapply(indexes, data.frame)
+                  lapply(tmp, data.frame)
           )
-        indexes <- data.frame(cbind(id = object_rgb$id, indexes))
+        colnames(tmp) <- ind_name
+        object_rgb <- cbind(object_rgb, tmp)
+        indexes <- data.frame(cbind(id = object_rgb$id, tmp))
         colnames(indexes) <- c("id", ind_name)
         indexes <- aggregate(. ~ id, indexes, mean, na.rm = TRUE)
       } else{

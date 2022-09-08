@@ -425,9 +425,9 @@ summary_index <- function(object,
   if(!is.null(index)){
 
     if(isFALSE(select_higher)){
-      ids <- which(obj_in[[index]] <= cut_point)
+      ids <- obj_in$id[which(obj_in$DGCI <= cut_point)]
     } else{
-      ids <- which(obj_in[[index]] >= cut_point)
+      ids <- obj_in$id[which(obj_in$DGCI >= cut_point)]
     }
     temp <- object$object_rgb
     indexes <-
@@ -439,6 +439,7 @@ summary_index <- function(object,
                           }
               ), data.frame)
       )
+
     res <-
       transform(temp,
                 threshold = ifelse(indexes[[1]] == TRUE, "less", "greater"),
