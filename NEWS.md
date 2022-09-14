@@ -14,6 +14,8 @@
 
 * `make_brush()`, `make_mask()`, and `image_segment_mask()` to create masks and segment images based on such a mask.
 
+* `image_segment_manual()`, `image segment kmeans()`, and `image_segment_mask()` to perform image segmentation in different ways.
+
 ## New features
 * Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.
 

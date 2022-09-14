@@ -542,12 +542,13 @@ compute_measures <- function(mask,
       data.frame(EBImage::computeFeatures.moment(mask))
     )[valid, ]
   ocont <- ocont[valid]
+  names(ocont) <- valid
   ch <- conv_hull(ocont)
   area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
   shape$s.perimeter = poly_perimeter(ocont)
   lw <- poly_lw(ocont)
   shape <- transform(shape,
-                     id = 1:nrow(shape),
+                     id = as.numeric(valid),
                      radius_ratio = s.radius.max / s.radius.min,
                      diam_mean = s.radius.mean * 2,
                      diam_min = s.radius.min * 2,

@@ -1524,9 +1524,9 @@ image_binary <- function(image,
 #'   ((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
 #'   "NRGB" for normalized RGB, or "all" for all indexes. User can also
 #'   calculate your own index using the bands names, e.g. `index = "R+B/G"`.
-#' @param resize Resize the image before processing? Defaults to `30`, which
-#'   resizes the image to 30% of the original size to speed up image processing.
-#'   Set `resize = FALSE` to keep the original size of the image.
+#' @param resize Resize the image before processing? Defaults to `resize =
+#'   FALSE`. Use `resize = 50`, which resizes the image to 50% of the original
+#'   size to speed up image processing.
 #' @param re Respective position of the red-edge band at the original image
 #'   file.
 #' @param nir Respective position of the near-infrared band at the original
@@ -2213,100 +2213,206 @@ image_segment_iter <- function(image,
 
 
 
+#' Image segmentation using k-means clustering
+#'
+#' Segments image objects using clustering by the k-means clustering algorithm
+#'
+#' @param image An `Image` object.
+#' @param bands A numeric integer/vector indicating the RGB band used in the
+#'   segmentation. Defaults to `1:3`, i.e., all the RGB bands are used.
+#' @param nclasses The number of desired classes after image segmentation.
+#' @param invert Invert the segmentation? Defaults to `FALSE`. If `TRUE` the
+#'   binary matrix is inverted.
+#' @param filter Applies a median filtering in the binary matrix? Defaults to
+#'   `FALSE`. Use a numeric integer to indicate the size of the median filter.
+#' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
+#' @param plot Plot the segmented image?
+#' @return A list with the following values:
+#' * `image` The segmented image considering only two classes (foreground and
+#' background)
+#' * `clusters` The class of each pixel. For example, if `ncluster = 3`,
+#' `clusters` will be a two-way matrix with values ranging from 1 to 3.
+#' `masks` A list with the binary matrices showing the segmentation.
+#' @export
+#' @references Hartigan, J. A. and Wong, M. A. (1979). Algorithm AS 136: A
+#'   K-means clustering algorithm. Applied Statistics, 28, 100–108.
+#'   \doi{10.2307/2346830}
+#'
+#' @examples
+#' img <- image_pliman("la_leaves.jpg", plot = TRUE)
+#' seg <- image_segment_kmeans(img)
+#' seg <- image_segment_kmeans(img, fill_hull = TRUE, invert = TRUE, filter = 10)
 
-image_segment_manual <-  function(img,
+image_segment_kmeans <-   function (image,
+                                    bands = 1:3,
+                                    nclasses = 2,
+                                    invert = FALSE,
+                                    filter = FALSE,
+                                    fill_hull = FALSE,
+                                    plot = TRUE){
+  imm <- image@.Data[, , bands]
+  if(length(dim(imm)) < 3){
+    imb <- data.frame(B1 = image_to_mat(imm)[,3])
+  } else{
+    imb <- image_to_mat(imm)[, -c(1, 2)]
+  }
+  x <- suppressWarnings(stats::kmeans(imb, nclasses))
+  x2 <- x3 <- x$cluster
+  nm <- names(sort(table(x2)))
+  for (i in 1:length(nm)) {
+    x3[x2 == nm[i]] <- i
+  }
+  m <- matrix(x3, nrow = dim(image)[1])
+  LIST <- list()
+  for (i in 1:length(nm)) {
+    list <- list(m == i)
+    LIST <- c(LIST, list)
+  }
+  if(isTRUE(fill_hull)){
+    LIST <- lapply(LIST, EBImage::fillHull)
+  }
+  if(is.numeric(filter) & filter > 1){
+    LIST <- lapply(LIST, EBImage::medianFilter, size = filter)
+  }
+  mask <- LIST[[1]]
+  if(isFALSE(invert)){
+    id <- which(mask == 1)
+  } else{
+    id <- which(mask != 1)
+  }
+  im2 <- image
+  im2@.Data[, , 1][id] <- 1
+  im2@.Data[, , 2][id] <- 1
+  im2@.Data[, , 3][id] <- 1
+  if(isTRUE(plot)){
+    if(nclasses == 2){
+      plot(im2)
+    } else{
+      suppressWarnings(image(m, useRaster = TRUE))
+    }
+  }
+  return(list(image = im2,
+              clusters = m,
+              masks = LIST))
+}
+
+
+#' Image segmentation by hand
+#'
+#' Segments image objects 'by hand'. The user will need to pick the perimeter of
+#' the object to be segmented. So, this only works in an interactive section.
+#'
+#' @param image An `Image` object.
+#' @param type The type of segmentation. By default (`type = "select"`) objects
+#'   are selected. Use `type = "remove"` to remove the selected area from the
+#'   image.
+#' @param resize By default, the segmented object is resized to fill the
+#'   original image size. Use `resize = FALSE` to keep the segmented object in
+#'   the original scale.
+#' @param edge Number of pixels to add in the edge of the segmented object when
+#'   `resize = TRUE`. Defaults to 5.
+#' @param plot Plot the segmented object? Defaults to `TRUE`.
+#'
+#' @return A list with the segmented image and the mask used for segmentation.
+#' @export
+#'
+#' @examples
+#' if (interactive()) {
+#' img <- image_pliman("la_leaves.jpg")
+#' seg <- image_segment_manual(img)
+#' plot(seg$mask)
+#'
+#' }
+image_segment_manual <-  function(image,
                                   type = c("select", "remove"),
                                   resize = TRUE,
+                                  edge = 5,
                                   plot = TRUE){
-  plot(img)
-  message("Create a mask by clicking in the image")
-  stop <- FALSE
-  n <- 1e+06
-  coor <- NULL
-  a <- 0
-  while (isFALSE(stop)) {
-    if (a > 1) {
-      if (nrow(coor) > 1) {
-        lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
-                                                            1):nrow(coor), 2], col = col)
+  if (isTRUE(interactive())) {
+    plot(image)
+    message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
+    stop <- FALSE
+    n <- 1e+06
+    coor <- NULL
+    a <- 0
+    while (isFALSE(stop)) {
+      if (a > 1) {
+        if (nrow(coor) > 1) {
+          lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
+                                                              1):nrow(coor), 2], col = "red")
+        }
+      }
+      x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+      if (is.null(x)){
+        stop <- TRUE
+      }
+      coor <- rbind(coor, x)
+      a <- a + 1
+      if (a >= n) {
+        stop = TRUE
       }
     }
-    x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
-    if (is.null(x)){
-      stop <- TRUE
+    coor <- rbind(coor, coor[1, ])
+    mat <- NULL
+    for (i in 1:(nrow(coor) - 1)) {
+      c1<-  coor[i, ]
+      c2 <- coor[i + 1, ]
+      a <- c1[2]
+      b <- (c2[2] - c1[2])/(c2[1] - c1[1])
+      Xs <- round(c1[1], 0):round(c2[1], 0) - round(c1[1], 0)
+      Ys <- round(a + b * Xs, 0)
+      mat <- rbind(mat, cbind(Xs + round(c1[1], 0), Ys))
+      lines(Xs + round(c1[1], 0), Ys, col = "red")
     }
-    coor <- rbind(coor, x)
-    a <- a + 1
-    if (a >= n) {
-      stop = TRUE
+    n = dim(image)
+    imF = matrix(0, n[1], n[2])
+    id = unique(mat[, 1])
+    for (i in id) {
+      coorr <- mat[mat[, 1] == i, ]
+      imF[i, min(coorr[, 2], na.rm = T):max(coorr[, 2], na.rm = T)] = 1
     }
-  }
-  coor <- rbind(coor, coor[1, ])
-  mat <- NULL
-  for (i in 1:(nrow(coor) - 1)) {
-    c1<-  coor[i, ]
-    c2 <- coor[i + 1, ]
-    a <- c1[2]
-    b <- (c2[2] - c1[2])/(c2[1] - c1[1])
-    Xs <- round(c1[1], 0):round(c2[1], 0) - round(c1[1], 0)
-    Ys <- round(a + b * Xs, 0)
-    mat <- rbind(mat, cbind(Xs + round(c1[1], 0), Ys))
-    lines(Xs + round(c1[1], 0), Ys, col = col)
-  }
-  n = dim(img)
-  imF = matrix(0, n[1], n[2])
-  id = unique(mat[, 1])
-  for (i in id) {
-    coorr <- mat[mat[, 1] == i, ]
-    imF[i, min(coorr[, 2], na.rm = T):max(coorr[, 2], na.rm = T)] = 1
-  }
-  mask <- EBImage::fillHull(EBImage::bwlabel(imF))
-  # return(mask)
-  if(type[1] == "select"){
-    id <- mask != 1
-  } else{
-    id <- mask == 1
-  }
-  img@.Data[, , 1][id] = 1
-  img@.Data[, , 2][id] = 1
-  img@.Data[, , 3][id] = 1
+    mask <- EBImage::fillHull(EBImage::bwlabel(imF))
+    # return(mask)
+    if(type[1] == "select"){
+      id <- mask != 1
+    } else{
+      id <- mask == 1
+    }
+    image@.Data[, , 1][id] = 1
+    image@.Data[, , 2][id] = 1
+    image@.Data[, , 3][id] = 1
 
-  if(isTRUE(resize)){
-    # get_coordinates <- function(data_mask, edge) {
-    nrows <- nrow(mask)
-    ncols <- ncol(mask)
-    a <- apply(mask, 2, function(x) {
-      any(x != 0)
-    })
-    col_min <- min(which(a == TRUE))
-    col_min <- ifelse(col_min < 1, 1, col_min)
-    col_max <- max(which(a == TRUE))
-    col_max <- ifelse(col_max > ncols, ncols, col_max)
-    b <- apply(mask, 1, function(x) {
-      any(x != 0)
-    })
-    row_min <- min(which(b == TRUE))
-    row_min <- ifelse(row_min < 1, 1, row_min)
-    row_max <- max(which(b == TRUE))
-    row_max <- ifelse(row_max > nrows, nrows, row_max)
-    img <- img[row_min:row_max, col_min:col_max, 1:3]
+    if(isTRUE(resize)){
+      nrows <- nrow(mask)
+      ncols <- ncol(mask)
+      a <- apply(mask, 2, function(x) {
+        any(x != 0)
+      })
+      col_min <- min(which(a == TRUE))
+      col_min <- ifelse(col_min < 1, 1, col_min) - edge
+      col_max <- max(which(a == TRUE))
+      col_max <- ifelse(col_max > ncols, ncols, col_max) + edge
+      b <- apply(mask, 1, function(x) {
+        any(x != 0)
+      })
+      row_min <- min(which(b == TRUE))
+      row_min <- ifelse(row_min < 1, 1, row_min) - edge
+      row_max <- max(which(b == TRUE))
+      row_max <- ifelse(row_max > nrows, nrows, row_max) + edge
+      image <- image[row_min:row_max, col_min:col_max, 1:3]
+    }
+    if(isTRUE(plot)){
+      plot(image)
+    }
+    return(list(image = image, mask = EBImage::Image(mask)))
   }
-  if(isTRUE(plot)){
-    plot(img)
-  }
-  return(list(img = img, mask = mask))
 }
 
 
 
-
-
-
-
-#' Convert an image to numerical matrices
+#' Convert an image to a data.frame
 #'
-#' Given an object image, converts it into three matrices (RGB) and a data frame
-#' where each column corresponds to the RGB values.
+#' Given an object image, converts it into a data frame where each row corresponds to the intensity values of each pixel in the image.
 #' @param image An image object.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
@@ -2348,16 +2454,17 @@ image_to_mat <- function(image,
     }
     return(structure(res, class = "img_mat_list"))
   } else{
-    d <- match.call()
-    ncols <- ncol(image@.Data[,,1])
-    im <- cbind(c(image@.Data[,,1]), c(image@.Data[,,2]), c(image@.Data[,,3]))
-    df_in <- transform(data.frame(im), code = paste(d[["image"]]))[c(4, 1, 2, 3)]
-    colnames(df_in) <-  c("CODE", "R", "G", "B")
-    rbg <- list(R = matrix(im[, 1], ncol = ncols),
-                G = matrix(im[, 2], ncol = ncols),
-                B = matrix(im[, 3], ncol = ncols),
-                df_in = df_in)
-    return(rbg)
+    mat <- cbind(expand.grid(Row = 1:dim(image)[1], Col = 1:dim(image)[2]))
+    if(length(dim(image)) == 3){
+      for (i in 1:dim(image)[3]) {
+        mat <- cbind(mat, c(image[, , i]))
+      }
+      colnames(mat) = c("row", "col", paste0("B", 1:dim(image)[3]))
+    } else{
+      mat <- cbind(mat, c(image))
+      colnames(mat) = c("row", "col", "B1")
+    }
+    return(mat)
   }
 }
 
@@ -2368,87 +2475,97 @@ image_to_mat <- function(image,
 #' to the RGB values.
 #' @param image An image object.
 #' @param npal The number of color palettes.
-#' @param filter Performs median filtering. This can be useful to reduce the
-#'   noise in produced palettes. Defaults to `TRUE`. See more at
-#'   [image_filter()].
-#' @param blur Performs blurring filter of palettes?  Defaults to `FALSE`. See
-#'   more at [image_blur()].
-#' @param parallel Processes the images asynchronously (in parallel) in separate
-#'   R sessions running in the background on the same machine. It may speed up
-#'   the processing time when `image` is a list. The number of sections is set
-#'   up to 70% of available cores.
-#' @param workers A positive numeric scalar or a function specifying the maximum
-#'   number of parallel processes that can be active at the same time.
-#' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @return
-#' * `image_palette()` returns a list with `npal` color palettes of class `Image`.
-#' *
+#' @param proportional Creates a joint palette with proportional size equal to
+#'   the number of pixels in the image? Defaults to `TRUE`.
+#' @param plot Plot the generated palette? Defaults to `TRUE`.
+#' @return `image_palette()` returns a list with two elements:
+#' * `palette_list` A list with `npal` color palettes of class `Image`.
+#' * `joint` An object of class `Image` with the color palettes
 #' @name palettes
 #' @export
+#' @importFrom stats na.omit
 #' @examples
 #' \donttest{
 #' library(pliman)
-#'img <- image_pliman("sev_leaf_nb.jpg")
+#'img <- image_pliman("sev_leaf.jpg")
 #'pal <- image_palette(img, npal = 4)
-#'image_combine(pal)
 #'
+#'image_combine(pal$palette_list)
 #'
-#'# runs only in an iterative section
-#' if(FALSE){
-#' pick_palette(img)
-#' }
 #'}
-image_palette <- function(image,
-                          npal,
-                          filter = TRUE,
-                          blur = FALSE,
-                          parallel = FALSE,
-                          workers = NULL,
-                          verbose = TRUE){
-  check_ebi()
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
-      stop("All images must be of class 'Image'")
-    }
-    if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, c("image", "image_to_mat"))
-      on.exit(stopCluster(clust))
-      if(verbose == TRUE){
-        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      }
-      res <- parLapply(clust, image, image_palette, npal)
-    } else{
-      res <- lapply(image, image_palette, npal)
-    }
-    return(structure(res, class = "palette_list"))
-  } else{
-    imgRGB <-
-      data.frame(R = as.vector(image[,,1]),
-                 G = as.vector(image[,,2]),
-                 B = as.vector(image[,,3]))
-    kms <- kmeans(imgRGB, centers = npal)
-    rgbs <- list()
-    for (i in 1:npal) {
-      ID <- which(kms$cluster == i)
-      dim_mat <- trunc(sqrt(length(ID))*0.9)
-      ID <- sample(ID[1:dim_mat^2])
-      R <- image@.Data[,,1][ID]
-      G <- image@.Data[,,2][ID]
-      B <- image@.Data[,,3][ID]
-      pal <- EBImage::Image(c(R, G, B), dim = c(dim_mat, dim_mat, 3), colormode = "Color")
-      if(filter == TRUE){
-        pal <- image_filter(pal, size = 2)
-      }
-      if(blur == TRUE){
-        pal <- image_blur(pal, sigma = 1)
-      }
-      rgbs[[i]] <-  pal
-    }
-    return(rgbs)
+image_palette <- function (image,
+                           npal = 2,
+                           proportional = TRUE,
+                           plot = TRUE) {
+  id <- matrix(TRUE,
+               nrow = nrow(image@.Data[, , 1]),
+               ncol = ncol(image@.Data[, , 1]))
+  ck <- image_segment_kmeans(image, nclasses = npal, plot = FALSE)[["masks"]]
+  layers = length(ck)
+  ck2 <- 1 * ck[[1]]
+  for (i in 2:layers) {
+    ck2 <- ck2 + i * ck[[i]]
   }
+  ck <- ck2
+  MAT <- NULL
+  for (i in unique(na.omit(c(ck)))) {
+    r = mean(image@.Data[, , 1][ck == i], na.rm = T)
+    g = mean(image@.Data[, , 2][ck == i], na.rm = T)
+    b = mean(image@.Data[, , 3][ck == i], na.rm = T)
+    MAT = cbind(MAT, c(r = r, g = g, b = b))
+  }
+  pal_list <- list()
+  for(i in 1:ncol(MAT)){
+    R <- matrix(rep(MAT[[1, i]], 10000), 100, 100)
+    G <- matrix(rep(MAT[[2, i]], 10000), 100, 100)
+    B <- matrix(rep(MAT[[3, i]], 10000), 100, 100)
+    pal_list[[paste0("pal_", i)]] <- EBImage::rgbImage(R, G, B)
+  }
+  MATn <- NULL
+  for (i in unique(na.omit(c(ck)))) {
+    r <- length(na.omit(image@.Data[, , 1][ck == i]))
+    MATn <- cbind(MATn, r = r)
+  }
+  if (proportional == FALSE) {
+    n <- ncol(MAT)
+    ARR <- array(NA, dim = c(150, 66 * n, 3))
+    c = 1
+    f = 66
+    for (i in 1:n) {
+      ARR[1:150, c:f, 1] <- MAT[1, i]
+      ARR[1:150, c:f, 2] <- MAT[2, i]
+      ARR[1:150, c:f, 3] <- MAT[3, i]
+      c = f + 1
+      f = f + 66
+    }
+  }
+  if (proportional == TRUE) {
+    n <- ncol(MAT)
+    ARR <- array(NA, dim = c(150, 66 * n, 3))
+    nn <- round(66 * n * (MATn/sum(MATn)), 0)
+    a <- 1
+    b <- nn[1]
+    nn <- c(nn, 0)
+    for (i in 1:n) {
+      ARR[1:150, a:b, 1] <- MAT[1, i]
+      ARR[1:150, a:b, 2] <- MAT[2, i]
+      ARR[1:150, a:b, 3] <- MAT[3, i]
+      a <- b + 1
+      b <- b + nn[i + 1]
+      if (b > (66 * n)) {
+        b <- 66 * n
+      }
+    }
+  }
+  im2 <- EBImage::as.Image(ARR)
+  EBImage::colorMode(im2) <- 2
+  if (plot == TRUE) {
+    plot(im2)
+  }
+  return(list(palette_list = pal_list,
+              joint = im2))
 }
+
 
 
 #' Utilities for image resolution

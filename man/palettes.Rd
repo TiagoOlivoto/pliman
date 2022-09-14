@@ -5,42 +5,23 @@
 \alias{image_palette}
 \title{Create image palettes}
 \usage{
-image_palette(
-  image,
-  npal,
-  filter = TRUE,
-  blur = FALSE,
-  parallel = FALSE,
-  workers = NULL,
-  verbose = TRUE
-)
+image_palette(image, npal = 2, proportional = TRUE, plot = TRUE)
 }
 \arguments{
 \item{image}{An image object.}
 
 \item{npal}{The number of color palettes.}
 
-\item{filter}{Performs median filtering. This can be useful to reduce the
-noise in produced palettes. Defaults to \code{TRUE}. See more at
-\code{\link[=image_filter]{image_filter()}}.}
+\item{proportional}{Creates a joint palette with proportional size equal to
+the number of pixels in the image? Defaults to \code{TRUE}.}
 
-\item{blur}{Performs blurring filter of palettes?  Defaults to \code{FALSE}. See
-more at \code{\link[=image_blur]{image_blur()}}.}
-
-\item{parallel}{Processes the images asynchronously (in parallel) in separate
-R sessions running in the background on the same machine. It may speed up
-the processing time when \code{image} is a list. The number of sections is set
-up to 70\% of available cores.}
-
-\item{workers}{A positive numeric scalar or a function specifying the maximum
-number of parallel processes that can be active at the same time.}
-
-\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
+\item{plot}{Plot the generated palette? Defaults to \code{TRUE}.}
 }
 \value{
+\code{image_palette()} returns a list with two elements:
 \itemize{
-\item \code{image_palette()} returns a list with \code{npal} color palettes of class \code{Image}.
-\item 
+\item \code{palette_list} A list with \code{npal} color palettes of class \code{Image}.
+\item \code{joint} An object of class \code{Image} with the color palettes
 }
 }
 \description{
@@ -50,14 +31,10 @@ to the RGB values.
 \examples{
 \donttest{
 library(pliman)
-img <- image_pliman("sev_leaf_nb.jpg")
+img <- image_pliman("sev_leaf.jpg")
 pal <- image_palette(img, npal = 4)
-image_combine(pal)
 
+image_combine(pal$palette_list)
 
-# runs only in an iterative section
-if(FALSE){
-pick_palette(img)
-}
 }
 }

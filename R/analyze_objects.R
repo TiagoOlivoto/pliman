@@ -673,8 +673,8 @@ analyze_objects <- function(img,
       if(!is.null(upper_circ)){
         shape <- shape[shape$circularity < upper_circ, ]
       }
-      object_contour <- object_contour[shape$id]
-      ch <- ch[shape$id]
+      object_contour <- object_contour[as.character(shape$id)]
+      ch <- ch[as.character(shape$id)]
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)

@@ -32,9 +32,8 @@ target mode for conversion to binary image. Use \code{\link[=pliman_indexes]{pli
 "NRGB" for normalized RGB, or "all" for all indexes. User can also
 calculate your own index using the bands names, e.g. \code{index = "R+B/G"}.}
 
-\item{resize}{Resize the image before processing? Defaults to \code{30}, which
-resizes the image to 30\% of the original size to speed up image processing.
-Set \code{resize = FALSE} to keep the original size of the image.}
+\item{resize}{Resize the image before processing? Defaults to \code{resize = FALSE}. Use \code{resize = 50}, which resizes the image to 50\% of the original
+size to speed up image processing.}
 
 \item{re}{Respective position of the red-edge band at the original image
 file.}

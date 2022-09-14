@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_imagem.R
 \name{image_to_mat}
 \alias{image_to_mat}
-\title{Convert an image to numerical matrices}
+\title{Convert an image to a data.frame}
 \usage{
 image_to_mat(image, parallel = FALSE, workers = NULL, verbose = TRUE)
 }
@@ -25,8 +25,7 @@ containing four columns: the name of the image in \code{image} and the R, G, B
 values.
 }
 \description{
-Given an object image, converts it into three matrices (RGB) and a data frame
-where each column corresponds to the RGB values.
+Given an object image, converts it into a data frame where each row corresponds to the intensity values of each pixel in the image.
 }
 \examples{
 library(pliman)
