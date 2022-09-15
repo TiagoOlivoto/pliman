@@ -10,6 +10,7 @@
 image_import(
   image,
   ...,
+  which = 1,
   pattern = NULL,
   path = NULL,
   plot = FALSE,
@@ -31,6 +32,10 @@ image_pliman(image, plot = FALSE)
 
 \item{...}{Alternative arguments passed to the corresponding functions from
 the \code{jpeg}, \code{png}, and \code{tiff} packages.}
+
+\item{which}{logical scalar or integer vector to indicate which image are
+imported if a TIFF files is informed. Defaults to \code{1} (the first image is
+returned).}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working

@@ -8,9 +8,9 @@ image_shp(
   img,
   rows = 1,
   cols = 1,
-  col_line = "blue",
+  col_line = "red",
   size_line = 2,
-  col_text = "blue",
+  col_text = "red",
   size_text = 1
 )
 }
@@ -22,7 +22,7 @@ image_shp(
 \item{cols}{The number of desired columns in the grid. Defaults to \code{1}.}
 
 \item{col_line, col_text}{The color of the line/text in the grid. Defaults to
-\code{"blue"}.}
+\code{"red"}.}
 
 \item{size_line, size_text}{The size of the line/text in the grid. Defaults to
 \code{2.5}.}

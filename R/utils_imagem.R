@@ -76,6 +76,9 @@ image_combine <- function(...,
 #' * For `image_export()`, an Image object, an array or a list of images.
 #' * For `image_pliman()`, a charactere value specifying the image example. See
 #' `?pliman_images` for more details.
+#' @param which logical scalar or integer vector to indicate which image are
+#'   imported if a TIFF files is informed. Defaults to `1` (the first image is
+#'   returned).
 #' @param name An string specifying the name of the image. It can be either a
 #'   character with the image name (e.g., "img1") or name and extension (e.g.,
 #'   "img1.jpg"). If none file extension is provided, the image will be saved as
@@ -122,13 +125,14 @@ image_combine <- function(...,
 #' image_import(image = file, path = path)
 image_import <- function(image,
                          ...,
+                         which = 1,
                          pattern = NULL,
                          path = NULL,
                          plot = FALSE,
                          nrow = NULL,
                          ncol = NULL){
   check_ebi()
-  valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF")
+  valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF", "TIF", "tif")
   if(!is.null(pattern)){
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -177,7 +181,11 @@ image_import <- function(image,
       }
       return(ls)
     } else{
-      img <- EBImage::readImage(img_name, ...)
+      if(file_extension(image) %in% c("tif", "TIF", "tiff", "TIFF")){
+        img <- suppressWarnings(EBImage::readImage(img_name, all = which, ...))
+      } else{
+        img <- EBImage::readImage(img_name, ...)
+      }
       if(isTRUE(plot)){
         plot(img)
       }
@@ -469,7 +477,7 @@ image_crop <- function(image,
     if (is.null(width) & is.null(height)) {
       message("Use the left mouse buttom to crop the image.")
       plot(image)
-      cord <- locator(type = "p", n = 2, col = "red", pch = 22)
+      cord <- locator(type = "p", n = 2, col = "red", pch = 19)
       w <- round(cord$x[[1]], 0):round(cord$x[[2]], 0)
       h <- round(cord$y[[1]], 0):round(cord$y[[2]], 0)
       cord <- apply(data.frame(do.call(rbind, cord)), 2, round, digits = 0)

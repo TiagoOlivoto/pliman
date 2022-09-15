@@ -202,7 +202,8 @@ get_measures <- function(object,
   }
 
   if("img" %in% names(res)){
-    if(class(object) != "plm_disease_byl"){
+    if(!inherits(object, "plm_disease_byl") & !inherits(object, "anal_obj")){
+      res$img <- as.numeric(gsub(pattern = "img", x = res$img, replacement = ""))
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -218,7 +219,7 @@ get_measures <- function(object,
                 })
         )
       names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[6:ncol(res)]))
-      smr$img <- unique(res$img)
+      smr$img <- paste0("img", unique(res$img))
       smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
       smr$area_sd[is.na(smr$area_sd)] <- 0
       merg <- smr
@@ -247,6 +248,7 @@ get_measures <- function(object,
     }
 
     if(inherits(object, "plm_disease_byl")){
+      res$img <- as.numeric(gsub(pattern = "shp", x = res$img, replacement = ""))
       smr <-
         do.call(cbind,
                 lapply(6:ncol(res), function(i){
@@ -262,7 +264,7 @@ get_measures <- function(object,
                 })
         )
       names(smr) <- c("n", "area_sum", "area_mean", "area_sd",  names(res[7:ncol(res)]))
-      smr$img <- unique(res$img)
+      smr$img <- paste0("img", unique(res$img))
       smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
       smr$area_sd[is.na(smr$area_sd)] <- 0
       merg <- smr
@@ -278,6 +280,7 @@ get_measures <- function(object,
                 })
         )
       mergt$img <- unique(merg$img)
+
       mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
       names(mergt) <- names(smr)
       smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
@@ -290,6 +293,48 @@ get_measures <- function(object,
              merge = mergt)
 
     }
+
+    if(inherits(object, "anal_obj")){
+      index <- object$object_index
+      if(!is.null(index)){
+        index$img <- as.numeric(gsub(pattern = "obj", x = index$img, replacement = ""))
+        aggr <-
+          do.call(cbind,
+                  lapply(3:ncol(index), function(i){
+                    aggregate(index[[i]] ~ img, index, mean, na.rm = TRUE)[2]
+                  })
+          )
+        names(aggr) <- c(names(index[3:ncol(index)]))
+        aggr$img <- paste0("obj", unique(index$img))
+        aggr <- aggr[,c(ncol(aggr), 1:(ncol(aggr)-1))]
+      } else{
+        aggr <- NULL
+      }
+      res_img <- res$img
+      res$img <- as.numeric(gsub(pattern = "obj", x = res$img, replacement = ""))
+      smr <-
+        do.call(cbind,
+                lapply(5:ncol(res), function(i){
+                  if(i  %in% c(5, 6, 28)){
+                    aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                  } else{
+                    aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
+                  }
+                })
+        )
+      names(smr) <- c("area", names(res[6:ncol(res)]))
+      smr$img <- paste0("obj", unique(res$img))
+      res$img <- res_img
+      smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
+      smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
+      res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
+      rownames(res) <- NULL
+      out <-
+        list(results = res,
+             summary = smr,
+             index = aggr)
+    }
+
     class(out) <- c("measures_ls")
     return(out)
   } else{
@@ -311,47 +356,108 @@ plot_measures <- function(object,
                           size = 0.9,
                           col = "white",
                           ...){
-  if("measures"  %in% class(object)){
-    object <- object
-  } else if(inherits(object, "anal_obj")){
+  if("shapefiles" %in% names(object)){
+    meas <- get_measures(object)$summary
     index <- object$object_index
-    object <- object$results
-  } else if(inherits(object, "objects_rgb")){
-    object <- object$objects
-  } else if(inherits(object, "plm_disease")){
-    object <- object$shape
-  } else{
-    stop("Object of ivalid class.")
-  }
-  if(is.null(id)){
-    id <- object$id
-  } else{
-    id <- id
-  }
-  object <- object[which(object$id %in% id), ]
-  if(measure %in% colnames(object)){
-    hjust <- ifelse(is.null(hjust), 0, hjust)
-    vjust <- ifelse(is.null(vjust), 0, vjust)
-    text(x = object[,2] + hjust,
-         y = object[,3] - vjust,
-         labels = round(object[, which(colnames(object) == measure)], digits),
-         col = col,
-         cex = size,
-         ...)
-  } else{
+    shapefiles <- object$shapefiles
+    coords <-
+      do.call(rbind,
+              lapply(shapefiles, function(x){
+                data.frame(x = mean(x$x[-1]), y = mean(x$y[-1]))
+              }))
+    object <- cbind(shp = meas[,1], coords, meas[,2:ncol(meas)])
+
     if(!is.null(index)){
-      measures <- colnames(index)
-      if(!measure %in% measures){
-        stop("'measure' must be one of {", paste(c(colnames(object), measures), collapse = ", "),"}.", call. = FALSE)
-      }
-      text(x = object[,2],
-           y = object[,3],
-           labels = round(index[which(index$id %in% object$id), which(colnames(index) == measure)], digits),
+
+      index$img <- as.numeric(gsub(pattern = "obj", x = index$img, replacement = ""))
+      aggr <-
+        do.call(cbind,
+                lapply(3:ncol(index), function(i){
+                  aggregate(index[[i]] ~ img, index, mean, na.rm = TRUE)[2]
+                })
+        )
+      names(aggr) <- c(names(index[3:ncol(index)]))
+      aggr$img <- paste0("obj", unique(index$img))
+      aggr <- aggr[,c(ncol(aggr), 1:(ncol(aggr)-1))]
+      aggr <- cbind(obj = aggr[,1], coords, data.frame(aggr[,2:ncol(aggr)]))
+      colnames(aggr) <- c("obj", "x", "y", colnames(index)[3:ncol(index)])
+      index <- aggr
+    } else{
+      index <- NULL
+    }
+
+
+    if(measure %in% colnames(object)){
+      hjust <- ifelse(is.null(hjust), 0, hjust)
+      vjust <- ifelse(is.null(vjust), 0, vjust)
+      text(x = object[,2] + hjust,
+           y = object[,3] - vjust,
+           labels = round(object[, which(colnames(object) == measure)], digits),
            col = col,
            cex = size,
            ...)
     } else{
-      stop("'measure' must be one of {", paste(colnames(object), collapse = ", "),"}.", call. = FALSE)
+      if(!is.null(index)){
+        measures <- colnames(index)
+        if(!measure %in% measures){
+          stop("'measure' must be one of {", paste(c(colnames(object), measures), collapse = ", "),"}.", call. = FALSE)
+        }
+        text(x = index[,2],
+             y = index[,3],
+             labels = round(index[, which(colnames(index) == measure)], digits),
+             col = col,
+             cex = size,
+             ...)
+      } else{
+        stop("'measure' must be one of {", paste(colnames(object), collapse = ", "),"}.", call. = FALSE)
+      }
+    }
+
+
+  } else{
+    if("measures"  %in% class(object)){
+      object <- object
+    } else if(inherits(object, "anal_obj")){
+      index <- object$object_index
+      object <- object$results
+    } else if(inherits(object, "objects_rgb")){
+      object <- object$objects
+    } else if(inherits(object, "plm_disease")){
+      object <- object$shape
+    } else{
+      stop("Object of ivalid class.")
+    }
+    if(is.null(id)){
+      id <- object$id
+    } else{
+      id <- id
+    }
+    object <- object[which(object$id %in% id), ]
+
+    if(measure %in% colnames(object)){
+      hjust <- ifelse(is.null(hjust), 0, hjust)
+      vjust <- ifelse(is.null(vjust), 0, vjust)
+      text(x = object[,2] + hjust,
+           y = object[,3] - vjust,
+           labels = round(object[, which(colnames(object) == measure)], digits),
+           col = col,
+           cex = size,
+           ...)
+    } else{
+      if(!is.null(index)){
+        measures <- colnames(index)
+        if(!measure %in% measures){
+          stop("'measure' must be one of {", paste(c(colnames(object), measures), collapse = ", "),"}.", call. = FALSE)
+        }
+        text(x = object[,2],
+             y = object[,3],
+             labels = round(index[which(index$id %in% object$id), which(colnames(index) == measure)], digits),
+             col = col,
+             cex = size,
+             ...)
+      } else{
+        stop("'measure' must be one of {", paste(colnames(object), collapse = ", "),"}.", call. = FALSE)
+      }
     }
   }
 }
@@ -513,6 +619,7 @@ names_measures <- function(){
     "circularity",
     "circularity_haralick",
     "circularity_norm",
+    "coverage",
     "asm",
     "con",
     "cor",
@@ -541,6 +648,7 @@ compute_measures <- function(mask,
       data.frame(EBImage::computeFeatures.shape(mask)),
       data.frame(EBImage::computeFeatures.moment(mask))
     )[valid, ]
+  coverage <- length(which(mask == 1)) / length(mask)
   ocont <- ocont[valid]
   names(ocont) <- valid
   ch <- conv_hull(ocont)
@@ -555,6 +663,7 @@ compute_measures <- function(mask,
                      diam_max = s.radius.max * 2,
                      length = lw[, 1],
                      width = lw[, 2],
+                     coverage = s.area / length(mask),
                      area_ch =   area_ch,
                      solidity = s.area / area_ch,
                      convexity = poly_convexity(ocont),
@@ -595,7 +704,8 @@ compute_measures <- function(mask,
                      "elongation",
                      "circularity",
                      "circularity_haralick",
-                     "circularity_norm")]
+                     "circularity_norm",
+                     "coverage")]
   shape <- cbind(shape, hal[valid, ])
   colnames(shape) <- names_measures()
   return(list(shape = shape,

@@ -9,7 +9,7 @@
 #' @param rows The number of desired rows in the grid. Defaults to `1`.
 #' @param cols The number of desired columns in the grid. Defaults to `1`.
 #' @param col_line,col_text The color of the line/text in the grid. Defaults to
-#'   `"blue"`.
+#'   `"red"`.
 #' @param size_line,size_text The size of the line/text in the grid. Defaults to
 #'   `2.5`.
 #'
@@ -26,9 +26,9 @@
 image_shp <- function(img,
                       rows = 1,
                       cols = 1,
-                      col_line = "blue",
+                      col_line = "red",
                       size_line = 2,
-                      col_text = "blue",
+                      col_text = "red",
                       size_text = 1){
   message("Select 2 points drawing the diagonal that includes the objects of interest.")
   plot(img)
@@ -177,7 +177,8 @@ object_split_shp <- function(img,
                  width = borders[[1]]:borders[[2]],
                  height = borders[[3]]:borders[[4]])
   }
-  return(imgs)
+  return(list(imgs = imgs,
+              shapefile = shapefile))
 }
 
 
@@ -282,7 +283,9 @@ analyze_objects_shp <- function(img,
     stop("When 'shapefile' is not informed, 'rows' and 'cols must be declared", call. = FALSE)
   }
   if(is.null(shapefile)){
-    spl <- object_split_shp(img, rows, cols)
+    shps <- object_split_shp(img, rows, cols)
+    spl <- shps$imgs
+    shapes <- shps$shapefile
   } else{
     shapes <- shapefile$shapefiles
     spl <- list()
@@ -358,16 +361,11 @@ analyze_objects_shp <- function(img,
     list(results = results,
          statistics = statistics,
          object_rgb = object_rgb,
-         object_index = object_index),
+         object_index = object_index,
+         shapefiles = shapes,
+         rows = rows,
+         cols = cols),
   class = "anal_obj"))
 
 }
 
-# #
-# library(pliman)
-# x11()
-# flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
-# shapefile <- image_shp(flax, 3, 5)
-#
-# res <- analyze_objects_shp(flax, shapefile, object_index = "DGCI", object_size = "medium")
-# c <- get_measures(res)

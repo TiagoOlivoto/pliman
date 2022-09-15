@@ -20,7 +20,7 @@
 \item{img}{The image that was used to compute the shapefile (optional)}
 
 \item{col_line, col_text}{The color of the line/text in the grid. Defaults to
-\code{"blue"}.}
+\code{"red"}.}
 
 \item{size_line, size_text}{The size of the line/text in the grid. Defaults to
 \code{2.5}.}
