@@ -203,7 +203,6 @@ get_measures <- function(object,
 
   if("img" %in% names(res)){
     if(!inherits(object, "plm_disease_byl") & !inherits(object, "anal_obj")){
-      res$img <- as.numeric(gsub(pattern = "img", x = res$img, replacement = ""))
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -248,7 +247,6 @@ get_measures <- function(object,
     }
 
     if(inherits(object, "plm_disease_byl")){
-      res$img <- as.numeric(gsub(pattern = "shp", x = res$img, replacement = ""))
       smr <-
         do.call(cbind,
                 lapply(6:ncol(res), function(i){
@@ -334,7 +332,6 @@ get_measures <- function(object,
              summary = smr,
              index = aggr)
     }
-
     class(out) <- c("measures_ls")
     return(out)
   } else{
@@ -343,6 +340,7 @@ get_measures <- function(object,
     return(res)
   }
 }
+
 
 
 #' @name utils_measures
@@ -528,12 +526,13 @@ summary_index <- function(object,
   }
   coords <- object$results[2:3]
   obj_in <- check_inf(object$object_index)
+  obj_in$id <- as.character(obj_in$id)
   if(!is.null(index)){
 
     if(isFALSE(select_higher)){
-      ids <- obj_in$id[which(obj_in$DGCI <= cut_point)]
+      ids <- obj_in$id[which(obj_in[[index]] <= cut_point)]
     } else{
-      ids <- obj_in$id[which(obj_in$DGCI >= cut_point)]
+      ids <- obj_in$id[which(obj_in[[index]] >= cut_point)]
     }
     temp <- object$object_rgb
     indexes <-
@@ -560,14 +559,14 @@ summary_index <- function(object,
       transform(less_ratio = round(n_less / (n_less  + n_greater), 3),
                 greater_ratio = 1 - round(n_less / (n_less  + n_greater), 3))
 
-    between_id = data.frame(
+    between_id <- data.frame(
       n = nrow(obj_in),
       nsel = length(ids),
       prop = length(ids) / nrow(obj_in),
-      mean_index_sel = mean(obj_in[[index]][ids]),
-      mean_index_nsel = mean(obj_in[[index]][!obj_in$id %in% ids])
+      mean_index_sel = mean(obj_in[[index]][obj_in$id %in% ids], na.rm = TRUE),
+      mean_index_nsel = mean(obj_in[[index]][!obj_in$id %in% ids], na.rm = TRUE)
     )
-    within_id = cbind(coords, res)[, c(3, 1, 2, 5, 4, 6, 7)]
+    within_id <- cbind(coords, res)[, c(3, 1, 2, 5, 4, 6, 7)]
 
   } else{
     ids <- NULL
@@ -591,6 +590,9 @@ summary_index <- function(object,
                  within_id = within_id,
                  pca_res = pca_res))
 }
+
+
+
 
 names_measures <- function(){
   c("id",

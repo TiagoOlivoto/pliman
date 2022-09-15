@@ -1927,7 +1927,7 @@ image_segment <- function(image,
                           verbose = TRUE){
   check_ebi()
   if(inherits(image, "img_segment")){
-    image <- image[[1]][["image"]]
+    image <- image[[1]]
   }
   if(is.list(image)){
     if(!all(sapply(image, class)  %in% c("Image", "img_segment"))){
@@ -1979,11 +1979,7 @@ image_segment <- function(image,
       img@.Data[,,1][ID] <- 1
       img@.Data[,,2][ID] <- 1
       img@.Data[,,3][ID] <- 1
-      mask <- image@.Data[,,1]
-      mask[ID] <- 1
-      mask[!ID] <- 0
-      mask <- EBImage::as.Image(mask)
-      imgs[[i]] <- list(image = img, mask = mask)
+      imgs[[i]] <- img
     }
     names(imgs) <- index
     num_plots <- length(imgs)
@@ -2001,16 +1997,21 @@ image_segment <- function(image,
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
-        plot(imgs[[i]][[1]])
+        plot(imgs[[i]])
         if(verbose == TRUE){
-          dim <- image_dimension(imgs[[i]][[1]], verbose = FALSE)
+          dim <- image_dimension(imgs[[i]], verbose = FALSE)
           text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
         }
       }
     }
-    invisible(structure(imgs, class = "img_segment"))
+    if(length(imgs) == 1){
+      return(imgs[[1]])
+    } else{
+      invisible(structure(imgs, class = "img_segment"))
+    }
   }
 }
+
 
 
 
@@ -2079,7 +2080,7 @@ image_segment_iter <- function(image,
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
       } else{
         index <- index[1]
       }
@@ -2095,12 +2096,12 @@ image_segment_iter <- function(image,
                       has_white_bg = has_white_bg,
                       ...)
       total <- length(image)
-      segm <- length(which(segmented[[1]][["image"]] != 1))
+      segm <- length(which(segmented != 1))
       prop <- segm / total * 100
       results <- data.frame(total = total,
                             segmented = segm,
                             prop = prop)
-      imgs <- list(image, segmented[[1]][["image"]])
+      imgs <- list(image, segmented)
       if(verbose){
         print(results)
       }
@@ -2118,7 +2119,7 @@ image_segment_iter <- function(image,
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
       } else{
         if(length(index) != nseg){
           stop("Length of 'index' must be equal 'nseg'.", call. = FALSE)
@@ -2162,7 +2163,7 @@ image_segment_iter <- function(image,
             switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                    "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                    "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                   "GRAY", "GLAI", "SAT", "CI", "SHP", "RI")
+                   "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
           if(is.null(indx)){
             break
           }
@@ -2186,7 +2187,7 @@ image_segment_iter <- function(image,
         rbind(total,
               do.call(rbind,
                       lapply(segmented, function(x){
-                        length(which(x[[1]][["image"]] != 1))
+                        length(which(x != 1))
                       })
               )
         )
@@ -2200,9 +2201,9 @@ image_segment_iter <- function(image,
       pixels <- data.frame(pixels)
       pixels$percent <- prop
       imgs <- lapply(segmented, function(x){
-        x[[1]][["image"]]
+        x[[1]]
       })
-      imgs <- c(list(image), imgs)
+      imgs <- c(list(image), segmented)
       names <- paste("seg", 1:length(segmented), sep = "")
       names(imgs) <- c("original", names)
       pixels <- transform(pixels, image = c("original",names))

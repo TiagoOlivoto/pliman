@@ -566,7 +566,7 @@ measure_disease <- function(img,
                                show_image = FALSE,
                                fill_hull = FALSE)
 
-          img <- seg[[1]][["image"]]
+          img <- seg
         }
         # segment disease from leaf
         if(is.null(threshold)){
