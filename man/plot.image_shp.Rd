@@ -7,9 +7,9 @@
 \method{plot}{image_shp}(
   x,
   img = NULL,
-  col_line = "blue",
+  col_line = "red",
   size_line = 2,
-  col_text = "blue",
+  col_text = "red",
   size_text = 1,
   ...
 )
@@ -34,7 +34,6 @@ A \code{NULL} object
 Draws the bounding boxes for each object computed with \code{\link[=image_shp]{image_shp()}}.
 }
 \examples{
-if(interactive()){
 library(pliman)
 flax <- image_pliman("flax_leaves.jpg")
 shape <- image_shp(flax, rows = 3, cols = 5)
@@ -42,5 +41,4 @@ shape <- image_shp(flax, rows = 3, cols = 5)
 # grid on the existing image
 plot(flax)
 plot(shape)
-}
 }

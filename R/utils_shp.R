@@ -8,32 +8,41 @@
 #' @param img An object of class `Image`
 #' @param rows The number of desired rows in the grid. Defaults to `1`.
 #' @param cols The number of desired columns in the grid. Defaults to `1`.
+#' @param interactive If `FALSE` (default) the grid is created automatically
+#'   based on the image dimension and number of rows/columns. If `interactive =
+#'   TRUE`, users must draw points at the diagonal of the desired bounding box
+#'   that will contain the grid.
 #' @param col_line,col_text The color of the line/text in the grid. Defaults to
 #'   `"red"`.
 #' @param size_line,size_text The size of the line/text in the grid. Defaults to
 #'   `2.5`.
-#'
+#' @param plot Plots the grid on the image? Defaults to `TRUE`.
 #' @return A list with `row * col` objects containing the plot coordinates.
 #' @export
 #'
 #' @examples
-#' if(interactive()){
 #' library(pliman)
-#' flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
+#' flax <- image_pliman("flax_leaves.jpg")
 #' shape <- image_shp(flax, rows = 3, cols = 5)
-#' }
 #'
 image_shp <- function(img,
                       rows = 1,
                       cols = 1,
+                      interactive = FALSE,
                       col_line = "red",
                       size_line = 2,
                       col_text = "red",
-                      size_text = 1){
-  message("Select 2 points drawing the diagonal that includes the objects of interest.")
-  plot(img)
-  cord <- locator(type = "p", n = 2, col = "red", pch = 19)
-  c1 <- data.frame(do.call(rbind, cord)) |> t()
+                      size_text = 1,
+                      plot = TRUE){
+  if(isTRUE(interactive)){
+    message("Select 2 points drawing the diagonal that includes the objects of interest.")
+    plot(img)
+    cord <- locator(type = "p", n = 2, col = "red", pch = 19)
+    c1 <- data.frame(do.call(rbind, cord)) |> t()
+  } else{
+    imgd <- dim(img)
+    c1 <- matrix(c(0, imgd[1], 0, imgd[2]), ncol = 2)
+  }
   xmin <- min(c1[,1])
   xmax <- max(c1[,1])
   ymin <- min(c1[,2])
@@ -55,7 +64,6 @@ image_shp <- function(img,
   }
   coords <- list()
   con <- 0
-  plot(img)
   for(i in 1:rows){
     for(j in 1:cols){
       con <- con + 1
@@ -63,14 +71,20 @@ image_shp <- function(img,
         data.frame(plot = con,
                    x = c(xvec[j], xvec[j + 1], xvec[j + 1], xvec[j], xvec[j]),
                    y = c(yvec[i], yvec[i], yvec[i + 1], yvec[i + 1], yvec[i]))
-      lines(tmp[, -1], col = col_line, type = "l", lwd = size_line)
-      text(min(tmp$x[-1]), min(tmp$y[-1]),
-           label = con,
-           col = col_text,
-           cex = size_text,
-           adj = c(-0.2, 1.2))
       coords[[paste0("plot_", con)]] <- tmp
     }
+  }
+  if(isTRUE(plot)){
+    plot(img)
+    d <-
+      lapply(seq_along(coords), function(i){
+        lines(coords[[i]][, -1], col = col_line, type = "l", lwd = size_line)
+        text(min(coords[[i]]$x[-1]), min(coords[[i]]$y[-1]),
+             label = i,
+             col = col_text,
+             cex = size_text,
+             adj = c(-0.2, 1.2))
+      })
   }
   lst <- list(shapefiles = coords,
               bbox = bbox,
@@ -78,6 +92,7 @@ image_shp <- function(img,
               cols = cols)
   return(structure(lst, class = "image_shp"))
 }
+
 
 
 
@@ -94,7 +109,6 @@ image_shp <- function(img,
 #' @importFrom grDevices dev.list
 #'
 #' @examples
-#' if(interactive()){
 #' library(pliman)
 #' flax <- image_pliman("flax_leaves.jpg")
 #' shape <- image_shp(flax, rows = 3, cols = 5)
@@ -102,12 +116,11 @@ image_shp <- function(img,
 #' # grid on the existing image
 #' plot(flax)
 #' plot(shape)
-#' }
 plot.image_shp <- function(x,
                            img = NULL,
-                           col_line = "blue",
+                           col_line = "red",
                            size_line = 2,
-                           col_text = "blue",
+                           col_text = "red",
                            size_text = 1,
                            ...){
   shapefiles <- x$shapefiles
@@ -154,13 +167,15 @@ plot.image_shp <- function(x,
 #' library(pliman)
 #' flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
 #' objects <- object_split_shp(flax, rows = 3, cols = 5)
-#' image_combine(objects)
+#' image_combine(objects$imgs)
 #' }
 object_split_shp <- function(img,
                              rows = 1,
                              cols = 1,
+                             interactive = FALSE,
                              ...){
-  shapefile <- image_shp(img, rows, cols, ...)$shapefiles
+  shps <- image_shp(img, rows, cols, interactive = interactive, plot = FALSE, ...)
+  shapefile <- shps$shapefiles
   imgs <- list()
   get_borders <- function(x){
     min_x <- min(x[,1])
@@ -178,7 +193,7 @@ object_split_shp <- function(img,
                  height = borders[[3]]:borders[[4]])
   }
   return(list(imgs = imgs,
-              shapefile = shapefile))
+              shapefile = shps))
 }
 
 
@@ -256,8 +271,12 @@ image_align <- function(img,
 #' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
 #'   (default), both `rows` and `cols` must be declared.
 #' @param rows,cols The number of rows and columns to generate the shapefile
-#'   when `shapefile` is not declared.
-#' @param show_image Shows the processed images? Defaults to `TRUE`.
+#'   when `shapefile` is not declared. Defaults to `1`.
+#' @param interactive If `FALSE` (default) the grid is created automatically
+#'   based on the image dimension and number of rows/columns. If `interactive =
+#'   TRUE`, users must draw points at the diagonal of the desired bounding box
+#'   that will contain the grid.
+#' @param plot Plots the processed images? Defaults to `TRUE`.
 #' @param object_size Argument to control control the watershed segmentation.
 #'   See [analyze_objects()] for more details.
 #' @param ... Aditional arguments passed on to [analyze_objects].
@@ -269,25 +288,33 @@ image_align <- function(img,
 #' @examples
 #' if(interactive()){
 #' library(pliman)
-#' flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
-#' res <- analyze_objects_shp(flax, rows = 3, cols = 5)
+#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+#' res <-
+#'    analyze_objects_shp(flax,
+#'                        rows = 3,
+#'                        cols = 5,
+#'                        plot = FALSE,
+#'                        object_index = "DGCI")
+#' plot(flax)
+#' plot(res$shapefiles)
+#' plot_measures(e, measure = "DGCI")
 #' }
 analyze_objects_shp <- function(img,
                                 shapefile = NULL,
-                                rows = NULL,
-                                cols = NULL,
-                                show_image = TRUE,
+                                rows = 1,
+                                cols = 1,
+                                interactive = FALSE,
+                                plot = TRUE,
                                 object_size = "large",
                                 ...){
-  if(is.null(shapefile) & is.null(rows)){
-    stop("When 'shapefile' is not informed, 'rows' and 'cols must be declared", call. = FALSE)
-  }
   if(is.null(shapefile)){
-    shps <- object_split_shp(img, rows, cols)
-    spl <- shps$imgs
-    shapes <- shps$shapefile
+    tmp <- object_split_shp(img, rows, cols, interactive = interactive)
+    spl <- tmp$imgs
+    shapes <- tmp$shapefile
+    shps <- tmp$shapefile
   } else{
-    shapes <- shapefile$shapefiles
+    shps <- shapefile
+    shapes <- shps$shapefiles
     spl <- list()
     rows <- shapefile$rows
     cols <- shapefile$cols
@@ -301,20 +328,20 @@ analyze_objects_shp <- function(img,
     for (i in 1:length(shapes)) {
       tmp <- shapes[[i]][-1]
       borders <- get_borders(tmp)
-      spl[[paste0("obj", i)]] <-
+      spl[[paste0("shp", i)]] <-
         image_crop(img,
                    width = borders[[1]]:borders[[2]],
                    height = borders[[3]]:borders[[4]])
     }
   }
-  if(isTRUE(show_image)){
+  if(isTRUE(plot)){
     op <- par(mfrow = c(rows, cols))
     on.exit(par(op))
   }
   list <- lapply(spl,
                  analyze_objects,
                  img,
-                 show_image = show_image,
+                 show_image = plot,
                  object_size = object_size,
                  ...)
   results <-
@@ -362,10 +389,8 @@ analyze_objects_shp <- function(img,
          statistics = statistics,
          object_rgb = object_rgb,
          object_index = object_index,
-         shapefiles = shapes,
-         rows = rows,
-         cols = cols),
-  class = "anal_obj"))
+         shapefiles = shps),
+    class = "anal_obj"))
 
 }
 

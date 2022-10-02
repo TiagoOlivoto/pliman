@@ -8,10 +8,12 @@ image_shp(
   img,
   rows = 1,
   cols = 1,
+  interactive = FALSE,
   col_line = "red",
   size_line = 2,
   col_text = "red",
-  size_text = 1
+  size_text = 1,
+  plot = TRUE
 )
 }
 \arguments{
@@ -21,11 +23,17 @@ image_shp(
 
 \item{cols}{The number of desired columns in the grid. Defaults to \code{1}.}
 
+\item{interactive}{If \code{FALSE} (default) the grid is created automatically
+based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
+that will contain the grid.}
+
 \item{col_line, col_text}{The color of the line/text in the grid. Defaults to
 \code{"red"}.}
 
 \item{size_line, size_text}{The size of the line/text in the grid. Defaults to
 \code{2.5}.}
+
+\item{plot}{Plots the grid on the image? Defaults to \code{TRUE}.}
 }
 \value{
 A list with \code{row * col} objects containing the plot coordinates.
@@ -37,10 +45,8 @@ interest in the plot space. Then, given \code{rows} and \code{cols}, a grid is d
 and the objects' coordinates are returned.
 }
 \examples{
-if(interactive()){
 library(pliman)
-flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
+flax <- image_pliman("flax_leaves.jpg")
 shape <- image_shp(flax, rows = 3, cols = 5)
-}
 
 }

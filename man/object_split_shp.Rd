@@ -4,7 +4,7 @@
 \alias{object_split_shp}
 \title{Splits image objects based on a shape file}
 \usage{
-object_split_shp(img, rows = 1, cols = 1, ...)
+object_split_shp(img, rows = 1, cols = 1, interactive = FALSE, ...)
 }
 \arguments{
 \item{img}{An object of class \code{Image}}
@@ -12,6 +12,10 @@ object_split_shp(img, rows = 1, cols = 1, ...)
 \item{rows}{The number of desired rows in the grid. Defaults to \code{1}.}
 
 \item{cols}{The number of desired columns in the grid. Defaults to \code{1}.}
+
+\item{interactive}{If \code{FALSE} (default) the grid is created automatically
+based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
+that will contain the grid.}
 
 \item{...}{Other arguments passed on to \code{\link[=image_shp]{image_shp()}}}
 }
@@ -28,6 +32,6 @@ if(interactive()){
 library(pliman)
 flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
 objects <- object_split_shp(flax, rows = 3, cols = 5)
-image_combine(objects)
+image_combine(objects$imgs)
 }
 }

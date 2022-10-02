@@ -294,8 +294,14 @@ get_measures <- function(object,
 
     if(inherits(object, "anal_obj")){
       index <- object$object_index
+      shapefiles <- object$shapefiles$shapefiles
+      coords <-
+        do.call(rbind,
+                lapply(shapefiles, function(x){
+                  data.frame(x = mean(x$x[-1]), y = mean(x$y[-1]))
+                }))
       if(!is.null(index)){
-        index$img <- as.numeric(gsub(pattern = "obj", x = index$img, replacement = ""))
+        index$img <- as.numeric(gsub(pattern = "shp", x = index$img, replacement = ""))
         aggr <-
           do.call(cbind,
                   lapply(3:ncol(index), function(i){
@@ -305,28 +311,42 @@ get_measures <- function(object,
         names(aggr) <- c(names(index[3:ncol(index)]))
         aggr$img <- paste0("obj", unique(index$img))
         aggr <- aggr[,c(ncol(aggr), 1:(ncol(aggr)-1))]
+        aggr$x <- coords$x
+        aggr$y <- coords$y
+        aggr <- aggr[, c(c("img", "x", "y"), setdiff(colnames(aggr), c("img", "x", "y")))]
       } else{
         aggr <- NULL
       }
       res_img <- res$img
-      res$img <- as.numeric(gsub(pattern = "obj", x = res$img, replacement = ""))
+      res$img <- as.numeric(gsub(pattern = "shp", x = res$img, replacement = ""))
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
                   if(i  %in% c(5, 6, 28)){
-                    aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                    if(i == 5){
+                      n <- aggregate(res[[i]] ~ img, res, length)[[2]]
+                      a <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                      cbind(n, a)
+                    } else{
+                      aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
+                    }
                   } else{
                     aggregate(res[[i]] ~ img, res, mean, na.rm = TRUE)[2]
                   }
                 })
         )
-      names(smr) <- c("area", names(res[6:ncol(res)]))
+      names(smr) <- c("n", "area", names(res[6:ncol(res)]))
       smr$img <- paste0("obj", unique(res$img))
       res$img <- res_img
       smr <- smr[,c(ncol(smr), 1:ncol(smr)-1)]
       smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
       res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
+      smr$x <- coords$x
+      smr$y <- coords$y
+      smr <- smr[, c(c("img", "x", "y", "n"), setdiff(colnames(smr), c("img", "x", "y", "n")))]
       rownames(res) <- NULL
+      class(res) <- c("data.frame", "measures")
+      class(smr) <- c("data.frame", "measures")
       out <-
         list(results = res,
              summary = smr,
@@ -357,7 +377,7 @@ plot_measures <- function(object,
   if("shapefiles" %in% names(object)){
     meas <- get_measures(object)$summary
     index <- object$object_index
-    shapefiles <- object$shapefiles
+    shapefiles <- object$shapefiles$shapefiles
     coords <-
       do.call(rbind,
               lapply(shapefiles, function(x){
@@ -367,7 +387,7 @@ plot_measures <- function(object,
 
     if(!is.null(index)){
 
-      index$img <- as.numeric(gsub(pattern = "obj", x = index$img, replacement = ""))
+      index$img <- as.numeric(gsub(pattern = "shp", x = index$img, replacement = ""))
       aggr <-
         do.call(cbind,
                 lapply(3:ncol(index), function(i){
@@ -383,7 +403,6 @@ plot_measures <- function(object,
     } else{
       index <- NULL
     }
-
 
     if(measure %in% colnames(object)){
       hjust <- ifelse(is.null(hjust), 0, hjust)
@@ -411,7 +430,6 @@ plot_measures <- function(object,
       }
     }
 
-
   } else{
     if("measures"  %in% class(object)){
       object <- object
@@ -422,6 +440,11 @@ plot_measures <- function(object,
       object <- object$objects
     } else if(inherits(object, "plm_disease")){
       object <- object$shape
+    } else if(inherits(object, "measures_ls")){
+      index <- object$index
+      colnames(index)[1] <- "id"
+      object <- object$summary
+      colnames(object)[1] <- "id"
     } else{
       stop("Object of ivalid class.")
     }

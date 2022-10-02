@@ -7,9 +7,10 @@
 analyze_objects_shp(
   img,
   shapefile = NULL,
-  rows = NULL,
-  cols = NULL,
-  show_image = TRUE,
+  rows = 1,
+  cols = 1,
+  interactive = FALSE,
+  plot = TRUE,
   object_size = "large",
   ...
 )
@@ -21,9 +22,13 @@ analyze_objects_shp(
 (default), both \code{rows} and \code{cols} must be declared.}
 
 \item{rows, cols}{The number of rows and columns to generate the shapefile
-when \code{shapefile} is not declared.}
+when \code{shapefile} is not declared. Defaults to \code{1}.}
 
-\item{show_image}{Shows the processed images? Defaults to \code{TRUE}.}
+\item{interactive}{If \code{FALSE} (default) the grid is created automatically
+based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
+that will contain the grid.}
+
+\item{plot}{Plots the processed images? Defaults to \code{TRUE}.}
 
 \item{object_size}{Argument to control control the watershed segmentation.
 See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}
@@ -42,7 +47,15 @@ read-ready data frames.
 \examples{
 if(interactive()){
 library(pliman)
-flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
-res <- analyze_objects_shp(flax, rows = 3, cols = 5)
+flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+res <-
+   analyze_objects_shp(flax,
+                       rows = 3,
+                       cols = 5,
+                       plot = FALSE,
+                       object_index = "DGCI")
+plot(flax)
+plot(res$shapefiles)
+plot_measures(e, measure = "DGCI")
 }
 }

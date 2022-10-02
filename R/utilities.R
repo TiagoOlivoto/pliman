@@ -33,6 +33,7 @@ column_to_rownames <- function(.data, var = "rowname"){
   if(!var %in% colnames(df)){
     stop("Variable '", var, "' not in data.", call. = FALSE)
   }
+  rownames(df) <- df[[var]]
   df[[var]] <- NULL
   df
 }
