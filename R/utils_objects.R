@@ -432,3 +432,44 @@ object_split <- function(img,
   }
   return(list_objects)
 }
+
+
+#' Apply color to image objects
+#'
+#' The function applies the color informed in the argument `color` to segmented
+#' objects in the image. The segmentation is performed using image indexes. Use
+#' [image_index()] to identify the better candidate index to segment objects.
+#'
+#' @inheritParams image_binary
+#' @param color The color to apply in the image objects. Defaults to `"blue"`.
+#' @param plot Plots the modified image? Defaults to `TRUE`.
+#' @param ... Additional arguments passed on to [image_binary()].
+#'
+#' @return An object of class `Image`
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("la_leaves.jpg")
+#' img2 <- object_to_color(img, index = "G-R")
+#' image_combine(img, img2)
+#'
+object_to_color <- function(image,
+                            index = "NB",
+                            color = "blue",
+                            plot = TRUE,
+                            ...){
+  bin <- image_binary(image,
+                      index = index,
+                      show_image = FALSE,
+                      ...)[[1]]
+  pix_ref <- which(bin == 1)
+  colto <- col2rgb(color) / 255
+  image@.Data[,,1][pix_ref] <- colto[1]
+  image@.Data[,,2][pix_ref] <- colto[2]
+  image@.Data[,,3][pix_ref] <- colto[3]
+  if(isTRUE(plot)){
+    plot(image)
+  }
+  invisible(image)
+}
