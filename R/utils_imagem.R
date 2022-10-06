@@ -2005,7 +2005,7 @@ image_segment <- function(image,
       }
     }
     if(length(imgs) == 1){
-      return(imgs[[1]])
+      invisible(imgs[[1]])
     } else{
       invisible(structure(imgs, class = "img_segment"))
     }
