@@ -219,10 +219,10 @@ object_contour <- function(image,
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_contour, index, invert, fill_hull, threshold,
+      parLapply(clust, image, object_contour, index, invert, filter, fill_hull, threshold,
                 watershed, extension, tolerance, object_size, show_image)
     } else{
-      lapply(image, object_contour, index, invert, fill_hull, threshold,
+      lapply(image, object_contour, index, invert, filter, fill_hull, threshold,
              watershed, extension, tolerance, object_size, show_image)
     }
   } else{
