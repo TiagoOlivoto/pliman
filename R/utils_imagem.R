@@ -1941,9 +1941,9 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{

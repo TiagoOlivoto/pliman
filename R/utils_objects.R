@@ -220,10 +220,10 @@ object_contour <- function(image,
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       parLapply(clust, image, object_contour, index, invert, filter, fill_hull, threshold,
-                watershed, extension, tolerance, object_size, show_image)
+                watershed, extension, tolerance, object_size, show_image = show_image)
     } else{
       lapply(image, object_contour, index, invert, filter, fill_hull, threshold,
-             watershed, extension, tolerance, object_size, show_image)
+             watershed, extension, tolerance, object_size, show_image = show_image)
     }
   } else{
     img2 <- image_binary(image,
