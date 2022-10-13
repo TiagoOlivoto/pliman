@@ -112,6 +112,7 @@ The following indexes are available in pliman.
 \item \code{HUE2}  atan(2*(R-G-R)/30.5*(G-B))
 \item \code{BGI}   B/G
 \item \code{GRAY}	\code{0.299*R + 0.587*G + 0.114*B}
+\item \code{GRAY2} \code{((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2}
 \item \code{GLAI} \code{(25*(G-R)/(G+R-B)+1.25)}
 \item \code{CI} Coloration Index \code{(R-B)/R}
 \item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}

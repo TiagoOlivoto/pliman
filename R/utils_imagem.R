@@ -1517,6 +1517,7 @@ image_binary <- function(image,
 #' * `HUE2`  atan(2*(R-G-R)/30.5*(G-B))
 #' * `BGI`   B/G
 #' * `GRAY`	`0.299*R + 0.587*G + 0.114*B`
+#' * `GRAY2` `((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2`
 #' * `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
 #' * `CI` Coloration Index `(R-B)/R`
 #' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
@@ -2080,7 +2081,7 @@ image_segment_iter <- function(image,
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI", "GRAY2")
       } else{
         index <- index[1]
       }
@@ -2119,7 +2120,7 @@ image_segment_iter <- function(image,
           switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                  "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                  "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
+                 "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI", "GRAY2")
       } else{
         if(length(index) != nseg){
           stop("Length of 'index' must be equal 'nseg'.", call. = FALSE)
@@ -2163,7 +2164,7 @@ image_segment_iter <- function(image,
             switch(menu(avali_index, title = "Choose the index to segment the image, or type 0 to exit"),
                    "R", "G", "B", "NR", "NG", "NB", "GB", "RB", "GR", "BI", "BIM", "SCI", "GLI",
                    "HI", "NGRDI", "NDGBI", "NDRBI", "I", "S", "VARI", "HUE", "HUE2", "BGI", "L",
-                   "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI")
+                   "GRAY", "GLAI", "SAT", "CI", "SHP", "RI", "G-B", "G-R", "R-G", "R-B", "B-R", "B-G", "DGCI", "GRAY2")
           if(is.null(indx)){
             break
           }
