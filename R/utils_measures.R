@@ -197,7 +197,11 @@ get_measures <- function(object,
     if(inherits(object, "plm_disease_byl")){
       res[8:19] <- apply(res[8:19], 2, pixels_to_cm, dpi = dpi)
     } else{
-      res[6:17] <- apply(res[6:17], 2, pixels_to_cm, dpi = dpi)
+      if("img" %in% colnames(res)){
+        res[7:18] <- apply(res[7:18], 2, pixels_to_cm, dpi = dpi)
+      } else{
+        res[6:17] <- apply(res[6:17], 2, pixels_to_cm, dpi = dpi)
+      }
     }
   }
 

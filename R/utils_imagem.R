@@ -1523,7 +1523,8 @@ image_binary <- function(image,
 #' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
 #' * `SHP` Shape Index `2*(R-G-B)/(G-B)`
 #' * `RI` Redness Index `R**2/(B*G**3)`
-#' * `DGCI` Dark Green Color Index, based on HSB color space `60*((G - B) / (max(R, G, B) - min(R, G, B)))`
+#' * `DGCI` Dark Green Color Index, based on HSB color space `60*((G - B) /
+#' (max(R, G, B) - min(R, G, B)))`
 #'
 #' @name image_index
 #' @param image An image object.
@@ -1722,6 +1723,10 @@ image_index <- function(image,
 #'   `type = "density"` to produce a density plot with the pixels' intensity.
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
+#' @param npixel The number of pixels to be plotted. This is used to reduce the
+#'   plotting time when high-resolution images are used. By default, 60.000 are
+#'   plotted. When `type = "raster"` the gray-level image is resized to match
+#'   ~60.000 pixels keeping the same aspect ratio.
 #' @param ... Currently not used
 #' @method plot image_index
 #' @export
@@ -1739,6 +1744,7 @@ plot.image_index <- function(x,
                              type = "raster",
                              nrow = NULL,
                              ncol = NULL,
+                             npixel = 60000,
                              ...){
   if(!type %in% c("raster", "density")){
     stop("`type` must be one of the 'raster' or 'density'. ")
@@ -1751,6 +1757,7 @@ plot.image_index <- function(x,
                   as.vector(i)}
                 ))
       )
+    mat <- mat[sample(1:nrow(mat), npixel),]
     colnames(mat) <- names(x)
     mat$id <- rownames(mat)
     if(length(x) == 1){
@@ -1808,7 +1815,16 @@ plot.image_index <- function(x,
     pixels <-
       do.call(rbind,
               lapply(seq_along(x), function(i){
-                get_pixels(x[i], names(x[i]))
+                ntpix <- prod(dim(x[[i]]))
+                if(ntpix > npixel){
+                  rows <- dim(x[[i]])[1]
+                  corfac <- sqrt(npixel / ntpix)
+                  nrow_new <- ceiling(rows * corfac)
+                  x2 <- EBImage::resize(x[[i]], nrow_new)
+                } else{
+                  x2 <- x[i]
+                }
+                get_pixels(x2, names(x[i]))
               })
       )
     num_plots <-length(unique(pixels$spectrum))
@@ -1835,6 +1851,7 @@ plot.image_index <- function(x,
     return(p)
   }
 }
+
 
 
 #' Image segmentation

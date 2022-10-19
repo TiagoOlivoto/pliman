@@ -20,7 +20,7 @@ image_index(
   verbose = TRUE
 )
 
-\method{plot}{image_index}(x, type = "raster", nrow = NULL, ncol = NULL, ...)
+\method{plot}{image_index}(x, type = "raster", nrow = NULL, ncol = NULL, npixel = 60000, ...)
 }
 \arguments{
 \item{image}{An image object.}
@@ -67,6 +67,11 @@ number of parallel processes that can be active at the same time.}
 \item{type}{The type of plot. Use \code{type = "raster"} (default) to produce a
 raster plot showing the intensity of the pixels for each image index or
 \code{type = "density"} to produce a density plot with the pixels' intensity.}
+
+\item{npixel}{The number of pixels to be plotted. This is used to reduce the
+plotting time when high-resolution images are used. By default, 60.000 are
+plotted. When \code{type = "raster"} the gray-level image is resized to match
+~60.000 pixels keeping the same aspect ratio.}
 
 \item{...}{Currently not used}
 }
