@@ -30,7 +30,7 @@
 * `analyze_objects()` now returns the objects `object_index` and `object_rgb` when the argument `pattern` is used. Thanks to [João Paulo Oliveira Ribeiro](https://www.researchgate.net/profile/Joao-Paulo-Ribeiro) for alerting me regarding this issue.
 * New argument `reference` in `analyze_objects()` to adjust measures using a reference object in the image.
 * Argument `object_index` in `analyze_objects()` now recognizes the names of built-in indexes (see ?`pliman_indexes()`).
-
+* `plot.image_index()` not limits the number of pixels to reduce plotting time.
 
 # pliman 1.1.0
 ## New functions

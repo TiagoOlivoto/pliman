@@ -1757,7 +1757,7 @@ plot.image_index <- function(x,
                   as.vector(i)}
                 ))
       )
-    mat <- mat[sample(1:nrow(mat), npixel),]
+    mat <- data.frame(mat[sample(1:nrow(mat), npixel),])
     colnames(mat) <- names(x)
     mat$id <- rownames(mat)
     if(length(x) == 1){
