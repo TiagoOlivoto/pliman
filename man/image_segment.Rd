@@ -9,6 +9,7 @@ image_segment(
   image,
   index = NULL,
   threshold = "Otsu",
+  col_background = NULL,
   has_white_bg = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
@@ -58,6 +59,9 @@ Inform any non-numeric value different than \code{"Otsu"} to iteratively chosen
 the threshold based on a raster plot showing pixel intensity of the index.
 For \code{image_segmentation_iter()}, use a vector (allows a mixed (numeric and
 character) type) with the same length of \code{nseg}.}
+
+\item{col_background}{The color of the segmented background. Defaults to
+\code{NULL} (white background).}
 
 \item{has_white_bg}{Logical indicating whether a white background is present.
 If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be

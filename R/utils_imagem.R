@@ -1879,6 +1879,8 @@ plot.image_index <- function(x,
 #'   the threshold based on a raster plot showing pixel intensity of the index.
 #'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
 #'   character) type) with the same length of `nseg`.
+#' @param col_background The color of the segmented background. Defaults to
+#'   `NULL` (white background).
 #' @param has_white_bg Logical indicating whether a white background is present.
 #'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
 #'   considered as `NA`. This may be useful to compute an image index for
@@ -1931,6 +1933,7 @@ plot.image_index <- function(x,
 image_segment <- function(image,
                           index = NULL,
                           threshold = "Otsu",
+                          col_background = NULL,
                           has_white_bg = FALSE,
                           fill_hull = FALSE,
                           filter = FALSE,
@@ -1959,9 +1962,9 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, threshold, col_background, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, threshold, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, threshold, col_background, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
@@ -1979,6 +1982,14 @@ image_segment <- function(image,
         }
     }
     imgs <- list()
+    # color for background
+    if (is.null(col_background)){
+      col_background <- col2rgb("white") / 255
+    } else{
+      ifelse(is.character(col_background),
+             col_background <- col2rgb(col_background) / 255,
+             col_background <- col_background / 255)
+    }
     for(i in 1:length(index)){
       indx <- index[[i]]
       img2 <- image_binary(image,
@@ -1994,9 +2005,9 @@ image_segment <- function(image,
                            invert = invert)[[1]]
       ID <- which(img2@.Data == FALSE)
       img <- image
-      img@.Data[,,1][ID] <- 1
-      img@.Data[,,2][ID] <- 1
-      img@.Data[,,3][ID] <- 1
+      img@.Data[,,1][ID] <- col_background[1]
+      img@.Data[,,2][ID] <- col_background[2]
+      img@.Data[,,3][ID] <- col_background[3]
       imgs[[i]] <- img
     }
     names(imgs) <- index
@@ -2592,6 +2603,185 @@ image_palette <- function (image,
   return(list(palette_list = pal_list,
               joint = im2))
 }
+
+
+
+
+
+
+
+
+#' Expands an image
+#'
+#' Expands an image towards the left, top, right, or bottom by sampling pixels
+#' from the image edge. Users can choose how many pixels (rows or columns) are
+#' sampled and how many pixels the expansion will have.
+#'
+#' @param image An `Image` object.
+#' @param left,top,right,bottom The number of pixels to expand in the left, top,
+#'   right, and bottom directions, respectively.
+#' @param edge The number of pixels to expand in all directions. This can be
+#'   used to avoid calling all the above arguments
+#' @param sample_left,sample_top,sample_right,sample_bottom The number of pixels
+#'   to sample from each side. Defaults to 20.
+#' @param random Randomly sampling of the edge's pixels? Defaults to `FALSE`.
+#' @param filter Apply a median filter in the sampled pixels? Defaults to
+#'   `FALSE`.
+#' @param plot Plots the extended image? defaults to `FALSE`.
+#'
+#' @return An `Image` object
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("soybean_touch.jpg")
+#' image_expand(img, left = 200)
+#' image_expand(img, right = 150, bottom = 250, filter = 5)
+#'
+image_expand <- function(image,
+                         left = NULL,
+                         top = NULL,
+                         right = NULL,
+                         bottom = NULL,
+                         edge = NULL,
+                         sample_left = 10,
+                         sample_top = 10,
+                         sample_right = 10,
+                         sample_bottom = 10,
+                         random = FALSE,
+                         filter = NULL,
+                         plot = TRUE){
+  if(!is.null(edge)){
+    left <- edge
+    top <- edge
+    right <- edge
+    bottom <- edge
+  }
+  if(sample_left < 2){
+    warning("`sample_left` must be > 1. Setting to 2", call. = FALSE)
+    sample_left <- 2
+  }
+  if(sample_top < 2){
+    warning("`sample_top` must be > 1. Setting to 2", call. = FALSE)
+    sample_top <- 2
+  }
+  if(sample_right < 2){
+    warning("`sample_right` must be > 1. Setting to 2", call. = FALSE)
+    sample_right <- 2
+  }
+  if(sample_bottom < 2){
+    warning("`sample_bottom` must be > 1. Setting to 2", call. = FALSE)
+    sample_bottom <- 2
+  }
+  if(!is.null(left)){
+    left_img <- image@.Data[1:sample_left,,] |> EBImage::Image(colormode = "Color")
+    left_img <- EBImage::resize(left_img, w = left, h = dim(image)[2])
+    if(isTRUE(random)){
+      nc <- dim(left_img)
+      for (i in 1:nc[1]) {
+        left_img@.Data[i,,] <- left_img@.Data[i,sample(1:nc[2], nc[2]),]
+      }
+    }
+    if(!is.null(filter)){
+      left_img <- EBImage::medianFilter(left_img, size = filter)
+    }
+    image <- EBImage::abind(left_img, image, along = 1)
+  }
+  if(!is.null(top)){
+    top_img <- image@.Data[,1:sample_top,] |> EBImage::Image(colormode = "Color")
+    top_img <- EBImage::resize(top_img, w = dim(image)[1], h = top)
+    if(isTRUE(random)){
+      nc <- dim(top_img)
+      for (i in 1:nc[2]) {
+        top_img@.Data[,i,] <- top_img@.Data[sample(1:nc[1], nc[1]),i,]
+      }
+    }
+    if(!is.null(filter)){
+      top_img <- EBImage::medianFilter(top_img, size = filter)
+    }
+    image <- EBImage::abind(top_img, image, along = 2)
+  }
+  if(!is.null(right)){
+    dimx <- dim(image)[1]
+    right_img <- image@.Data[(dimx-sample_right):dimx,,] |> EBImage::Image(colormode = "Color")
+    right_img <- EBImage::resize(right_img, w = right, h = dim(image)[2])
+    if(isTRUE(random)){
+      nc <- dim(right_img)
+      for (i in 1:nc[1]) {
+        right_img@.Data[i,,] <- right_img@.Data[i,sample(1:nc[2], nc[2]),]
+      }
+    }
+    if(!is.null(filter)){
+      right_img <- EBImage::medianFilter(right_img, size = filter)
+    }
+    image <- EBImage::abind(image, right_img, along = 1)
+  }
+  if(!is.null(bottom)){
+    dimy <- dim(image)[2]
+    bot_img <- image@.Data[,(dimy-sample_bottom):dimy,] |> EBImage::Image(colormode = "Color")
+    bot_img <- EBImage::resize(bot_img, w = dim(image)[1], h = bottom)
+    if(isTRUE(random)){
+      nc <- dim(bot_img)
+      for (i in 1:nc[2]) {
+        bot_img@.Data[,i,] <- bot_img@.Data[sample(1:nc[1], nc[1]),i,]
+      }
+    }
+    if(!is.null(filter)){
+      bot_img <- EBImage::medianFilter(bot_img, size = filter)
+    }
+    image <- EBImage::abind(image, bot_img, along = 2)
+  }
+  if(isTRUE(plot)){
+    plot(image)
+  }
+  invisible(image)
+}
+
+
+#' Squares an image
+#'
+#' Converts a rectangular image into a square image by expanding the
+#' rows/columns using [image_expand()].
+#'
+#' @inheritParams image_expand
+#'
+#' @return The modified `Image` object.
+#' @param ... Further arguments passed on to [image_expand()].
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("soybean_touch.jpg")
+#' dim(img)
+#' square <- image_square(img)
+#' dim(square)
+image_square <- function(image, plot = TRUE, ...){
+  len <- dim(image)
+  n <- max(len[1], len[2])
+  if (len[1] > len[2]) {
+    ni1 <- ceiling((n - len[2])/2)
+    if((ni1*2 + len[2]) != n){
+      ni2 <- ni1 - 1
+    } else{
+      ni2 <- ni1
+    }
+    image <- image_expand(image, bottom = ni1, top = ni2, plot = FALSE, ...)
+  }
+  if (len[2] > len[1]) {
+    ni1 <- ceiling((n - len[1])/2)
+    if((ni1*2 + len[1]) != n){
+      ni2 <- ni1 - 1
+    } else{
+      ni2 <- ni1
+    }
+    image <- image_expand(image, left = ni1, right = ni2, plot = FALSE, ...)
+  }
+  if(isTRUE(plot)){
+    plot(image)
+  }
+  invisible(image)
+}
+
 
 
 
