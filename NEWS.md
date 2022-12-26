@@ -22,6 +22,7 @@
 * Haralick's features that quantify pixel texture for image objects were included.
 
 * `analyze_objects()`, `measure_disease()`, and `measure_disease_byl()` have now a `filter` argument that applies a median filtering in the binary mask. This is useful to reduce the noise in the segmentation of objects.
+* Included `reference_larger` and `reference_smaller` arguments in `analyze_objects()` indicating when the larger/smaller object in the image must be used as the reference object.
 
 
 ## Minor changes
