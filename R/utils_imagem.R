@@ -2873,7 +2873,7 @@ cm_to_pixels <- function(cm, dpi){
 #' @name utils_dpi
 #' @export
 npixels <- function(image){
-  if(class(image) != "Image"){
+  if(!inherits(image, "Image")){
     stop("Image must be of class 'Image'.")
   }
   dim <- dim(image)

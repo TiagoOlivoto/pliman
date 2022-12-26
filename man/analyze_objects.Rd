@@ -14,6 +14,8 @@ analyze_objects(
   reference_area = NULL,
   back_fore_index = "R/(G/B)",
   fore_ref_index = "B-R",
+  reference_larger = FALSE,
+  reference_smaller = FALSE,
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -100,6 +102,15 @@ objects and the reference object. It can be either an available index in
 and B bands. Defaults to \code{"B-R"}. This index is optimized to segment green
 leaves from a blue reference object after a white background has been
 removed.}
+
+\item{reference_larger, reference_smaller}{Logical argument indicating when
+the larger/smaller object in the image must be used as the reference
+object. This only is valid when \code{reference} is set to \code{TRUE} and
+\code{reference_area} indicates the area of the reference object. IMPORTANT.
+When reference_smaller is used, objects with an area smaller than 1\% of the
+mean of all the objects are ignored. This is used to remove possible noise
+in the image such as dust. So, be sure the reference object has an area
+that will be not removed by that cutpoint.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working
@@ -434,6 +445,16 @@ top <-
                  marker = "id",
                  topn_upper = 5)
 top$results
+
+# Correct the measures based on the area of the largest object
+
+img <- image_pliman("objects_300dpi.jpg") |> image_resize(20)
+res <-
+ analyze_objects(img,
+                 reference = TRUE,
+                 reference_area = 100,
+                 reference_larger = TRUE,
+                 marker = "area")
 }
 
 \donttest{

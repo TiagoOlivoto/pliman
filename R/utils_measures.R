@@ -132,7 +132,7 @@ get_measures <- function(object,
     stop("'measure' must be informed.", call. = FALSE)
   }
   if(!is.null(id)){
-    if(class(measure) != "formula"){
+    if(!inherits(measure, "formula")){
       stop("'measure' must be a two-sided formula, e.g., 'area ~ 25'.")
     }
     terms <- as.formula(measure)

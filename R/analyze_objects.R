@@ -85,6 +85,14 @@
 #'   and B bands. Defaults to `"B-R"`. This index is optimized to segment green
 #'   leaves from a blue reference object after a white background has been
 #'   removed.
+#' @param reference_larger,reference_smaller Logical argument indicating when
+#'   the larger/smaller object in the image must be used as the reference
+#'   object. This only is valid when `reference` is set to `TRUE` and
+#'   `reference_area` indicates the area of the reference object. IMPORTANT.
+#'   When reference_smaller is used, objects with an area smaller than 1% of the
+#'   mean of all the objects are ignored. This is used to remove possible noise
+#'   in the image such as dust. So, be sure the reference object has an area
+#'   that will be not removed by that cutpoint.
 #' @param pattern A pattern of file name used to identify images to be imported.
 #'   For example, if `pattern = "im"` all images in the current working
 #'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
@@ -356,6 +364,16 @@
 #'                  marker = "id",
 #'                  topn_upper = 5)
 #' top$results
+#'
+#' # Correct the measures based on the area of the largest object
+#'
+#' img <- image_pliman("objects_300dpi.jpg") |> image_resize(20)
+#' res <-
+#'  analyze_objects(img,
+#'                  reference = TRUE,
+#'                  reference_area = 100,
+#'                  reference_larger = TRUE,
+#'                  marker = "area")
 #' }
 #'
 analyze_objects <- function(img,
@@ -365,6 +383,8 @@ analyze_objects <- function(img,
                             reference_area = NULL,
                             back_fore_index = "R/(G/B)",
                             fore_ref_index = "B-R",
+                            reference_larger = FALSE,
+                            reference_smaller = FALSE,
                             pattern = NULL,
                             parallel = FALSE,
                             workers = NULL,
@@ -572,86 +592,137 @@ analyze_objects <- function(img,
         if(is.null(reference_area)){
           stop("A known area must be declared when a template is used.", call. = FALSE)
         }
-        # segment back and fore
-        if(!isFALSE(invert)){
-          invert1 <- ifelse(length(invert) == 1, invert, invert[1])
+        if(isFALSE(reference_larger) & isFALSE(reference_smaller)){
+          # segment back and fore
+          if(!isFALSE(invert)){
+            invert1 <- ifelse(length(invert) == 1, invert, invert[1])
+          } else{
+            invert1 <- FALSE
+          }
+          img_bf <-
+            image_binary(img,
+                         index = back_fore_index,
+                         filter = filter,
+                         invert = invert1,
+                         show_image = FALSE,
+                         fill_hull = fill_hull,
+                         verbose = FALSE)[[1]]
+          img3 <- img
+          img3@.Data[,,1][which(img_bf != 1)] <- 2
+          img3@.Data[,,2][which(img_bf != 1)] <- 2
+          img3@.Data[,,3][which(img_bf != 1)] <- 2
+          ID <-  which(img_bf == 1) # IDs for foreground
+          ID2 <- which(img_bf == 0) # IDs for background
+          # segment fore and ref
+          if(!isFALSE(invert)){
+            invert2 <- ifelse(length(invert) == 1, invert, invert[2])
+          } else{
+            invert2 <- FALSE
+          }
+          img4 <-
+            image_binary(img3,
+                         index = fore_ref_index,
+                         filter = filter,
+                         invert = invert2,
+                         show_image = FALSE,
+                         verbose = FALSE)[[1]]
+          mask <- img_bf
+          pix_ref <- which(img4 != 1)
+          img@.Data[,,1][pix_ref] <- 1
+          img@.Data[,,2][pix_ref] <- 0
+          img@.Data[,,3][pix_ref] <- 0
+          npix_ref <- length(pix_ref)
+          mask[pix_ref] <- 0
+          if(is.numeric(filter) & filter > 1){
+            mask <- EBImage::medianFilter(mask, size = filter)
+          }
+          if(isTRUE(watershed)){
+            parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+            res <- length(img)
+            parms2 <- parms[parms$object_size == object_size,]
+            rowid <-
+              which(sapply(as.character(parms2$resolution), function(x) {
+                eval(parse(text=x))}))
+            ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+            tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+            nmask <- EBImage::watershed(EBImage::distmap(mask),
+                                        tolerance = tol,
+                                        ext = ext)
+          } else{
+            nmask <- EBImage::bwlabel(mask)
+          }
+          shape <- compute_measures(mask = nmask,
+                                    img = img,
+                                    har_nbins = har_nbins,
+                                    har_scales = har_scales,
+                                    har_band = har_band)
+          object_contour <- shape$cont
+          ch <- shape$ch
+          shape <- shape$shape
+          # correct measures based on the area of the reference object
+          px_side <- sqrt(reference_area / npix_ref)
+          shape$area <- shape$area * px_side^2
+          shape$area_ch <- shape$area_ch * px_side^2
+          shape[6:17] <- apply(shape[6:17], 2, function(x){
+            x * px_side
+          })
         } else{
-          invert1 <- FALSE
+          # correct the measures based on larger or smaller objects
+          mask <-
+            image_binary(img,
+                         index = index,
+                         filter = filter,
+                         invert = invert,
+                         fill_hull = fill_hull,
+                         show_image = FALSE,
+                         verbose = FALSE)[[1]]
+          if(isTRUE(watershed)){
+            parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+            res <- length(mask)
+            parms2 <- parms[parms$object_size == object_size,]
+            rowid <-
+              which(sapply(as.character(parms2$resolution), function(x) {
+                eval(parse(text=x))}))
+            ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+            tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+            nmask <- EBImage::watershed(EBImage::distmap(mask),
+                                        tolerance = tol,
+                                        ext = ext)
+          } else{
+            nmask <- EBImage::bwlabel(mask)
+          }
+          shape <- compute_measures(mask = nmask,
+                                    img = img,
+                                    har_nbins = har_nbins,
+                                    har_scales = har_scales,
+                                    har_band = har_band)
+          object_contour <- shape$cont
+          ch <- shape$ch
+          shape <- shape$shape
+          if(isTRUE(reference_larger)){
+            shape <- shape[shape$area > mean(shape$area) * 0.05, ]
+            id_ref <- which.max(shape$area)
+            npix_ref <- shape[id_ref, 4]
+          } else{
+            shape <- shape[shape$area > mean(shape$area) * 0.05, ]
+            id_ref <- which.min(shape$area)
+            npix_ref <- shape[id_ref, 4]
+          }
+          shape <- shape[-id_ref,]
+          px_side <- sqrt(reference_area / npix_ref)
+          shape$area <- shape$area * px_side ^ 2
+          shape$area_ch <- shape$area_ch * px_side ^ 2
+          shape[6:17] <- apply(shape[6:17], 2, function(x){
+            x * px_side
+          })
         }
-        img_bf <-
-          image_binary(img,
-                       index = back_fore_index,
-                       filter = filter,
-                       invert = invert1,
-                       show_image = FALSE,
-                       verbose = FALSE)[[1]]
-        img3 <- img
-        img3@.Data[,,1][which(img_bf != 1)] <- 2
-        img3@.Data[,,2][which(img_bf != 1)] <- 2
-        img3@.Data[,,3][which(img_bf != 1)] <- 2
-        ID <-  which(img_bf == 1) # IDs for foreground
-        ID2 <- which(img_bf == 0) # IDs for background
-        # segment fore and ref
-        if(!isFALSE(invert)){
-          invert2 <- ifelse(length(invert) == 1, invert, invert[2])
-        } else{
-          invert2 <- FALSE
-        }
-        img4 <-
-          image_binary(img3,
-                       index = fore_ref_index,
-                       filter = filter,
-                       invert = invert2,
-                       show_image = FALSE,
-                       verbose = FALSE)[[1]]
-        mask <- img_bf
-        pix_ref <- which(img4 != 1)
-        img@.Data[,,1][pix_ref] <- 1
-        img@.Data[,,2][pix_ref] <- 0
-        img@.Data[,,3][pix_ref] <- 0
-        npix_ref <- length(pix_ref)
-        mask[pix_ref] <- 0
-        if(is.numeric(filter) & filter > 1){
-          mask <- EBImage::medianFilter(mask, size = filter)
-        }
-        if(isTRUE(watershed)){
-          parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-          res <- length(img)
-          parms2 <- parms[parms$object_size == object_size,]
-          rowid <-
-            which(sapply(as.character(parms2$resolution), function(x) {
-              eval(parse(text=x))}))
-          ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-          tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-          nmask <- EBImage::watershed(EBImage::distmap(mask),
-                                      tolerance = tol,
-                                      ext = ext)
-        } else{
-          nmask <- EBImage::bwlabel(mask)
-        }
-        shape <- compute_measures(mask = nmask,
-                                  img = img,
-                                  har_nbins = har_nbins,
-                                  har_scales = har_scales,
-                                  har_band = har_band)
-        object_contour <- shape$cont
-        ch <- shape$ch
-        shape <- shape$shape
-        # correct measures based on the area of the reference object
-        px_side <- sqrt(reference_area / npix_ref)
-        shape$area <- shape$area * px_side^2
-        shape$area_ch <- shape$area_ch * px_side^2
-        shape[6:17] <- apply(shape[6:17], 2, function(x){
-          x * px_side
-        })
       }
-
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
       }
       ifelse(!is.null(lower_size),
              shape <- shape[shape$area > lower_size, ],
-             shape <- shape[shape$area > mean(shape$area) * 0.1, ])
+             shape <- shape[shape$area > mean(shape$area) * 0.05, ])
       if(!is.null(upper_size)){
         shape <- shape[shape$area < upper_size, ]
       }

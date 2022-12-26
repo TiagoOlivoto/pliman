@@ -238,7 +238,7 @@ get_biplot <- function(x,
   if(!show %in% c("both", "var", "ind")){
     stop("`show` must be one of 'var', 'ind', or 'both'", call. = FALSE)
   }
-  if(class(x) != "pca"){
+  if(!inherits(x, "pca")){
     stop("`x` must be an object computed with 'pca()'", call. = FALSE)
   }
   var <- x$var$coord
