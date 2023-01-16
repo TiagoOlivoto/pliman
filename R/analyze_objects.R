@@ -64,6 +64,7 @@
 #' R band. To chance this default, use the argument `har_band`. For example,
 #' `har_band = 2` will compute the features with the green band.
 #'
+#' If `efourier = TRUE` is used, an Elliptical Fourier Analysis (Kuhl and Giardina, 1982) is computed for each object contour. should be
 #' @param img The image to be analyzed.
 #' @param foreground,background A color palette for the foregrond and
 #'   background, respectively (optional). If a chacarceter is used (eg.,
@@ -158,6 +159,12 @@
 #'   operation involving them, e.g., `object_index = "R/B"`. In this case, it
 #'   will return for each object in the image, the average value of the R/B
 #'   ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
+#' @param efourier Logical argument indicating if Elliptical Fourier should be
+#'   computed for each object. This will call [efourier()] internally. It
+#'   `efourier = TRUE` is used, both standard and normalized Fourier
+#'   coefficients are returned.
+#' @param nharm An integer indicating the number of harmonics to use. Defaults
+#'   to 10. For more details see [efourier()].
 #' @param threshold By default (`threshold = "Otsu"`), a threshold value based
 #'   on Otsu's method is used to reduce the grayscale image to a binary image.
 #'   If a numeric value is informed, this value will be used as a threshold.
@@ -313,6 +320,18 @@
 #'  for each pixel of each object.
 #'  * `object_index`: If `object_index` is used, returns the index computed for
 #'  each object.
+#'
+#'  * Elliptical Fourier Analysis: If `efourier = TRUE` is used, the following
+#'     objects are returned.
+#'     - `efourier`: The Fourier coefficients.  For more details see
+#'        [efourier()].
+#'     - `efourier_norm`: The normalized Fourier coefficients. For more details
+#'        see [efourier_norm()].
+#'     - `efourier_error`: The error between original data and  reconstructed
+#'        outline. For more details see [efourier_error()].
+#'     - `efourier_power`: The spectrum of harmonic Fourier power.
+#'        For more details see [efourier_power()].
+#'
 #'  * `analyze_objects_iter()` returns a data.frame containing the features
 #'  described in the `results` object of [analyze_objects()].
 #'
@@ -320,6 +339,9 @@
 #'  of the pixels, optionally  for each object when `facet = TRUE` is used.
 #'
 #' @references
+#' Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,
+#' Springer 316 pp.
+#'
 #' Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
 #' remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
 #' batatas): the influence of genetics, environment, and G×E. New Phytologist,
@@ -329,16 +351,20 @@
 #' Classification. IEEE Transactions on Systems, Man, and Cybernetics SMC-3(6): 610–621.
 #' \doi{10.1109/TSMC.1973.4309314}
 #'
+#' Kuhl, F. P., and Giardina, C. R. (1982). Elliptic Fourier features of a
+#' closed contour. Computer Graphics and Image Processing 18, 236–258. doi:
+#' \doi{10.1016/0146-664X(82)90034-X}
+#'
 #' Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 #' and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.
 #' \doi{10.5951/mathteacher.110.8.0631}
 #'
-#'  Montero, R. S., Bribiesca, E., Santiago, R., & Bribiesca, E. (2009). State
-#'  of the Art of Compactness and Circularity Measures. International
-#'  Mathematical Forum, 4(27), 1305–1335.
+#' Montero, R. S., Bribiesca, E., Santiago, R., & Bribiesca, E. (2009). State
+#' of the Art of Compactness and Circularity Measures. International
+#' Mathematical Forum, 4(27), 1305–1335.
 #'
-#'  Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
-#'  Computer Vision. 3rd ed. World Scientific.
+#' Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
+#' Computer Vision. 3rd ed. World Scientific.
 #'
 #' @export
 #' @name analyze_objects
@@ -400,6 +426,8 @@ analyze_objects <- function(img,
                             object_size = "medium",
                             index = "NB",
                             object_index = NULL,
+                            efourier = FALSE,
+                            nharm = 10,
                             threshold = "Otsu",
                             tolerance = NULL,
                             extension = NULL,
@@ -746,6 +774,25 @@ analyze_objects <- function(img,
       }
       object_contour <- object_contour[as.character(shape$id)]
       ch <- ch[as.character(shape$id)]
+
+      if(isTRUE(efourier)){
+        efr <-
+          efourier(object_contour,
+                   nharm = nharm)
+        efer <- efourier_error(efr, plot = FALSE)
+        efpow <- efourier_power(efr, plot = FALSE)
+        efrn <- efourier_norm(efr)
+        efr <- efourier_coefs(efr)
+        names(efr)[1] <- "id"
+        efrn <- efourier_coefs(efrn)
+        names(efrn)[1] <- "id"
+      } else{
+        efr <- NULL
+        efrn <- NULL
+        efer <- NULL
+        efpow <- NULL
+      }
+
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
@@ -825,10 +872,12 @@ analyze_objects <- function(img,
       results <- list(results = shape,
                       statistics = stats,
                       object_rgb = object_rgb,
-                      object_index = indexes)
+                      object_index = indexes,
+                      efourier = efr,
+                      efourier_norm = efrn,
+                      efourier_error = efer,
+                      efourier_power = efpow)
       class(results) <- "anal_obj"
-
-
       if(show_image == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
 
@@ -1053,6 +1102,54 @@ analyze_objects <- function(img,
       object_rgb <- NULL
       object_index <- NULL
     }
+    if(!isFALSE(efourier)){
+      efourier <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["efourier"]],
+                            img =  names(results[i]))
+                })
+        )
+      efourier <- efourier[, c(ncol(efourier), 1:ncol(efourier)-1)]
+      names(efourier)[2] <- "id"
+
+      efourier_norm <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["efourier_norm"]],
+                            img =  names(results[i]))
+                })
+        )
+      efourier_norm <- efourier_norm[, c(ncol(efourier_norm), 1:ncol(efourier_norm)-1)]
+      names(efourier_norm)[2] <- "id"
+
+
+      efourier_error <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["efourier_error"]],
+                            img =  names(results[i]))
+                })
+        )
+      efourier_error <- efourier_error[, c(ncol(efourier_error), 1:ncol(efourier_error)-1)]
+      names(efourier_error)[2] <- "id"
+
+      efourier_power <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["efourier_power"]],
+                            img =  names(results[i]))
+                })
+        )
+      efourier_power <- efourier_power[, c(ncol(efourier_power), 1:ncol(efourier_power)-1)]
+      names(efourier_power)[2] <- "id"
+    } else{
+      efourier <- NULL
+      efourier_norm <- NULL
+      efourier_error <- NULL
+      efourier_power <- NULL
+    }
+
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
@@ -1079,7 +1176,11 @@ analyze_objects <- function(img,
              count = summ,
              results = results,
              object_rgb = object_rgb,
-             object_index = object_index),
+             object_index = object_index,
+             efourier = efourier,
+             efourier_norm = efourier_norm,
+             efourier_error = efourier_error,
+             efourier_power = efourier_power),
         class = "anal_obj_ls"
       )
     )
