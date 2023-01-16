@@ -240,6 +240,9 @@ get_measures <- function(object,
       mergt$img <- unique(merg$img)
       mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
       names(mergt) <- names(smr)
+      if(!is.null(object$efourier)){
+        res <- cbind(res, object$efourier_norm[, -c(1:2)])
+      }
       smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
       res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
       rownames(res) <- NULL
@@ -349,6 +352,9 @@ get_measures <- function(object,
       smr$y <- coords$y
       smr <- smr[, c(c("img", "x", "y", "n"), setdiff(colnames(smr), c("img", "x", "y", "n")))]
       rownames(res) <- NULL
+      if(!is.null(object$efourier)){
+        res <- cbind(res, object$efourier_norm[, -c(1:2)])
+      }
       class(res) <- c("data.frame", "measures")
       class(smr) <- c("data.frame", "measures")
       out <-
@@ -359,12 +365,14 @@ get_measures <- function(object,
     class(out) <- c("measures_ls")
     return(out)
   } else{
+    if(!is.null(object$efourier)){
+      res <- cbind(res, object$efourier_norm[, -1])
+    }
     res <- round_cols(res, digits = digits)
     class(res) <- c("data.frame", "measures")
     return(res)
   }
 }
-
 
 
 #' @name utils_measures

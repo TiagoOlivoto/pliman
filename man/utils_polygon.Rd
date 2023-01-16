@@ -95,7 +95,7 @@ poly_mass(x, y = NULL)
 
 poly_spline(x, y = NULL, vertices = 100, k = 2)
 
-poly_smooth(x, y = NULL, prop = 0.1, vertices = 1000, plot = TRUE)
+poly_smooth(x, y = NULL, niter = 10, n = NULL, prop = NULL, plot = TRUE)
 }
 \arguments{
 \item{x, y}{Coordinate vectors of points. This can be specified as two vectors
@@ -110,8 +110,9 @@ to \code{1}.}
 
 \item{plot}{Plots the object? Defaults to \code{TRUE}}
 
-\item{n, prop}{The number and proportion of coordinates to sample,
-respectively when using \verb{poly_sample*()}.}
+\item{n, prop}{The number and proportion of coordinates to sample from the
+perimeter coordinates. In \code{poly_smooth()} these arguments can be used to
+sample points from the object's perimeter before smoothing.}
 
 \item{noise_x, noise_y}{A numeric factor to define the noise added to \code{x} and
 \code{y} axis, respectively. See \code{\link[base:jitter]{base::jitter()}} for more details.}
@@ -120,6 +121,8 @@ respectively when using \verb{poly_sample*()}.}
 
 \item{k}{The number of points to wrap around the ends to obtain a smooth
 periodic spline.}
+
+\item{niter}{An integer indicating the number of smoothing iterations.}
 }
 \value{
 \itemize{
@@ -210,8 +213,7 @@ to \code{50}
 \item \code{poly_sample_prop()} Samples a proportion of coordinates among existing
 points. Defaults to \code{0.1}
 \item \code{poly_spline()} Interpolates a polygon contour.
-\item \code{poly_smooth()} Smooths a polygon contour by combining sampling \code{prop}
-coordinate points and them interpoling them using \code{vertices} vertices.
+\item \code{poly_smooth()} Smooths a polygon contour using a simple moving average.
 \item \code{poly_jitter()} Add a small amount of noise to a set of point
 coordinates. See \code{\link[base:jitter]{base::jitter()}} for more details.
 }

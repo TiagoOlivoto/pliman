@@ -31,6 +31,8 @@ analyze_objects(
   object_size = "medium",
   index = "NB",
   object_index = NULL,
+  efourier = FALSE,
+  nharm = 10,
   threshold = "Otsu",
   tolerance = NULL,
   extension = NULL,
@@ -190,6 +192,14 @@ value for each object is returned. It can be the R, G, and B values or any
 operation involving them, e.g., \code{object_index = "R/B"}. In this case, it
 will return for each object in the image, the average value of the R/B
 ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equations of available indexes.}
+
+\item{efourier}{Logical argument indicating if Elliptical Fourier should be
+computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
+\code{efourier = TRUE} is used, both standard and normalized Fourier
+coefficients are returned.}
+
+\item{nharm}{An integer indicating the number of harmonics to use. Defaults
+to 10. For more details see \code{\link[=efourier]{efourier()}}.}
 
 \item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
 on Otsu's method is used to reduce the grayscale image to a binary image.
@@ -357,6 +367,18 @@ objects.
 for each pixel of each object.
 \item \code{object_index}: If \code{object_index} is used, returns the index computed for
 each object.
+\item Elliptical Fourier Analysis: If \code{efourier = TRUE} is used, the following
+objects are returned.
+\itemize{
+\item \code{efourier}: The Fourier coefficients.  For more details see
+\code{\link[=efourier]{efourier()}}.
+\item \code{efourier_norm}: The normalized Fourier coefficients. For more details
+see \code{\link[=efourier_norm]{efourier_norm()}}.
+\item \code{efourier_error}: The error between original data and  reconstructed
+outline. For more details see \code{\link[=efourier_error]{efourier_error()}}.
+\item \code{efourier_power}: The spectrum of harmonic Fourier power.
+For more details see \code{\link[=efourier_power]{efourier_power()}}.
+}
 \item \code{analyze_objects_iter()} returns a data.frame containing the features
 described in the \code{results} object of \code{\link[=analyze_objects]{analyze_objects()}}.
 \item \code{plot.anal_obj()} returns a \code{trellis} object containing the distribution
@@ -429,6 +451,8 @@ textures with different scales, e.g., a texture that is repeated every two
 pixels or 10 pixels. By default, the Haralick features are computed with the
 R band. To chance this default, use the argument \code{har_band}. For example,
 \code{har_band = 2} will compute the features with the green band.
+
+If \code{efourier = TRUE} is used, an Elliptical Fourier Analysis (Kuhl and Giardina, 1982) is computed for each object contour. should be
 }
 \examples{
 \donttest{
@@ -479,6 +503,9 @@ plot(rgb, which = "index")
 }
 }
 \references{
+Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,
+Springer 316 pp.
+
 Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S. (2020). The
 remarkable morphological diversity of leaf shape in sweet potato (Ipomoea
 batatas): the influence of genetics, environment, and G×E. New Phytologist,
@@ -487,6 +514,10 @@ batatas): the influence of genetics, environment, and G×E. New Phytologist,
 Haralick, R.M., K. Shanmugam, and I. Dinstein. 1973. Textural Features for Image
 Classification. IEEE Transactions on Systems, Man, and Cybernetics SMC-3(6): 610–621.
 \doi{10.1109/TSMC.1973.4309314}
+
+Kuhl, F. P., and Giardina, C. R. (1982). Elliptic Fourier features of a
+closed contour. Computer Graphics and Image Processing 18, 236–258. doi:
+\doi{10.1016/0146-664X(82)90034-X}
 
 Lee, Y., & Lim, W. (2017). Shoelace Formula: Connecting the Area of a Polygon
 and the Vector Cross Product. The Mathematics Teacher, 110(8), 631–636.

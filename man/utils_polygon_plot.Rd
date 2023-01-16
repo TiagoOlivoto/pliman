@@ -13,16 +13,19 @@ plot_contour(x, y = NULL, id = NULL, col = "black", lwd = 1, ...)
 plot_polygon(
   x,
   y = NULL,
-  fill = "blue",
+  fill = "gray",
   random_fill = TRUE,
+  points = FALSE,
   merge = TRUE,
   border = "black",
   alpha = 1,
   add = FALSE,
   nrow = NULL,
   ncol = NULL,
-  aspect_ratio = NULL,
+  aspect_ratio = 1,
   show_id = TRUE,
+  xlim = NULL,
+  ylim = NULL,
   ...
 )
 
@@ -64,6 +67,8 @@ polygon's border, and the alpha transparency (1 opaque, 0 transparent).}
 \item{random_fill}{Fill multiple objects with random colors? Defaults to
 \code{TRUE}.}
 
+\item{points}{Plot the points? Defaults to \code{FALSE}.}
+
 \item{merge}{Merge multiple objects into a single plot? Defaults to \code{TRUE}.
 If \code{FALSE}, a single call \code{plot()} will be used for each objects. Use
 \code{nrow} and \code{ncol} to control the number of rows and columns of the window.}
@@ -73,11 +78,15 @@ If \code{FALSE}, a single call \code{plot()} will be used for each objects. Use
 \item{nrow, ncol}{The number of rows and columns to use in the composite
 image. Defaults to \code{NULL}, i.e., a square grid is produced.}
 
-\item{aspect_ratio}{The x/y aspect ratio. Defaults to \code{NULL}. Set
-\code{aspect_ratio = 1} to set up the window so that one data unit in the y
-direction is equal to one data unit in the x direction.}
+\item{aspect_ratio}{The x/y aspect ratio. Defaults to \code{1}. This will set up
+the window so that one data unit in the y direction is equal to one data
+unit in the x direction. Set \code{aspect_ratio = NULL} to fit the object to the
+window size.}
 
 \item{show_id}{Shows the object id? Defaults to \code{TRUE}.}
+
+\item{xlim, ylim}{A numeric vector of length 2 (min; max) indicating the range
+of \code{x} and \code{y}-axes.}
 
 \item{arrow}{If \code{TRUE} (default) plots two arrows connecting the center of
 mass to the minimum and maximum radius.}
@@ -98,9 +107,6 @@ each object.
 }
 }
 \examples{
-img <- image_pliman("potato_leaves.jpg")
-cont <- object_contour(img, watershed = FALSE)
-
-plot_polygon(cont)
-plot_contour(cont, id = 2, col = "red", lwd = 4)
+plot_polygon(contours)
+plot_contour(contours[[1]], id = 6, col = "red", lwd = 3)
 }

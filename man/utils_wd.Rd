@@ -5,6 +5,7 @@
 \alias{set_wd_here}
 \alias{get_wd_here}
 \alias{open_wd_here}
+\alias{open_wd}
 \title{Set and get the Working Directory quicky}
 \usage{
 set_wd_here(path = NULL)
@@ -12,6 +13,8 @@ set_wd_here(path = NULL)
 get_wd_here(path = NULL)
 
 open_wd_here(path = get_wd_here())
+
+open_wd(path = getwd())
 }
 \arguments{
 \item{path}{Path components below the project root. Defaults to \code{NULL}. This means that
@@ -30,6 +33,7 @@ user will be asked if he wants to create such a folder.}
 \item \code{\link[=get_wd_here]{get_wd_here()}} gets the working directory to the path of the current script.
 \item \code{\link[=set_wd_here]{set_wd_here()}} sets the working directory to the path of the current script.
 \item \code{\link[=open_wd_here]{open_wd_here()}} Open the File Explorer at the directory path of the current script.
+\item \code{\link[=open_wd]{open_wd()}} Open the File Explorer at the current working directory.
 }
 }
 \examples{

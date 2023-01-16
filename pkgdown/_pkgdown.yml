@@ -79,12 +79,13 @@ reference:
       - utils_image
       - image_combine
       - image_create
+      - image_expand
+      - image_square
 
   - title: "Image transformation"
     desc: "Performs spatial transformations such as rotation, reflection, and resizing"
     contents:
       - utils_transform
-      - rgb_to_hsv
       - apply_fun_to_imgs
 
   - title: "Utilities for files"
@@ -94,11 +95,20 @@ reference:
       - pipe
       - leading_zeros
 
+  - title: "Utilities for shape files"
+    desc: "Provides utilities for creating and analyzing image shape files"
+    contents:
+      - analyze_objects_shp
+      - image_shp
+      - image_align
+      - plot.image_shp
 
-  - title: "Utilities for image resolution"
+
+  - title: "Utilities for image resolution and color space"
     desc: "Provides utilities for conversions between size (cm) and resolution (dpi) "
     contents:
       - utils_dpi
+      - utils_colorspace
 
   - title: "Utilities for shapes"
     desc: "Provides utilities for construction of know shapes such as circles, squares, triangles, rectangles, and polygons. Several `poly_*` functions are provided to handle polygons' coordinates"
@@ -120,8 +130,34 @@ reference:
       - image_index
       - palettes
       - image_segment
+      - image_segment_kmeans
+      - image_segment_manual
+      - image_segment_mask
       - image_to_mat
+      - make_brush
+      - make_mask
       - plot.image_index
+
+
+
+  - title: "Elliptical Fourier Analysis"
+    desc: "Utilities for landmarks extraction and Elliptical Fourier Analysis"
+    contents:
+    - efourier
+    - efourier_coefs
+    - efourier_error
+    - efourier_inv
+    - efourier_norm
+    - efourier_power
+    - efourier_shape
+    - ellipse
+    - landmarks
+    - landmarks_add
+    - landmarks_angle
+    - landmarks_dist
+    - landmarks_regradi
+    - calibrate
+    - contours
 
 
   - title: "Analyze objects"
@@ -131,7 +167,8 @@ reference:
       - utils_measures
       - pliman_images
       - utils_objects
-      - random_color
+      - object_split_shp
+      - object_to_color
       - tune_tolerance
       - plot.anal_obj
       - summary_index
@@ -156,6 +193,8 @@ reference:
       - utils_rows_cols
       - utils_stats
       - utils_wd
+      - random_color
+      - ggplot_color
 
 
 

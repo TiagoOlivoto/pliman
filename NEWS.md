@@ -8,7 +8,7 @@
 
 * A set of `poly_*()` function to analyze polygons. All of them are based on a set of coordinate points describing the edge of the object(s). See ?`utils_polygon` for more details.
 
-* `get_na_here()` and `set_na_here()` to deal with working directories.
+* `get_wd_here()` and `set_wd_here()` to deal with working directories.
 
 * `apply_fun_to_imgs()` to apply a function (or functions) to a set of images stored in the working directory.
 
@@ -16,13 +16,35 @@
 
 * `image_segment_manual()`, `image segment kmeans()`, and `image_segment_mask()` to perform image segmentation in different ways.
 
-## New features
-* Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, and circularity. This improvement was at cost of a slight increase in computation time.
+* A new family of `efourier_*()` functions to performs Elliptical Fourier Analysis.
+   - `efourier()`:	Elliptical Fourier Analysis
+   - `efourier_coefs()`:	Get Fourier coefficients
+   - `efourier_error()`:	Erros between the original and reconstructed outline
+   - `efourier_inv()`:	Inverse Elliptical Fourier Analysis
+   - `efourier_norm()`:	Normalized Fourier coefficients
+   - `efourier_power()`:	Power in Fourier Analysis
+   - `efourier_shape()`:	Draw shapes based on Fourier coefficients
+   
+* A new family of `landmarks_*()` functions to handle landmarks
+   - `landmarks()`: Create image landmarks
+   - `landmarks_add()`:	Artificially inflates the number of landmarks
+   - `landmarks_angle()`:	Angles between landmarks
+   - `landmarks_dist()`:	Distances between landmarks
+   - `landmarks_regradi()`:	Pseudolandmarks with equally spaced angles
+   
 
+## New features
 * Haralick's features that quantify pixel texture for image objects were included.
 
+* Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, circularity. Haralick's features are now computed by default. .  This improvement was at cost of a slight increase in computation time.
+
 * `analyze_objects()`, `measure_disease()`, and `measure_disease_byl()` have now a `filter` argument that applies a median filtering in the binary mask. This is useful to reduce the noise in the segmentation of objects.
-* Included `reference_larger` and `reference_smaller` arguments in `analyze_objects()` indicating when the larger/smaller object in the image must be used as the reference object.
+
+* Arguments `reference_larger` and `reference_smaller` were included in `analyze_objects()` indicating when the larger/smaller object in the image must be used as the reference object.
+
+* Arguments `efourier` and `nharm` included in `analyze_objects()`. If `efourier = TRUE`, Elliptical Fourier analysis is computed for each object depending on the number of harmonics (`nharm`).
+
+* Argument
 
 
 ## Minor changes

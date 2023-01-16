@@ -151,7 +151,7 @@ manipulate_files <- function(pattern,
       name <-
         unlist(lapply(seq_along(names),
                       function(i){
-                        paste0(name, i, collapse = "_")
+                        paste0(name,  collapse = "_")
                       }))
     } else{
       name <- name

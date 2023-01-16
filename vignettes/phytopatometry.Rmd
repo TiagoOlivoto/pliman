@@ -43,7 +43,9 @@ Sample palettes can be made by simply manually sampling small areas of represent
 
 ```{r}
 pals <- image_palette(img, npal = 8)
-image_combine(pals, ncol = 4)
+
+# to extract the color palettes, use the object
+plot(pals$palette_list[[1]])
 ```
 
 ```{r disease2, fig.width=10, fig.height=7}

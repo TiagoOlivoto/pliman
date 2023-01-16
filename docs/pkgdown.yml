@@ -1,5 +1,5 @@
-pandoc: 2.17.1.1
-pkgdown: 2.0.3
+pandoc: 2.19.2
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   analyze_objects: analyze_objects.html
@@ -9,7 +9,7 @@ articles:
   pliman_start: pliman_start.html
   polygons: polygons.html
   segmentation: segmentation.html
-last_built: 2022-06-03T12:42Z
+last_built: 2023-01-16T18:58Z
 urls:
   reference: https://tiagoolivoto.github.io/pliman/reference
   article: https://tiagoolivoto.github.io/pliman/articles

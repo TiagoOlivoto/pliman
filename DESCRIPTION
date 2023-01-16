@@ -33,3 +33,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     lattice
+LazyData: true

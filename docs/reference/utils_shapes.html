@@ -8,7 +8,7 @@ draw_trian_equi() Draws an equilateral triangle with a desired side.
 draw_trian_rect() Draws a triangle rectangle given two cathetus.
 draw_n_tagon() Draws polygons with n sides
 
-"><title>Utilities for drawing coordinates of known shapes — utils_shapes • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for drawing coordinates of known shapes — utils_shapes"><meta property="og:description" content="The functions computes the coordinates of common shapes such as
+"><title>Utilities for drawing coordinates of known shapes — utils_shapes • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for drawing coordinates of known shapes — utils_shapes"><meta property="og:description" content="The functions computes the coordinates of common shapes such as
 squares triangles, rectangles and circles.
 draw_circle() Draws a perfect circle with a desired radius.
 draw_square() Draws a square with a desired side.
@@ -131,69 +131,82 @@ squares triangles, rectangles and circles.</p><ul><li><p><code>draw_circle()</co
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">draw_circle</span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span>, n <span class="op">=</span> <span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">draw_rectangle</span><span class="op">(</span>side1 <span class="op">=</span> <span class="fl">2</span>, side2 <span class="op">=</span> <span class="fl">3</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">draw_trian_equi</span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">draw_trian_rect</span><span class="op">(</span>cat1 <span class="op">=</span> <span class="fl">1</span>, cat2 <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">draw_n_tagon</span><span class="op">(</span><span class="va">n</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">draw_circle</span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span>, n <span class="op">=</span> <span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">draw_rectangle</span><span class="op">(</span>side1 <span class="op">=</span> <span class="fl">2</span>, side2 <span class="op">=</span> <span class="fl">3</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">draw_trian_equi</span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">draw_trian_rect</span><span class="op">(</span>cat1 <span class="op">=</span> <span class="fl">1</span>, cat2 <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">draw_n_tagon</span><span class="op">(</span><span class="va">n</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>radius</dt>
 <dd><p>The radius of the circle. Defaults to <code>1</code>.</p></dd>
+
+
 <dt>n</dt>
 <dd><p>The number of sides in the <code>n</code>-tagon.</p></dd>
+
+
 <dt>plot</dt>
 <dd><p>Plots the result? Defaults to <code>TRUE</code>.</p></dd>
+
+
 <dt>side</dt>
 <dd><p>The side of the square/equilateral triangle. Defaults to <code>2</code>.</p></dd>
+
+
 <dt>side1, side2</dt>
 <dd><p>The first and second sides of the rectangle. Defaults to
 <code>2</code> and <code>3</code>, respectively.</p></dd>
+
+
 <dt>cat1, cat2</dt>
 <dd><p>The first and second cathetus of the right triangle.
 Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with the <code>x</code> and <code>y</code> coordinates</p>
+    
+
+<p>A data frame with the <code>x</code> and <code>y</code> coordinates</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">########## An example of a circle ##########</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">radius</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span class="r-in"><span class="va">circ</span> <span class="op">&lt;-</span> <span class="fu">draw_circle</span><span class="op">(</span>radius <span class="op">=</span> <span class="va">radius</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">########## An example of a circle ##########</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">radius</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="va">circ</span> <span class="op">&lt;-</span> <span class="fu">draw_circle</span><span class="op">(</span>radius <span class="op">=</span> <span class="va">radius</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area</span></span>
-<span class="r-in"><span class="va">pi</span> <span class="op">*</span> <span class="va">radius</span> <span class="op">^</span> <span class="fl">2</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area</span></span></span>
+<span class="r-in"><span><span class="va">pi</span> <span class="op">*</span> <span class="va">radius</span> <span class="op">^</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 28.27433</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">circ</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">circ</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 28.27415</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter</span></span>
-<span class="r-in"><span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">radius</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter</span></span></span>
+<span class="r-in"><span><span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">radius</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18.84956</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">circ</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">circ</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18.84952</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">############ An example of a square ############</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">############ An example of a square ############</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
@@ -201,28 +214,28 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 2 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 0 0</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">^</span> <span class="fl">2</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">^</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">############ An example of a rectangle ############</span></span>
-<span class="r-in"><span class="va">side1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span class="r-in"><span class="va">side2</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">rect</span> <span class="op">&lt;-</span> <span class="fu">draw_rectangle</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">############ An example of a rectangle ############</span></span></span>
+<span class="r-in"><span><span class="va">side1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="va">side2</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">rect</span> <span class="op">&lt;-</span> <span class="fu">draw_rectangle</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
@@ -230,77 +243,77 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 3 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 3 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 0 0</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">rect</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">rect</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">rect</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">rect</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">###########  An example of an equilateral triangle #########</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># defaults</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">trig</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_equi</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">###########  An example of an equilateral triangle #########</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># defaults</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">trig</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_equi</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x         y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 1.0 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.5 0.8660254</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.0 0.0000000</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">### area (b*h / 2)</span></span>
-<span class="r-in"><span class="co"># height of the triangle</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">h</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">side</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">### area (b*h / 2)</span></span></span>
+<span class="r-in"><span><span class="co"># height of the triangle</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">h</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">side</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8660254</span>
-<span class="r-in"><span class="va">side</span> <span class="op">*</span> <span class="va">h</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">*</span> <span class="va">h</span> <span class="op">/</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4330127</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">trig</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">trig</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4330127</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">### perimeter (side * 3)</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">trig</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">### perimeter (side * 3)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">trig</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">########### An example of a rectangle triangle ##########</span></span>
-<span class="r-in"><span class="va">cat1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span class="r-in"><span class="va">cat2</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_rect</span><span class="op">(</span><span class="va">cat1</span>, <span class="va">cat2</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">########### An example of a rectangle triangle ##########</span></span></span>
+<span class="r-in"><span><span class="va">cat1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="va">cat2</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_rect</span><span class="op">(</span><span class="va">cat1</span>, <span class="va">cat2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-5.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 3 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 0 0</span>
-<span class="r-in"><span class="co"># area</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">cat1</span> <span class="op">*</span> <span class="va">cat2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span class="r-in"><span><span class="co"># area</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">cat1</span> <span class="op">*</span> <span class="va">cat2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter</span></span>
-<span class="r-in"><span class="va">cat1</span> <span class="op">+</span> <span class="va">cat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">cat1</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">cat2</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter</span></span></span>
+<span class="r-in"><span><span class="va">cat1</span> <span class="op">+</span> <span class="va">cat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">cat1</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">cat2</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.605551</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.605551</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">############ An creating shapes with n sides ############</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">############ An creating shapes with n sides ############</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
@@ -308,17 +321,17 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 2 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 0 0</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">^</span> <span class="fl">2</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">^</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter</span></span>
-<span class="r-in"><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter</span></span></span>
+<span class="r-in"><span><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
 </code></pre></div>
     </div>
@@ -331,7 +344,7 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

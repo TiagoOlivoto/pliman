@@ -52,13 +52,52 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/analyze_objects.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/analyze_objects_shp.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/apply_fun_to_imgs.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/calibrate.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/contours.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/count_lesions.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/count_objects.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_coefs.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_error.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_inv.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_norm.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_power.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/efourier_shape.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/ellipse.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/ggplot_color.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_align.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_binary.html</loc>
@@ -70,6 +109,9 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_create.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_expand.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_index.html</loc>
   </url>
   <url>
@@ -79,16 +121,52 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_segment.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_segment_kmeans.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_segment_manual.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_segment_mask.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_shp.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_square.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_to_mat.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/landmarks.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/landmarks_add.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/landmarks_angle.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/landmarks_dist.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/landmarks_regradi.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/leading_zeros.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/leaf_area.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/make_brush.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/make_mask.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/measure_disease.html</loc>
@@ -103,6 +181,12 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/object_split.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/object_split_shp.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/object_to_color.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/palettes.html</loc>
   </url>
   <url>
@@ -110,6 +194,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/pliman_images.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/plot.image_shp.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/prop_segmented.html</loc>
@@ -179,6 +266,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/utils_transform.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_wd.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/SUPPORT.html</loc>

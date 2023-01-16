@@ -14,7 +14,7 @@ known distance informed by the user. See more information in the Details
 section.
 npixels() returns the number of pixels of an image.
 
-"><title>Utilities for image resolution — utils_dpi • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for image resolution — utils_dpi"><meta property="og:description" content="Provides useful conversions between size (cm), number of pixels (px) and
+"><title>Utilities for image resolution — utils_dpi • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for image resolution — utils_dpi"><meta property="og:description" content="Provides useful conversions between size (cm), number of pixels (px) and
 dots per inch (dpi).
 dpi_to_cm() converts a known dpi value to centimeters.
 cm_to_dpi() converts a known centimeter values to dpi.
@@ -149,37 +149,48 @@ section.</p></li>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">dpi_to_cm</span><span class="op">(</span><span class="va">dpi</span><span class="op">)</span>
-
-<span class="fu">cm_to_dpi</span><span class="op">(</span><span class="va">cm</span><span class="op">)</span>
-
-<span class="fu">pixels_to_cm</span><span class="op">(</span><span class="va">px</span>, <span class="va">dpi</span><span class="op">)</span>
-
-<span class="fu">cm_to_pixels</span><span class="op">(</span><span class="va">cm</span>, <span class="va">dpi</span><span class="op">)</span>
-
-<span class="fu">npixels</span><span class="op">(</span><span class="va">image</span><span class="op">)</span>
-
-<span class="fu">dpi</span><span class="op">(</span><span class="va">image</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">distance</span><span class="op">(</span><span class="va">image</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dpi_to_cm</span><span class="op">(</span><span class="va">dpi</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cm_to_dpi</span><span class="op">(</span><span class="va">cm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">pixels_to_cm</span><span class="op">(</span><span class="va">px</span>, <span class="va">dpi</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cm_to_pixels</span><span class="op">(</span><span class="va">cm</span>, <span class="va">dpi</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">npixels</span><span class="op">(</span><span class="va">image</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">dpi</span><span class="op">(</span><span class="va">image</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">distance</span><span class="op">(</span><span class="va">image</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>dpi</dt>
 <dd><p>The image resolution in dots per inch.</p></dd>
+
+
 <dt>cm</dt>
 <dd><p>The size in centimeters.</p></dd>
+
+
 <dt>px</dt>
 <dd><p>The number of pixels.</p></dd>
+
+
 <dt>image</dt>
 <dd><p>An image object.</p></dd>
+
+
 <dt>plot</dt>
 <dd><p>Call a new plot to <code>image</code>? Defaults to <code>TRUE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <ul><li><p><code>dpi_to_cm()</code>, <code>cm_to_dpi()</code>, <code>pixels_to_cm()</code>, and <code>cm_to_pixels()</code> return
+    
+
+<ul><li><p><code>dpi_to_cm()</code>, <code>cm_to_dpi()</code>, <code>pixels_to_cm()</code>, and <code>cm_to_pixels()</code> return
 a numeric value or a vector of numeric values if the input data is a vector.</p></li>
 <li><p><code>dpi()</code> returns the computed dpi (dots per inch) given the known distance
 informed in the plot.</p></li>
@@ -198,40 +209,40 @@ known distance in the image (e.g., <code>la_leaves.jpg</code>).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># Convert  dots per inch to centimeter</span></span>
-<span class="r-in"><span class="fu">dpi_to_cm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Convert  dots per inch to centimeter</span></span></span>
+<span class="r-in"><span><span class="fu">dpi_to_cm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.5400000 1.2700000 0.8466667</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Convert centimeters to dots per inch</span></span>
-<span class="r-in"><span class="fu">cm_to_dpi</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Convert centimeters to dots per inch</span></span></span>
+<span class="r-in"><span><span class="fu">cm_to_dpi</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3937008 0.7874016 1.1811024</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Convert centimeters to number of pixels with resolution of 96 dpi.</span></span>
-<span class="r-in"><span class="fu">cm_to_pixels</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">96</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Convert centimeters to number of pixels with resolution of 96 dpi.</span></span></span>
+<span class="r-in"><span><span class="fu">cm_to_pixels</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">96</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  37.79528  75.59055 113.38583</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Convert number of pixels to cm with resolution of 96 dpi.</span></span>
-<span class="r-in"><span class="fu">pixels_to_cm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">96</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Convert number of pixels to cm with resolution of 96 dpi.</span></span></span>
+<span class="r-in"><span><span class="fu">pixels_to_cm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">96</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.02645833 0.05291667 0.07937500</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in"><span class="co">#### compute the dpi (dots per inch) resolution ####</span></span>
-<span class="r-in"><span class="co"># only works in an interactive section</span></span>
-<span class="r-in"><span class="co"># objects_300dpi.jpg has a known resolution of 300 dpi</span></span>
-<span class="r-in"><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># Higher square: 10 x 10 cm</span></span>
-<span class="r-in"><span class="co"># 1) Run the function dpi()</span></span>
-<span class="r-in"><span class="co"># 2) Use the left mouse button to create a line in the higher square</span></span>
-<span class="r-in"><span class="co"># 3) Declare a known distance (10 cm)</span></span>
-<span class="r-in"><span class="co"># 4) See the computed dpi</span></span>
-<span class="r-in"><span class="fu">dpi</span><span class="op">(</span><span class="va">img</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">img2</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaves.jpg"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># square leaf sample (2 x 2 cm)</span></span>
-<span class="r-in"><span class="fu">dpi</span><span class="op">(</span><span class="va">img2</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">#### compute the dpi (dots per inch) resolution ####</span></span></span>
+<span class="r-in"><span><span class="co"># only works in an interactive section</span></span></span>
+<span class="r-in"><span><span class="co"># objects_300dpi.jpg has a known resolution of 300 dpi</span></span></span>
+<span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Higher square: 10 x 10 cm</span></span></span>
+<span class="r-in"><span><span class="co"># 1) Run the function dpi()</span></span></span>
+<span class="r-in"><span><span class="co"># 2) Use the left mouse button to create a line in the higher square</span></span></span>
+<span class="r-in"><span><span class="co"># 3) Declare a known distance (10 cm)</span></span></span>
+<span class="r-in"><span><span class="co"># 4) See the computed dpi</span></span></span>
+<span class="r-in"><span><span class="fu">dpi</span><span class="op">(</span><span class="va">img</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">img2</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"la_leaves.jpg"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># square leaf sample (2 x 2 cm)</span></span></span>
+<span class="r-in"><span><span class="fu">dpi</span><span class="op">(</span><span class="va">img2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -243,7 +254,7 @@ known distance in the image (e.g., <code>la_leaves.jpg</code>).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

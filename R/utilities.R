@@ -659,7 +659,24 @@ random_color <- function(n = 1, distinct = FALSE){
 }
 
 
-
+#' ggplot2-like colors generation
+#'
+#' Generate ggplot2
+#'
+#' @param n The number of colors. This works well for up to about eight colours,
+#'   but after that it becomes hard to tell the different colours apart.
+#'
+#' @importFrom grDevices hcl
+#' @export
+#' @examples
+#'
+#' library(pliman)
+#' ggplot_color(n = 3)
+ggplot_color <- function(n = 1){
+  # adapted from https://stackoverflow.com/a/8197703
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
 
 
 #' Set and get the Working Directory quicky
@@ -667,6 +684,7 @@ random_color <- function(n = 1, distinct = FALSE){
 #' * [get_wd_here()] gets the working directory to the path of the current script.
 #' * [set_wd_here()] sets the working directory to the path of the current script.
 #' * [open_wd_here()] Open the File Explorer at the directory path of the current script.
+#' * [open_wd()] Open the File Explorer at the current working directory.
 #'
 #' @param path Path components below the project root. Defaults to `NULL`. This means that
 #'   the directory will be set to the path of the file. If the path doesn't exist, the
@@ -728,7 +746,7 @@ get_wd_here <- function(path = NULL){
       if(inst == "yes"){
         install.packages("rstudioapi", quiet = TRUE)
       } else{
-        message("To use `set_wd_here()`, first install {rstudioapi}.")
+        message("To use `get_wd_here()`, first install {rstudioapi}.")
       }
     }
   } else{
@@ -751,6 +769,25 @@ open_wd_here <- function(path = get_wd_here()){
         install.packages("utils", quiet = TRUE)
       } else{
         message("To use `open_wd_here()`, first install {utils}.")
+      }
+    }
+  } else{
+    utils::browseURL(url = path)
+  }
+}
+
+#' @export
+#' @name utils_wd
+open_wd <- function(path = getwd()){
+  if(!requireNamespace("utils", quietly = TRUE)) {
+    if(interactive() == TRUE){
+      inst <-
+        switch(menu(c("Yes", "No"), title = "Package {utils} required but not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        install.packages("utils", quiet = TRUE)
+      } else{
+        message("To use `open_wd()`, first install {utils}.")
       }
     }
   } else{

@@ -64,14 +64,13 @@ to 50
 poly_sample_prop() Samples a proportion of coordinates among existing
 points. Defaults to 0.1
 poly_spline() Interpolates a polygon contour.
-poly_smooth() Smooths a polygon contour by combining sampling prop
-coordinate points and them interpoling them using vertices vertices.
+poly_smooth() Smooths a polygon contour using a simple moving average.
 poly_jitter() Add a small amount of noise to a set of point
 coordinates. See base::jitter() for more details.
 
 poly_measures() Is a wrapper around the poly_*() functions.
 
-"><title>Utilities for Polygons — utils_polygon • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for Polygons — utils_polygon"><meta property="og:description" content="Several useful functions to analyze polygons. All of them are
+"><title>Utilities for Polygons — utils_polygon • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for Polygons — utils_polygon"><meta property="og:description" content="Several useful functions to analyze polygons. All of them are
 based on a set of coordinate points describing the edge of the object(s).
 Area measures
 conv_hull() Computes convex hull of a set of points.
@@ -136,8 +135,7 @@ to 50
 poly_sample_prop() Samples a proportion of coordinates among existing
 points. Defaults to 0.1
 poly_spline() Interpolates a polygon contour.
-poly_smooth() Smooths a polygon contour by combining sampling prop
-coordinate points and them interpoling them using vertices vertices.
+poly_smooth() Smooths a polygon contour using a simple moving average.
 poly_jitter() Add a small amount of noise to a set of point
 coordinates. See base::jitter() for more details.
 
@@ -306,8 +304,7 @@ to <code>50</code></p></li>
 <li><p><code>poly_sample_prop()</code> Samples a proportion of coordinates among existing
 points. Defaults to <code>0.1</code></p></li>
 <li><p><code>poly_spline()</code> Interpolates a polygon contour.</p></li>
-<li><p><code>poly_smooth()</code> Smooths a polygon contour by combining sampling <code>prop</code>
-coordinate points and them interpoling them using <code>vertices</code> vertices.</p></li>
+<li><p><code>poly_smooth()</code> Smooths a polygon contour using a simple moving average.</p></li>
 <li><p><code>poly_jitter()</code> Add a small amount of noise to a set of point
 coordinates. See <code><a href="https://rdrr.io/r/base/jitter.html" class="external-link">base::jitter()</a></code> for more details.</p></li>
 </ul></li>
@@ -316,67 +313,67 @@ coordinates. See <code><a href="https://rdrr.io/r/base/jitter.html" class="exter
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">poly_check</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_is_closed</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_close</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_unclose</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_limits</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">conv_hull</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_area</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_slide</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, fp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-
-<span class="fu">poly_distpts</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_centdist</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_rotate</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, angle <span class="op">=</span> <span class="fl">0</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">poly_align</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">poly_lw</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_eccentricity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_convexity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_caliper</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_elongation</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_solidity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_flip_y</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_flip_x</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_sample</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
-
-<span class="fu">poly_sample_prop</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, prop <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
-
-<span class="fu">poly_jitter</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, noise_x <span class="op">=</span> <span class="fl">1</span>, noise_y <span class="op">=</span> <span class="fl">1</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">poly_circularity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_circularity_haralick</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_measures</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_mass</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">poly_spline</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, vertices <span class="op">=</span> <span class="fl">100</span>, k <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-
-<span class="fu">poly_smooth</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, prop <span class="op">=</span> <span class="fl">0.1</span>, vertices <span class="op">=</span> <span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poly_check</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_is_closed</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_close</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_unclose</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_limits</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">conv_hull</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_area</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_slide</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, fp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_distpts</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_centdist</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_rotate</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, angle <span class="op">=</span> <span class="fl">0</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_align</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_lw</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_eccentricity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_convexity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_caliper</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_elongation</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_solidity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_flip_y</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_flip_x</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_sample</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_sample_prop</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, prop <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_jitter</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, noise_x <span class="op">=</span> <span class="fl">1</span>, noise_y <span class="op">=</span> <span class="fl">1</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_circularity</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_circularity_haralick</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_measures</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_mass</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_spline</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, vertices <span class="op">=</span> <span class="fl">100</span>, k <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">poly_smooth</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, niter <span class="op">=</span> <span class="fl">10</span>, n <span class="op">=</span> <span class="cn">NULL</span>, prop <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -386,28 +383,50 @@ coordinates. See <code><a href="https://rdrr.io/r/base/jitter.html" class="exter
 (<code>x</code> and <code>y</code>), or a 2-column matrix <code>x</code>. If <code>x</code> is a list of vector
 coordinates the function will be applied to each element using
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">base::lapply()</a></code>.</p></dd>
+
+
 <dt>fp</dt>
 <dd><p>The id of the point that will become the new first point. Defaults
 to <code>1</code>.</p></dd>
+
+
 <dt>angle</dt>
 <dd><p>The angle (0-360) to rotate the object.</p></dd>
+
+
 <dt>plot</dt>
 <dd><p>Plots the object? Defaults to <code>TRUE</code></p></dd>
+
+
 <dt>n, prop</dt>
-<dd><p>The number and proportion of coordinates to sample,
-respectively when using <code>poly_sample*()</code>.</p></dd>
+<dd><p>The number and proportion of coordinates to sample from the
+perimeter coordinates. In <code>poly_smooth()</code> these arguments can be used to
+sample points from the object's perimeter before smoothing.</p></dd>
+
+
 <dt>noise_x, noise_y</dt>
 <dd><p>A numeric factor to define the noise added to <code>x</code> and
 <code>y</code> axis, respectively. See <code><a href="https://rdrr.io/r/base/jitter.html" class="external-link">base::jitter()</a></code> for more details.</p></dd>
+
+
 <dt>vertices</dt>
 <dd><p>The number of spline vertices to create.</p></dd>
+
+
 <dt>k</dt>
 <dd><p>The number of points to wrap around the ends to obtain a smooth
 periodic spline.</p></dd>
+
+
+<dt>niter</dt>
+<dd><p>An integer indicating the number of smoothing iterations.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <ul><li><p><code>conv_hull()</code> and <code>poly_spline()</code> returns a matrix with <code>x</code> and <code>y</code>
+    
+
+<ul><li><p><code>conv_hull()</code> and <code>poly_spline()</code> returns a matrix with <code>x</code> and <code>y</code>
 coordinates for the convex hull/smooth line in clockwise order. If <code>x</code> is a
 list, a list of points is returned.</p></li>
 <li><p><code>poly_area()</code> returns a <code>double</code>, or a numeric vector if <code>x</code> is a list of
@@ -436,95 +455,95 @@ Computer Vision. 3rd ed. World Scientific.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># A 2 x 2 square</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_shapes.html">draw_square</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># square area</span></span>
-<span class="r-in"><span class="fu">poly_area</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># A 2 x 2 square</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_shapes.html">draw_square</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># square area</span></span></span>
+<span class="r-in"><span><span class="fu">poly_area</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># polygon perimeter</span></span>
-<span class="r-in"><span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># polygon perimeter</span></span></span>
+<span class="r-in"><span><span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># center of mass of the square</span></span>
-<span class="r-in"><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu">poly_mass</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_mass</a></span><span class="op">(</span><span class="va">cm</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># The convex hull will be the vertices of the square</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">conv_square</span> <span class="op">&lt;-</span> <span class="fu">conv_hull</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> |&gt; <span class="fu">poly_close</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># center of mass of the square</span></span></span>
+<span class="r-in"><span><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu">poly_mass</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_mass</a></span><span class="op">(</span><span class="va">cm</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The convex hull will be the vertices of the square</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">conv_square</span> <span class="op">&lt;-</span> <span class="fu">conv_hull</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">poly_close</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 2 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 2 0</span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_contour</a></span><span class="op">(</span><span class="va">conv_square</span>,</span>
-<span class="r-in">             col <span class="op">=</span> <span class="st">"blue"</span>,</span>
-<span class="r-in">             lwd <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_contour</a></span><span class="op">(</span><span class="va">conv_square</span>,</span></span>
+<span class="r-in"><span>             col <span class="op">=</span> <span class="st">"blue"</span>,</span></span>
+<span class="r-in"><span>             lwd <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_polygon-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">poly_area</span><span class="op">(</span><span class="va">conv_square</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">poly_area</span><span class="op">(</span><span class="va">conv_square</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">################### Example with a polygon ##################</span></span>
-<span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>,   <span class="fl">2</span>, <span class="fl">3</span>,  <span class="fl">5</span>, <span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6.5</span>, <span class="fl">7</span>, <span class="fl">3</span>,  <span class="fl">1</span>, <span class="fl">1</span>,  <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">df_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area of the polygon</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">df_poly</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">poly_area</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">################### Example with a polygon ##################</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>,   <span class="fl">2</span>, <span class="fl">3</span>,  <span class="fl">5</span>, <span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6.5</span>, <span class="fl">7</span>, <span class="fl">3</span>,  <span class="fl">1</span>, <span class="fl">1</span>,  <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area of the polygon</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">df_poly</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">poly_area</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perimeter of the polygon</span></span>
-<span class="r-in"><span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perimeter of the polygon</span></span></span>
+<span class="r-in"><span><span class="fu">poly_perimeter</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 21.27069</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># center of mass of polygon</span></span>
-<span class="r-in"><span class="co"># arrows from center of mass to maximum and minimum radius</span></span>
-<span class="r-in"><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu">poly_mass</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_mass</a></span><span class="op">(</span><span class="va">cm</span>, arrow <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># vertices of the convex hull</span></span>
-<span class="r-in"><span class="op">(</span><span class="va">conv_poly</span> <span class="op">&lt;-</span> <span class="fu">conv_hull</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># center of mass of polygon</span></span></span>
+<span class="r-in"><span><span class="co"># arrows from center of mass to maximum and minimum radius</span></span></span>
+<span class="r-in"><span><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu">poly_mass</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_mass</a></span><span class="op">(</span><span class="va">cm</span>, arrow <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># vertices of the convex hull</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">conv_poly</span> <span class="op">&lt;-</span> <span class="fu">conv_hull</span><span class="op">(</span><span class="va">df_poly</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    x   y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5  5 1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7 -1 0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9  0 5.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  1 6.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3  2 7.0</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># area of the convex hull</span></span>
-<span class="r-in"><span class="fu">poly_area</span><span class="op">(</span><span class="va">conv_poly</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># area of the convex hull</span></span></span>
+<span class="r-in"><span><span class="fu">poly_area</span><span class="op">(</span><span class="va">conv_poly</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 24</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">conv_poly</span>,</span>
-<span class="r-in">             fill <span class="op">=</span> <span class="st">"red"</span>,</span>
-<span class="r-in">              alpha <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span class="r-in">               add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">conv_poly</span>,</span></span>
+<span class="r-in"><span>             fill <span class="op">=</span> <span class="st">"red"</span>,</span></span>
+<span class="r-in"><span>              alpha <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>               add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_polygon-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">############ example of circularity measures ################</span></span>
-<span class="r-in"><span class="va">tri</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_shapes.html">draw_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">tri</span>, aspect_ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">############ example of circularity measures ################</span></span></span>
+<span class="r-in"><span><span class="va">tri</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_shapes.html">draw_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">tri</span>, aspect_ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_polygon-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">tri</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">tri</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.000083</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tri2</span> <span class="op">&lt;-</span></span>
-<span class="r-in">  <span class="fu"><a href="utils_shapes.html">draw_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> |&gt;</span>
-<span class="r-in">  <span class="fu">poly_jitter</span><span class="op">(</span>noise_x <span class="op">=</span> <span class="fl">100</span>, noise_y <span class="op">=</span> <span class="fl">100</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">tri2</span>, aspect_ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tri2</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="utils_shapes.html">draw_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">poly_jitter</span><span class="op">(</span>noise_x <span class="op">=</span> <span class="fl">100</span>, noise_y <span class="op">=</span> <span class="fl">100</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">tri2</span>, aspect_ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_polygon-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">tri2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">poly_circularity_norm</span><span class="op">(</span><span class="va">tri2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.267712</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -536,7 +555,7 @@ Computer Vision. 3rd ed. World Scientific.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

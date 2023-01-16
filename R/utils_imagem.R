@@ -282,6 +282,9 @@ image_pliman <- function(image, plot = FALSE){
   }
 }
 
+
+
+
 ##### Spatial transformations
 #'Spatial transformations
 #'

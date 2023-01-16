@@ -49,4 +49,26 @@ if (getRversion() >= "2.15.1") {
       "Spectrum", "value", "area", "id", ".", "object", "s.radius.max",
       "s.radius.min", "y", "s.area", "s.perimeter", "symptomatic", "m.eccentricity",
       "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames", "s.radius.sd"))
-  }
+}
+
+
+#' @title Contour outlines from five leaves
+#' @description A list of contour outlines from five leaves. It may be used as
+#'   example in some functions such as [efourier()]
+#' @format A list with five objects
+#' * `leaf_1`
+#' * `leaf_2`
+#' * `leaf_3`
+#' * `leaf_4`
+#' * `leaf_5`
+#'
+#' Each object is a `data.frame` with the coordinates for the outline perimeter
+#' @md
+#' @name contours
+#' @source Personal data. The images were obtained in the Flavia data set
+#'   downlodable at <https://flavia.sourceforge.net/>
+#' @docType data
+#' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
+#' @keywords data
+NULL
+

@@ -91,8 +91,7 @@
 #'
 #'   - `poly_spline()` Interpolates a polygon contour.
 #'
-#'   - `poly_smooth()` Smooths a polygon contour by combining sampling `prop`
-#'   coordinate points and them interpoling them using `vertices` vertices.
+#'   - `poly_smooth()` Smooths a polygon contour using a simple moving average.
 #'
 #'   - `poly_jitter()` Add a small amount of noise to a set of point
 #'   coordinates. See [base::jitter()] for more details.
@@ -112,8 +111,10 @@
 #' @param vertices The number of spline vertices to create.
 #' @param k The number of points to wrap around the ends to obtain a smooth
 #'   periodic spline.
-#' @param n,prop The number and proportion of coordinates to sample,
-#'   respectively when using `poly_sample*()`.
+#' @param n,prop The number and proportion of coordinates to sample from the
+#'   perimeter coordinates. In `poly_smooth()` these arguments can be used to
+#'   sample points from the object's perimeter before smoothing.
+#' @param niter An integer indicating the number of smoothing iterations.
 #' @name utils_polygon
 #' @return
 #'  * `conv_hull()` and `poly_spline()` returns a matrix with `x` and `y`
@@ -439,6 +440,7 @@ poly_align <- function(x,
   }
 }
 
+
 #' @name utils_polygon
 #' @export
 # computes width and length
@@ -719,7 +721,7 @@ poly_measures <- function(x, y = NULL){
 #' @export
 poly_mass <- function(x, y = NULL){
   # adapted from https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
-  if (inherits(x, "list")) {
+  if (inherits(x, "list") | inherits(x, "iefourier_lst")) {
     do.call(rbind, lapply(x, poly_mass, y))
   } else{
     if(is.null(y)){
@@ -792,23 +794,40 @@ poly_spline <- function(x,
 #' @export
 poly_smooth <- function(x,
                         y = NULL,
-                        prop = 0.1,
-                        vertices = 1000,
-                        plot = TRUE){
+                        niter = 10,
+                        n = NULL,
+                        prop = NULL,
+                        plot = TRUE) {
   if (inherits(x, "list")) {
-    coords <- lapply(x, poly_smooth, y, prop, vertices, plot)
+    coords <- lapply(x, poly_smooth, y, niter, n, prop, plot)
     if(isTRUE(plot)){
       plot_polygon(coords, merge = FALSE, aspect_ratio = 1)
     }
     return(coords)
   } else{
     coords <- poly_check(x, y)
-    sampls <- poly_sample_prop(coords, prop = prop)
-    spl <- poly_spline(sampls, vertices = vertices)
-    if(isTRUE(plot)){
-      plot_polygon(spl)
+    if(!is.null(n) ){
+      coords <-
+        poly_sample(coords,
+                    n = n)
     }
-    return(spl)
+    if(!is.null(prop) ){
+      coords <-
+        poly_sample_prop(coords,
+                         prop = prop)
+    }
+    p <- nrow(coords)
+    a <- 0
+    while (a < niter) {
+      a <- a + 1
+      coo_i <- rbind(coords[-1, ], coords[1, ])
+      coo_s <- rbind(coords[p, ], coords[-p, ])
+      coords <- coords/2 + coo_i/4 + coo_s/4
+    }
+    if(isTRUE(plot)){
+      plot_polygon(coords, aspect_ratio = 1)
+    }
+    return(coords)
   }
 }
 
@@ -834,16 +853,20 @@ poly_smooth <- function(x,
 #'   polygon's border, and the alpha transparency (1 opaque, 0 transparent).
 #' @param random_fill Fill multiple objects with random colors? Defaults to
 #'   `TRUE`.
+#' @param points Plot the points? Defaults to `FALSE`.
 #' @param merge Merge multiple objects into a single plot? Defaults to `TRUE`.
 #'   If `FALSE`, a single call `plot()` will be used for each objects. Use
 #'   `nrow` and `ncol` to control the number of rows and columns of the window.
 #' @param add Add the current plot to a previous one? Defaults to `FALSE`.
 #' @param nrow,ncol The number of rows and columns to use in the composite
 #'   image. Defaults to `NULL`, i.e., a square grid is produced.
-#' @param aspect_ratio The x/y aspect ratio. Defaults to `NULL`. Set
-#'   `aspect_ratio = 1` to set up the window so that one data unit in the y
-#'   direction is equal to one data unit in the x direction.
+#' @param aspect_ratio The x/y aspect ratio. Defaults to `1`. This will set up
+#'   the window so that one data unit in the y direction is equal to one data
+#'   unit in the x direction. Set `aspect_ratio = NULL` to fit the object to the
+#'   window size.
 #' @param show_id Shows the object id? Defaults to `TRUE`.
+#' @param xlim,ylim A numeric vector of length 2 (min; max) indicating the range
+#'   of `x` and `y`-axes.
 #' @param arrow If `TRUE` (default) plots two arrows connecting the center of
 #'   mass to the minimum and maximum radius.
 #' @param object An object computed with [analyze_objects()].
@@ -859,18 +882,15 @@ poly_smooth <- function(x,
 #' @export
 #'
 #' @examples
-#' img <- image_pliman("potato_leaves.jpg")
-#' cont <- object_contour(img, watershed = FALSE)
-#'
-#' plot_polygon(cont)
-#' plot_contour(cont, id = 2, col = "red", lwd = 4)
+#' plot_polygon(contours)
+#' plot_contour(contours[[1]], id = 6, col = "red", lwd = 3)
 plot_contour <- function(x,
                          y = NULL,
                          id = NULL,
                          col = "black",
                          lwd = 1,
                          ...){
-  if (inherits(x, "list")) {
+  if (inherits(x, "list") | inherits(x, "iefourier_lst")) {
     if(is.null(id)){
       invisible(lapply(x, plot_contour, y, id, col, lwd))
     } else{
@@ -891,19 +911,27 @@ plot_contour <- function(x,
 #' @export
 plot_polygon <- function(x,
                          y = NULL,
-                         fill = "blue",
+                         fill = "gray",
                          random_fill = TRUE,
+                         points = FALSE,
                          merge = TRUE,
                          border = "black",
                          alpha = 1,
                          add = FALSE,
                          nrow = NULL,
                          ncol = NULL,
-                         aspect_ratio = NULL,
+                         aspect_ratio = 1,
                          show_id = TRUE,
+                         xlim = NULL,
+                         ylim = NULL,
                          ...){
-  if (inherits(x, "list")) {
+  if (inherits(x, "list") | inherits(x, "iefourier_lst")) {
     if(isTRUE(merge)){
+      if(inherits(x[[1]][[1]], "landmarks_regradi")){
+        x <- lapply(x, function(x){
+          x[[1]]$coords
+        })
+      }
       binds <- do.call(rbind,
                        lapply(x, function(x){
                          x
@@ -913,12 +941,15 @@ plot_polygon <- function(x,
       ylim <- c(lims[3], lims[4])
 
       plot(binds,
+           axes = FALSE,
            type = "n",
            xlab = "",
            ylab = "",
            xlim = xlim,
            ylim = ylim,
            asp = 1)
+      axis(1)
+      axis(2)
 
       ifelse(random_fill == TRUE,
              colf <- random_color(n = length(x)),
@@ -944,7 +975,11 @@ plot_polygon <- function(x,
       }
 
     } else{
-
+      if(inherits(x[[1]][[1]], "landmarks_regradi")){
+        x <- lapply(x, function(x){
+          x[[1]]$coords
+        })
+      }
       num_plots <- length(x)
       if (is.null(nrow) && is.null(ncol)){
         ncol <- ceiling(sqrt(num_plots))
@@ -958,17 +993,25 @@ plot_polygon <- function(x,
       }
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
-      invisible(lapply(x, plot_polygon, y, fill, border, alpha, add, aspect_ratio = aspect_ratio, ...))
+      invisible(lapply(x, plot_polygon, y, fill, random_fill, points, merge, border, alpha, add, aspect_ratio = aspect_ratio, ...))
     }
   } else{
-    coords <- poly_check(x, y)
-
+    if(inherits(x, "landmarks_regradi")){
+      coords <- x$coords
+    } else{
+      coords <- poly_check(x, y)
+    }
     if(isFALSE(add)){
       plot(coords,
+           axes = FALSE,
            type = "n",
            xlab = "",
            ylab = "",
+           xlim = xlim,
+           ylim = ylim,
            asp = aspect_ratio)
+      axis(1)
+      axis(2)
     }
     if (!isFALSE(fill)) {
       polygon(coords,
@@ -980,8 +1023,12 @@ plot_polygon <- function(x,
               border = border,
               ...)
     }
+    if(isTRUE(points)){
+      points(coords, pch = 16)
+    }
   }
 }
+
 
 #' @name utils_polygon_plot
 #' @export
@@ -1061,3 +1108,4 @@ plot_ellipse <- function(object,
       lines(x, y, col = col, lwd = lwd, )
     })
 }
+
