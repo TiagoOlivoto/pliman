@@ -326,8 +326,8 @@ maximum radius (in pixels), respectively.
 maximum diameter (in pixels), respectively.
 \item \code{major_axis}, \code{minor_axis}: elliptical fit for major and minor axes (in
 pixels).
-\item \code{calliper}: The longest distance between any two points on the margin
-of the object. See \code{\link[=poly_calliper]{poly_calliper()}} for more details
+\item \code{caliper}: The longest distance between any two points on the margin
+of the object. See \code{\link[=poly_caliper]{poly_caliper()}} for more details
 \item \code{length}, \code{width} The length and width of objects (in pixels). These
 measures are obtained as the range of x and y coordinates after aligning
 each object with \code{\link[=poly_align]{poly_align()}}.
@@ -338,12 +338,12 @@ ratio of the eigen values (inertia axes of coordinates).
 \item \code{form_factor} (Wu et al., 2007):  the difference between a leaf and a
 circle. It is defined as \code{4*pi*A/P}, where A is the area and P is the
 perimeter of the object.
-\item \code{narrow_factor} (Wu et al., 2007): Narrow factor (\code{calliper / length}).
+\item \code{narrow_factor} (Wu et al., 2007): Narrow factor (\code{caliper / length}).
 \item \code{asp_ratio} (Wu et al., 2007): Aspect ratio (\code{length / width}).
 \item \code{rectangularity} (Wu et al., 2007): The similarity between a leaf and
 a rectangle (\code{length * width/ area}).
 \item \code{pd_ratio} (Wu et al., 2007): Ratio of perimeter to diameter
-(\code{perimeter / calliper})
+(\code{perimeter / caliper})
 \item \code{plw_ratio} (Wu et al., 2007): Perimeter ratio of length and width
 (\code{perimeter / (length + width)})
 \item \code{solidity}: object solidity given by \code{area / area_ch}.
@@ -355,7 +355,7 @@ between the perimeter of the convex hull and the perimeter of the polygon.
 \code{CH =  m/sd}, where \code{m} and \code{sd} are the mean and standard deviations
 from each pixels of the perimeter to the centroid of the object.
 \item \code{circularity_norm}: The normalized circularity (Cn), to be unity for a
-circle. This measure is computed as `Cn = perimeter ^ 2 / 4\emph{pi}area`` and
+circle. This measure is computed as \code{Cn = perimeter ^ 2 / 4*pi*area} and
 is invariant under translation, rotation, scaling transformations, and
 dimensionless.
 \item \code{asm}: The angular second-moment feature.

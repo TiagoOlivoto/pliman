@@ -15,7 +15,7 @@ produced with \code{\link[=object_contour]{object_contour()}} or a vector of lan
 to 10.}
 
 \item{align}{Align the objects before computing Fourier analysis? Defaults to
-\code{FALSE}. If \code{TRUE}, the object is first aligned along the major calliper
+\code{FALSE}. If \code{TRUE}, the object is first aligned along the major caliper
 with \code{\link[=poly_align]{poly_align()}}.}
 
 \item{smooth_iter}{The number of smoothing iterations to perform. This will
@@ -49,7 +49,7 @@ plot_polygon(leaf1)
 
 #### default options
 # 10 harmonics (default)
-# object is aligned along the major calliper with `poly_align()`
+# object is aligned along the major caliper with `poly_align()`
 ef <- efourier(leaf1)
 efourier_coefs(ef)
 
