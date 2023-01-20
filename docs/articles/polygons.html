@@ -132,7 +132,7 @@
                         <h4 data-toc-skip class="author">Tiago
 Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2023-01-16</h4>
+            <h4 data-toc-skip class="date">2023-01-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/polygons.Rmd" class="external-link"><code>vignettes/polygons.Rmd</code></a></small>
       <div class="d-none name"><code>polygons.Rmd</code></div>
@@ -404,30 +404,30 @@ has a side of 5 cm. So, using <code><a href="../reference/utils_dpi.html">dpi()<
 obtained. In this case, the dpi is ~50.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">measures_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">measures</span>, dpi <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    id       x       y    area area_ch perimeter radius_mean radius_min</span></span>
-<span><span class="co">#&gt; 2   1 910.886 190.083 116.322 148.490    65.539       6.073      3.502</span></span>
-<span><span class="co">#&gt; 4   2 688.698 171.649  53.661  56.578    32.040       4.330      3.157</span></span>
-<span><span class="co">#&gt; 13  3 866.753 482.757  39.183  42.720    28.740       3.664      2.472</span></span>
-<span><span class="co">#&gt; 24  4 959.632 622.004  31.214  32.164    23.698       3.271      2.449</span></span>
-<span><span class="co">#&gt; 36  5 341.372 703.995   5.977   6.716    12.063       1.574      0.876</span></span>
-<span><span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean diam_min diam_max caliper length</span></span>
-<span><span class="co">#&gt; 2       8.697     1.064        0.126    12.147    7.004   17.394  16.183 15.970</span></span>
-<span><span class="co">#&gt; 4       6.592     0.856        0.106     8.659    6.314   13.184  11.968 11.961</span></span>
-<span><span class="co">#&gt; 13      5.510     0.743        0.113     7.328    4.945   11.020   9.561  9.469</span></span>
-<span><span class="co">#&gt; 24      4.858     0.693        0.101     6.543    4.898    9.715   9.361  9.351</span></span>
-<span><span class="co">#&gt; 36      2.663     0.525        0.154     3.149    1.753    5.327   4.992  4.991</span></span>
-<span><span class="co">#&gt;     width solidity convexity elongation circularity circularity_haralick</span></span>
-<span><span class="co">#&gt; 2  13.507    0.783     0.644      0.154      36.927                3.292</span></span>
-<span><span class="co">#&gt; 4   7.042    0.948     0.885      0.411      19.131                3.688</span></span>
-<span><span class="co">#&gt; 13  7.139    0.917     0.758      0.246      21.080                3.328</span></span>
-<span><span class="co">#&gt; 24  5.087    0.970     0.919      0.456      17.991                3.532</span></span>
-<span><span class="co">#&gt; 36  2.066    0.890     0.709      0.586      24.345                1.669</span></span>
-<span><span class="co">#&gt;    circularity_norm eccentricity</span></span>
-<span><span class="co">#&gt; 2             2.939        0.833</span></span>
-<span><span class="co">#&gt; 4             1.522        0.422</span></span>
-<span><span class="co">#&gt; 13            1.677        0.599</span></span>
-<span><span class="co">#&gt; 24            1.432        0.400</span></span>
-<span><span class="co">#&gt; 36            1.937        0.195</span></span></code></pre></div>
+<span><span class="co">#&gt;    id        x        y      area   area_ch perimeter radius_mean radius_min</span></span>
+<span><span class="co">#&gt; 2   1 910.8859 190.0833 116.32235 148.49003  65.53918     6.07337    3.50207</span></span>
+<span><span class="co">#&gt; 4   2 688.6980 171.6494  53.66054  56.57795  32.04021     4.32962    3.15703</span></span>
+<span><span class="co">#&gt; 13  3 866.7526 482.7571  39.18315  42.71991  28.73970     3.66424    2.47249</span></span>
+<span><span class="co">#&gt; 24  4 959.6320 622.0042  31.21413  32.16381  23.69756     3.27138    2.44923</span></span>
+<span><span class="co">#&gt; 36  5 341.3717 703.9947   5.97676   6.71612  12.06250     1.57436    0.87636</span></span>
+<span><span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean diam_min diam_max  caliper</span></span>
+<span><span class="co">#&gt; 2     8.69701   1.06396      0.12616  12.14674  7.00414 17.39403 16.18321</span></span>
+<span><span class="co">#&gt; 4     6.59178   0.85595      0.10607   8.65924  6.31406 13.18355 11.96779</span></span>
+<span><span class="co">#&gt; 13    5.50988   0.74284      0.11321   7.32847  4.94497 11.01976  9.56134</span></span>
+<span><span class="co">#&gt; 24    4.85775   0.69340      0.10076   6.54276  4.89845  9.71549  9.36099</span></span>
+<span><span class="co">#&gt; 36    2.66330   0.52495      0.15438   3.14872  1.75272  5.32660  4.99212</span></span>
+<span><span class="co">#&gt;      length    width solidity convexity elongation circularity</span></span>
+<span><span class="co">#&gt; 2  15.97039 13.50652  0.03980   0.64352    0.15428    36.92656</span></span>
+<span><span class="co">#&gt; 4  11.96062  7.04164  0.04818   0.88508    0.41126    19.13091</span></span>
+<span><span class="co">#&gt; 13  9.46862  7.13916  0.04659   0.75796    0.24602    21.07974</span></span>
+<span><span class="co">#&gt; 24  9.35108  5.08697  0.04930   0.91883    0.45600    17.99103</span></span>
+<span><span class="co">#&gt; 36  4.99137  2.06599  0.04521   0.70931    0.58609    24.34494</span></span>
+<span><span class="co">#&gt;    circularity_haralick circularity_norm eccentricity</span></span>
+<span><span class="co">#&gt; 2               3.29155          2.93852      0.83340</span></span>
+<span><span class="co">#&gt; 4               3.68833          1.52239      0.42177</span></span>
+<span><span class="co">#&gt; 13              3.32842          1.67747      0.59918</span></span>
+<span><span class="co">#&gt; 24              3.53220          1.43168      0.39958</span></span>
+<span><span class="co">#&gt; 36              1.66941          1.93731      0.19494</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

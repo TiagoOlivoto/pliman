@@ -40,7 +40,10 @@ knitr::opts_chunk$set(
 * Get the object contours;
 * Get convex hulls;
 * Isolate objects;
-* Plot object measures.
+* Plot object measures;
+* Perform Elliptical Fourier Analysis;
+* 
+
 
 `pliman` also provides useful functions for image [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), [binarization](https://tiagoolivoto.github.io/pliman/reference/image_binary.html), [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_segment.html), and [resolution](https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html). Please, visit the [Examples](https://tiagoolivoto.github.io/pliman/index.html) page in `pliman` website for a detailed documentation of each function.
 
@@ -68,18 +71,19 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 
 # Basic usage
+The two main functions of pliman are `analyze objects()` and `measure disease()`, which can be used to compute object features and measure disease severity, respectively.
 
-# Analyze objects
-The function `analyze_objects()` can be used to count the objects such as leaves, grains, pods, and pollen in an image. The following example counts and compute the features of soybean grains of an image with 30 grains.
+## Analyze objects
+The function `analyze_objects()` can be used to analyze objects such as leaves, grains, pods, and pollen in an image. The following example counts and computes several features of soybean grains of an image with 30 grains.
 
 ```{r}
 library(pliman)
 img <-image_pliman("soybean_touch.jpg", plot = TRUE)
 soy <- analyze_objects(img, marker = "id")
-soy$statistics
+str(soy$results)
 ```
 
-# Disease severity
+## Disease severity
 
 ```{r fig.width=12, fig.height=3}
 img <-image_pliman("sev_leaf.jpg")
@@ -103,6 +107,14 @@ sev$severity
 `pliman` takes the advantage of several powerful functions from [EBImage package](https://bioconductor.org/packages/release/bioc/html/EBImage.html). Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!
 
 
+# Citation
+
+```{r, comment=""}
+citation("pliman")
+```
+
+
+
 # Getting help
 
 -   If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues). The package [reprex](https://reprex.tidyverse.org/) may help you with that.
@@ -112,5 +124,9 @@ sev$severity
 # Code of Conduct
 
 Please note that the pliman project is released with a [Contributor Code of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+
+
+
+<div align='center'><a href='https://www.free-website-hit-counter.com'><img src='https://www.free-website-hit-counter.com/c.php?d=9&id=144207&s=2' border='0' alt='Free Website Hit Counter'></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free website hit counter</a></small></div>
 
 

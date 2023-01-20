@@ -303,7 +303,7 @@
 #'     from each pixels of the perimeter to the centroid of the object.
 #'
 #'     - `circularity_norm`: The normalized circularity (Cn), to be unity for a
-#'     circle. This measure is computed as `Cn = perimeter ^ 2 / 4*pi*area`` and
+#'     circle. This measure is computed as `Cn = perimeter ^ 2 / 4*pi*area` and
 #'     is invariant under translation, rotation, scaling transformations, and
 #'     dimensionless.
 #'

@@ -253,10 +253,10 @@ removed.</p></dd>
 the larger/smaller object in the image must be used as the reference
 object. This only is valid when <code>reference</code> is set to <code>TRUE</code> and
 <code>reference_area</code> indicates the area of the reference object. IMPORTANT.
-When reference_smaller is used, objects with an area smaller than 1% of the
-mean of all the objects are ignored. This is used to remove possible noise
-in the image such as dust. So, be sure the reference object has an area
-that will be not removed by that cutpoint.</p></dd>
+When <code>reference_smaller</code> is used, objects with an area smaller than 1% of
+the mean of all the objects are ignored. This is used to remove possible
+noise in the image such as dust. So, be sure the reference object has an
+area that will be not removed by that cutpoint.</p></dd>
 
 
 <dt>pattern</dt>
@@ -558,13 +558,26 @@ maximum radius (in pixels), respectively.</p></li>
 maximum diameter (in pixels), respectively.</p></li>
 <li><p><code>major_axis</code>, <code>minor_axis</code>: elliptical fit for major and minor axes (in
 pixels).</p></li>
+<li><p><code>calliper</code>: The longest distance between any two points on the margin
+of the object. See <code>poly_calliper()</code> for more details</p></li>
 <li><p><code>length</code>, <code>width</code> The length and width of objects (in pixels). These
 measures are obtained as the range of x and y coordinates after aligning
 each object with <code><a href="utils_polygon.html">poly_align()</a></code>.</p></li>
 <li><p><code>radius_ratio</code>: radius ratio given by <code>radius_max / radius_min</code>.</p></li>
+<li><p><code>theta</code>: object angle (in radians).</p></li>
 <li><p><code>eccentricity</code>: elliptical eccentricity computed using the
 ratio of the eigen values (inertia axes of coordinates).</p></li>
-<li><p><code>theta</code>: object angle (in radians).</p></li>
+<li><p><code>form_factor</code> (Wu et al., 2007):  the difference between a leaf and a
+circle. It is defined as <code>4*pi*A/P</code>, where A is the area and P is the
+perimeter of the object.</p></li>
+<li><p><code>narrow_factor</code> (Wu et al., 2007): Narrow factor (<code>calliper / length</code>).</p></li>
+<li><p><code>asp_ratio</code> (Wu et al., 2007): Aspect ratio (<code>length / width</code>).</p></li>
+<li><p><code>rectangularity</code> (Wu et al., 2007): The similarity between a leaf and
+a rectangle (<code>length * width/ area</code>).</p></li>
+<li><p><code>pd_ratio</code> (Wu et al., 2007): Ratio of perimeter to diameter
+(<code>perimeter / calliper</code>)</p></li>
+<li><p><code>plw_ratio</code> (Wu et al., 2007): Perimeter ratio of length and width
+(<code>perimeter / (length + width)</code>)</p></li>
 <li><p><code>solidity</code>: object solidity given by <code>area / area_ch</code>.</p></li>
 <li><p><code>convexity</code>: The convexity of the object computed using the ratio
 between the perimeter of the convex hull and the perimeter of the polygon.</p></li>
@@ -689,6 +702,11 @@ of the Art of Compactness and Circularity Measures. International
 Mathematical Forum, 4(27), 1305–1335.</p>
 <p>Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
 Computer Vision. 3rd ed. World Scientific.</p>
+<p>Wu, S. G., Bao, F. S., Xu, E. Y., Wang, Y.-X., Chang, Y.-F., and Xiang, Q.-L.
+(2007). A Leaf Recognition Algorithm for Plant Classification Using
+Probabilistic Neural Network. in 2007 IEEE International Symposium on Signal
+Processing and Information Technology, 11–16.
+<a href="https://doi.org/10.1109/ISSPIT.2007.4458016" class="external-link">doi:10.1109/ISSPIT.2007.4458016</a></p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -732,12 +750,18 @@ Computer Vision. 3rd ed. World Scientific.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.43448 1.2403149  53.39784 47.98561 58.86897   57.49117   51.25223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6    30.03551 1.6644721  53.24535 48.15544 60.07101   58.94378   49.79657</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.70321 0.9453011  53.21949 49.90975 57.40641   56.45901   51.87605</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      length    width radius_ratio eccentricity      theta solidity convexity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  61.02071 51.02434     1.254392    0.7539797 -0.9926965 1.012433 0.9145237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 61.03697 48.69446     1.346629    0.6824269  1.2961522 1.014455 0.8647999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.20133 51.98953     1.226805    0.8162596 -0.5648957 1.009611 0.9112384</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  59.50243 50.79021     1.247440    0.8034516  1.1344362 1.015873 0.8767728</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.54173 52.42395     1.150204    0.8525173 -0.8413811 1.012775 0.8810137</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     caliper   length    width radius_ratio      theta eccentricity form_factor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  61.03278 61.02071 51.02434     1.254392 -0.9926965    0.7539797   0.8911068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 61.18823 61.03697 48.69446     1.346629  1.2961522    0.6824269   0.8824052</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.69749 57.20133 51.98953     1.226805 -0.5648957    0.8162596   0.8862079</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  59.50630 59.50243 50.79021     1.247440  1.1344362    0.8034516   0.9058285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.85948 56.54173 52.42395     1.150204 -0.8413811    0.8525173   0.9098151</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    narrow_factor asp_ratio rectangularity pd_ratio plw_ratio solidity convexity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       1.000198  1.195914       1.274475 3.041156  1.656567 1.012433 0.9145237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10      1.002478  1.253468       1.283317 2.968057  1.655043 1.014455 0.8647999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       1.008674  1.100247       1.286833 3.137474  1.657871 1.009611 0.9112384</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       1.000065  1.171534       1.311693 3.004417  1.620976 1.015873 0.8767728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1.005620  1.078548       1.289317 3.133971  1.635340 1.012775 0.8810137</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    elongation circularity circularity_haralick circularity_norm    coverage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.16381943    14.10198             15.65045         1.161421 0.004569772</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.20221369    14.24104             11.46618         1.174075 0.004332211</span>
