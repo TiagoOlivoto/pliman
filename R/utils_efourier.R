@@ -9,7 +9,7 @@
 #' @param nharm An integer indicating the number of harmonics to use. Defaults
 #'   to 10.
 #' @param align Align the objects before computing Fourier analysis? Defaults to
-#'   `FALSE`. If `TRUE`, the object is first aligned along the major calliper
+#'   `FALSE`. If `TRUE`, the object is first aligned along the major caliper
 #'   with [poly_align()].
 #' @param smooth_iter The number of smoothing iterations to perform. This will
 #'   smooth the perimeter of the objects using [poly_smooth()].
@@ -40,7 +40,7 @@
 #'
 #' #### default options
 #' # 10 harmonics (default)
-#' # object is aligned along the major calliper with `poly_align()`
+#' # object is aligned along the major caliper with `poly_align()`
 #' ef <- efourier(leaf1)
 #' efourier_coefs(ef)
 #'

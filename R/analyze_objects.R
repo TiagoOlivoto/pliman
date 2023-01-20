@@ -257,8 +257,8 @@
 #'     - `major_axis`, `minor_axis`: elliptical fit for major and minor axes (in
 #'     pixels).
 #'
-#'     - `calliper`: The longest distance between any two points on the margin
-#'     of the object. See [poly_calliper()] for more details
+#'     - `caliper`: The longest distance between any two points on the margin
+#'     of the object. See [poly_caliper()] for more details
 #'
 #'     - `length`, `width` The length and width of objects (in pixels). These
 #'     measures are obtained as the range of x and y coordinates after aligning
@@ -275,7 +275,7 @@
 #'     circle. It is defined as `4*pi*A/P`, where A is the area and P is the
 #'     perimeter of the object.
 #'
-#'     - `narrow_factor` (Wu et al., 2007): Narrow factor (`calliper / length`).
+#'     - `narrow_factor` (Wu et al., 2007): Narrow factor (`caliper / length`).
 #'
 #'     - `asp_ratio` (Wu et al., 2007): Aspect ratio (`length / width`).
 #'
@@ -283,7 +283,7 @@
 #'     a rectangle (`length * width/ area`).
 #'
 #'     - `pd_ratio` (Wu et al., 2007): Ratio of perimeter to diameter
-#'     (`perimeter / calliper`)
+#'     (`perimeter / caliper`)
 #'
 #'     - `plw_ratio` (Wu et al., 2007): Perimeter ratio of length and width
 #'     (`perimeter / (length + width)`)
