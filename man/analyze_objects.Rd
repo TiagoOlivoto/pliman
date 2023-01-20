@@ -109,10 +109,10 @@ removed.}
 the larger/smaller object in the image must be used as the reference
 object. This only is valid when \code{reference} is set to \code{TRUE} and
 \code{reference_area} indicates the area of the reference object. IMPORTANT.
-When reference_smaller is used, objects with an area smaller than 1\% of the
-mean of all the objects are ignored. This is used to remove possible noise
-in the image such as dust. So, be sure the reference object has an area
-that will be not removed by that cutpoint.}
+When \code{reference_smaller} is used, objects with an area smaller than 1\% of
+the mean of all the objects are ignored. This is used to remove possible
+noise in the image such as dust. So, be sure the reference object has an
+area that will be not removed by that cutpoint.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
 For example, if \code{pattern = "im"} all images in the current working
@@ -326,13 +326,26 @@ maximum radius (in pixels), respectively.
 maximum diameter (in pixels), respectively.
 \item \code{major_axis}, \code{minor_axis}: elliptical fit for major and minor axes (in
 pixels).
+\item \code{calliper}: The longest distance between any two points on the margin
+of the object. See \code{\link[=poly_calliper]{poly_calliper()}} for more details
 \item \code{length}, \code{width} The length and width of objects (in pixels). These
 measures are obtained as the range of x and y coordinates after aligning
-each object with \code{poly_align()}.
+each object with \code{\link[=poly_align]{poly_align()}}.
 \item \code{radius_ratio}: radius ratio given by \code{radius_max / radius_min}.
+\item \code{theta}: object angle (in radians).
 \item \code{eccentricity}: elliptical eccentricity computed using the
 ratio of the eigen values (inertia axes of coordinates).
-\item \code{theta}: object angle (in radians).
+\item \code{form_factor} (Wu et al., 2007):  the difference between a leaf and a
+circle. It is defined as \code{4*pi*A/P}, where A is the area and P is the
+perimeter of the object.
+\item \code{narrow_factor} (Wu et al., 2007): Narrow factor (\code{calliper / length}).
+\item \code{asp_ratio} (Wu et al., 2007): Aspect ratio (\code{length / width}).
+\item \code{rectangularity} (Wu et al., 2007): The similarity between a leaf and
+a rectangle (\code{length * width/ area}).
+\item \code{pd_ratio} (Wu et al., 2007): Ratio of perimeter to diameter
+(\code{perimeter / calliper})
+\item \code{plw_ratio} (Wu et al., 2007): Perimeter ratio of length and width
+(\code{perimeter / (length + width)})
 \item \code{solidity}: object solidity given by \code{area / area_ch}.
 \item \code{convexity}: The convexity of the object computed using the ratio
 between the perimeter of the convex hull and the perimeter of the polygon.
@@ -529,6 +542,12 @@ Mathematical Forum, 4(27), 1305–1335.
 
 Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
 Computer Vision. 3rd ed. World Scientific.
+
+Wu, S. G., Bao, F. S., Xu, E. Y., Wang, Y.-X., Chang, Y.-F., and Xiang, Q.-L.
+(2007). A Leaf Recognition Algorithm for Plant Classification Using
+Probabilistic Neural Network. in 2007 IEEE International Symposium on Signal
+Processing and Information Technology, 11–16.
+\doi{10.1109/ISSPIT.2007.4458016}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

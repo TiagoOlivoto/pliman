@@ -34,7 +34,7 @@
    
 
 ## New features
-* Haralick's features that quantify pixel texture for image objects were included.
+* [Haralick's features](https://ieeexplore.ieee.org/document/4309314) that quantify pixel texture for image objects were included.
 
 * Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, circularity. Haralick's features are now computed by default. .  This improvement was at cost of a slight increase in computation time.
 
@@ -44,7 +44,7 @@
 
 * Arguments `efourier` and `nharm` included in `analyze_objects()`. If `efourier = TRUE`, Elliptical Fourier analysis is computed for each object depending on the number of harmonics (`nharm`).
 
-* Argument
+* Logical arguments `reference_larger` and `reference_smaller` included in `analyze_objects()`. Those indicates when the larger/smaller object in the image must be used as the reference object. This only is valid when `reference = TRUE` and `reference_area` indicates the area of the reference object. **IMPORTANT**. When `reference_smaller` is used, objects with an area smaller than 1% of the mean of all the objects are ignored. This is used to remove possible noise in the image such as dust. So, be sure the reference object has an area that will be not removed by that cutpoint.
 
 
 ## Minor changes

@@ -4,7 +4,14 @@
 \alias{efourier_power}
 \title{Power in Fourier Analysis}
 \usage{
-efourier_power(x, first = TRUE, plot = TRUE, ncol = NULL, nrow = NULL)
+efourier_power(
+  x,
+  first = TRUE,
+  thresh = c(0.8, 0.85, 0.9, 0.95, 0.99, 0.999),
+  plot = TRUE,
+  ncol = NULL,
+  nrow = NULL
+)
 }
 \arguments{
 \item{x}{An object of class \code{efourier}computed with \code{\link[=efourier]{efourier()}}.}
@@ -12,13 +19,21 @@ efourier_power(x, first = TRUE, plot = TRUE, ncol = NULL, nrow = NULL)
 \item{first}{Logical argument indicating whether to include the first
 harmonic for computing the power. See \code{Details}.}
 
+\item{thresh}{A numeric vector indicating the threshold power. The number of
+harmonics needed for such thresholds will then be computed.}
+
 \item{plot}{Logical argument indicating whether to produce a plot.}
 
 \item{ncol, nrow}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
 }
 \value{
-A \code{data.frame} object.
+A list with the objects:
+\itemize{
+\item \code{cum_power}, a \code{data.frame} object with the accumulated power depending on
+the number of harmonics
+\item 
+}
 }
 \description{
 Computes an spectrum of harmonic Fourier power. The power is proportional to
@@ -43,7 +58,7 @@ Adapted from Claude (2008). pp. 229.
 }
 \examples{
 library(pliman)
-efourier(contours[[4]]) |> efourier_power()
+pw <- efourier(contours) |> efourier_power()
 
 }
 \references{

@@ -13,7 +13,7 @@ get_measures(
   dpi = NULL,
   sep = "\\\\_|-",
   verbose = TRUE,
-  digits = 3
+  digits = 5
 )
 
 plot_measures(

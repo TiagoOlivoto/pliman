@@ -212,6 +212,8 @@ efourier_inv <- function(x,
 #' predicted outline for each pixel of the outline.
 #' *  `data.frame` object with the minimum, maximum and average
 #' deviations (based on the outline points).
+#'
+#' If `x` is an object of class `efourier_lst`, a list will be returned.
 #' @importFrom graphics legend
 #' @export
 #' @examples
@@ -254,14 +256,20 @@ efourier_error <- function(x,
     }
     op <- par(mfrow = c(nrow, ncol))
     on.exit(par(op))
-    err <- lapply(x, efourier_error, nharm, type, plot)
+    error <- lapply(x, efourier_error, nharm, type, plot)
     err <-
       do.call(rbind,
-              lapply(err, function(x){x}))
+              lapply(error, function(x){x$stats}))
+
     err$object <- sapply(strsplit(rownames(err), "\\."), "[", 1)
-    err <- err[, c(5, 1, 2, 3, 4)]
+    err <- err[, c(4, 1, 2, 3)]
     rownames(err) <- NULL
-    return(err)
+
+    dev_points <- lapply(error, function(x){x$dev_points})
+    return(list(
+      stats = err,
+      dev_points = dev_points
+    ))
   } else{
     ef <- x[["coords"]]
     if(is.null(nharm)){
@@ -344,13 +352,12 @@ efourier_error <- function(x,
                lty = 1,
                pch = c(NA,NA),
                cex = 0.5)
-
       }
     }
     invisible(list(dev_points = dev_points,
-                stats = data.frame(average_dev = averagedev,
-                                   max_dev = maxdev,
-                                   min_dev = mindev)))
+                   stats = data.frame(average_dev = averagedev,
+                                      max_dev = maxdev,
+                                      min_dev = mindev)))
   }
 }
 
@@ -550,6 +557,8 @@ efourier_coefs <- function(x){
 #' @param x An object of class `efourier`computed with [efourier()].
 #' @param first Logical argument indicating whether to include the first
 #'   harmonic for computing the power. See `Details`.
+#' @param thresh A numeric vector indicating the threshold power. The number of
+#'   harmonics needed for such thresholds will then be computed.
 #' @param plot Logical argument indicating whether to produce a plot.
 #' @param ncol,nrow The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
@@ -562,7 +571,10 @@ efourier_coefs <- function(x){
 #'   possible to remove the first harmonic for this computation. When working on
 #'   a set of outlines, high-rank-harmonics can contain information that may
 #'   allow groups to be distinguished (Claude, 2008).
-#' @return A `data.frame` object.
+#' @return A list with the objects:
+#' * `cum_power`, a `data.frame` object with the accumulated power depending on
+#'  the number of harmonics
+#' *
 #' @details Adapted from Claude (2008). pp. 229.
 #' @references Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,
 #' Springer 316 pp.
@@ -570,10 +582,11 @@ efourier_coefs <- function(x){
 #'
 #' @examples
 #' library(pliman)
-#' efourier(contours[[4]]) |> efourier_power()
+#' pw <- efourier(contours) |> efourier_power()
 #'
 efourier_power <- function(x,
                            first = TRUE,
+                           thresh = c(0.8, 0.85, 0.9, 0.95, 0.99, 0.999),
                            plot = TRUE,
                            ncol = NULL,
                            nrow = NULL){
@@ -591,14 +604,23 @@ efourier_power <- function(x,
     }
     op <- par(mfrow = c(nrow, ncol))
     on.exit(par(op))
-    power <- lapply(x, efourier_power, first, plot)
-    power <-
+    power <- lapply(x, efourier_power, first, thresh, plot)
+    pwer <-
       do.call(rbind,
-              lapply(power, function(x){x}))
-    power$object <- sapply(strsplit(rownames(power), "\\."), "[", 1)
-    power <- power[, c(3, 1, 2)]
-    rownames(power) <- NULL
-    return(power)
+              lapply(power, function(x){x$cum_power}))
+    pwer$object <- sapply(strsplit(rownames(pwer), "\\."), "[", 1)
+    pwer <- pwer[, c(3, 1, 2)]
+    rownames(pwer) <- NULL
+
+    min_harm <- do.call(rbind,
+                        lapply(power, function(x){x$min_harm}))
+    min_harm$object <- names(power)
+    min_harm <- min_harm[, c(ncol(min_harm), 1:ncol(min_harm)-1)]
+    rownames(min_harm) <- NULL
+    return(list(
+      cum_power = pwer,
+      min_harm = min_harm
+    ))
   } else{
     a <- x$an
     b <- x$bn
@@ -629,8 +651,23 @@ efourier_power <- function(x,
         lines(harms, cump)
       }
     }
-    return(data.frame(nharm = harms,
-                      cum_power = cump))
+
+    cum_power <-
+      data.frame(nharm = harms,
+                 cum_power = cump)
+
+    minh <- numeric(length(thresh))
+    names(minh) <- paste0(thresh)
+    for (i in seq_along(thresh)){
+      wi <- which(cump > thresh[i])
+      minh[i] <- ifelse(length(wi)==0, NA, min(wi))
+    }
+    minh <- data.frame(t(minh))
+    colnames(minh) <- paste0("p", thresh)
+    return(list(
+      cum_power = cum_power,
+      min_harm = minh
+    ))
   }
 }
 

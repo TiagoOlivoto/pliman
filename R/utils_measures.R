@@ -99,7 +99,7 @@ get_measures <- function(object,
                          dpi = NULL,
                          sep = "\\_|-",
                          verbose = TRUE,
-                         digits = 3){
+                         digits = 5){
   if(is.data.frame(object)){
     if(any(c("area", "perimeter", "radius_mean") %in% colnames(object) == FALSE)){
       stop("Object informed seems to be not an object computed with pliman.")
@@ -154,11 +154,11 @@ get_measures <- function(object,
       res$area <- corrected
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[8:19] <- apply(res[8:19], 2, function(x){
+        res[8:20] <- apply(res[8:20], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:17] <- apply(res[6:17], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       }
@@ -170,11 +170,11 @@ get_measures <- function(object,
       res$area <- res$area * px_side^2
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[8:19] <- apply(res[8:19], 2, function(x){
+        res[8:20] <- apply(res[8:20], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:17] <- apply(res[6:17], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       }
@@ -195,12 +195,12 @@ get_measures <- function(object,
     res$area <- res$area * 1/dpc^2
     res$area_ch <- res$area_ch * 1/dpc^2
     if(inherits(object, "plm_disease_byl")){
-      res[8:19] <- apply(res[8:19], 2, pixels_to_cm, dpi = dpi)
+      res[8:20] <- apply(res[8:20], 2, pixels_to_cm, dpi = dpi)
     } else{
       if("img" %in% colnames(res)){
-        res[7:18] <- apply(res[7:18], 2, pixels_to_cm, dpi = dpi)
+        res[7:19] <- apply(res[7:19], 2, pixels_to_cm, dpi = dpi)
       } else{
-        res[6:17] <- apply(res[6:17], 2, pixels_to_cm, dpi = dpi)
+        res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
       }
     }
   }
@@ -329,7 +329,7 @@ get_measures <- function(object,
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
-                  if(i  %in% c(5, 6, 28)){
+                  if(i  %in% c(5, 6, 35)){
                     if(i == 5){
                       n <- aggregate(res[[i]] ~ img, res, length)[[2]]
                       a <- aggregate(res[[i]] ~ img, res, sum, na.rm = TRUE)[2]
@@ -645,11 +645,18 @@ names_measures <- function(){
     "diam_max",
     "major_axis",
     "minor_axis",
+    "calliper",
     "length",
     "width",
     "radius_ratio",
-    "eccentricity",
     "theta",
+    "eccentricity",
+    "form_factor",
+    "narrow_factor",
+    "asp_ratio",
+    "rectangularity",
+    "pd_ratio",
+    "plw_ratio",
     "solidity",
     "convexity",
     "elongation",
@@ -691,6 +698,7 @@ compute_measures <- function(mask,
   ch <- conv_hull(ocont)
   area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
   shape$s.perimeter = poly_perimeter(ocont)
+  calliper = poly_caliper(ocont)
   lw <- poly_lw(ocont)
   shape <- transform(shape,
                      id = as.numeric(valid),
@@ -703,6 +711,13 @@ compute_measures <- function(mask,
                      coverage = s.area / length(mask),
                      area_ch =   area_ch,
                      solidity = s.area / area_ch,
+                     calliper = calliper,
+                     form_factor = 4 * pi * s.area / s.perimeter ^ 2,
+                     narrow_factor =  calliper / lw[, 1],
+                     asp_ratio = lw[, 1] / lw[, 2],
+                     rectangularity = lw[, 1]  * lw[, 2] / s.area,
+                     pd_ratio = s.perimeter / calliper,
+                     plw_ratio = s.perimeter / (lw[, 1]  + lw[, 2]),
                      convexity = poly_convexity(ocont),
                      elongation = poly_elongation(ocont),
                      circularity = s.perimeter ^ 2 / s.area,
@@ -731,11 +746,18 @@ compute_measures <- function(mask,
                      "diam_max",
                      "m.majoraxis",
                      "minor_axis",
+                     "calliper",
                      "length",
                      "width",
                      "radius_ratio",
-                     "m.eccentricity",
                      "m.theta",
+                     "m.eccentricity",
+                     "form_factor",
+                     "narrow_factor",
+                     "asp_ratio",
+                     "rectangularity",
+                     "pd_ratio",
+                     "plw_ratio",
                      "solidity",
                      "convexity",
                      "elongation",

@@ -41,6 +41,8 @@ predicted outline for each pixel of the outline.
 \item \code{data.frame} object with the minimum, maximum and average
 deviations (based on the outline points).
 }
+
+If \code{x} is an object of class \code{efourier_lst}, a list will be returned.
 }
 \description{
 Computes the sum of squared distances between the original data and

@@ -90,10 +90,10 @@
 #'   the larger/smaller object in the image must be used as the reference
 #'   object. This only is valid when `reference` is set to `TRUE` and
 #'   `reference_area` indicates the area of the reference object. IMPORTANT.
-#'   When reference_smaller is used, objects with an area smaller than 1% of the
-#'   mean of all the objects are ignored. This is used to remove possible noise
-#'   in the image such as dust. So, be sure the reference object has an area
-#'   that will be not removed by that cutpoint.
+#'   When `reference_smaller` is used, objects with an area smaller than 1% of
+#'   the mean of all the objects are ignored. This is used to remove possible
+#'   noise in the image such as dust. So, be sure the reference object has an
+#'   area that will be not removed by that cutpoint.
 #' @param pattern A pattern of file name used to identify images to be imported.
 #'   For example, if `pattern = "im"` all images in the current working
 #'   directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
@@ -257,17 +257,37 @@
 #'     - `major_axis`, `minor_axis`: elliptical fit for major and minor axes (in
 #'     pixels).
 #'
+#'     - `calliper`: The longest distance between any two points on the margin
+#'     of the object. See [poly_calliper()] for more details
+#'
 #'     - `length`, `width` The length and width of objects (in pixels). These
 #'     measures are obtained as the range of x and y coordinates after aligning
-#'     each object with `poly_align()`.
+#'     each object with [poly_align()].
 #'
 #'     - `radius_ratio`: radius ratio given by `radius_max / radius_min`.
+#'
+#'     - `theta`: object angle (in radians).
 #'
 #'     - `eccentricity`: elliptical eccentricity computed using the
 #'    ratio of the eigen values (inertia axes of coordinates).
 #'
-#'     - `theta`: object angle (in radians).
+#'     - `form_factor` (Wu et al., 2007):  the difference between a leaf and a
+#'     circle. It is defined as `4*pi*A/P`, where A is the area and P is the
+#'     perimeter of the object.
 #'
+#'     - `narrow_factor` (Wu et al., 2007): Narrow factor (`calliper / length`).
+#'
+#'     - `asp_ratio` (Wu et al., 2007): Aspect ratio (`length / width`).
+#'
+#'     - `rectangularity` (Wu et al., 2007): The similarity between a leaf and
+#'     a rectangle (`length * width/ area`).
+#'
+#'     - `pd_ratio` (Wu et al., 2007): Ratio of perimeter to diameter
+#'     (`perimeter / calliper`)
+#'
+#'     - `plw_ratio` (Wu et al., 2007): Perimeter ratio of length and width
+#'     (`perimeter / (length + width)`)
+
 #'     - `solidity`: object solidity given by `area / area_ch`.
 #'
 #'     - `convexity`: The convexity of the object computed using the ratio
@@ -365,6 +385,12 @@
 #'
 #' Chen, C.H., and P.S.P. Wang. 2005. Handbook of Pattern Recognition and
 #' Computer Vision. 3rd ed. World Scientific.
+#'
+#' Wu, S. G., Bao, F. S., Xu, E. Y., Wang, Y.-X., Chang, Y.-F., and Xiang, Q.-L.
+#' (2007). A Leaf Recognition Algorithm for Plant Classification Using
+#' Probabilistic Neural Network. in 2007 IEEE International Symposium on Signal
+#' Processing and Information Technology, 11–16.
+#' \doi{10.1109/ISSPIT.2007.4458016}
 #'
 #' @export
 #' @name analyze_objects
@@ -779,8 +805,10 @@ analyze_objects <- function(img,
         efr <-
           efourier(object_contour,
                    nharm = nharm)
-        efer <- efourier_error(efr, plot = FALSE)
-        efpow <- efourier_power(efr, plot = FALSE)
+        efer <- efourier_error(efr, plot = FALSE)$stats
+        efpowwer <- efourier_power(efr, plot = FALSE)
+        efpow <- efpowwer$cum_power
+        min_harm <- efpowwer$min_harm
         efrn <- efourier_norm(efr)
         efr <- efourier_coefs(efr)
         names(efr)[1] <- "id"
@@ -791,6 +819,7 @@ analyze_objects <- function(img,
         efrn <- NULL
         efer <- NULL
         efpow <- NULL
+        min_harm <- NULL
       }
 
       if(!is.null(object_index)){
@@ -876,7 +905,8 @@ analyze_objects <- function(img,
                       efourier = efr,
                       efourier_norm = efrn,
                       efourier_error = efer,
-                      efourier_power = efpow)
+                      efourier_power = efpow,
+                      efourier_minharm = min_harm)
       class(results) <- "anal_obj"
       if(show_image == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
@@ -1043,7 +1073,7 @@ analyze_objects <- function(img,
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
-        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
       results <-
         parLapply(clust, names_plant,
@@ -1143,11 +1173,23 @@ analyze_objects <- function(img,
         )
       efourier_power <- efourier_power[, c(ncol(efourier_power), 1:ncol(efourier_power)-1)]
       names(efourier_power)[2] <- "id"
+
+      efourier_minharm <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["efourier_minharm"]],
+                            img =  names(results[i]))
+                })
+        )
+      efourier_minharm <- efourier_minharm[, c(ncol(efourier_minharm), 1:ncol(efourier_minharm)-1)]
+      names(efourier_minharm)[2] <- "id"
+
     } else{
       efourier <- NULL
       efourier_norm <- NULL
       efourier_error <- NULL
       efourier_power <- NULL
+      efourier_minharm <- NULL
     }
 
     results <-
@@ -1180,7 +1222,7 @@ analyze_objects <- function(img,
              efourier = efourier,
              efourier_norm = efourier_norm,
              efourier_error = efourier_error,
-             efourier_power = efourier_power),
+             efourier_minharm = efourier_minharm),
         class = "anal_obj_ls"
       )
     )
