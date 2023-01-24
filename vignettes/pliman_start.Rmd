@@ -98,7 +98,7 @@ measure_disease(img = img,
                 img_healthy = healthy,
                 img_symptoms = symptoms,
                 img_background = background,
-                show_image = TRUE)
+                plot = TRUE)
 ```
 
 

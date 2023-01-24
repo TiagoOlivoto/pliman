@@ -214,7 +214,7 @@ Users can also obtain the object contour and convex hull as follows:
 cont <-
   object_contour(potato,
                  watershed = FALSE,
-                 show_image = FALSE)
+                 plot = FALSE)
 plot(potato)
 plot_contour(cont, col = "red", lwd = 3)
 ```

@@ -156,14 +156,14 @@ seg_iter1 <-
                      index = c("VARI", "GLI"),
                      threshold = c(0.3, "Otsu"),
                      ncol = 3,
-                     show_image = FALSE)
+                     plot = FALSE)
 seg_iter2 <-
   image_segment_iter(seg_iter,
                      nseg = 2, # two segmentations
                      index = c("VARI", "GLI"),
                      threshold = c(0.5, "Otsu"),
                      ncol = 3,
-                     show_image = FALSE)
+                     plot = FALSE)
 
 image_combine(seg_iter1$images$seg1,
               seg_iter2$images$seg1)
