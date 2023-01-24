@@ -7,7 +7,9 @@
 image_binary(
   image,
   index = NULL,
-  threshold = "Otsu",
+  threshold = c("Otsu", "adaptive"),
+  k = 0.1,
+  windowsize = NULL,
   has_white_bg = FALSE,
   resize = FALSE,
   fill_hull = FALSE,
@@ -15,7 +17,7 @@ image_binary(
   re = NULL,
   nir = NULL,
   invert = FALSE,
-  show_image = TRUE,
+  plot = TRUE,
   nrow = NULL,
   ncol = NULL,
   parallel = FALSE,
@@ -30,11 +32,25 @@ image_binary(
 target mode for conversion to binary image. See the available indexes with
 \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}} for more details.}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.}
+\item{threshold}{The theshold method to be used.
+\itemize{
+\item By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.
+\item If \code{threshold = "adaptive"}, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the \code{k} and \code{windowsize} arguments.
+\item If any non-numeric value different than \code{"Otsu"} and \code{"adaptive"} is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.
+}}
+
+\item{k}{a numeric in the range 0-1. when \code{k} is high, local threshold
+values tend to be lower. when \code{k} is low, local threshold value tend to be
+higher.}
+
+\item{windowsize}{windowsize controls the number of local neighborhood in
+adaptive thresholding. By default it is set to \code{1/3 * minxy}, where
+\code{minxy} is the minimum dimension of the image (in pixels).}
 
 \item{has_white_bg}{Logical indicating whether a white background is present.
 If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be
@@ -63,7 +79,7 @@ image file.}
 
 \item{invert}{Inverts the binary image, if desired.}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
@@ -92,11 +108,15 @@ clustering-based image thresholding.
 library(pliman)
 img <- image_pliman("soybean_touch.jpg")
 image_binary(img, index = c("R, G"))
+
 }
 \references{
-Nobuyuki Otsu, "A threshold selection method from gray-level
-histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
-\doi{10.1109/TSMC.1979.4310076}
+Otsu, N. 1979. Threshold selection method from gray-level histograms. IEEE
+Trans Syst Man Cybern SMC-9(1): 62–66. \doi{10.1109/tsmc.1979.4310076}
+
+Shafait, F., D. Keysers, and T.M. Breuel. 2008. Efficient implementation of
+local adaptive thresholding techniques using integral images. Document
+Recognition and Retrieval XV. SPIE. p. 317–322 \doi{10.1117/12.767755}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

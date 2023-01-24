@@ -25,7 +25,7 @@ measure_disease_byl(
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
-  show_image = TRUE,
+  plot = TRUE,
   show_features = FALSE,
   save_image = FALSE,
   verbose = TRUE,
@@ -79,11 +79,17 @@ image.}
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.}
+\item{threshold}{The theshold method to be used.
+\itemize{
+\item By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.
+\item If \code{threshold = "adaptive"}, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the \code{k} and \code{windowsize} arguments.
+\item If any non-numeric value different than \code{"Otsu"} and \code{"adaptive"} is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.
+}}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
 neighboring objects. Higher value smooths out small objects.}
@@ -125,7 +131,7 @@ number of sections is set up to 70\% of available cores.}
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{show_features}{If \code{TRUE} returnS the lesion features such as number,
 area, perimeter, and radius. Defaults to \code{FALSE}.}

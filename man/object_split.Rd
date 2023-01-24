@@ -18,7 +18,7 @@ object_split(
   object_size = "medium",
   keep_location = FALSE,
   col_background = "white",
-  show_image = TRUE,
+  plot = TRUE,
   verbose = TRUE,
   ...
 )
@@ -61,11 +61,17 @@ image.}
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.}
+\item{threshold}{The theshold method to be used.
+\itemize{
+\item By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.
+\item If \code{threshold = "adaptive"}, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the \code{k} and \code{windowsize} arguments.
+\item If any non-numeric value different than \code{"Otsu"} and \code{"adaptive"} is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.
+}}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
 neighboring objects. Higher value smooths out small objects.}
@@ -90,7 +96,7 @@ original image.}
 ?\code{\link[grDevices:colors]{grDevices::colors()}}) or a numeric vector with R, G, and B intensities
 (see ?\code{\link[grDevices:rgb]{grDevices::rgb()}}).}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 

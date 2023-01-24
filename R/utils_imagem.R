@@ -417,7 +417,7 @@ image_autocrop <- function(image,
                               index = index,
                               id = NULL,
                               edge = edge,
-                              show_image = FALSE,
+                              plot = FALSE,
                               filter = filter)
     segmented <- image[conv_hull$row_min:conv_hull$row_max,
                        conv_hull$col_min:conv_hull$col_max,
@@ -1069,7 +1069,7 @@ image_skeleton <- function(image,
     }
   } else{
     if(EBImage::colorMode(image) != 0){
-      image <- image_binary(image, ..., resize = FALSE, show_image = FALSE)[[1]]
+      image <- image_binary(image, ..., resize = FALSE, plot = FALSE)[[1]]
     }
     s <- matrix(1, nrow(image), ncol(image))
     skel <- matrix(0, nrow(image), ncol(image))
@@ -1293,11 +1293,23 @@ image_create <- function(color,
 #' @param index A character value (or a vector of characters) specifying the
 #'   target mode for conversion to binary image. See the available indexes with
 #'   [pliman_indexes()] and [image_index()] for more details.
-#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
-#'   on Otsu's method is used to reduce the grayscale image to a binary image.
-#'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
-#'   the threshold based on a raster plot showing pixel intensity of the index.
+#' @param threshold The theshold method to be used.
+#'  * By default (`threshold = "Otsu"`), a threshold value based
+#'  on Otsu's method is used to reduce the grayscale image to a binary image. If
+#'  a numeric value is informed, this value will be used as a threshold.
+#'
+#'  * If `threshold = "adaptive"`, adaptive thresholding (Shafait et al. 2008)
+#'  is used, and will depend on the `k` and `windowsize` arguments.
+#'
+#'  * If any non-numeric value different than `"Otsu"` and `"adaptive"` is used,
+#'  an iterative section will allow you to choose the threshold based on a
+#'  raster plot showing pixel intensity of the index.
+#' @param k a numeric in the range 0-1. when `k` is high, local threshold
+#'   values tend to be lower. when `k` is low, local threshold value tend to be
+#'   higher.
+#' @param windowsize windowsize controls the number of local neighborhood in
+#'   adaptive thresholding. By default it is set to `1/3 * minxy`, where
+#'   `minxy` is the minimum dimension of the image (in pixels).
 #' @param has_white_bg Logical indicating whether a white background is present.
 #'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
 #'   considered as `NA`. This may be useful to compute an image index for
@@ -1318,7 +1330,7 @@ image_create <- function(color,
 #' @param nir Respective position of the near-infrared band at the original
 #'   image file.
 #' @param invert Inverts the binary image, if desired.
-#' @param show_image Show image after processing?
+#' @param plot Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
@@ -1328,9 +1340,14 @@ image_create <- function(color,
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @references Nobuyuki Otsu, "A threshold selection method from gray-level
-#'   histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
-#'   \doi{10.1109/TSMC.1979.4310076}
+#' @references
+#' Otsu, N. 1979. Threshold selection method from gray-level histograms. IEEE
+#' Trans Syst Man Cybern SMC-9(1): 62–66. \doi{10.1109/tsmc.1979.4310076}
+#'
+#' Shafait, F., D. Keysers, and T.M. Breuel. 2008. Efficient implementation of
+#' local adaptive thresholding techniques using integral images. Document
+#' Recognition and Retrieval XV. SPIE. p. 317–322 \doi{10.1117/12.767755}
+#'
 #' @md
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -1341,9 +1358,12 @@ image_create <- function(color,
 #' library(pliman)
 #'img <- image_pliman("soybean_touch.jpg")
 #'image_binary(img, index = c("R, G"))
+#'
 image_binary <- function(image,
                          index = NULL,
-                         threshold = "Otsu",
+                         threshold = c("Otsu", "adaptive"),
+                         k = 0.1,
+                         windowsize = NULL,
                          has_white_bg = FALSE,
                          resize = FALSE,
                          fill_hull = FALSE,
@@ -1351,12 +1371,13 @@ image_binary <- function(image,
                          re = NULL,
                          nir = NULL,
                          invert = FALSE,
-                         show_image = TRUE,
+                         plot = TRUE,
                          nrow = NULL,
                          ncol = NULL,
                          parallel = FALSE,
                          workers = NULL,
                          verbose = TRUE){
+  threshold <- threshold[[1]]
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
@@ -1374,6 +1395,8 @@ image_binary <- function(image,
                        image_binary,
                        index,
                        threshold,
+                       k,
+                       windowsize,
                        has_white_bg,
                        resize,
                        fill_hull,
@@ -1381,7 +1404,7 @@ image_binary <- function(image,
                        re,
                        nir,
                        invert,
-                       show_image,
+                       plot,
                        nrow,
                        ncol)
     } else{
@@ -1389,6 +1412,8 @@ image_binary <- function(image,
                     image_binary,
                     index,
                     threshold,
+                    k,
+                    windowsize,
                     has_white_bg,
                     resize,
                     fill_hull,
@@ -1396,7 +1421,7 @@ image_binary <- function(image,
                     re,
                     nir,
                     invert,
-                    show_image,
+                    plot,
                     nrow,
                     ncol)
     }
@@ -1407,61 +1432,88 @@ image_binary <- function(image,
                         fill_hull,
                         threshold,
                         filter){
-      no_inf <- imgs[!is.infinite(imgs)]
-      if(threshold == "Otsu"){
-        threshold <- EBImage::otsu(imgs, range = c(min(no_inf, na.rm = TRUE),
-                                                   max(no_inf, na.rm = TRUE)))
-      } else{
-        if(is.numeric(threshold)){
-          threshold <- threshold
-        } else{
-          pixels <- data.frame(imgs@.Data)
-          colnames(pixels) <- 1:ncol(pixels)
-          pixels$id <- 1:nrow(pixels)
-          pixels <-
-            reshape(pixels,
-                    direction = "long",
-                    varying = list(names(pixels)[1:ncol(pixels)-1]),
-                    v.names = "value",
-                    idvar = "id",
-                    timevar = "y",
-                    times = names(pixels)[1:ncol(pixels)-1])
-          pixels$y <- as.numeric(pixels$y)
-          p <-
-            levelplot(value ~ id * y,
-                      data = pixels,
-                      xlab = NULL,
-                      ylab = NULL,
-                      useRaster = TRUE,
-                      col.regions = terrain.colors(300),
-                      colorkey = list(interpolate = TRUE,
-                                      raster = TRUE))
-          plot(p)
-          threshold <- readline("Selected threshold: ")
+      # adapted from imagerExtra  https://bit.ly/3Wp4pwv
+      if(threshold == "adaptive"){
+        if(is.null(windowsize)){
+          windowsize <- min(dim(imgs)) / 3
+          if(windowsize %% 2 == 0){
+            windowsize <- as.integer(windowsize + 1)
+          }
         }
+        if (windowsize <= 2){
+          stop("windowsize must be greater than or equal to 3", call. = FALSE)
+        }
+        if (windowsize %% 2 == 0){
+          warning(sprintf("windowsize is even (%d). windowsize will be treated as %d", windowsize, windowsize + 1), call. = FALSE)
+          windowsize <- as.integer(windowsize + 1)
+        }
+        if (windowsize >= dim(imgs)[[1]] || windowsize >= dim(imgs)[[2]]){
+          warning("windowsize is too large. Setting to `min(dim(image)) / 3`", call. = FALSE)
+          windowsize <- min(dim(imgs)) / 3
+        }
+        if (k > 1){
+          stop("k is out of range. k must be in [0, 1].", call. = FALSE)
+        }
+        imgs <- EBImage::Image(threshold_adaptive(as.matrix(imgs), k, windowsize, 0.5))
+      }
+      if(threshold != "adaptive"){
+        no_inf <- imgs[!is.infinite(imgs)]
+        if(threshold == "Otsu"){
+          threshold <- EBImage::otsu(imgs, range = c(min(no_inf, na.rm = TRUE),
+                                                     max(no_inf, na.rm = TRUE)))
+        } else{
+          if(is.numeric(threshold)){
+            threshold <- threshold
+          } else{
+            pixels <- data.frame(imgs@.Data)
+            colnames(pixels) <- 1:ncol(pixels)
+            pixels$id <- 1:nrow(pixels)
+            pixels <-
+              reshape(pixels,
+                      direction = "long",
+                      varying = list(names(pixels)[1:ncol(pixels)-1]),
+                      v.names = "value",
+                      idvar = "id",
+                      timevar = "y",
+                      times = names(pixels)[1:ncol(pixels)-1])
+            pixels$y <- as.numeric(pixels$y)
+            p <-
+              levelplot(value ~ id * y,
+                        data = pixels,
+                        xlab = NULL,
+                        ylab = NULL,
+                        useRaster = TRUE,
+                        col.regions = terrain.colors(300),
+                        colorkey = list(interpolate = TRUE,
+                                        raster = TRUE))
+            plot(p)
+            threshold <- readline("Selected threshold: ")
+          }
+        }
+        imgs <- EBImage::Image(imgs < threshold)
       }
 
-      if(invert == FALSE){
-        imgs <- EBImage::Image(imgs < threshold)
-      } else{
-        imgs <- EBImage::Image(imgs > threshold)
+      if(invert == TRUE){
+        imgs <- 1 - imgs
       }
+
       imgs[which(is.na(imgs))] <- FALSE
-      if(is.numeric(filter) & filter > 1){
-        imgs <- EBImage::medianFilter(imgs, filter)
-      }
       if(isTRUE(fill_hull)){
         imgs <- EBImage::fillHull(imgs)
       }
+      if(is.numeric(filter) & filter > 1){
+        imgs <- EBImage::medianFilter(imgs, filter)
+      }
       return(imgs)
     }
-    imgs <- lapply(image_index(image, index, resize, re, nir, has_white_bg, show_image = FALSE, nrow, ncol, verbose = verbose),
+
+    imgs <- lapply(image_index(image, index, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
                    bin_img,
                    invert,
                    fill_hull,
                    threshold,
                    filter)
-    if(show_image == TRUE){
+    if(plot == TRUE){
       num_plots <- length(imgs)
       if (is.null(nrow) && is.null(ncol)){
         ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
@@ -1549,7 +1601,7 @@ image_binary <- function(image,
 #'   as NA. This may be useful to compute an image index for objects that have,
 #'   for example, a white background. In such cases, the background will not be
 #'   considered for the threshold computation.
-#' @param show_image Show image after processing?
+#' @param plot Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
@@ -1577,7 +1629,7 @@ image_index <- function(image,
                         re = NULL,
                         nir = NULL,
                         has_white_bg = FALSE,
-                        show_image = TRUE,
+                        plot = TRUE,
                         nrow = NULL,
                         ncol = NULL,
                         parallel = FALSE,
@@ -1596,9 +1648,9 @@ image_index <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_index, index, resize, re, nir, has_white_bg, show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
     } else{
-      res <- lapply(image, image_index, index, resize, re, nir, has_white_bg, show_image, nrow, ncol)
+      res <- lapply(image, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
     }
     return(structure(res, class = "index_list"))
   } else{
@@ -1684,7 +1736,7 @@ image_index <- function(image,
       }
     }
     names(imgs) <- index
-    if(show_image == TRUE){
+    if(plot == TRUE){
       num_plots <- length(imgs)
       if (is.null(nrow) && is.null(ncol)){
         ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
@@ -1741,7 +1793,7 @@ image_index <- function(image,
 #' img <- image_pliman("sev_leaf.jpg")
 #'
 #' # resize the image to 30% of the original size
-#' ind <- image_index(img, resize = 30, show_image = FALSE)
+#' ind <- image_index(img, resize = 30, plot = FALSE)
 #' plot(ind)
 plot.image_index <- function(x,
                              type = "raster",
@@ -1867,6 +1919,8 @@ plot.image_index <- function(x,
 #'
 #' * `image_segment_iter()` Provides an iterative image segmentation, returning
 #' the proportions of segmented pixels.
+#'
+#' @inheritParams image_binary
 #' @param image An image object or a list of image objects.
 #' @param index
 #'  * For `image_segment()`, a character value (or a vector of characters)
@@ -1875,13 +1929,6 @@ plot.image_index <- function(x,
 #' * For `image_segment_iter()` a character or a vector of characters with the
 #' same length of `nseg`. It can be either an available index (described above)
 #' or any operation involving the RGB values (e.g., `"B/R+G"`).
-#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
-#'   on Otsu's method is used to reduce the grayscale image to a binary image.
-#'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than `"Otsu"` to iteratively chosen
-#'   the threshold based on a raster plot showing pixel intensity of the index.
-#'   For `image_segmentation_iter()`, use a vector (allows a mixed (numeric and
-#'   character) type) with the same length of `nseg`.
 #' @param col_background The color of the segmented background. Defaults to
 #'   `NULL` (white background).
 #' @param has_white_bg Logical indicating whether a white background is present.
@@ -1900,7 +1947,7 @@ plot.image_index <- function(x,
 #'   image file.
 #' @param invert Inverts the binary image, if desired. For
 #'   `image_segmentation_iter()` use a vector with the same length of `nseg`.
-#' @param show_image Show image after processing?
+#' @param plot Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
@@ -1933,9 +1980,13 @@ plot.image_index <- function(x,
 #'img <- image_pliman("soybean_touch.jpg", plot = TRUE)
 #'image_segment(img, index = c("R, G, B"))
 #'
+#'# adaptive thresholding
+#'
 image_segment <- function(image,
                           index = NULL,
-                          threshold = "Otsu",
+                          threshold = c("Otsu", "adaptive"),
+                          k = 0.1,
+                          windowsize = NULL,
                           col_background = NULL,
                           has_white_bg = FALSE,
                           fill_hull = FALSE,
@@ -1943,13 +1994,14 @@ image_segment <- function(image,
                           re = NULL,
                           nir = NULL,
                           invert = FALSE,
-                          show_image = TRUE,
+                          plot = TRUE,
                           nrow = NULL,
                           ncol = NULL,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
   check_ebi()
+  threshold <- threshold[[1]]
   if(inherits(image, "img_segment")){
     image <- image[[1]]
   }
@@ -1965,9 +2017,9 @@ image_segment <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, threshold, col_background, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
+      res <- parLapply(clust, image, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, threshold, col_background, has_white_bg, fill_hull, filter, re, nir, invert, show_image = show_image, nrow, ncol)
+      res <- lapply(image, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
@@ -1998,13 +2050,15 @@ image_segment <- function(image,
       img2 <- image_binary(image,
                            index = indx,
                            threshold = threshold,
+                           k = k,
+                           windowsize = windowsize,
                            has_white_bg = has_white_bg,
                            resize = FALSE,
                            fill_hull = fill_hull,
                            filter = filter,
                            re = re,
                            nir = nir,
-                           show_image = FALSE,
+                           plot = FALSE,
                            invert = invert)[[1]]
       ID <- which(img2@.Data == FALSE)
       img <- image
@@ -2025,7 +2079,7 @@ image_segment <- function(image,
     if (is.null(nrow)){
       nrow <- ceiling(num_plots/ncol)
     }
-    if(show_image == TRUE){
+    if(plot == TRUE){
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
@@ -2054,8 +2108,10 @@ image_segment_iter <- function(image,
                                index = NULL,
                                invert = NULL,
                                threshold = NULL,
+                               k = 0.1,
+                               windowsize = NULL,
                                has_white_bg = FALSE,
-                               show_image = TRUE,
+                               plot = TRUE,
                                verbose = TRUE,
                                nrow = NULL,
                                ncol = NULL,
@@ -2075,9 +2131,9 @@ image_segment_iter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, show_image, verbose, nrow, ncol,  ...)
+      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol,  ...)
     } else{
-      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, show_image, verbose, nrow, ncol, ...)
+      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol, ...)
     }
     results <-
       do.call(rbind, lapply(a, function(x){
@@ -2124,7 +2180,7 @@ image_segment_iter <- function(image,
                       index = index,
                       threshold = my_thresh,
                       invert = invert[1],
-                      show_image = FALSE,
+                      plot = FALSE,
                       has_white_bg = has_white_bg,
                       ...)
       total <- length(image)
@@ -2137,7 +2193,7 @@ image_segment_iter <- function(image,
       if(verbose){
         print(results)
       }
-      if(show_image == TRUE){
+      if(plot == TRUE){
         image_combine(imgs, ...)
       }
       invisible(list(results = results,
@@ -2178,7 +2234,7 @@ image_segment_iter <- function(image,
                       index = indx,
                       invert = invert[1],
                       threshold = my_thresh[1],
-                      show_image = FALSE,
+                      plot = FALSE,
                       has_white_bg = has_white_bg,
                       ...)
       segmented[[1]] <- first
@@ -2186,7 +2242,7 @@ image_segment_iter <- function(image,
         if(is.null(index)){
           image_segment(first,
                         index = "all",
-                        show_image = TRUE,
+                        plot = TRUE,
                         has_white_bg = has_white_bg,
                         ncol = ncol,
                         nrow = nrow,
@@ -2210,7 +2266,7 @@ image_segment_iter <- function(image,
                         index = indx,
                         threshold = my_thresh,
                         invert = invert[i],
-                        show_image = FALSE,
+                        plot = FALSE,
                         ...)
         segmented[[i]] <- second
         first <- second
@@ -2243,7 +2299,7 @@ image_segment_iter <- function(image,
       if(verbose){
         print(pixels)
       }
-      if(show_image == TRUE){
+      if(plot == TRUE){
         image_combine(imgs, ncol = ncol, nrow = nrow, ...)
       }
       invisible(list(results = pixels,

@@ -341,7 +341,7 @@ analyze_objects_shp <- function(img,
   list <- lapply(spl,
                  analyze_objects,
                  img,
-                 show_image = plot,
+                 plot = plot,
                  object_size = object_size,
                  ...)
   results <-

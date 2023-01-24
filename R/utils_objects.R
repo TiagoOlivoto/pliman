@@ -36,7 +36,7 @@
 #'   Defaults to `2`.
 #' @param extension,tolerance,object_size Controls the watershed segmentation of
 #'   objects in the image. See [analyze_objects()] for more details.
-#' @param show_image Shows the image with bounding rectangles? Defaults to
+#' @param plot Shows the image with bounding rectangles? Defaults to
 #'   `TRUE`.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
@@ -85,7 +85,7 @@ object_coord <- function(image,
                          object_size = "medium",
                          parallel = FALSE,
                          workers = NULL,
-                         show_image = TRUE){
+                         plot = TRUE){
   check_ebi()
   if(inherits(image, "list")){
     if(!all(sapply(image, class) == "Image")){
@@ -99,10 +99,10 @@ object_coord <- function(image,
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       parLapply(clust, image, object_coord, id, index, invert,
                 fill_hull, threshold, edge, extension, tolerance,
-                object_size, show_image)
+                object_size, plot)
     } else{
       lapply(image, object_coord, id, index, invert, fill_hull, threshold,
-             edge, extension, tolerance, object_size, show_image)
+             edge, extension, tolerance, object_size, plot)
     }
   } else{
     # helper function to get coordinates from a mask
@@ -140,7 +140,7 @@ object_coord <- function(image,
                          filter = filter,
                          fill_hull = fill_hull,
                          threshold = threshold,
-                         show_image = FALSE,
+                         plot = FALSE,
                          resize = FALSE)[[1]]
     if(is.null(id)){
       data_mask <- img2@.Data
@@ -179,7 +179,7 @@ object_coord <- function(image,
                     row_min = as.numeric(coord[3,]),
                     row_max = as.numeric(coord[4,]))
     }
-    if(show_image == TRUE){
+    if(plot == TRUE){
       plot(image)
       rect(xleft = coord$row_min,
            xright = coord$row_max,
@@ -207,7 +207,7 @@ object_contour <- function(image,
                            object_size = "medium",
                            parallel = FALSE,
                            workers = NULL,
-                           show_image = TRUE){
+                           plot = TRUE){
   check_ebi()
   if(inherits(image, "list")){
     if(!all(sapply(image, class) == "Image")){
@@ -220,10 +220,10 @@ object_contour <- function(image,
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       parLapply(clust, image, object_contour, index, invert, filter, fill_hull, threshold,
-                watershed, extension, tolerance, object_size, show_image = show_image)
+                watershed, extension, tolerance, object_size, plot = plot)
     } else{
       lapply(image, object_contour, index, invert, filter, fill_hull, threshold,
-             watershed, extension, tolerance, object_size, show_image = show_image)
+             watershed, extension, tolerance, object_size, plot = plot)
     }
   } else{
     img2 <- image_binary(image,
@@ -232,7 +232,7 @@ object_contour <- function(image,
                          filter = filter,
                          fill_hull = fill_hull,
                          threshold = threshold,
-                         show_image = FALSE,
+                         plot = FALSE,
                          resize = FALSE)[[1]]
     if(isTRUE(watershed)){
       res <- length(img2)
@@ -252,7 +252,7 @@ object_contour <- function(image,
     contour <- EBImage::ocontour(nmask)
     dims <- sapply(contour, function(x){dim(x)[1]})
     contour <- contour[which(dims > mean(dims * 0.1))]
-    if(isTRUE(show_image)){
+    if(isTRUE(plot)){
       plot(image)
       plot_contour(contour, col = "red")
     }
@@ -283,7 +283,7 @@ object_isolate <- function(image,
   } else{
     coord <- object_coord(image,
                           id = id,
-                          show_image = FALSE,
+                          plot = FALSE,
                           ...)
     segmented <- image[coord$row_min:coord$row_max,
                        coord$col_min:coord$col_max,
@@ -359,7 +359,7 @@ object_split <- function(img,
                          object_size = "medium",
                          keep_location = FALSE,
                          col_background = "white",
-                         show_image = TRUE,
+                         plot = TRUE,
                          verbose = TRUE,
                          ...){
 
@@ -370,7 +370,7 @@ object_split <- function(img,
                        fill_hull = fill_hull,
                        threshold = threshold,
                        resize = FALSE,
-                       show_image = FALSE)[[1]]
+                       plot = FALSE)[[1]]
   if(isTRUE(watershed)){
     parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     res <- length(img2)
@@ -427,7 +427,7 @@ object_split <- function(img,
     cat("Objects created  :", length(list_objects), "\n")
     cat("==============================\n")
   }
-  if(isTRUE(show_image)){
+  if(isTRUE(plot)){
     image_combine(list_objects, ...)
   }
   return(list_objects)
@@ -461,7 +461,7 @@ object_to_color <- function(image,
                             ...){
   bin <- image_binary(image,
                       index = index,
-                      show_image = FALSE,
+                      plot = FALSE,
                       ...)[[1]]
   pix_ref <- which(bin == 1)
   colto <- col2rgb(color) / 255

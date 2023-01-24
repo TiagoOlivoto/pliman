@@ -21,6 +21,7 @@ al. (2020).
 \item \code{sev_back.jpg} A blue palette representing the background of \code{sev_leaf}.
 \item \code{sev_healthy.jpg} Healthy area of \code{sev_leaf}.
 \item \code{sev_sympt.jpg} The symptomatic area \code{sev_leaf}.
+\item \code{shadow.jpg} A shaded leaf, useful to test adaptive thresholding
 \item \code{soy_green.jpg} Soybean grains with a white background.
 \item \code{soybean_grain.jpg} A sample palette of the grains in \code{soy_green}.
 \item \code{soybean_touch.jpg} Soybean grains with a cyan background touching one each

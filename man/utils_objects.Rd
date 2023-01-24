@@ -23,7 +23,7 @@ object_coord(
   object_size = "medium",
   parallel = FALSE,
   workers = NULL,
-  show_image = TRUE
+  plot = TRUE
 )
 
 object_contour(
@@ -39,7 +39,7 @@ object_contour(
   object_size = "medium",
   parallel = FALSE,
   workers = NULL,
-  show_image = TRUE
+  plot = TRUE
 )
 
 object_isolate(image, id = NULL, parallel = FALSE, workers = NULL, ...)
@@ -93,7 +93,7 @@ up to 50\% of available cores.}
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
-\item{show_image}{Shows the image with bounding rectangles? Defaults to
+\item{plot}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
 
 \item{...}{\itemize{

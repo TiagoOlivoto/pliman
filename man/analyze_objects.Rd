@@ -34,6 +34,8 @@ analyze_objects(
   efourier = FALSE,
   nharm = 10,
   threshold = "Otsu",
+  k = 0.1,
+  windowsize = NULL,
   tolerance = NULL,
   extension = NULL,
   lower_size = NULL,
@@ -46,7 +48,7 @@ analyze_objects(
   upper_circ = NULL,
   randomize = TRUE,
   nrows = 1000,
-  show_image = TRUE,
+  plot = TRUE,
   show_original = TRUE,
   show_chull = FALSE,
   show_contour = TRUE,
@@ -201,11 +203,25 @@ coefficients are returned.}
 \item{nharm}{An integer indicating the number of harmonics to use. Defaults
 to 10. For more details see \code{\link[=efourier]{efourier()}}.}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.}
+\item{threshold}{The theshold method to be used.
+\itemize{
+\item By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.
+\item If \code{threshold = "adaptive"}, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the \code{k} and \code{windowsize} arguments.
+\item If any non-numeric value different than \code{"Otsu"} and \code{"adaptive"} is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.
+}}
+
+\item{k}{a numeric in the range 0-1. when \code{k} is high, local threshold
+values tend to be lower. when \code{k} is low, local threshold value tend to be
+higher.}
+
+\item{windowsize}{windowsize controls the number of local neighborhood in
+adaptive thresholding. By default it is set to \code{1/3 * minxy}, where
+\code{minxy} is the minimum dimension of the image (in pixels).}
 
 \item{tolerance}{The minimum height of the object in the units of image
 intensity between its highest point (seed) and the point where it contacts
@@ -241,7 +257,7 @@ to \code{NULL} (i.e., no lower and upper limits).}
 \item{nrows}{The number of lines to be used in training step. Defaults to
 2000.}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{show_original}{Show the count objects in the original image?}
 
@@ -465,7 +481,8 @@ pixels or 10 pixels. By default, the Haralick features are computed with the
 R band. To chance this default, use the argument \code{har_band}. For example,
 \code{har_band = 2} will compute the features with the green band.
 
-If \code{efourier = TRUE} is used, an Elliptical Fourier Analysis (Kuhl and Giardina, 1982) is computed for each object contour. should be
+If \code{efourier = TRUE} is used, an Elliptical Fourier Analysis (Kuhl and
+Giardina, 1982) is computed for each object contour.
 }
 \examples{
 \donttest{

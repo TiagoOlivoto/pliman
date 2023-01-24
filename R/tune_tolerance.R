@@ -81,7 +81,7 @@ tune_tolerance <- function(img,
                    invert = invert,
                    fill_hull = fill_hull,
                    resize = FALSE,
-                   show_image = FALSE)[[1]]
+                   plot = FALSE)[[1]]
     nmask <- EBImage::watershed(EBImage::distmap(bin),
                                 tolerance = tolerance,
                                 ext = extension)

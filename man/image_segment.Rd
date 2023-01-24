@@ -8,7 +8,9 @@
 image_segment(
   image,
   index = NULL,
-  threshold = "Otsu",
+  threshold = c("Otsu", "adaptive"),
+  k = 0.1,
+  windowsize = NULL,
   col_background = NULL,
   has_white_bg = FALSE,
   fill_hull = FALSE,
@@ -16,7 +18,7 @@ image_segment(
   re = NULL,
   nir = NULL,
   invert = FALSE,
-  show_image = TRUE,
+  plot = TRUE,
   nrow = NULL,
   ncol = NULL,
   parallel = FALSE,
@@ -30,8 +32,10 @@ image_segment_iter(
   index = NULL,
   invert = NULL,
   threshold = NULL,
+  k = 0.1,
+  windowsize = NULL,
   has_white_bg = FALSE,
-  show_image = TRUE,
+  plot = TRUE,
   verbose = TRUE,
   nrow = NULL,
   ncol = NULL,
@@ -52,13 +56,25 @@ same length of \code{nseg}. It can be either an available index (described above
 or any operation involving the RGB values (e.g., \code{"B/R+G"}).
 }}
 
-\item{threshold}{By default (\code{threshold = "Otsu"}), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than \code{"Otsu"} to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.
-For \code{image_segmentation_iter()}, use a vector (allows a mixed (numeric and
-character) type) with the same length of \code{nseg}.}
+\item{threshold}{The theshold method to be used.
+\itemize{
+\item By default (\code{threshold = "Otsu"}), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.
+\item If \code{threshold = "adaptive"}, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the \code{k} and \code{windowsize} arguments.
+\item If any non-numeric value different than \code{"Otsu"} and \code{"adaptive"} is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.
+}}
+
+\item{k}{a numeric in the range 0-1. when \code{k} is high, local threshold
+values tend to be lower. when \code{k} is low, local threshold value tend to be
+higher.}
+
+\item{windowsize}{windowsize controls the number of local neighborhood in
+adaptive thresholding. By default it is set to \code{1/3 * minxy}, where
+\code{minxy} is the minimum dimension of the image (in pixels).}
 
 \item{col_background}{The color of the segmented background. Defaults to
 \code{NULL} (white background).}
@@ -85,7 +101,7 @@ image file.}
 \item{invert}{Inverts the binary image, if desired. For
 \code{image_segmentation_iter()} use a vector with the same length of \code{nseg}.}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
@@ -131,6 +147,8 @@ the proportions of segmented pixels.
 library(pliman)
 img <- image_pliman("soybean_touch.jpg", plot = TRUE)
 image_segment(img, index = c("R, G, B"))
+
+# adaptive thresholding
 
 }
 \references{

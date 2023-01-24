@@ -12,7 +12,7 @@ image_index(
   re = NULL,
   nir = NULL,
   has_white_bg = FALSE,
-  show_image = TRUE,
+  plot = TRUE,
   nrow = NULL,
   ncol = NULL,
   parallel = FALSE,
@@ -47,7 +47,7 @@ as NA. This may be useful to compute an image index for objects that have,
 for example, a white background. In such cases, the background will not be
 considered for the threshold computation.}
 
-\item{show_image}{Show image after processing?}
+\item{plot}{Show image after processing?}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
@@ -134,7 +134,7 @@ library(pliman)
 img <- image_pliman("sev_leaf.jpg")
 
 # resize the image to 30\% of the original size
-ind <- image_index(img, resize = 30, show_image = FALSE)
+ind <- image_index(img, resize = 30, plot = FALSE)
 plot(ind)
 }
 \references{

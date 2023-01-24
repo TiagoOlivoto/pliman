@@ -63,7 +63,7 @@ measure_disease_byl <- function(img,
                                 pattern = NULL,
                                 parallel = FALSE,
                                 workers = NULL,
-                                show_image = TRUE,
+                                plot = TRUE,
                                 show_features = FALSE,
                                 save_image = FALSE,
                                 verbose = TRUE,
@@ -124,11 +124,11 @@ measure_disease_byl <- function(img,
                            tolerance = tolerance,
                            object_size = object_size,
                            keep_location = keep_location,
-                           show_image = FALSE,
+                           plot = FALSE,
                            verbose = FALSE)
     results <- list()
     tmp_dir <- tempdir()
-    if(isTRUE(show_image)){
+    if(isTRUE(plot)){
       save_image <- FALSE
       clear_td()
     }
@@ -139,7 +139,7 @@ measure_disease_byl <- function(img,
                  measure_disease(splits[[i]],
                                  index_dh = index_dh,
                                  index_lb = index_lb,
-                                 show_image = FALSE,
+                                 plot = FALSE,
                                  save_image = TRUE,
                                  show_features = show_features,
                                  dir_processed = tmp_dir,
@@ -157,7 +157,7 @@ measure_disease_byl <- function(img,
                                  img_healthy = img_healthy,
                                  img_symptoms = img_symptoms,
                                  img_background = back,
-                                 show_image = FALSE,
+                                 plot = FALSE,
                                  save_image = TRUE,
                                  show_features = show_features,
                                  dir_processed = tmp_dir,
@@ -168,7 +168,7 @@ measure_disease_byl <- function(img,
                })
     }
     names(results) <- paste0(name_ori, "-", 1:length(results))
-    if(isTRUE(show_image)){
+    if(isTRUE(plot)){
       imgs <- image_import(pattern = as.character(name_ori), path = tmp_dir)
       image_combine(imgs)
       clear_td()

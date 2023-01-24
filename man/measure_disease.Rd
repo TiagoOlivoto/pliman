@@ -36,7 +36,7 @@ measure_disease(
   extension = NULL,
   show_features = FALSE,
   show_segmentation = FALSE,
-  show_image = TRUE,
+  plot = TRUE,
   show_original = TRUE,
   show_background = TRUE,
   show_contour = TRUE,
@@ -181,7 +181,7 @@ area, perimeter, and radius. Defaults to \code{FALSE}.}
 \item{show_segmentation}{Shows the object segmentation colored with random
 permutations. Defaults to \code{TRUE}.}
 
-\item{show_image}{Show image after processing? Defaults to \code{TRUE}.}
+\item{plot}{Show image after processing? Defaults to \code{TRUE}.}
 
 \item{show_original}{Show the symptoms in the original image?}
 
@@ -307,7 +307,7 @@ sev <-
                  img_healthy = healthy,
                  img_symptoms = lesions,
                  lesion_size = "large",
-                 show_image = TRUE)
+                 plot = TRUE)
 
 # an interactive section
 measure_disease_iter(img)

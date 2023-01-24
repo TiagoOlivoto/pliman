@@ -134,7 +134,7 @@
 #'   area, perimeter, and radius. Defaults to `FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
 #'   permutations. Defaults to `TRUE`.
-#' @param show_image Show image after processing? Defaults to `TRUE`.
+#' @param plot Show image after processing? Defaults to `TRUE`.
 #' @param show_original Show the symptoms in the original image?
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
@@ -200,7 +200,7 @@
 #'                  img_healthy = healthy,
 #'                  img_symptoms = lesions,
 #'                  lesion_size = "large",
-#'                  show_image = TRUE)
+#'                  plot = TRUE)
 #'
 #' # an interactive section
 #' measure_disease_iter(img)
@@ -236,7 +236,7 @@ measure_disease <- function(img,
                             extension = NULL,
                             show_features = FALSE,
                             show_segmentation = FALSE,
-                            show_image = TRUE,
+                            plot = TRUE,
                             show_original = TRUE,
                             show_background = TRUE,
                             show_contour = TRUE,
@@ -301,7 +301,7 @@ measure_disease <- function(img,
   help_count <-
     function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
              index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension,
-             randomize, nsample, show_image, show_original, show_background,
+             randomize, nsample, plot, show_original, show_background,
              col_leaf, col_lesions, col_background,
              save_image, dir_original, dir_processed){
       if(is.character(img)){
@@ -387,7 +387,7 @@ measure_disease <- function(img,
                  nmask <- EBImage::watershed(EBImage::distmap(plant_symp),
                                              tolerance = tol,
                                              ext = ext))
-          if(show_image == TRUE | save_image == TRUE){
+          if(plot == TRUE | save_image == TRUE){
             if(show_original == TRUE & show_segmentation == FALSE){
               im2 <- img
               if(isFALSE(show_contour)){
@@ -487,7 +487,7 @@ measure_disease <- function(img,
                  nmask <- EBImage::watershed(EBImage::distmap(leaf_sympts),
                                              tolerance = tol,
                                              ext = ext))
-          if(show_image == TRUE | save_image == TRUE){
+          if(plot == TRUE | save_image == TRUE){
             if(show_original == TRUE & show_segmentation == TRUE){
               im2 <- EBImage::colorLabels(nmask)
               if(backg){
@@ -563,7 +563,7 @@ measure_disease <- function(img,
                                threshold = my_thresh,
                                invert = invert1,
                                filter = filter,
-                               show_image = FALSE,
+                               plot = FALSE,
                                fill_hull = FALSE)
 
           img <- seg
@@ -588,7 +588,7 @@ measure_disease <- function(img,
                              invert = invert2,
                              has_white_bg = has_white_bg,
                              resize = FALSE,
-                             show_image = FALSE)[[1]]
+                             plot = FALSE)[[1]]
         img2@.Data[is.na(img2@.Data)] <- FALSE
         # which(is.na(img2@.Data))
         res <- length(img2)
@@ -617,7 +617,7 @@ measure_disease <- function(img,
         )
         ID <- which(img2 == 1)
         ID2 <- which(img2 == 0)
-        if(show_image == TRUE | save_image == TRUE){
+        if(plot == TRUE | save_image == TRUE){
           if(show_original == TRUE & show_segmentation == FALSE){
             im2 <- img
             im2@.Data[,,1][which(img[,,1]==1)] <- col_background[1]
@@ -721,7 +721,7 @@ measure_disease <- function(img,
       if(isTRUE(show_contour) & show_original == TRUE){
         ocont <- EBImage::ocontour(nmask)
       }
-      if(show_image == TRUE){
+      if(plot == TRUE){
         if(marker != "point"){
           plot(im2)
           if(show_features & show_mark & has_lesion){
@@ -796,7 +796,7 @@ measure_disease <- function(img,
   if(missing(pattern)){
     help_count(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
-               nsample, show_image, show_original, show_background, col_leaf,
+               nsample, plot, show_original, show_background, col_leaf,
                col_lesions, col_background, save_image, dir_original, dir_processed)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
@@ -829,7 +829,7 @@ measure_disease <- function(img,
                     help_count(x,
                                img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                                index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
-                               nsample, show_image, show_original, show_background, col_leaf,
+                               nsample, plot, show_original, show_background, col_leaf,
                                col_lesions, col_background, save_image, dir_original, dir_processed)
                   })
 
@@ -845,7 +845,7 @@ measure_disease <- function(img,
           help_count(img  = names_plant[i],
                      img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                      index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
-                     nsample, show_image, show_original, show_background, col_leaf,
+                     nsample, plot, show_original, show_background, col_leaf,
                      col_lesions, col_background, save_image, dir_original, dir_processed)
       }
     }
