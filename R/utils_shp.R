@@ -39,52 +39,27 @@ image_shp <- function(img,
     plot(img)
     cord <- locator(type = "p", n = 2, col = "red", pch = 19)
     c1 <- data.frame(do.call(rbind, cord)) |> t()
+    c1 <- c(min(c1[,1]), max(c1[,1]), min(c1[,2]), max(c1[,2]))
   } else{
     imgd <- dim(img)
-    c1 <- matrix(c(0, imgd[1], 0, imgd[2]), ncol = 2)
+    c1 <- c(0, imgd[1], 0, imgd[2])
   }
-  xmin <- min(c1[,1])
-  xmax <- max(c1[,1])
-  ymin <- min(c1[,2])
-  ymax <- max(c1[,2])
   bbox <-
-    data.frame(x = c(xmin, xmax, xmax, xmin, xmin),
-               y = c(ymin, ymin, ymax, ymax, ymin))
-  xr <- xmax - xmin
-  yr <- ymax - ymin
-  intx <- xr / (cols )
-  xvec <- xmin
-  for (i in 1:(cols)) {
-    xvec <- append(xvec, xvec[length(xvec)] + intx)
-  }
-  inty <- yr / (rows )
-  yvec <- ymin
-  for (i in 1:(rows)) {
-    yvec <- append(yvec, yvec[length(yvec)] + inty)
-  }
-  coords <- list()
-  con <- 0
-  for(i in 1:rows){
-    for(j in 1:cols){
-      con <- con + 1
-      tmp <-
-        data.frame(plot = con,
-                   x = c(xvec[j], xvec[j + 1], xvec[j + 1], xvec[j], xvec[j]),
-                   y = c(yvec[i], yvec[i], yvec[i + 1], yvec[i + 1], yvec[i]))
-      coords[[paste0("plot_", con)]] <- tmp
-    }
-  }
+    data.frame(x = c(c1[1], c1[2], c1[2], c1[1], c1[1]),
+               y = c(c1[3], c1[3], c1[4], c1[4], c1[3]))
+  shps <- help_shp(img[,,1], rows, cols, c1)
+  shps <- data.frame(plot = paste0(rep(1:(cols * rows), each = 5)), shps)
+  colnames(shps) <- c("plot", "x", "y")
+  coords <- split(shps, shps$plot)
+  names(coords) <- paste0("plot_", names(coords))
+  coords <- coords[paste0("plot_", 1:length(coords))]
   if(isTRUE(plot)){
     plot(img)
-    d <-
-      lapply(seq_along(coords), function(i){
-        lines(coords[[i]][, -1], col = col_line, type = "l", lwd = size_line)
-        text(min(coords[[i]]$x[-1]), min(coords[[i]]$y[-1]),
-             label = i,
-             col = col_text,
-             cex = size_text,
-             adj = c(-0.2, 1.2))
-      })
+    plot_shp(coords,
+             col_line = col_line,
+             size_line = size_line,
+             col_text = col_text,
+             size_text = size_text)
   }
   lst <- list(shapefiles = coords,
               bbox = bbox,
@@ -92,7 +67,6 @@ image_shp <- function(img,
               cols = cols)
   return(structure(lst, class = "image_shp"))
 }
-
 
 
 
@@ -158,6 +132,9 @@ plot.image_shp <- function(x,
 #'  number of rows and columns. Then, using the object coordinates, a list of
 #'  `Image` objects is created.
 #' @inheritParams  image_shp
+#' @param only_shp If `TRUE` returns only the shapefiles with the coordinates
+#'   for each image. If `FALSE` (default) returns the splitted image according
+#'   to `rows` and `cols` arguments.
 #' @param ... Other arguments passed on to [image_shp()]
 #' @return A list of `Image` objects
 #' @export
@@ -173,29 +150,33 @@ object_split_shp <- function(img,
                              rows = 1,
                              cols = 1,
                              interactive = FALSE,
+                             only_shp = FALSE,
                              ...){
   shps <- image_shp(img, rows, cols, interactive = interactive, plot = FALSE, ...)
   shapefile <- shps$shapefiles
-  imgs <- list()
-  get_borders <- function(x){
-    min_x <- min(x[,1])
-    max_x <- max(x[,1])
-    min_y <- min(x[,2])
-    max_y <- max(x[,2])
-    return(list(min_x, max_x, min_y, max_y))
-  }
-  for (i in 1:length(shapefile)) {
-    tmp <- shapefile[[i]][-1]
-    borders <- get_borders(tmp)
-    imgs[[paste0("shp", i)]] <-
-      image_crop(img,
-                 width = borders[[1]]:borders[[2]],
-                 height = borders[[3]]:borders[[4]])
+  if(!isTRUE(only_shp)){
+    imgs <- list()
+    get_borders <- function(x){
+      min_x <- min(x[,1])
+      max_x <- max(x[,1])
+      min_y <- min(x[,2])
+      max_y <- max(x[,2])
+      return(list(min_x, max_x, min_y, max_y))
+    }
+    for (i in 1:length(shapefile)) {
+      tmp <- shapefile[[i]][-1]
+      borders <- get_borders(tmp)
+      imgs[[paste0("shp", i)]] <-
+        image_crop(img,
+                   width = borders[[1]]:borders[[2]],
+                   height = borders[[3]]:borders[[4]])
+    }
+  } else{
+    imgs <- img
   }
   return(list(imgs = imgs,
               shapefile = shps))
 }
-
 
 
 #' Aligns an `Image` object by hand
@@ -392,5 +373,267 @@ analyze_objects_shp <- function(img,
          shapefiles = shps),
     class = "anal_obj"))
 
+}
+
+
+
+#' Analyzes objects using shapefiles
+#'
+#' This function calls [analyze_objects()] in each image polygon of a shapefile
+#' object generated with generated with [image_shp()] and bind the results into
+#' read-ready data frames.
+#'
+#' @inheritParams analyze_objects
+#'
+#' @param img An `Image` object
+#' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
+#'   (default), both `rows` and `cols` must be declared.
+#' @param rows,cols The number of rows and columns to generate the shapefile
+#'   when `shapefile` is not declared. Defaults to `1`.
+#' @param interactive If `FALSE` (default) the grid is created automatically
+#'   based on the image dimension and number of rows/columns. If `interactive =
+#'   TRUE`, users must draw points at the diagonal of the desired bounding box
+#'   that will contain the grid.
+#' @param plot Plots the processed images? Defaults to `TRUE`.
+#' @param object_size Argument to control control the watershed segmentation.
+#'   See [analyze_objects()] for more details.
+#' @param ... Aditional arguments passed on to [analyze_objects].
+#'
+#' @return An object of class `anal_obj`. See more details in the `Value`
+#'   section of [analyze_objects()].
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+#' res <-
+#'    analyze_objects_shp(flax,
+#'                        rows = 3,
+#'                        cols = 5,
+#'                        plot = FALSE,
+#'                        object_index = "DGCI")
+#' plot(flax)
+#' plot(res$shapefiles)
+#' plot_measures(e, measure = "DGCI")
+#' }
+analyze_objects_shp2 <- function(img,
+                                 shapefile = NULL,
+                                 rows = 1,
+                                 cols = 1,
+                                 interactive = FALSE,
+                                 plot = TRUE,
+                                 parallel = FALSE,
+                                 workers = NULL,
+                                 object_size = "medium",
+                                 efourier = FALSE,
+                                 object_index = NULL,
+                                 veins = FALSE,
+                                 verbose = TRUE,
+                                 ...){
+  if(is.null(shapefile)){
+    tmp <- object_split_shp(img, rows, cols, interactive = interactive, only_shp = FALSE)
+    imgs <- tmp$imgs
+    shapes <- tmp$shapefile$shapefiles
+  } else{
+    shapes <- shapefile
+    rows <- shapefile$rows
+    cols <- shapefile$cols
+  }
+  get_borders <- function(x){
+    min_x <- min(x[,2])
+    max_x <- max(x[,2])
+    min_y <- min(x[,3])
+    max_y <- max(x[,3])
+    return(c(min_x, max_x, min_y, max_y))
+  }
+
+  if(parallel == TRUE){
+    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+    cl <- parallel::makePSOCKcluster(workers)
+    doParallel::registerDoParallel(cl)
+    on.exit(stopCluster(cl))
+
+    ## declare alias for dopar command
+    `%dopar%` <- foreach::`%dopar%`
+
+
+    results <-
+      foreach::foreach(i = seq_along(imgs), .packages = "pliman") %dopar%{
+        analyze_objects(imgs[[i]],
+                        plot = plot,
+                        object_size = object_size,
+                        object_index = object_index,
+                        veins = veins,
+                        efourier = efourier,
+                        ...)
+      }
+  } else{
+    results <-
+      lapply(seq_along(imgs), function(i){
+        analyze_objects(imgs[[i]],
+                        plot = plot,
+                        object_size = object_size,
+                        object_index = object_index,
+                        veins = veins,
+                        efourier = efourier,
+                        ...)
+      })
+  }
+  names(results) <- paste0("shp", 1:length(shapes))
+
+  # RESULTS
+  res <-
+    do.call(rbind,
+            lapply(results, function(x){x$results}))
+  vect <- rownames(res)
+
+  res$img <-
+    sapply(seq_along(vect),
+           function(i){
+             strsplit(vect[[i]], split = "\\.")[[1]][[1]]
+           })
+  res <- res[, c(ncol(res), 1:(ncol(res) - 1))]
+  rownames(res) <- NULL
+
+  # STATISTICS
+  statistics <-
+    do.call(rbind,
+            lapply(seq_along(results), function(x){
+              transform(results[[x]][["statistics"]], img = names(results[x]))[,c(3, 1, 2)]
+            }))
+
+  if(!is.null(results[[1]][["object_rgb"]])){
+    object_rgb <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["object_rgb"]], img = names(results[i]))
+              }))
+    object_rgb <- object_rgb[, c(ncol(object_rgb), 1:(ncol(object_rgb) - 1))]
+  } else{
+    object_rgb <- NULL
+  }
+
+  if(!is.null(results[[1]][["object_index"]])){
+    object_index <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["object_index"]], img = names(results[i]))
+              }))
+    object_index <- object_index[, c(ncol(object_index), 1:(ncol(object_index) - 1))]
+  } else{
+    object_index <- NULL
+  }
+
+  # FOURIER COEFFICIENTS
+  if(!isFALSE(efourier)){
+    efourier <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["efourier"]],
+                          img =  names(results[i]))
+              })
+      )
+    efourier <- efourier[, c(ncol(efourier), 1:ncol(efourier)-1)]
+    names(efourier)[2] <- "id"
+
+    efourier_norm <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["efourier_norm"]],
+                          img =  names(results[i]))
+              })
+      )
+    efourier_norm <- efourier_norm[, c(ncol(efourier_norm), 1:ncol(efourier_norm)-1)]
+    names(efourier_norm)[2] <- "id"
+
+
+    efourier_error <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["efourier_error"]],
+                          img =  names(results[i]))
+              })
+      )
+    efourier_error <- efourier_error[, c(ncol(efourier_error), 1:ncol(efourier_error)-1)]
+    names(efourier_error)[2] <- "id"
+
+    efourier_power <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["efourier_power"]],
+                          img =  names(results[i]))
+              })
+      )
+    efourier_power <- efourier_power[, c(ncol(efourier_power), 1:ncol(efourier_power)-1)]
+    names(efourier_power)[2] <- "id"
+
+    efourier_minharm <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["efourier_minharm"]],
+                          img =  names(results[i]))
+              })
+      )
+    efourier_minharm <- efourier_minharm[, c(ncol(efourier_minharm), 1:ncol(efourier_minharm)-1)]
+    names(efourier_minharm)[2] <- "id"
+
+  } else{
+    efourier <- NULL
+    efourier_norm <- NULL
+    efourier_error <- NULL
+    efourier_power <- NULL
+    efourier_minharm <- NULL
+  }
+
+
+  # VEINS FEATURES
+  if(isTRUE(veins)){
+    veins <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["veins"]],
+                          img =  names(results[i]))
+              })
+      )
+
+    veins <- veins[, c(ncol(veins), 1:ncol(veins)-1)]
+  } else{
+    veins <- NULL
+  }
+
+  return(
+    structure(
+      list(results = res,
+           statistics = statistics,
+           object_rgb = object_rgb,
+           object_index = object_index,
+           efourier = efourier,
+           efourier_norm = efourier_norm,
+           efourier_error = efourier_error,
+           efourier_power = efourier_power,
+           efourier_minharm = efourier_minharm,
+           veins = veins,
+           shapefiles = tmp$shapefile),
+      class = "anal_obj"
+    )
+  )
+
+}
+
+
+plot_shp <- function(coords,
+                     col_line = "red",
+                     size_line = 1,
+                     col_text =  "red",
+                     size_text = 0.7){
+  lapply(seq_along(coords), function(i){
+    lines(coords[[i]][, -1], col = col_line, type = "l", lwd = size_line)
+    text(min(coords[[i]]$x[-1]), min(coords[[i]]$y[-1]),
+         label = i,
+         col = col_text,
+         cex = size_text,
+         adj = c(-0.2, 1.2))
+  })
 }
 

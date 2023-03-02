@@ -8,11 +8,10 @@
 \alias{plot_ellipse}
 \title{Utilities for plotting polygons}
 \usage{
-plot_contour(x, y = NULL, id = NULL, col = "black", lwd = 1, ...)
+plot_contour(x, id = NULL, col = "black", lwd = 1, ...)
 
 plot_polygon(
   x,
-  y = NULL,
   fill = "gray",
   random_fill = TRUE,
   points = FALSE,
@@ -29,23 +28,12 @@ plot_polygon(
   ...
 )
 
-plot_mass(
-  x,
-  y = NULL,
-  id = NULL,
-  arrow = TRUE,
-  col = "black",
-  cex = 1,
-  lwd = 1
-)
+plot_mass(x, id = NULL, col = "black", cex = 1, lwd = 1)
 
 plot_ellipse(object, id = NULL, col = "black", lwd = 1)
 }
 \arguments{
-\item{x, y}{Coordinate vectors of points. This can be specified as two vectors
-(\code{x} and \code{y}), or a 2-column matrix \code{x}. If \code{x} is a list of vector
-coordinates the function will be applied to each element using
-\code{\link[base:lapply]{base::lapply()}}.}
+\item{x}{A 2-column matrix with the \code{x} and \code{y} coordinates.}
 
 \item{id}{The object identification (numeric) to plot the contour/ellipse. By
 default (\code{id = NULL}), the contour is plotted to all objects.}
@@ -87,9 +75,6 @@ window size.}
 
 \item{xlim, ylim}{A numeric vector of length 2 (min; max) indicating the range
 of \code{x} and \code{y}-axes.}
-
-\item{arrow}{If \code{TRUE} (default) plots two arrows connecting the center of
-mass to the minimum and maximum radius.}
 
 \item{object}{An object computed with \code{\link[=analyze_objects]{analyze_objects()}}.}
 }

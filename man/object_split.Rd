@@ -16,8 +16,8 @@ object_split(
   extension = NULL,
   tolerance = NULL,
   object_size = "medium",
-  keep_location = FALSE,
-  col_background = "white",
+  edge = 3,
+  remove_bg = FALSE,
   plot = TRUE,
   verbose = TRUE,
   ...
@@ -87,14 +87,11 @@ which is the highest.}
 (e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
 peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
-\item{keep_location}{A logical argument (defaults to \code{TRUE}). If \code{FALSE}, the
-new image is created with the object in the exactly position of the
-original image.}
+\item{edge}{The number of pixels to be added in the edge of the segmented
+object. Defaults to 5.}
 
-\item{col_background}{The background color in the new image. Defaults to
-\code{white}. Use the built-in color names which \code{R} knows about (see
-?\code{\link[grDevices:colors]{grDevices::colors()}}) or a numeric vector with R, G, and B intensities
-(see ?\code{\link[grDevices:rgb]{grDevices::rgb()}}).}
+\item{remove_bg}{If \code{TRUE}, the pixels that are not part of objects are
+converted to white.}
 
 \item{plot}{Show image after processing?}
 

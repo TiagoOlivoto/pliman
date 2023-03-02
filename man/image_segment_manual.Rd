@@ -6,6 +6,7 @@
 \usage{
 image_segment_manual(
   image,
+  shape = c("free", "circle", "rectangle"),
   type = c("select", "remove"),
   resize = TRUE,
   edge = 5,
@@ -14,6 +15,9 @@ image_segment_manual(
 }
 \arguments{
 \item{image}{An \code{Image} object.}
+
+\item{shape}{The type of shape to use. Defaults to "free". Other possible
+values are "circle" and "rectangle". Partial matching is allowed.}
 
 \item{type}{The type of segmentation. By default (\code{type = "select"}) objects
 are selected. Use \code{type = "remove"} to remove the selected area from the
@@ -32,8 +36,14 @@ the original scale.}
 A list with the segmented image and the mask used for segmentation.
 }
 \description{
-Segments image objects 'by hand'. The user will need to pick the perimeter of
-the object to be segmented. So, this only works in an interactive section.
+This R code is a function that allows the user to manually segment an image based on the parameters provided. This only works in an interactive section.
+}
+\details{
+If the shape is "free", it allows the user to draw a perimeter to
+select/remove objects. If the shape is "circle", it allows the user to
+click on the center and edge of the circle to define the desired area. If
+the shape is "rectangle", it allows the user to select two points to define
+the area.
 }
 \examples{
 if (interactive()) {

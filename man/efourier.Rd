@@ -4,7 +4,7 @@
 \alias{efourier}
 \title{Elliptical Fourier Analysis}
 \usage{
-efourier(x, nharm = 10, align = FALSE, smooth_iter = 0)
+efourier(x, nharm = 10, align = FALSE, center = FALSE, smooth_iter = 0)
 }
 \arguments{
 \item{x}{A \code{matrix}, a \code{data.frame} a \code{list} of perimeter coordinates, often
@@ -17,6 +17,10 @@ to 10.}
 \item{align}{Align the objects before computing Fourier analysis? Defaults to
 \code{FALSE}. If \code{TRUE}, the object is first aligned along the major caliper
 with \code{\link[=poly_align]{poly_align()}}.}
+
+\item{center}{Center the objects on the origin before computing Fourier
+analysis? Defaults to \code{FALSE}. If \code{TRUE}, the object is first centered on
+the origin with \code{\link[=poly_center]{poly_center()}}.}
 
 \item{smooth_iter}{The number of smoothing iterations to perform. This will
 smooth the perimeter of the objects using \code{\link[=poly_smooth]{poly_smooth()}}.}
@@ -49,13 +53,15 @@ plot_polygon(leaf1)
 
 #### default options
 # 10 harmonics (default)
-# object is aligned along the major caliper with `poly_align()`
+# without alignment
+
 ef <- efourier(leaf1)
 efourier_coefs(ef)
 
-# without alignment
+# object is aligned along the major caliper with `poly_align()`
+# object is centered on the origin with `poly_center()`
 # using a list of object coordinates
-ef2 <- efourier(contours, align = FALSE)
+ef2 <- efourier(contours, align = TRUE, center = TRUE)
 efourier_coefs(ef2)
 
 # reconstruct the perimeter of the object

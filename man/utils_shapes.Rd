@@ -66,11 +66,6 @@ poly_area(circ)
 2 * pi * radius
 poly_perimeter(circ)
 
-
-
-
-
-
 ############ An example of a square ############
 side <- 2
 (square <- draw_square(side = side))
@@ -83,11 +78,6 @@ poly_area(square)
 side * 4
 poly_perimeter(square)
 
-
-
-
-
-
 ############ An example of a rectangle ############
 side1 <- 2
 side2 <- 3
@@ -98,10 +88,6 @@ poly_area(rect)
 
 # perimeter
 poly_perimeter(rect)
-
-
-
-
 ###########  An example of an equilateral triangle #########
 side <- 1 # defaults
 (trig <- draw_trian_equi(side = side))
@@ -116,11 +102,6 @@ poly_area(trig)
 ### perimeter (side * 3)
 poly_perimeter(trig)
 
-
-
-
-
-
 ########### An example of a rectangle triangle ##########
 cat1 <- 2
 cat2 <- 3
@@ -132,12 +113,6 @@ poly_area(df)
 # perimeter
 cat1 + cat2 + sqrt(cat1^2 + cat2^2)
 poly_perimeter(df)
-
-
-
-
-
-
 ############ An creating shapes with n sides ############
 side <- 2
 (square <- draw_square(side = side))

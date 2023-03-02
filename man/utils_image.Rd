@@ -13,6 +13,7 @@ image_import(
   which = 1,
   pattern = NULL,
   path = NULL,
+  resize = FALSE,
   plot = FALSE,
   nrow = NULL,
   ncol = NULL
@@ -47,6 +48,10 @@ will be returned if the pattern matches any file that is not supported
 \item{path}{A character vector of full path names; the default corresponds to
 the working directory, \code{\link[=getwd]{getwd()}}. It will overwrite (if given) the path
 informed in \code{image} argument.}
+
+\item{resize}{Resize the image after importation? Defaults to \code{FALSE}. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).}
 
 \item{plot}{Plots the image after importing? Defaults to \code{FALSE}.}
 

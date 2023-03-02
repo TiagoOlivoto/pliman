@@ -9,9 +9,10 @@ efourier_shape(
   bn = NULL,
   cn = NULL,
   dn = NULL,
+  n = 1,
   nharm = NULL,
   npoints = 150,
-  alpha = 3,
+  alpha = 4,
   plot = TRUE
 )
 }
@@ -23,6 +24,9 @@ efourier_shape(
 \item{cn}{The \eqn{c_n} Fourier coefficients on which to calculate a shape.}
 
 \item{dn}{The \eqn{d_n} Fourier coefficients on which to calculate a shape.}
+
+\item{n}{The number of shapes to generate. Defaults to 1. If more than one
+shape is used, a list of coordinates is returned.}
 
 \item{nharm}{The number of harmonics to use. It must be less than or equal to
 the length of \verb{*_n} coefficients.}

@@ -303,7 +303,7 @@ measure_disease <- function(img,
              index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension,
              randomize, nsample, plot, show_original, show_background,
              col_leaf, col_lesions, col_background,
-             save_image, dir_original, dir_processed){
+             save_image, dir_original, dir_processed, marker, marker_col, marker_size){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -797,7 +797,8 @@ measure_disease <- function(img,
     help_count(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                nsample, plot, show_original, show_background, col_leaf,
-               col_lesions, col_background, save_image, dir_original, dir_processed)
+               col_lesions, col_background,  save_image, dir_original, dir_processed,
+               marker, marker_col, marker_size)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -830,7 +831,8 @@ measure_disease <- function(img,
                                img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                                index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                                nsample, plot, show_original, show_background, col_leaf,
-                               col_lesions, col_background, save_image, dir_original, dir_processed)
+                               col_lesions, col_background,  save_image, dir_original, dir_processed,
+                               marker, marker_col, marker_size)
                   })
 
     } else{
@@ -846,7 +848,8 @@ measure_disease <- function(img,
                      img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
                      index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
                      nsample, plot, show_original, show_background, col_leaf,
-                     col_lesions, col_background, save_image, dir_original, dir_processed)
+                     col_lesions, col_background,  save_image, dir_original,
+                     dir_processed, marker, marker_col, marker_size)
       }
     }
     names(results) <- names_plant

@@ -1,0 +1,76 @@
+#' Object edges
+#'
+#' Applies the Sobel-Feldman Operator to detect edges. The operator is based on
+#' convolving the image with a small, separable, and integer-valued filter in
+#' the horizontal and vertical directions.
+#'
+#' @param image An image or a list of images of class `Image`.
+#' @param sigma Gaussian kernel standard deviation used in the gaussian blur.
+#' @param threshold The theshold method to be used.  If `threshold = "Otsu"`
+#'   (default), a threshold value based on Otsu's method is used to reduce the
+#'   grayscale image to a binary image. If any non-numeric value different than
+#'   `"Otsu"` is used, an iterative section will allow you to choose the
+#'   threshold based on a raster plot showing pixel intensity of the index.
+#'   Alternatively, provide a numeric value to be used as the threshold value.
+#' @param thinning Logical value indicating whether a thinning procedure should
+#'   be applied to the detected edges. See [image_skeleton()]
+#' @param plot Logical value indicating whether a plot should be created
+#' @return A binary version of `image`.
+#' @references Sobel, I., and G. Feldman. 1973. A 3×3 isotropic gradient
+#'   operator for image processing. Pattern Classification and Scene Analysis:
+#'   271–272.
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("sev_leaf_nb.jpg", plot = TRUE)
+#' object_edge(img)
+#'
+object_edge <- function(image,
+                        sigma = 1,
+                        threshold = "Otsu",
+                        thinning = FALSE,
+                        plot = TRUE){
+  gray <- image_index(image,
+                      "GRAY",
+                      plot = FALSE,
+                      verbose = FALSE)[[1]]
+  if(!isFALSE(sigma)){
+    gray <- EBImage::gblur(gray, sigma = sigma)
+  }
+  edata <- sobel_help(gray)
+
+  if (threshold == "Otsu") {
+    threshold <- EBImage::otsu(edata, range = range(edata, na.rm = TRUE))
+  }
+  else {
+    if (is.numeric(threshold)) {
+      threshold <- threshold
+    }
+    else {
+      pixels <- data.frame(edata@.Data)
+      colnames(pixels) <- 1:ncol(pixels)
+      pixels$id <- 1:nrow(pixels)
+      pixels <- reshape(pixels, direction = "long",
+                        varying = list(names(pixels)[1:ncol(pixels) -
+                                                       1]), v.names = "value", idvar = "id",
+                        timevar = "y", times = names(pixels)[1:ncol(pixels) -
+                                                               1])
+      pixels$y <- as.numeric(pixels$y)
+      p <- levelplot(value ~ id * y, data = pixels,
+                     xlab = NULL, ylab = NULL, useRaster = TRUE,
+                     col.regions = terrain.colors(300), colorkey = list(interpolate = TRUE,
+                                                                        raster = TRUE))
+      plot(p)
+      threshold <- readline("Selected threshold: ")
+    }
+  }
+  edata <- EBImage::Image(edata > threshold)
+  if(isTRUE(thinning)){
+    edata <- image_thinning(edata, verbose = FALSE, plot = FALSE)
+  }
+  if(isTRUE(plot)){
+    plot(edata)
+  }
+  return(edata)
+}

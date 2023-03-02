@@ -49,8 +49,7 @@ draw_circle <- function(radius = 1,
          y = 0.5 * radius,
          label = radius)
   }
-
-  return(circ)
+  return(as.matrix(circ))
 }
 
 
@@ -59,11 +58,6 @@ draw_circle <- function(radius = 1,
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
-#'
-#'
 #'
 #' ############ An example of a square ############
 #' side <- 2
@@ -81,12 +75,12 @@ draw_square <- function(side = 2,
   x <- c(0, 0, side, side, 0)
   y <- c(0, side, side, 0, 0)
   df <- data.frame(x = x, y = y)
+  df <- df[-1, ]
   if (isTRUE(plot)){
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-
-  return(df)
+  return(as.matrix(df))
 }
 
 
@@ -96,11 +90,6 @@ draw_square <- function(side = 2,
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
-#'
-#'
 #'
 #' ############ An example of a rectangle ############
 #' side1 <- 2
@@ -118,21 +107,18 @@ draw_rectangle <- function(side1 = 2,
   x <- c(0, 0, side2, side2, 0)
   y <- c(0, side1, side1, 0, 0)
   df <- data.frame(x = x, y = y)
+  df <- df[-1, ]
   if(isTRUE(plot)){
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(df)
+  return(as.matrix(df))
 }
 
 #' @name utils_shapes
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
-#'
 #' ###########  An example of an equilateral triangle #########
 #' side <- 1 # defaults
 #' (trig <- draw_trian_equi(side = side))
@@ -154,11 +140,12 @@ draw_trian_equi <- function(side = 2,
   y <- c(0, 0, side * sin(angle), 0)
 
   df <- data.frame(x = x, y = y)
+  df <- df[-1, ]
   if(isTRUE(plot)){
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(df)
+  return(as.matrix(df))
 }
 
 #' @param cat1,cat2 The first and second cathetus of the right triangle.
@@ -167,11 +154,6 @@ draw_trian_equi <- function(side = 2,
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
-#'
-#'
 #' ########### An example of a rectangle triangle ##########
 #' cat1 <- 2
 #' cat2 <- 3
@@ -193,7 +175,7 @@ draw_trian_rect <- function(cat1 = 1,
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(rbind(df, df[1,]))
+  return(as.matrix(rbind(df, df[1,])))
 }
 
 #' @param n The number of sides in the `n`-tagon.
@@ -201,12 +183,6 @@ draw_trian_rect <- function(cat1 = 1,
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
-#'
-#'
-#'
 #' ############ An creating shapes with n sides ############
 #' side <- 2
 #' (square <- draw_square(side = side))
@@ -220,6 +196,7 @@ draw_trian_rect <- function(cat1 = 1,
 #' poly_perimeter(square)
 draw_n_tagon <- function(n, plot = TRUE){
   coords <- draw_circle(n = n + 1, plot = FALSE)
+  coords <- coords[-1, ]
   if(isTRUE(plot)){
     plot(coords,
          type = "n",
@@ -228,5 +205,5 @@ draw_n_tagon <- function(n, plot = TRUE){
          asp = 1)
     polygon(coords, col = "red")
   }
-  return(coords)
+  return(as.matrix(coords))
 }

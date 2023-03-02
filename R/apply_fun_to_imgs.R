@@ -40,15 +40,15 @@
 #' @examples
 #' # apply_fun_to_imgs("pattern", image_resize, rel_size = 50)
 apply_fun_to_imgs <- function(pattern,
-                              fun,
-                              ...,
-                              dir_original = NULL,
-                              dir_processed = NULL,
-                              prefix = "",
-                              suffix = "",
-                              parallel = FALSE,
-                              workers = 3,
-                              verbose = TRUE){
+                               fun,
+                               ...,
+                               dir_original = NULL,
+                               dir_processed = NULL,
+                               prefix = "",
+                               suffix = "",
+                               parallel = FALSE,
+                               workers = 3,
+                               verbose = TRUE){
   if(is.null(dir_original)){
     diretorio_original <- paste0("./")
   } else{
@@ -91,25 +91,28 @@ apply_fun_to_imgs <- function(pattern,
   }
 
   if(parallel == TRUE){
-    clust <- makeCluster(workers)
-    clusterExport(clust,
-                  varlist = c("imgs", "help_apply", "image_import", "fun", "image_segment_mask"),
-                  envir=environment())
-    on.exit(stopCluster(clust))
+    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+    cl <- parallel::makePSOCKcluster(workers)
+    doParallel::registerDoParallel(cl)
+    on.exit(stopCluster(cl))
+
+    ## declare alias for dopar command
+    `%dopar%` <- foreach::`%dopar%`
+
     if(verbose == TRUE){
       message("Image processing using multiple sessions (",workers, "). Please wait.")
     }
+
     results <-
-      parLapply(clust, imgs,
-                function(x, ...){
-                  help_apply(x,
-                             fun,
-                             ...,
-                             diretorio_original = diretorio_original,
-                             diretorio_processada = diretorio_processada,
-                             prefix = prefix,
-                             suffix = suffix)
-                })
+      foreach::foreach(i = seq_along(imgs), .packages = "pliman") %dopar%{
+        help_apply(imgs[[i]],
+                   fun,
+                   ...,
+                   diretorio_original = diretorio_original,
+                   diretorio_processada = diretorio_processada,
+                   prefix = prefix,
+                   suffix = suffix)
+      }
 
   } else{
     pb <- progress(max = length(imgs), style = 4)
@@ -127,3 +130,7 @@ apply_fun_to_imgs <- function(pattern,
     }
   }
 }
+
+
+
+

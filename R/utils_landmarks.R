@@ -1,8 +1,3 @@
-########### helper functions ########
-help_dist <- function(v1, v2){
-  sqrt(sum((v1 - v2)^2))
-}
-
 help_angle <- function(v1, v2){
   v1 <- complex(1, v1[1], v1[2])
   v2 <- complex(1, v2[1], v2[2])
@@ -160,15 +155,16 @@ landmarks_regradi <- function(x,
     V2 <- sort(V2)
     coords <- M1[V2,] |> as.data.frame()
     colnames(coords) <- c("x", "y")
-    coords$x <- coords$x + mean(Rx)
-    coords$y <- coords$y + mean(Ry)
+    coords$x <- coords[,1] + mean(Rx)
+    coords$y <- coords[,2] + mean(Ry)
     if(isTRUE(close)){
       coords <- poly_close(coords)
     }
     Xc <- mean(coords[,1])
     Yc <- mean(coords[,2])
     if(isTRUE(plot)){
-      plot(coords$x, coords$y,
+      plot(coords[,1],
+           coords[,2],
            type = "l",
            lwd = 1.5,
            asp = 1,
@@ -177,11 +173,11 @@ landmarks_regradi <- function(x,
            axes = FALSE)
       axis(1)
       axis(2)
-      points(coords$x, coords$y, pch = 16)
+      points(coords[,1], coords[,2], pch = 16)
       segments(mean(Rx),
                mean(Ry),
-               coords$x,
-               coords$y,
+               coords[,1],
+               coords[,2],
                col = "gray")
     }
     return(
@@ -222,17 +218,17 @@ landmarks_regradi <- function(x,
 #' plot_polygon(contours[[4]])
 #' ldm <- landmarks_regradi(contours[[4]], plot = FALSE)
 #' points(ldm$coords, pch = 16)
-#' segments(mean(ldm$coords$x),
-#'          mean(ldm$coords$y),
-#'          ldm$coords$x,
-#'          ldm$coords$y)
+#' segments(mean(ldm$coords[,1]),
+#'          mean(ldm$coords[,2]),
+#'          ldm$coords[,1],
+#'          ldm$coords[,2])
 #'
 #' ldm_add <- landmarks_add(ldm, plot = FALSE)
 #' points(ldm_add, col = "red")
 #' points(ldm$coords, pch = 16)
 #'
 #' # smoothed version
-#' ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 50)
+#' ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 10)
 #' lines(ldm_add_smo, col = "blue", lwd = 3)
 landmarks_add<-function(x,
                         n = 3,
@@ -347,12 +343,11 @@ calibrate <- function(img){
 #' x <- landmarks(img)
 #' landmarks_dist(x)
 #' }
+#'
+
 landmarks_dist <- function(x){
-  dists <- combn(nrow(x), 2, FUN = function(y){
-    help_dist(x[y[1], 1:2], x[y[2], 1:2])
-  })
   n <- nrow(x)
-  create_mat(dists, n)
+  create_mat(dist(x), n)
 }
 
 

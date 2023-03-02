@@ -11,6 +11,9 @@
 #' @param align Align the objects before computing Fourier analysis? Defaults to
 #'   `FALSE`. If `TRUE`, the object is first aligned along the major caliper
 #'   with [poly_align()].
+#' @param center Center the objects on the origin before computing Fourier
+#'   analysis? Defaults to `FALSE`. If `TRUE`, the object is first centered on
+#'   the origin with [poly_center()].
 #' @param smooth_iter The number of smoothing iterations to perform. This will
 #'   smooth the perimeter of the objects using [poly_smooth()].
 #' @return A list of class `efourier` with:
@@ -40,13 +43,15 @@
 #'
 #' #### default options
 #' # 10 harmonics (default)
-#' # object is aligned along the major caliper with `poly_align()`
+#' # without alignment
+#'
 #' ef <- efourier(leaf1)
 #' efourier_coefs(ef)
 #'
-#' # without alignment
+#' # object is aligned along the major caliper with `poly_align()`
+#' # object is centered on the origin with `poly_center()`
 #' # using a list of object coordinates
-#' ef2 <- efourier(contours, align = FALSE)
+#' ef2 <- efourier(contours, align = TRUE, center = TRUE)
 #' efourier_coefs(ef2)
 #'
 #' # reconstruct the perimeter of the object
@@ -57,6 +62,7 @@
 efourier <- function(x,
                      nharm = 10,
                      align = FALSE,
+                     center = FALSE,
                      smooth_iter = 0) {
   if (inherits(x, "list")) {
     if(inherits(x[[1]][[1]], "landmarks_regradi")){
@@ -69,7 +75,7 @@ efourier <- function(x,
         x$coords
       })
     }
-    coords <- lapply(x, efourier, nharm, align, smooth_iter)
+    coords <- lapply(x, efourier, nharm, align, center, smooth_iter)
     return(structure(coords, class = "efourier_lst"))
   } else{
     if(inherits(x, "landmarks_regradi")){
@@ -79,6 +85,9 @@ efourier <- function(x,
     }
     if(isTRUE(align)){
       coord <- poly_align(coord, plot = FALSE)
+    }
+    if(isTRUE(center)){
+      coord <- poly_center(coord, plot = FALSE)
     }
     nr <- nrow(coord)
     if (nharm * 2 > nr) {
@@ -132,6 +141,9 @@ efourier <- function(x,
 #'   [efourier()].
 #' @param nharm An integer indicating the number of harmonics to use. If not
 #'   specified the number of harmonics used in `x` is used.
+#' @param a0,c0 the estimates of the coordinates of the centroid of the
+#'   configuration. If `NULL` (default), the generated coordinates will be
+#'   centered on the position of the original shape given by [efourier()].
 #' @param npoints The number of interpolated points on the constructed outline.
 #'   Defaults to 500.
 #' @details Adapted from Claude (2008). pp. 223.
@@ -147,9 +159,11 @@ efourier <- function(x,
 #' plot_contour(ief, col = "red", lwd = 2)
 efourier_inv <- function(x,
                          nharm = NULL,
+                         a0 = NULL,
+                         c0 = NULL,
                          npoints = 500) {
   if (inherits(x, "efourier_lst")) {
-    coords <- lapply(x, efourier_inv, nharm, npoints)
+    coords <- lapply(x, efourier_inv, nharm, a0, c0, npoints)
     return(structure(coords, class = "iefourier_lst"))
   } else{
     if (is.null(x$a0)){
@@ -162,8 +176,9 @@ efourier_inv <- function(x,
     bn <- x$bn
     cn <- x$cn
     dn <- x$dn
-    a0 <- x$a0
-    c0 <- x$c0
+    a0 <- ifelse(is.null(a0), x$a0, a0)
+    c0 <- ifelse(is.null(c0), x$c0, c0)
+
     if (is.null(nharm)) {
       nharm <- length(an)
     }
@@ -383,7 +398,7 @@ efourier_error <- function(x,
 #' * `theta` angle, in radians, between the starting and the semi-major axis of
 #' the first fitting ellipse.
 #' * `psi` orientation of the first fitting ellipse
-#' * `a0` and `c0`, harmoniccoefficients.
+#' * `a0` and `c0`, harmonic coefficients.
 #' * `lnef` the concatenation of coefficients.
 #' * `nharm` the number of harmonics used.
 #' @details Adapted from Claude (2008). pp. 226.
@@ -689,6 +704,8 @@ efourier_power <- function(x,
 #' @param dn The \eqn{d_n} Fourier coefficients on which to calculate a shape.
 #' @param nharm The number of harmonics to use. It must be less than or equal to
 #'   the length of `*_n` coefficients.
+#' @param n The number of shapes to generate. Defaults to 1. If more than one
+#'   shape is used, a list of coordinates is returned.
 #' @param npoints The number of points to calculate.
 #' @param alpha The power coefficient associated with the (usually decreasing)
 #'   amplitude of the Fourier coefficients.
@@ -699,6 +716,7 @@ efourier_power <- function(x,
 #' @details Adapted from Claude (2008). pp. 223.
 #' @references Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,
 #' Springer 316 pp.
+#' @importFrom stats rnorm
 #' @export
 #'
 #' @examples
@@ -716,43 +734,53 @@ efourier_shape <- function(an = NULL,
                            bn = NULL,
                            cn = NULL,
                            dn = NULL,
+                           n = 1,
                            nharm = NULL,
                            npoints = 150,
-                           alpha = 3,
+                           alpha = 4,
                            plot = TRUE) {
-  if (is.null(nharm) & is.null(an)){
-    nharm <- 10
+  shapes <- list()
+  if(n == 1){
+    if (is.null(nharm) & is.null(an)){
+      nharm <- 10
+    }
+    if (is.null(nharm) & !is.null(an)){
+      nharm <- length(an)
+    }
+    if (is.null(an)){
+      an <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+    }
+    if (is.null(bn)){
+      bn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+    }
+    if (is.null(cn)) {
+      cn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+    }
+    if (is.null(dn)) {
+      dn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+    }
+    ef <- list(an = an, bn = bn, cn = cn, dn = dn, a0 = rnorm(1, 10, 30), c0 = rnorm(1, 10, 30))
+    shapes <- efourier_inv(ef, nharm = nharm, npoints = npoints) |> unclass()
+  } else{
+    for(i in 1:n){
+      if (is.null(nharm) & is.null(an)){
+        nharm <- 10
+      }
+      if (is.null(nharm) & !is.null(an)){
+        nharm <- length(an)
+      }
+      an <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+      bn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+      cn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+      dn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
+      ef <- list(an = an, bn = bn, cn = cn, dn = dn, a0 = rnorm(1, 10, 30), c0 = rnorm(1, 10, 30))
+      shapes[[i]] <- efourier_inv(ef, nharm = nharm, npoints = npoints) |> unclass()
+    }
   }
-  if (is.null(nharm) & !is.null(an)){
-    nharm <- length(an)
-  }
-  if (is.null(an)){
-    an <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
-  }
-  if (is.null(bn)){
-    bn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
-  }
-  if (is.null(cn)) {
-    cn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
-  }
-  if (is.null(dn)) {
-    dn <- runif(nharm, -pi, pi)/(1:nharm) ^ alpha
-  }
-  ef <- list(an = an, bn = bn, cn = cn, dn = dn, a0 = 0, c0 = 0)
-  shp <- efourier_inv(ef, nharm = nharm, npoints = npoints) |> unclass()
   if (isTRUE(plot)){
-    plot(shp,
-         axes = FALSE,
-         type = "n",
-         xlab = "",
-         ylab = "",
-         asp = 1)
-    axis(1)
-    axis(2)
-    polygon(shp,
-            col = rgb(t(col2rgb("gray") / 255),  alpha = 1),
-            border = NA)
+    plot_polygon(shapes)
   }
-  return(shp)
+  return(shapes)
 }
+
 

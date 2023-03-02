@@ -26,6 +26,7 @@ img <- image_pliman("potato_leaves.jpg")
 x <- landmarks(img)
 landmarks_dist(x)
 }
+
 }
 \references{
 Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,

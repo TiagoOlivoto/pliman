@@ -6,8 +6,7 @@
 #' replicates of the same treatment  and obtaining the results for each
 #' replication with a single image. To do that, leaf samples are first splitten
 #' with [object_split()] and then, [measure_disease()] is applied to the list of
-#' leaves. Arguments `img` to `keep_location` are passed on to [object_split()].
-#' Arguments `dir_original` to `...` are passed on to [measure_disease()].
+#' leaves.
 #'
 #' @inheritParams object_split
 #' @inheritParams measure_disease
@@ -56,7 +55,6 @@ measure_disease_byl <- function(img,
                                 extension = NULL,
                                 tolerance = NULL,
                                 object_size = "large",
-                                keep_location = FALSE,
                                 dir_original = NULL,
                                 img_healthy = NULL,
                                 img_symptoms = NULL,
@@ -123,7 +121,6 @@ measure_disease_byl <- function(img,
                            extension = extension,
                            tolerance = tolerance,
                            object_size = object_size,
-                           keep_location = keep_location,
                            plot = FALSE,
                            verbose = FALSE)
     results <- list()

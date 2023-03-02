@@ -6,8 +6,10 @@
 \alias{poly_is_closed}
 \alias{poly_close}
 \alias{poly_unclose}
+\alias{poly_angles}
 \alias{poly_limits}
 \alias{conv_hull}
+\alias{conv_hull_unified}
 \alias{poly_area}
 \alias{poly_slide}
 \alias{poly_distpts}
@@ -15,6 +17,7 @@
 \alias{poly_perimeter}
 \alias{poly_rotate}
 \alias{poly_align}
+\alias{poly_center}
 \alias{poly_lw}
 \alias{poly_eccentricity}
 \alias{poly_convexity}
@@ -27,95 +30,100 @@
 \alias{poly_sample_prop}
 \alias{poly_jitter}
 \alias{poly_circularity}
-\alias{poly_circularity_haralick}
 \alias{poly_circularity_norm}
-\alias{poly_measures}
+\alias{poly_circularity_haralick}
 \alias{poly_mass}
 \alias{poly_spline}
 \alias{poly_smooth}
+\alias{poly_measures}
 \title{Utilities for Polygons}
 \usage{
-poly_check(x, y = NULL)
+poly_check(x)
 
-poly_is_closed(x, y = NULL)
+poly_is_closed(x)
 
-poly_close(x, y = NULL)
+poly_close(x)
 
-poly_unclose(x, y = NULL)
+poly_unclose(x)
 
-poly_limits(x, y = NULL)
+poly_angles(x)
 
-conv_hull(x, y = NULL)
+poly_limits(x)
 
-poly_area(x, y = NULL)
+conv_hull(x)
 
-poly_slide(x, y = NULL, fp = 1)
+conv_hull_unified(x)
 
-poly_distpts(x, y = NULL)
+poly_area(x)
 
-poly_centdist(x, y = NULL)
+poly_slide(x, fp = 1)
 
-poly_perimeter(x, y = NULL)
+poly_distpts(x)
 
-poly_rotate(x, y = NULL, angle = 0, plot = TRUE)
+poly_centdist(x)
 
-poly_align(x, y = NULL, plot = TRUE)
+poly_perimeter(x)
 
-poly_lw(x, y = NULL)
+poly_rotate(x, angle, plot = TRUE)
 
-poly_eccentricity(x, y = NULL)
+poly_align(x, plot = TRUE)
 
-poly_convexity(x, y = NULL)
+poly_center(x, plot = TRUE)
 
-poly_caliper(x, y = NULL)
+poly_lw(x)
 
-poly_elongation(x, y = NULL)
+poly_eccentricity(x)
 
-poly_solidity(x, y = NULL)
+poly_convexity(x)
 
-poly_flip_y(x, y = NULL)
+poly_caliper(x)
 
-poly_flip_x(x, y = NULL)
+poly_elongation(x)
 
-poly_sample(x, y = NULL, n = 50)
+poly_solidity(x)
 
-poly_sample_prop(x, y = NULL, prop = 0.1)
+poly_flip_y(x)
 
-poly_jitter(x, y = NULL, noise_x = 1, noise_y = 1, plot = TRUE)
+poly_flip_x(x)
 
-poly_circularity(x, y = NULL)
+poly_sample(x, n = 50)
 
-poly_circularity_haralick(x, y = NULL)
+poly_sample_prop(x, prop = 0.1)
 
-poly_circularity_norm(x, y = NULL)
+poly_jitter(x, noise_x = 1, noise_y = 1, plot = TRUE)
 
-poly_measures(x, y = NULL)
+poly_circularity(x)
 
-poly_mass(x, y = NULL)
+poly_circularity_norm(x)
 
-poly_spline(x, y = NULL, vertices = 100, k = 2)
+poly_circularity_haralick(x)
 
-poly_smooth(x, y = NULL, niter = 10, n = NULL, prop = NULL, plot = TRUE)
+poly_mass(x)
+
+poly_spline(x, vertices = 100, k = 2)
+
+poly_smooth(x, niter = 10, n = NULL, prop = NULL, plot = TRUE)
+
+poly_measures(x)
 }
 \arguments{
-\item{x, y}{Coordinate vectors of points. This can be specified as two vectors
-(\code{x} and \code{y}), or a 2-column matrix \code{x}. If \code{x} is a list of vector
-coordinates the function will be applied to each element using
-\code{\link[base:lapply]{base::lapply()}}.}
+\item{x}{A 2-column matrix with the \code{x} and \code{y} coordinates. If \code{x} is a list
+of vector coordinates, the function will be applied to each element using
+\code{\link[base:lapply]{base::lapply()}} or \code{\link[base:lapply]{base::sapply()}}.}
 
-\item{fp}{The id of the point that will become the new first point. Defaults
-to \code{1}.}
+\item{fp}{The ID of the point that will become the new first point. Defaults
+to 1.}
 
 \item{angle}{The angle (0-360) to rotate the object.}
 
-\item{plot}{Plots the object? Defaults to \code{TRUE}}
+\item{plot}{Should the object be plotted? Defaults to \code{TRUE}.}
 
 \item{n, prop}{The number and proportion of coordinates to sample from the
-perimeter coordinates. In \code{poly_smooth()} these arguments can be used to
+perimeter coordinates. In\code{ poly_smooth()}, these arguments can be used to
 sample points from the object's perimeter before smoothing.}
 
-\item{noise_x, noise_y}{A numeric factor to define the noise added to \code{x} and
-\code{y} axis, respectively. See \code{\link[base:jitter]{base::jitter()}} for more details.}
+\item{noise_x, noise_y}{A numeric factor to define the noise added to the \code{x}
+and \code{y} axes, respectively. See \code{\link[base:jitter]{base::jitter()}} for more details.}
 
 \item{vertices}{The number of spline vertices to create.}
 
@@ -143,78 +151,87 @@ to the center of mass.
 }
 }
 \description{
-Several useful functions to analyze polygons. All of them are
-based on a set of coordinate points describing the edge of the object(s).
+Several useful functions for analyzing polygons. All of them are based on a set
+of coordinate points that describe the edge of the object(s). If a list of
+polygons is provided, it loops through the list and computes what is needed
+for each element of the list.
 \itemize{
-\item Area measures
+\item Polygon measures
 \itemize{
-\item \code{conv_hull()} Computes convex hull of a set of points.
+\item \code{conv_hull()} Computes the convex hull of a set of points.
+\item \code{conv_hull_unified()} Computes the convex hull of a set of points. Compared
+to \code{conv_hull()}, \code{conv_hull_unified()} binds (unifies) the coordinates when
+x is a list of coordinates.
 \item \code{poly_area()} Computes the area of a polygon given by the vertices in the
-vectors \code{x} and \code{y} using the Shoelace formula, as follows (Lee and Lim,
-2017). \deqn{A=\frac{1}{2}\left|\sum_{i=1}^{n}\left(x_{i} y_{i+1}-x_{i+1}
-  y_{i}\right)\right|}, where \code{x} and \code{y} are the coordinates which form the
+vectors x and y using the Shoelace formula, as follows (Lee and Lim,
+2017): \deqn{A=\frac{1}{2}\left|\sum_{i=1}^{n}\left(x_{i} y_{i+1}-x_{i+1}
+y_{i}\right)\right|} where \code{x} and \code{y} are the coordinates that form the
 corners of a polygon, and \code{n} is the number of coordinates.
-\item \code{poly_lw()} Returns the length and width of a polygon based on their
-alignment to the x-axis. The length is defined as the range along the
-x-axis and the width as the range on the y-axis.
+\item \code{poly_angles()} Calculates the internal angles of the polygon using the
+law of cosines.
+\item \code{poly_lw()} Returns the length and width of a polygon based on its
+alignment to the y-axis (with poly_align()). The length is defined as the
+range along the x-axis, and the width is defined as the range on the y-axis.
 \item \code{poly_mass()} Computes the center of mass of a polygon given by the
-vertices in the vectors \code{x} and \code{y}.
+vertices in the vectors in \code{x}.
 \item \code{poly_solidity()} Computes the solidity of a shape as the ratio of
 the shape area and the convex hull area.
 }
 \item Perimeter measures
 \itemize{
 \item \code{poly_slide()} Slides the coordinates of a polygon given by the vertices
-in the vectors \code{x} and \code{y} so that the id-th point become the first one.
-\item \code{poly_distpts()} Computes the euclidean distance between every points
-of a polygon given by the vertices in the vectors \code{x} and \code{y}.
-\item \code{poly_centdist()} Computes the euclidean distance between every point of
+in the vectors x and y so that the id-th point becomes the first one.
+\item \code{poly_distpts()} Computes the Euclidean distance between every point
+of a polygon given by the vertices in the vectors x and y.
+\item \code{poly_centdist()} Computes the Euclidean distance between every point on
 the perimeter and the centroid of the object.
 \item \code{poly_perimeter()} Computes the perimeter of a polygon given by the
-vertices in the vectors \code{x} and \code{y}.
-\item \code{poly_caliper()} Computes the caliper (Also called the Feret's diameter)
-of a polygon given by the vertices in the vectors \code{x} and \code{y}.
+vertices in the vectors x and y.
+\item \code{poly_caliper()} Computes the caliper (also called the Feret's diameter)
+of a polygon given by the vertices in the vectors x and y.
 }
 \item Circularity measures (Montero et al. 2009).
 \itemize{
 \item \code{poly_circularity()} computes the circularity (C), also called shape
-compactness, or roundness measure of an object. It is given by \code{C = P^2 /  A}, where \code{P} is the perimeter and \code{A} is the area of the object.
-\item \code{poly_circularity_norm()} computes the normalized circularity (Cn), to
-be unity for a circle. This measure is invariant under translation,
-rotation, scaling transformations, and dimensionless. It is given by: \code{Cn  = P^2 / 4*pi*A}.
-\item \code{poly_circularity_haralick()} computes the Haralick's circularity (CH).
-The method is based on the computation of all the Euclidean distances from
-the object centroid to each boundary pixel. With this set of distances,
-the media (m) and the standard deviation (sd) are computed. These
-statistical parameters are used on a ratio that calculates the
-circularity, CH, of a shape, as \code{CH =  m/sd}
-\item \code{poly_convexity()} Computes the convexity of a shape using a ratio
+compactness or roundness measure, of an object. It is given by \code{C = P^2 / A},
+where P is the perimeter and A is the area of the object.
+\item \code{poly_circularity_norm()} computes the normalized circularity (Cn), which
+is unity for a circle. This measure is invariant under translation,
+rotation, scaling transformations, and is dimensionless. It is given by:
+\code{Cn = P^2 / 4*pi*A}.
+\item \code{poly_circularity_haralick()} computes Haralick's circularity (CH). The
+method is based on computing all Euclidean distances from the object
+centroid to each boundary pixel. With this set of distances, the mean (\code{m})
+and the standard deviation (\code{sd}) are computed. These statistical parameters
+are used to calculate the circularity, CH, of a shape as \code{CH = m/sd}.
+\item \code{poly_convexity()} computes the convexity of a shape using the ratio
 between the perimeter of the convex hull and the perimeter of the polygon.
-\item \code{poly_eccentricity()} Computes the eccentricity of a shape using the
-ratio of the eigen values (inertia axes of coordinates).
-\item \code{poly_elongation()} Computes the elongation of a shape as \code{1 - width / length}.
+\item \code{poly_eccentricity()} computes the eccentricity of a shape using the
+ratio of the eigenvalues (inertia axes of coordinates).
+\item \code{poly_elongation()} computes the elongation of a shape as 1 - width / length.
 }
 \item Utilities for polygons
 \itemize{
-\item \code{poly_check()} Checks a set of coordinate points and return a matrix
-with \code{x} and \code{y} columns.
+\item \code{poly_check()} Checks a set of coordinate points and returns a matrix
+with x and y columns.
 \item \code{poly_is_closed()} Returns a logical value indicating if a polygon is
 closed.
-\item \code{poly_close()}, and \code{poly_unclose()} close and unclose a polygon,
+\item \code{poly_close()} and \code{poly_unclose()} close and unclose a polygon,
 respectively.
-\item \code{poly_rotate()} Rotates the polygon coordinates by a \code{angle} (0-360
-degrees) in the trigonometric direction (anti-clockwise).
-\item \code{poly_flip_x()},\code{poly_flip_y()} flips shapes along the x and y axis,
+\item \code{poly_rotate() }Rotates the polygon coordinates by an angle (0-360
+degrees) in the counterclockwise direction.
+\item \code{poly_flip_x()}, \code{poly_flip_y()} flip shapes along the x-axis and y-axis,
 respectively.
-\item \code{poly_align()} Aligns the coordinates along their longer axis using
+\item \code{poly_align()} Aligns the coordinates along their longer axis using the
 var-cov matrix and eigen values.
-\item \code{poly_sample()} Samples \code{n} coordinates among existing points. Defaults
-to \code{50}
-\item \code{poly_sample_prop()} Samples a proportion of coordinates among existing
-points. Defaults to \code{0.1}
-\item \code{poly_spline()} Interpolates a polygon contour.
-\item \code{poly_smooth()} Smooths a polygon contour using a simple moving average.
-\item \code{poly_jitter()} Add a small amount of noise to a set of point
+\item \code{poly_center()} Centers the coordinates on the origin.
+\item \code{poly_sample()} Samples n coordinates from existing points. Defaults
+to 50.
+\item \code{poly_sample_prop()} Samples a proportion of coordinates from existing
+points. Defaults to 0.1.
+\item \code{poly_spline()} Interpolates the polygon contour.
+\item \code{poly_smooth()} Smooths the polygon contour using a simple moving average.
+\item \code{poly_jitter()} Adds a small amount of noise to a set of point
 coordinates. See \code{\link[base:jitter]{base::jitter()}} for more details.
 }
 \item \code{poly_measures()} Is a wrapper around the \verb{poly_*()} functions.
@@ -247,7 +264,7 @@ poly_area(conv_square)
 ################### Example with a polygon ##################
 x <- c(0, 1,   2, 3,  5, 2, -1, 0, 0)
 y <- c(5, 6.5, 7, 3,  1, 1,  0, 2, 5)
-df_poly <- data.frame(x = x, y = y)
+df_poly <- cbind(x, y)
 
 # area of the polygon
 plot_polygon(df_poly, fill = "red")
@@ -257,9 +274,8 @@ poly_area(df_poly)
 poly_perimeter(df_poly)
 
 # center of mass of polygon
-# arrows from center of mass to maximum and minimum radius
 cm <- poly_mass(df_poly)
-plot_mass(cm, arrow = TRUE, col = "blue")
+plot_mass(cm,  col = "blue")
 
 # vertices of the convex hull
 (conv_poly <- conv_hull(df_poly))
@@ -269,8 +285,8 @@ poly_area(conv_poly)
 
 plot_polygon(conv_poly,
              fill = "red",
-              alpha = 0.2,
-               add = TRUE)
+             alpha = 0.2,
+             add = TRUE)
 
 
 ############ example of circularity measures ################

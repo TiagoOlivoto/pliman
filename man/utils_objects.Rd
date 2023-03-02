@@ -28,6 +28,7 @@ object_coord(
 
 object_contour(
   image,
+  center = FALSE,
   index = "NB",
   invert = FALSE,
   filter = FALSE,
@@ -95,6 +96,8 @@ number of parallel processes that can be active at the same time.}
 
 \item{plot}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
+
+\item{center}{If \code{TRUE} returns the object contours centered on the origin.}
 
 \item{...}{\itemize{
 \item For \code{object_isolate()}, further arguments passed on to \code{\link[=object_coord]{object_coord()}}.

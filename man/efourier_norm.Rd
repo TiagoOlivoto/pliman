@@ -20,7 +20,7 @@ A list with the following components:
 \item \code{theta} angle, in radians, between the starting and the semi-major axis of
 the first fitting ellipse.
 \item \code{psi} orientation of the first fitting ellipse
-\item \code{a0} and \code{c0}, harmoniccoefficients.
+\item \code{a0} and \code{c0}, harmonic coefficients.
 \item \code{lnef} the concatenation of coefficients.
 \item \code{nharm} the number of harmonics used.
 }

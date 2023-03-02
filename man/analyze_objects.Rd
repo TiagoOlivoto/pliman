@@ -20,6 +20,9 @@ analyze_objects(
   parallel = FALSE,
   workers = NULL,
   watershed = TRUE,
+  veins = FALSE,
+  sigma_veins = 1,
+  haralick = FALSE,
   har_nbins = 32,
   har_scales = 1,
   har_band = 1,
@@ -38,6 +41,7 @@ analyze_objects(
   windowsize = NULL,
   tolerance = NULL,
   extension = NULL,
+  lower_noise = 0.1,
   lower_size = NULL,
   upper_size = NULL,
   topn_lower = NULL,
@@ -54,6 +58,7 @@ analyze_objects(
   show_contour = TRUE,
   contour_col = "red",
   contour_size = 1,
+  show_lw = FALSE,
   show_background = TRUE,
   show_segmentation = FALSE,
   col_foreground = NULL,
@@ -140,6 +145,18 @@ detection. This will detect objects even when they are touching one other.
 If \code{FALSE}, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.}
+
+\item{veins}{Logical argument indicating whether vein features are computed.
+This will call \code{\link[=object_edge]{object_edge()}} and applies the Sobel-Feldman Operator to
+detect edges. The result is the proportion of edges in relation to the
+entire area of the object(s) in the image. Note that \strong{THIS WILL BE AN
+OPERATION ON AN IMAGE LEVEL, NOT OBJECT!}.}
+
+\item{sigma_veins}{Gaussian kernel standard deviation used in the gaussian
+blur in the edge detection algorithm}
+
+\item{haralick}{Logical value indicating whether Haralick features are
+computed. Defaults to \code{FALSE}.}
 
 \item{har_nbins}{An integer indicating the number of bins using to compute
 the Haralick matrix. Defaults to 32. See Details}
@@ -232,15 +249,21 @@ which is the highest.}
 \item{extension}{Radius of the neighborhood in pixels for the detection of
 neighboring objects. Higher value smooths out small objects.}
 
+\item{lower_noise}{To prevent noise from affecting the image analysis,
+objects with lesser than 10\% of the mean area of all objects are removed
+(\code{lower_noise = 0.1}). Increasing this value will remove larger noises
+(such as dust points), but can remove desired objects too. To define an
+explicit lower or upper size, use the \code{lower_size} and \code{upper_size}
+arguments.}
+
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
-analysis. Plant images often contain dirt and dust. To prevent dust from
-affecting the image analysis, objects with lesser than 10\% of the mean of
-all objects are removed. Upper limit is set to \code{NULL}, i.e., no upper
-limit used. One can set a known area or use \code{lower_limit = 0} to select all
-objects (not advised). Objects that matches the size of a given range of
-sizes can be selected by setting up the two arguments. For example, if
-\code{lower_size = 120} and \code{upper_size = 140}, objects with size greater than
-or equal 120 and less than or equal 140 will be considered.}
+analysis. Plant images often contain dirt and dust.  Upper limit is set to
+\code{NULL}, i.e., no upper limit used. One can set a known area or use
+\code{lower_limit = 0} to select all objects (not advised). Objects that matches
+the size of a given range of sizes can be selected by setting up the two
+arguments. For example, if \code{lower_size = 120} and \code{upper_size = 140},
+objects with size greater than or equal 120 and less than or equal 140 will
+be considered.}
 
 \item{topn_lower, topn_upper}{Select the top \code{n} objects based on its area.
 \code{topn_lower} selects the \code{n} elements with the smallest area whereas
@@ -269,6 +292,9 @@ to \code{TRUE}.}
 
 \item{contour_col, contour_size}{The color and size for the contour line
 around objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
+
+\item{show_lw}{If \code{TRUE}, plots the length and width lines on each object
+calling \code{\link[=plot_lw]{plot_lw()}}.}
 
 \item{show_background}{Show the background? Defaults to \code{TRUE}. A white
 background is shown by default when \code{show_original = FALSE}.}
@@ -392,7 +418,7 @@ homogeneity.
 \item \code{statistics}: A data frame with the summary statistics for the area of the
 objects.
 \item \code{count}: If \code{pattern} is used, shows the number of objects in each image.
-\item \code{object_rgb}: If \code{object_index} is used, returns the R, G, and B values
+\item \code{obj_rgb}: If \code{object_index} is used, returns the R, G, and B values
 for each pixel of each object.
 \item \code{object_index}: If \code{object_index} is used, returns the index computed for
 each object.
@@ -408,6 +434,8 @@ outline. For more details see \code{\link[=efourier_error]{efourier_error()}}.
 \item \code{efourier_power}: The spectrum of harmonic Fourier power.
 For more details see \code{\link[=efourier_power]{efourier_power()}}.
 }
+\item \code{veins}: If \code{veins = TRUE} is used, returns, for each image, the
+proportion of veins (in fact the object edges) related to the total object(s)' area.
 \item \code{analyze_objects_iter()} returns a data.frame containing the features
 described in the \code{results} object of \code{\link[=analyze_objects]{analyze_objects()}}.
 \item \code{plot.anal_obj()} returns a \code{trellis} object containing the distribution

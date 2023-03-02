@@ -1,120 +1,137 @@
 #' Utilities for Polygons
 #'
 #' @description
-#' Several useful functions to analyze polygons. All of them are
-#' based on a set of coordinate points describing the edge of the object(s).
+#' Several useful functions for analyzing polygons. All of them are based on a set
+#' of coordinate points that describe the edge of the object(s). If a list of
+#' polygons is provided, it loops through the list and computes what is needed
+#' for each element of the list.
 #'
-#' * Area measures
-#'   - `conv_hull()` Computes convex hull of a set of points.
-#'   - `poly_area()` Computes the area of a polygon given by the vertices in the
-#'   vectors `x` and `y` using the Shoelace formula, as follows (Lee and Lim,
-#'   2017). \deqn{A=\frac{1}{2}\left|\sum_{i=1}^{n}\left(x_{i} y_{i+1}-x_{i+1}
-#'   y_{i}\right)\right|}, where `x` and `y` are the coordinates which form the
-#'   corners of a polygon, and `n` is the number of coordinates.
+#'* Polygon measures
 #'
-#'   - `poly_lw()` Returns the length and width of a polygon based on their
-#'   alignment to the x-axis. The length is defined as the range along the
-#'   x-axis and the width as the range on the y-axis.
+#'    - `conv_hull()` Computes the convex hull of a set of points.
 #'
-#'   - `poly_mass()` Computes the center of mass of a polygon given by the
-#'   vertices in the vectors `x` and `y`.
+#'    - `conv_hull_unified()` Computes the convex hull of a set of points. Compared
+#' to `conv_hull()`, `conv_hull_unified()` binds (unifies) the coordinates when
+#' x is a list of coordinates.
 #'
-#'   - `poly_solidity()` Computes the solidity of a shape as the ratio of
-#'   the shape area and the convex hull area.
+#'    - `poly_area()` Computes the area of a polygon given by the vertices in the
+#' vectors x and y using the Shoelace formula, as follows (Lee and Lim,
+#' 2017): \deqn{A=\frac{1}{2}\left|\sum_{i=1}^{n}\left(x_{i} y_{i+1}-x_{i+1}
+#' y_{i}\right)\right|} where `x` and `y` are the coordinates that form the
+#' corners of a polygon, and `n` is the number of coordinates.
+#'
+#'    - `poly_angles()` Calculates the internal angles of the polygon using the
+#' law of cosines.
+#'
+#'
+#'    - `poly_lw()` Returns the length and width of a polygon based on its
+#' alignment to the y-axis (with poly_align()). The length is defined as the
+#' range along the x-axis, and the width is defined as the range on the y-axis.
+#'
+#'    - `poly_mass()` Computes the center of mass of a polygon given by the
+#' vertices in the vectors in `x`.
+#'
+#'    - `poly_solidity()` Computes the solidity of a shape as the ratio of
+#' the shape area and the convex hull area.
 #'
 #' * Perimeter measures
-#'   - `poly_slide()` Slides the coordinates of a polygon given by the vertices
-#'   in the vectors `x` and `y` so that the id-th point become the first one.
+#'    - `poly_slide()` Slides the coordinates of a polygon given by the vertices
+#' in the vectors x and y so that the id-th point becomes the first one.
 #'
-#'   - `poly_distpts()` Computes the euclidean distance between every points
-#'   of a polygon given by the vertices in the vectors `x` and `y`.
+#'    - `poly_distpts()` Computes the Euclidean distance between every point
+#' of a polygon given by the vertices in the vectors x and y.
 #'
-#'   - `poly_centdist()` Computes the euclidean distance between every point of
-#'   the perimeter and the centroid of the object.
+#'    - `poly_centdist()` Computes the Euclidean distance between every point on
+#' the perimeter and the centroid of the object.
 #'
-#'   - `poly_perimeter()` Computes the perimeter of a polygon given by the
-#'   vertices in the vectors `x` and `y`.
+#'    - `poly_perimeter()` Computes the perimeter of a polygon given by the
+#' vertices in the vectors x and y.
 #'
-#'   - `poly_caliper()` Computes the caliper (Also called the Feret's diameter)
-#'   of a polygon given by the vertices in the vectors `x` and `y`.
+#'    - `poly_caliper()` Computes the caliper (also called the Feret's diameter)
+#' of a polygon given by the vertices in the vectors x and y.
 #'
 #'
-#' * Circularity measures (Montero et al. 2009).
+#'  * Circularity measures (Montero et al. 2009).
+#'
 #'    - `poly_circularity()` computes the circularity (C), also called shape
-#'    compactness, or roundness measure of an object. It is given by `C = P^2 /
-#'    A`, where `P` is the perimeter and `A` is the area of the object.
+#' compactness or roundness measure, of an object. It is given by `C = P^2 / A`,
+#'  where P is the perimeter and A is the area of the object.
 #'
-#'    - `poly_circularity_norm()` computes the normalized circularity (Cn), to
-#'    be unity for a circle. This measure is invariant under translation,
-#'    rotation, scaling transformations, and dimensionless. It is given by: `Cn
-#'    = P^2 / 4*pi*A`.
+#'    - `poly_circularity_norm()` computes the normalized circularity (Cn), which
+#' is unity for a circle. This measure is invariant under translation,
+#' rotation, scaling transformations, and is dimensionless. It is given by:
+#' `Cn = P^2 / 4*pi*A`.
 #'
-#'    - `poly_circularity_haralick()` computes the Haralick's circularity (CH).
-#'    The method is based on the computation of all the Euclidean distances from
-#'    the object centroid to each boundary pixel. With this set of distances,
-#'    the media (m) and the standard deviation (sd) are computed. These
-#'    statistical parameters are used on a ratio that calculates the
-#'    circularity, CH, of a shape, as `CH =  m/sd`
+#'    - `poly_circularity_haralick()` computes Haralick's circularity (CH). The
+#' method is based on computing all Euclidean distances from the object
+#' centroid to each boundary pixel. With this set of distances, the mean (`m`)
+#' and the standard deviation (`sd`) are computed. These statistical parameters
+#' are used to calculate the circularity, CH, of a shape as `CH = m/sd`.
 #'
-#'    - `poly_convexity()` Computes the convexity of a shape using a ratio
-#'    between the perimeter of the convex hull and the perimeter of the polygon.
+#'    - `poly_convexity()` computes the convexity of a shape using the ratio
+#' between the perimeter of the convex hull and the perimeter of the polygon.
 #'
-#'    - `poly_eccentricity()` Computes the eccentricity of a shape using the
-#'    ratio of the eigen values (inertia axes of coordinates).
+#'    - `poly_eccentricity()` computes the eccentricity of a shape using the
+#' ratio of the eigenvalues (inertia axes of coordinates).
 #'
-#'    - `poly_elongation()` Computes the elongation of a shape as `1 - width / length`.
+#'    - `poly_elongation()` computes the elongation of a shape as 1 - width / length.
+#'
 #'
 #' * Utilities for polygons
-#'    - `poly_check()` Checks a set of coordinate points and return a matrix
-#'    with `x` and `y` columns.
+#'
+#'    - `poly_check()` Checks a set of coordinate points and returns a matrix
+#' with x and y columns.
 #'
 #'    - `poly_is_closed()` Returns a logical value indicating if a polygon is
-#'    closed.
+#' closed.
 #'
-#'    - `poly_close()`, and `poly_unclose()` close and unclose a polygon,
-#'    respectively.
+#'    - `poly_close()` and `poly_unclose()` close and unclose a polygon,
+#' respectively.
 #'
-#'   - `poly_rotate()` Rotates the polygon coordinates by a `angle` (0-360
-#'   degrees) in the trigonometric direction (anti-clockwise).
+#'    - `poly_rotate() `Rotates the polygon coordinates by an angle (0-360
+#' degrees) in the counterclockwise direction.
 #'
-#'   - `poly_flip_x()`,`poly_flip_y()` flips shapes along the x and y axis,
-#'   respectively.
+#'    - `poly_flip_x()`, `poly_flip_y()` flip shapes along the x-axis and y-axis,
+#' respectively.
 #'
-#'   - `poly_align()` Aligns the coordinates along their longer axis using
-#'   var-cov matrix and eigen values.
+#'    - `poly_align()` Aligns the coordinates along their longer axis using the
+#' var-cov matrix and eigen values.
 #'
-#'   - `poly_sample()` Samples `n` coordinates among existing points. Defaults
-#'   to `50`
+#'    - `poly_center()` Centers the coordinates on the origin.
 #'
-#'   - `poly_sample_prop()` Samples a proportion of coordinates among existing
-#'   points. Defaults to `0.1`
+#'    - `poly_sample()` Samples n coordinates from existing points. Defaults
+#' to 50.
 #'
-#'   - `poly_spline()` Interpolates a polygon contour.
+#'    - `poly_sample_prop()` Samples a proportion of coordinates from existing
+#' points. Defaults to 0.1.
 #'
-#'   - `poly_smooth()` Smooths a polygon contour using a simple moving average.
+#'    - `poly_spline()` Interpolates the polygon contour.
 #'
-#'   - `poly_jitter()` Add a small amount of noise to a set of point
-#'   coordinates. See [base::jitter()] for more details.
+#'    - `poly_smooth()` Smooths the polygon contour using a simple moving average.
+#'
+#'    - `poly_jitter()` Adds a small amount of noise to a set of point
+#' coordinates. See [base::jitter()] for more details.
+#'
 #'
 #' * `poly_measures()` Is a wrapper around the `poly_*()` functions.
 #'
-#' @param x,y Coordinate vectors of points. This can be specified as two vectors
-#'   (`x` and `y`), or a 2-column matrix `x`. If `x` is a list of vector
-#'   coordinates the function will be applied to each element using
-#'   [base::lapply()].
-#' @param fp The id of the point that will become the new first point. Defaults
-#'   to `1`.
+#' @param x A 2-column matrix with the `x` and `y` coordinates. If `x` is a list
+#' of vector coordinates, the function will be applied to each element using
+#' [base::lapply()] or [base::sapply()].
+#' @param fp The ID of the point that will become the new first point. Defaults
+#' to 1.
 #' @param angle The angle (0-360) to rotate the object.
-#' @param plot Plots the object? Defaults to `TRUE`
-#' @param noise_x,noise_y A numeric factor to define the noise added to `x` and
-#'   `y` axis, respectively. See [base::jitter()] for more details.
+#' @param plot Should the object be plotted? Defaults to `TRUE`.
+#' @param noise_x,noise_y A numeric factor to define the noise added to the `x`
+#' and `y` axes, respectively. See [base::jitter()] for more details.
 #' @param vertices The number of spline vertices to create.
 #' @param k The number of points to wrap around the ends to obtain a smooth
-#'   periodic spline.
+#' periodic spline.
 #' @param n,prop The number and proportion of coordinates to sample from the
-#'   perimeter coordinates. In `poly_smooth()` these arguments can be used to
-#'   sample points from the object's perimeter before smoothing.
+#' perimeter coordinates. In` poly_smooth()`, these arguments can be used to
+#' sample points from the object's perimeter before smoothing.
 #' @param niter An integer indicating the number of smoothing iterations.
+#'
 #' @name utils_polygon
 #' @return
 #'  * `conv_hull()` and `poly_spline()` returns a matrix with `x` and `y`
@@ -138,7 +155,6 @@
 #'
 #'
 #' @importFrom grDevices chull
-#' @importFrom graphics arrows
 #' @importFrom stats spline
 #' @export
 #' @references
@@ -181,7 +197,7 @@
 #'################### Example with a polygon ##################
 #' x <- c(0, 1,   2, 3,  5, 2, -1, 0, 0)
 #' y <- c(5, 6.5, 7, 3,  1, 1,  0, 2, 5)
-#' df_poly <- data.frame(x = x, y = y)
+#' df_poly <- cbind(x, y)
 #'
 #' # area of the polygon
 #' plot_polygon(df_poly, fill = "red")
@@ -191,9 +207,8 @@
 #' poly_perimeter(df_poly)
 #'
 #'# center of mass of polygon
-#'# arrows from center of mass to maximum and minimum radius
 #' cm <- poly_mass(df_poly)
-#' plot_mass(cm, arrow = TRUE, col = "blue")
+#' plot_mass(cm,  col = "blue")
 #'
 #'# vertices of the convex hull
 #' (conv_poly <- conv_hull(df_poly))
@@ -203,8 +218,8 @@
 #'
 #' plot_polygon(conv_poly,
 #'              fill = "red",
-#'               alpha = 0.2,
-#'                add = TRUE)
+#'              alpha = 0.2,
+#'              add = TRUE)
 #'
 #'
 #' ############ example of circularity measures ################
@@ -222,40 +237,25 @@
 #' }
 
 ## check a coordinate set of points
-poly_check <- function(x, y = NULL) {
+poly_check <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_check, y)
-  } else {
-    if (is.null(y)) {
-      if (is.data.frame(x) | is.matrix(x)) {
-        vx <- x[, 1]
-        vy <- x[, 2]
-      }
-      if (is.integer(x) &  length(x) == 2) {
-        vx <- x[1]
-        vy <- x[2]
-      }
-    } else{
-      vx <- x
-      vy <- y
+    lapply(x, poly_check)
+  } else{
+    if (is.data.frame(x)) {
+      x <- as.matrix(x)
     }
-    coord <- data.frame(x = vx, y = vy)
-    if (!all(sapply(coord, class) %in% c("numeric", 'integer'))){
-      stop("Columns must be numeric.")
-    }
-    colnames(coord) <- c("x", "y")
-    return(coord)
+    return(x)
   }
 }
 
 #' @name utils_polygon
 #' @export
 # check if a polygon is closed
-poly_is_closed <- function(x, y = NULL) {
+poly_is_closed <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_is_closed, y)
+    sapply(x, poly_is_closed)
   } else {
-    coord <- poly_check(x, y) |> as.matrix()
+    coord <- poly_check(x)
     return(identical(coord[1, ], coord[nrow(coord), ]))
   }
 }
@@ -263,24 +263,25 @@ poly_is_closed <- function(x, y = NULL) {
 #' @name utils_polygon
 #' @export
 # close a polygon, if unclosed
-poly_close <- function(x, y = NULL) {
+poly_close <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_close, y)
+    lapply(x, poly_close)
   } else {
-    coord <- poly_check(x, y)
+    coord <- poly_check(x)
     ifelse(poly_is_closed(coord),
            return(coord),
            return(rbind(coord, coord[1, ])))
   }
 }
+
 #' @name utils_polygon
 #' @export
 # unclose a polygon, if closed
-poly_unclose <- function(x, y = NULL) {
+poly_unclose <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_unclose, y)
+    lapply(x, poly_unclose)
   } else {
-    coord <- poly_check(x, y)
+    coord <- poly_check(x)
     ifelse(poly_is_closed(coord),
            return(coord[-nrow(coord), ]),
            return(coord))
@@ -289,27 +290,41 @@ poly_unclose <- function(x, y = NULL) {
 
 #' @name utils_polygon
 #' @export
-# unclose a polygon, if closed
-poly_limits <- function(x, y = NULL) {
+# compute the internal angles of a polygon
+poly_angles <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_limits, y)
+    lapply(x, function(x){
+      help_poly_angles(poly_unclose(x))
+    })
   } else {
-    coord <- poly_check(x, y)
-    lims <- data.frame(apply(coord, 2, range))
-    colnames(lims) <- c("x", "y")
-    rownames(lims) <- c("min", "max")
-    return(lims)
+    coord <- poly_unclose(x)
+    help_poly_angles(coord)
+  }
+}
+
+#' @name utils_polygon
+#' @export
+poly_limits <- function(x) {
+  if (inherits(x, "list")) {
+    res <- do.call(rbind, lapply(x, help_limits))
+    colnames(res) <- c("xmin", "xmax", "ymin", "ymax")
+    return(res)
+  } else {
+    res <- t(as.data.frame(help_limits(x)))
+    colnames(res) <- c("xmin", "xmax", "ymin", "ymax")
+    rownames(res) <- NULL
+    return(res)
   }
 }
 
 #' @name utils_polygon
 #' @export
 # computes the convex hull
-conv_hull <- function(x, y = NULL){
+conv_hull <- function(x){
   if (inherits(x, "list")) {
-    lapply(x, conv_hull,  y)
+    lapply(x, conv_hull)
   } else{
-    vcts <- poly_check(x, y)
+    vcts <- poly_check(x)
     vec <- chull(vcts)
     return(vcts[vec, ])
   }
@@ -317,99 +332,89 @@ conv_hull <- function(x, y = NULL){
 
 #' @name utils_polygon
 #' @export
+conv_hull_unified <- function(x){
+  if(inherits(x, "list")){
+    unified <- do.call(rbind, lapply(x, function(x){x}))
+  } else{
+    unified <- x
+  }
+  ch <- unified[chull(unified), ]
+  ch <- rbind(ch,  ch[1, ])
+  return(ch)
+}
+
+
+#' @name utils_polygon
+#' @export
 # Compute the area of a polygon using shoelace formula
 # adapted from https://www.geeksforgeeks.org/area-of-a-polygon-with-given-n-ordered-vertices/
-poly_area <- function(x, y = NULL){
-  if (inherits(x, "list")) {
-    sapply(x, poly_area, y)
-  } else{
-    coord <- poly_check(x, y) |> poly_close()
-    vx <- coord[, 1]
-    vy <- coord[, 2]
-    nr <- length(vx)
-    abs(sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr]) / 2)
-  }
+poly_area <- function(x){
+  help_area(x)
 }
+
 
 #' @name utils_polygon
 #' @export
 # Slides the coordinates so that the id-th point become the first one.
-# adapted from https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_slide <- function(x, y = NULL, fp = 1) {
+poly_slide <- function(x, fp = 1){
   if (inherits(x, "list")) {
-    lapply(x, poly_slide, y, fp)
+    sapply(x, help_slide, fp)
   } else{
-    coord <- poly_check(x, y)
-    n <- nrow(coord)
-    slided.rows <- unique(c(fp:n, 1:(fp - 1)))
-    return(coord[slided.rows, ])
+    help_slide(x, fp = fp)
   }
 }
+
+
+
 
 #' @name utils_polygon
 #' @export
 # calculates the euclidean distance between every points of a shape
-# adapted from https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_distpts <- function(x, y = NULL) {
+poly_distpts <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_distpts, y)
+    lapply(x, help_distpts)
   } else{
-    coord <- poly_check(x, y)
-    n <- nrow(coord)
-    d <- sqrt(apply((coord - poly_slide(coord, fp = n))^2, 1, sum))[-1]
-    return(d)
+    help_distpts(x)
   }
 }
 
 #' @name utils_polygon
 #' @export
 # Computes the euclidean distance between every points and the centroid
-poly_centdist <- function(x, y = NULL) {
-  ed <- function(x, y) {
-    return(sqrt((x[1] - y[1])^2 + (x[2] - y[2])^2))
-  }
+poly_centdist <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_centdist, y)
+    lapply(x, help_centdist)
   } else{
-    coord <- poly_check(x, y)
-    return(apply(coord, 1, function(x){
-      ed(apply(coord, 2, mean), x)
-    }))
+    help_centdist(x)
   }
 }
+
+
 
 #' @name utils_polygon
 #' @export
 # calculates the perimeter
-# adapted from https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_perimeter <- function(x, y = NULL) {
+poly_perimeter <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_perimeter, y)
+    sapply(x, function(x){sum(help_distpts(x))})
   } else{
-    coord <- poly_check(x, y)
-    return(sum(poly_distpts(coord)))
+    return(sum(help_distpts(x)))
   }
 }
+
 
 #' @name utils_polygon
 #' @export
 # rotate
-# adapted from https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_rotate <- function(x,
-                        y = NULL,
-                        angle = 0,
-                        plot = TRUE) {
+poly_rotate <- function(x, angle, plot = TRUE) {
   if (inherits(x, "list")) {
-    rot <- lapply(x, poly_rotate, y, angle, plot =  FALSE)
-    plot_polygon(rot)
-    return(rot)
-
+    rotated <- lapply(x, help_rotate, angle)
+    if(isTRUE(plot)){
+      plot_polygon(rotated)
+    }
+    return(rotated)
   } else{
-    theta <- angle * pi / 180
-    coord <- poly_check(x, y)
-    rmat <- matrix(c(cos(-theta), sin(-theta), -sin(-theta), cos(-theta)), nrow = 2)
-    rotated <- as.matrix(coord) %*% rmat
-    colnames(rotated) <- c("x", "y")
+    rotated <- help_rotate(x, angle)
     if(isTRUE(plot)){
       plot_polygon(rotated)
     }
@@ -419,138 +424,128 @@ poly_rotate <- function(x,
 
 #' @name utils_polygon
 #' @export
-# align a polygon
-# adapted from https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_align <- function(x,
-                       y = NULL,
-                       plot = TRUE) {
+poly_align <- function(x, plot = TRUE) {
   if (inherits(x, "list")) {
-    coords <- lapply(x, poly_align, y, plot = FALSE)
+    aligned <- lapply(x, help_align)
     if(isTRUE(plot)){
-      plot_polygon(coords, merge = FALSE, aspect_ratio = 1)
+      plot_polygon(aligned, merge = FALSE, aspect_ratio = 1)
     }
-    return(coords)
+    return(aligned)
   } else{
-    coord <- poly_check(x, y)
-    aligned <- as.matrix(coord) %*% svd(var(coord))$u
+    aligned <- help_align(x)
     if(isTRUE(plot)){
-      plot_polygon(aligned)
+      plot_polygon(aligned, merge = FALSE, aspect_ratio = 1)
     }
     return(aligned)
   }
 }
 
+#' @name utils_polygon
+#' @export
+poly_center <- function(x, plot = TRUE) {
+  if (inherits(x, "list")) {
+    centered <- lapply(x, poly_center)
+    if(isTRUE(plot)){
+      plot_polygon(centered, merge = FALSE, aspect_ratio = 1)
+    }
+    return(centered)
+  } else{
+    centered <-
+      transform(x,
+                X1 = X1 - mean(X1),
+                X2 = X2 - mean(X2))
+    if(isTRUE(plot)){
+      plot_polygon(centered, merge = FALSE, aspect_ratio = 1)
+    }
+    return(centered)
+  }
+}
 
 #' @name utils_polygon
 #' @export
 # computes width and length
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_lw <- function(x, y = NULL) {
-  if (inherits(x, "list")) {
-    lw <- sapply(x, poly_lw, y) |> t()
-    colnames(lw) <- c("length", "width")
-    return(lw)
-  } else{
-    coord <- poly_check(x, y)
-    d <- apply(poly_align(coord, plot = FALSE), 2, range)
-    lw <- abs(d[2, ] - d[1, ]) |> t()
-    colnames(lw) <- c("length", "width")
-    return(lw)
-  }
+poly_lw <- function(x) {
+  lw <- help_lw(x)
+  colnames(lw) <- c("length", "width")
+  return(lw)
 }
 
 #' @name utils_polygon
 #' @export
-# computes the eccentricity
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_eccentricity <- function(x, y = NULL) {
-  if (inherits(x, "list")) {
-    sapply(x, poly_eccentricity, y)
-  } else{
-    coord <- poly_check(x, y)
-    eig <- eigen(cov(coord))$values
-    return(eig[2]/eig[1])
-  }
+poly_eccentricity <- function(x) {
+  help_eigen_ratio(x)
 }
+
 
 #' @name utils_polygon
 #' @export
 # computes the convexity
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_convexity <- function(x, y = NULL) {
+poly_convexity <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_convexity, y)
+    sapply(x, function(x){sum(help_distpts(x[chull(x), ])) / sum(help_distpts(x))})
   } else{
-    coord <- poly_check(x, y)
-    return(poly_perimeter(conv_hull(coord))/poly_perimeter(coord))
+    return(sum(help_distpts(x[chull(x), ])) / sum(help_distpts(x)))
   }
 }
 
 #' @name utils_polygon
 #' @export
-# computes caliper of a polygon
-# https://github.com/MomX/Momocs/blob/356a9b2a59bc48c3a1182021d1240e8f165829f4/R/coo-utilities.R
-poly_caliper <- function(x, y = NULL) {
+poly_caliper <- function(x) {
   if (inherits(x, "list")){
-    sapply(x, poly_caliper, y)
+    sapply(x, poly_caliper)
   } else{
-    coord <- poly_check(x, y)
-    d <- dist(coord, method = "euclidean")
-    return(max(d))
+    if(nrow(x) > 250){
+      x <- landmarks_regradi(x, n = 250, plot = FALSE)$coord
+    }
+    return(max(dist(x)))
   }
 }
+
+
 
 #' @name utils_polygon
 #' @export
 # computes the elongation
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_elongation <- function(x, y = NULL) {
-  if (inherits(x, "list")) {
-    sapply(x, poly_elongation, y)
-  } else{
-    coord <- poly_check(x, y)
-    lw <- poly_lw(coord)
-    return(1 - lw[2]/lw[1])
-  }
+poly_elongation <- function(x) {
+  help_elongation(x)
 }
+
 
 #' @name utils_polygon
 #' @export
 # computes the solidity
-poly_solidity <- function(x, y = NULL) {
+poly_solidity <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_solidity, y)
+    sapply(x, function(x){
+      help_area(x) / help_area(x[chull(x), ])
+    })
   } else{
-    coord <- poly_check(x, y)
-    return(poly_area(coord) / poly_area(conv_hull(coord)))
+    help_area(x) / help_area(x[chull(x), ])
   }
 }
+
 
 #' @name utils_polygon
 #' @export
 # flips shapes in along the y axis
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_flip_y <- function(x, y = NULL) {
+poly_flip_y <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_flip_y, y)
+    lapply(x, help_flip_y)
   } else{
-    coord <- poly_check(x, y)
-    m <- matrix(c(1, 0, 0, -1), nrow = 2)
-    return(as.matrix(coord) %*% m)
+    help_flip_y(x)
   }
 }
+
+
 
 #' @name utils_polygon
 #' @export
 # flips shapes in along the x axis
-# adapted from https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R#L19
-poly_flip_x <- function(x, y = NULL) {
+poly_flip_x <- function(x) {
   if (inherits(x, "list")) {
-    lapply(x, poly_flip_x, y)
+    lapply(x, help_flip_x)
   } else{
-    coord <- poly_check(x, y)
-    m <- matrix(c(-1, 0, 0, 1), nrow = 2)
-    return(as.matrix(coord) %*% m)
+    help_flip_x(x)
   }
 }
 
@@ -558,11 +553,11 @@ poly_flip_x <- function(x, y = NULL) {
 #' @name utils_polygon
 #' @export
 # sample n points
-poly_sample <- function(x, y = NULL, n = 50) {
+poly_sample <- function(x, n = 50) {
   if (inherits(x, "list")) {
-    lapply(x, poly_sample, y, n)
+    lapply(x, poly_sample, n)
   } else{
-    coord <- poly_check(x, y)
+    coord <- poly_check(x)
     if (nrow(coord) < n){
       stop("Less coordinates than n, try coo_interpolate", call. = FALSE)
     }
@@ -574,11 +569,11 @@ poly_sample <- function(x, y = NULL, n = 50) {
 #' @name utils_polygon
 #' @export
 # sample a proportion of points
-poly_sample_prop <- function(x, y = NULL, prop = 0.1) {
+poly_sample_prop <- function(x, prop = 0.1) {
   if (inherits(x, "list")) {
-    lapply(x, poly_sample_prop, y, prop)
+    lapply(x, poly_sample_prop, prop)
   } else{
-    coord <- poly_check(x, y)
+    coord <- poly_check(x)
     return(poly_sample(coord, n = nrow(coord) * prop))
   }
 }
@@ -588,16 +583,15 @@ poly_sample_prop <- function(x, y = NULL, prop = 0.1) {
 #' @export
 # add an small amount of noise in a set of coordinates
 poly_jitter <- function(x,
-                        y = NULL,
                         noise_x = 1,
                         noise_y = 1,
                         plot = TRUE) {
   if (inherits(x, "list")) {
-    lapply(x, poly_jitter, y, noise_x, noise_y, plot)
+    lapply(x, poly_jitter, noise_x, noise_y, plot)
   } else{
-    coord <- poly_check(x, y)
-    coord$x <- jitter(coord$x, factor = noise_x)
-    coord$y <- jitter(coord$y, factor = noise_y)
+    coord <- poly_check(x)
+    coord[,1] <- jitter(coord[,1], factor = noise_x)
+    coord[,2] <- jitter(coord[,2], factor = noise_y)
     if(isTRUE(plot)){
       plot_polygon(coord)
     }
@@ -608,169 +602,78 @@ poly_jitter <- function(x,
 #' @name utils_polygon
 #' @export
 #  calculates the 'circularity measure'. Also called 'compactness' and 'shape factor'
-# https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R
-poly_circularity <- function(x, y = NULL) {
+poly_circularity <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_circularity, y)
+    sapply(x, function(x){
+      sum(help_distpts(x))^2 / help_area(x)
+    })
   } else{
-    if(is.null(y)){
-      if(is.data.frame(x) | is.matrix(x)){
-        coord <- x
-      }
-    } else{
-      coord <- cbind(x = x, y = y)
-    }
-    return(poly_perimeter(coord)^2 / poly_area(coord))
+    sum(help_distpts(x))^2 / help_area(x)
   }
 }
 
 #' @name utils_polygon
 #' @export
 # calculates calculates Haralick's circularity
-# https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R
-poly_circularity_haralick <- function(x, y = NULL) {
-  ed <- function(x, y) {
-    return(sqrt((x[1] - y[1])^2 + (x[2] - y[2])^2))
-  }
-  coo_centdist <- function(coo) {
-    return(
-      apply(coo, 1, function(x){
-        ed(apply(coo, 2, mean), x)
-      })
-    )
-  }
+poly_circularity_norm <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_circularity_haralick, y)
+    sapply(x, function(x){
+      (help_area(x) * 4 * pi) / sum(help_distpts(x))^2
+    })
   } else{
-    if(is.null(y)){
-      if(is.data.frame(x) | is.matrix(x)){
-        coord <- x
-      }
-    } else{
-      coord <- cbind(x = x, y = y)
-    }
-    cd <- coo_centdist(coord)
-    return(mean(cd) / sd(cd))
+    (help_area(x) * 4 * pi) / sum(help_distpts(x))^2
   }
 }
+
 
 #' @name utils_polygon
 #' @export
 # calculates calculates Haralick's circularity
-# https://github.com/MomX/Momocs/blob/66bd81530ff0c55a46f506208a94ee325c402e0f/R/coo-shapedescriptors.R
-poly_circularity_norm <- function(x, y = NULL) {
+poly_circularity_haralick <- function(x) {
   if (inherits(x, "list")) {
-    sapply(x, poly_circularity_norm, y)
+    sapply(x, function(x){
+      cd <- help_centdist(x)
+      mean(cd) / sd(cd)
+    })
   } else{
-    coord <- poly_check(x, y)
-    return(poly_perimeter(coord)^2/(poly_area(coord) * 4 * pi))
+    cd <- help_centdist(x)
+    mean(cd) / sd(cd)
   }
 }
 
 
-#' @name utils_polygon
-#' @export
-poly_measures <- function(x, y = NULL){
-  if (inherits(x, "list")) {
-    valid <- which(sapply(x, function(x){length(as.matrix(x))}) > 2)
-    coord <- x[valid]
-    res <- do.call(rbind, lapply(coord, poly_measures))
-    res$id <- 1:nrow(res)
-    shape <- res[, c(ncol(res), 1:ncol(res) -1) ]
-    return(shape)
-  } else{
-    coord <- poly_check(x, y)
-    mass <- poly_mass(coord)
-    ch <- conv_hull(coord)
-    area_ch <- poly_area(ch)
-    lw <- poly_lw(coord)
-    centdist <- poly_centdist(coord)
-    radius_mean = mean_list(centdist)
-    radius_min = min_list(centdist)
-    radius_max = max_list(centdist)
-    radius_sd = sd_list(centdist)
-    area <- poly_area(coord)
-    shape <- data.frame(x = mass$x,
-                        y = mass$y,
-                        area = area,
-                        area_ch = area_ch,
-                        perimeter = poly_perimeter(coord),
-                        radius_mean = radius_mean,
-                        radius_min = radius_min,
-                        radius_max = radius_max,
-                        radius_sd = radius_sd,
-                        radius_ratio = radius_max / radius_min,
-                        diam_mean = radius_mean * 2,
-                        diam_min = radius_min * 2,
-                        diam_max = radius_max * 2,
-                        caliper = poly_caliper(coord),
-                        length = lw[1],
-                        width = lw[2],
-                        solidity = area / area_ch,
-                        convexity = poly_convexity(coord),
-                        elongation = poly_elongation(coord),
-                        circularity = poly_circularity(coord),
-                        circularity_haralick = radius_min / radius_sd,
-                        circularity_norm = poly_circularity_norm(coord),
-                        eccentricity = poly_eccentricity(coord))
-  }
-  return(shape)
-}
 
 #' @name utils_polygon
 #' @export
-poly_mass <- function(x, y = NULL){
-  # adapted from https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
+poly_mass <- function(x){
   if (inherits(x, "list") | inherits(x, "iefourier_lst")) {
-    do.call(rbind, lapply(x, poly_mass, y))
+    cm <-
+      do.call(rbind,
+              lapply(x, function(x){
+                cm <- t(help_mc(x))
+              })
+      )
+    colnames(cm) <- c("x", "y")
+    return(cm)
   } else{
-    if(is.null(y)){
-      if(is.data.frame(x) | is.matrix(x)){
-        vx <- x[, 1]
-        vy <- x[, 2]
-      }
-    } else{
-      vx <- x
-      vy <- y
-    }
-    if(min(vx) < 0 | min(vy) < 0){
-      nr <- length(vx)
-      ar <- sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr])/2
-      cx <- 1 / (6 * ar) * sum((vx[-nr] + vx[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr]))
-      cy <- 1 / (6 * ar) * sum((vy[-nr] + vy[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr]))
-      ct <- sqrt((vx - cx)^2 + (vy - cy)^2)
-    } else{
-      nr <- length(vx)
-      ar <- abs(sum(vx[-nr] * vy[-1] - vx[-1] * vy[-nr])/2)
-      cx <- 1 / (6 * ar) * abs(sum((vx[-nr] + vx[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr])))
-      cy <- 1 / (6 * ar) * abs(sum((vy[-nr] + vy[-1]) * (vx[-nr] * vy[-1] - vx[-1] * vy[-nr])))
-      ct <- sqrt((vx - cx)^2 + (vy - cy)^2)
-    }
-    return(data.frame(x = cx,
-                      y = cy,
-                      min_x = vx[which.min(ct)],
-                      min_y = vy[which.min(ct)],
-                      max_x = vx[which.max(ct)],
-                      max_y = vy[which.max(ct)]))
+    cm <- t(help_mc(x))
+    colnames(cm) <- c("x", "y")
+    return(cm)
   }
 }
+
 
 #' @name utils_polygon
 #' @export
 poly_spline <- function(x,
-                        y = NULL,
                         vertices = 100,
                         k = 2){
   # adapted from https://gis.stackexchange.com/questions/24827/smoothing-polygons-in-contour-map
   if (inherits(x, "list")) {
-    lapply(x, poly_spline, y, vertices, k)
+    lapply(x, poly_spline, vertices, k)
   } else{
-    if(is.null(y)){
-      if(is.data.frame(x) | is.matrix(x)){
-        xy <- x
-      }
-    } else{
-      xy <- cbind(x, y)
+    if(is.data.frame(x) | is.matrix(x)){
+      xy <- x
     }
     n <- dim(xy)[1]
     if (k >= 1) {
@@ -793,19 +696,18 @@ poly_spline <- function(x,
 #' @name utils_polygon
 #' @export
 poly_smooth <- function(x,
-                        y = NULL,
                         niter = 10,
                         n = NULL,
                         prop = NULL,
                         plot = TRUE) {
   if (inherits(x, "list")) {
-    coords <- lapply(x, poly_smooth, y, niter, n, prop, plot)
+    coords <- lapply(x, poly_smooth,niter, n, prop, plot)
     if(isTRUE(plot)){
       plot_polygon(coords, merge = FALSE, aspect_ratio = 1)
     }
     return(coords)
   } else{
-    coords <- poly_check(x, y)
+    coords <- poly_check(x)
     if(!is.null(n) ){
       coords <-
         poly_sample(coords,
@@ -831,6 +733,58 @@ poly_smooth <- function(x,
   }
 }
 
+#' @name utils_polygon
+#' @export
+poly_measures <- function(x){
+  if (inherits(x, "list")) {
+    valid <- which(sapply(x, function(x){length(as.matrix(x))}) > 2)
+    coord <- x[valid]
+    res <- do.call(rbind, lapply(coord, poly_measures))
+    res$id <- 1:nrow(res)
+    shape <- res[, c(ncol(res), 1:ncol(res) -1) ]
+    return(shape)
+  } else{
+    coord <- poly_check(x)
+    mass <- poly_mass(coord)
+    ch <- coord[chull(coord), ]
+    area_ch <- help_area(ch)
+    lw <- help_lw(coord)
+    centdist <- help_centdist(coord)
+    radius_mean = mean(centdist)
+    radius_min = min(centdist)
+    radius_max = max(centdist)
+    radius_sd = sd(centdist)
+    area <- help_area(coord)
+    shape <- data.frame(x = mass[[1]],
+                        y = mass[[2]],
+                        area = area,
+                        area_ch = area_ch,
+                        perimeter = sum(help_distpts(coord)),
+                        radius_mean = radius_mean,
+                        radius_min = radius_min,
+                        radius_max = radius_max,
+                        radius_sd = radius_sd,
+                        radius_ratio = radius_max / radius_min,
+                        diam_mean = radius_mean * 2,
+                        diam_min = radius_min * 2,
+                        diam_max = radius_max * 2,
+                        caliper = lw[1],
+                        length = lw[1],
+                        width = lw[2],
+                        solidity = area / area_ch,
+                        convexity = poly_convexity(coord),
+                        elongation = poly_elongation(coord),
+                        circularity = poly_circularity(coord),
+                        circularity_haralick = poly_circularity_haralick(coord),
+                        circularity_norm = poly_circularity_norm(coord),
+                        eccentricity = poly_eccentricity(coord))
+  }
+  return(shape)
+}
+
+
+
+
 #' Utilities for plotting polygons
 #'
 #' @description
@@ -841,10 +795,7 @@ poly_smooth <- function(x,
 #'   - `plot_ellipse()` Plots an ellipse that fits the major and minor axis for
 #'   each object.
 #'
-#' @param x,y Coordinate vectors of points. This can be specified as two vectors
-#'   (`x` and `y`), or a 2-column matrix `x`. If `x` is a list of vector
-#'   coordinates the function will be applied to each element using
-#'   [base::lapply()].
+#' @param x A 2-column matrix with the `x` and `y` coordinates.
 #' @param id The object identification (numeric) to plot the contour/ellipse. By
 #'   default (`id = NULL`), the contour is plotted to all objects.
 #' @param col,lwd,cex The color, width of the lines, and size of point,
@@ -867,8 +818,6 @@ poly_smooth <- function(x,
 #' @param show_id Shows the object id? Defaults to `TRUE`.
 #' @param xlim,ylim A numeric vector of length 2 (min; max) indicating the range
 #'   of `x` and `y`-axes.
-#' @param arrow If `TRUE` (default) plots two arrows connecting the center of
-#'   mass to the minimum and maximum radius.
 #' @param object An object computed with [analyze_objects()].
 #' @param ...
 #'  * For `plot_contour()` and `plot_ellipse()` further arguments passed on to
@@ -885,19 +834,18 @@ poly_smooth <- function(x,
 #' plot_polygon(contours)
 #' plot_contour(contours[[1]], id = 6, col = "red", lwd = 3)
 plot_contour <- function(x,
-                         y = NULL,
                          id = NULL,
                          col = "black",
                          lwd = 1,
                          ...){
   if (inherits(x, "list") | inherits(x, "iefourier_lst")) {
     if(is.null(id)){
-      invisible(lapply(x, plot_contour, y, id, col, lwd))
+      invisible(lapply(x, plot_contour, id, col, lwd))
     } else{
-      invisible(lapply(x[id], plot_contour, y, id, col, lwd))
+      invisible(lapply(x[id], plot_contour, id, col, lwd))
     }
   } else{
-    coord <- poly_check(x, y)
+    coord <- poly_check(x)
     lines(coord,
           col = col,
           xlab = "",
@@ -910,7 +858,6 @@ plot_contour <- function(x,
 #' @name utils_polygon_plot
 #' @export
 plot_polygon <- function(x,
-                         y = NULL,
                          fill = "gray",
                          random_fill = TRUE,
                          points = FALSE,
@@ -993,13 +940,13 @@ plot_polygon <- function(x,
       }
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
-      invisible(lapply(x, plot_polygon, y, fill, random_fill, points, merge, border, alpha, add, aspect_ratio = aspect_ratio, ...))
+      invisible(lapply(x, plot_polygon,  fill, random_fill, points, merge, border, alpha, add, aspect_ratio = aspect_ratio, ...))
     }
   } else{
     if(inherits(x, "landmarks_regradi")){
       coords <- x$coords
     } else{
-      coords <- poly_check(x, y)
+      coords <- poly_check(x)
     }
     if(isFALSE(add)){
       plot(coords,
@@ -1033,50 +980,22 @@ plot_polygon <- function(x,
 #' @name utils_polygon_plot
 #' @export
 plot_mass <- function(x,
-                      y = NULL,
                       id = NULL,
-                      arrow = TRUE,
                       col = "black",
                       cex = 1,
                       lwd = 1){
   if (inherits(x, "list")) {
     if(is.null(id)){
-      invisible(lapply(x, plot_mass, y, id, arrow, col, cex, lwd))
+      invisible(lapply(x, plot_mass, y, id, col, cex, lwd))
     } else{
-      invisible(lapply(x[id], plot_mass, y, id, arrow, col, cex, lwd))
+      invisible(lapply(x[id], plot_mass, y, id, col, cex, lwd))
     }
   } else{
-    if(is.null(y)){
-      if(is.data.frame(x) | is.matrix(x)){
-        vx <- x[, 1]
-        vy <- x[, 2]
-        if("min_x"  %in% colnames(x)){
-          min_x <- x$min_x
-          min_y <- x$min_y
-          max_x <- x$max_x
-          max_y <- x$max_y
-        }
-      }
-    } else{
-      vx <- x
-      vy <- y
+    if(is.data.frame(x) | is.matrix(x)){
+      vx <- x[, 1]
+      vy <- x[, 2]
     }
     points(vx, vy, pch = 16, col = col, cex = cex)
-    if(arrow == TRUE){
-      if(!exists("min_x")){
-        stop("Arrows can only be plotted using an object computed with 'poly_mass()`.")
-      }
-      arrows(vx, vy, min_x, min_y,
-             angle = 25,
-             col = col,
-             lwd = lwd,
-             length = 0.15)
-      arrows(vx, vy, max_x, max_y,
-             angle = 25,
-             col = col,
-             lwd = lwd,
-             length = 0.15)
-    }
   }
 }
 
@@ -1107,5 +1026,245 @@ plot_ellipse <- function(object,
       y <- yc + a * ct * sa + b * st * ca
       lines(x, y, col = col, lwd = lwd, )
     })
+}
+
+
+
+#' Width at a given height
+#'
+#' The function computes the polygonal convex hull of the points in x and then
+#' returns the number of points that lie below a specified set of heights along
+#' the vertical axis of the convex hull.
+#'
+#' @details
+#'
+#' The convex hull computed from x is aligned along the major axis and then
+#' converted to a binary image. For each height in the at vector, the function
+#' computes the corresponding row number in the binary image (i.e., the row
+#' number that corresponds to the specified height along the vertical axis of
+#' the convex hull) and sums the values in that row to obtain the number of
+#' points that lie below the specified height. If the convex hull contains
+#' multiple polygons and unify = FALSE, the function loops over each polygon
+#' and returns a list of the number of points below the specified heights for
+#' each polygon. If the convex hull contains only one polygon or multiple
+#' polygons and unify = TRUE, the function returns a vector of the number of
+#' points below the specified heights for that single polygon.
+#'
+#'
+#' @param x A vector containing two-dimensional data points (often produced with
+#'   [object_contour]).
+#' @param at A vector of heights along the vertical axis of the convex hull at
+#'   which to count the number of points below. The default value is `c(0.05,
+#'   0.25, 0.5, 0.75, 0.95)`, which means the function will return the number of
+#'   points below the 5th, 25th, 50th, 75th, and 95th percentiles of the convex
+#'   hull. If `at = "heights"` is used, the function returns the width for each
+#'   point of the object length.
+#' @param unify A logical value indicating whether to use the unified convex
+#' hull calculation method. If unify = TRUE, coordinates in x will be
+#' first bound before computing the convex hull.
+#' @param plot A logical value that specifies whether the widths should be
+#'   plotted.
+#' @return A vector with the widths of the convex hull at the specified heights
+#'   or a list of vectors with the widths of each component.
+#'
+#' @export
+#'
+#' @examples
+#' cont <- contours[[2]]
+#' plot_polygon(cont |> conv_hull() |> poly_align())
+
+#' #  width below 5th, 25th, 50th, 75th, and 95th percentiles of the length
+#' wd <- poly_width_at(cont)
+#' wd
+#'
+#' # width along the height
+#' poly_width_at(cont, at = "height", plot = TRUE)
+#'
+#'
+poly_width_at <- function(x,
+                          at = c(0.05, 0.25, 0.5, 0.75, 0.95),
+                          unify = FALSE,
+                          plot = FALSE){
+  if(!is.numeric(at) && any(at != "height")){
+    warning("`at` must be one of 'height' or a numeric vector in the range 0-1.")
+  }
+  if(isTRUE(unify)){
+    chu <- conv_hull_unified(x) |> poly_align(plot = FALSE)
+  } else{
+    chu <- conv_hull(x) |> poly_align(plot = FALSE)
+  }
+  if(inherits(chu, "list")){
+    res <- list()
+    for(i in seq_along(chu)){
+      bin <- EBImage::Image(polygon_to_binary(chu[[i]]))
+      if(is.character(at)){
+        wdts <- sum_true_cols(bin)
+        wdts <- wdts[2:(length(wdts) - 1)]
+        res[[i]] <- wdts
+      } else{
+        heights <- ceiling(dim(bin)[2] * at)
+        res[[i]] <-
+          sapply(seq_along(heights), function(i){
+            sum(bin[, heights[i]:heights[i]]@.Data == TRUE)
+          })
+      }
+    }
+    names(res) <- paste0(1:length(res))
+    return(res)
+  } else{
+    bin <- EBImage::Image(polygon_to_binary(chu))
+    if(is.character(at)){
+      wdts <- sum_true_cols(bin)
+      wd <- wdts[2:(length(wdts) - 1)]
+    } else{
+      heights <- ceiling(dim(bin)[2] * at)
+      wd <-
+        sapply(seq_along(heights), function(i){
+          sum(bin[, heights[i]:heights[i]]@.Data == TRUE)
+        })
+    }
+    if(isTRUE(plot)){
+      plot(1:length(wd), wd,
+           type = "l",
+           axes = FALSE,
+           xlab = "Height",
+           ylab = "Width (pixels)")
+      axis(1)
+      axis(2)
+    }
+    invisible(wd)
+  }
+}
+
+
+#' Get the pixel indices for a given row of a binary image
+#'
+#' This function finds the first row in the bin matrix that has a value greater
+#' than 0 (TRUE). It then calculates the minimum, median, and maximum values for
+#' the pixels in that row and creates an array containing the row index, the
+#' minimum pixel index, the median pixel index, and the maximum pixel index.
+#'
+#' @param bin A logical matrix representing a binary image
+#' @param row An optional row index. If not provided, the function selects the
+#' first non-zero row.
+#' @param direction The direction for row selection when row is not provided.
+#' If set to `"updown"`, the function starts scanning from the top of the image
+#' towards the bottom. If set to `"downup"`, the function starts scanning from
+#' the bottom towards the top.
+#'
+#' @return A numeric vector containing the row index, the minimum pixel index,
+#' the median pixel index, and the maximum pixel index.
+#' @importFrom stats median
+#' @examples
+#' library(pliman)
+#' leaf <- image_pliman("sev_leaf.jpg")
+#' bin <- image_binary(leaf, "NB")[[1]]
+#'
+#' # first row with leaf (17)
+#' pixel_index(bin)
+#'
+#' # index at the row 100
+#' pixel_index(bin, row = 100)
+#'
+#' plot(leaf)
+#' points(x = 248, y = 17, pch = 16, col = "red", cex = 2)
+#' points(x = 163, y = 100, pch = 16, col = "red", cex = 2)
+#' points(x = 333, y = 100, pch = 16, col = "red", cex = 2)
+#'
+#'
+#' @export
+pixel_index <- function(bin,
+                        row = NULL,
+                        direction = "updown"){
+  if(is.null(row)){
+    nonzcols <- which(colSums(bin) > 0)
+    if(direction == "updown"){
+      i <- nonzcols[1]
+    } else{
+      i <- nonzcols[length(nonzcols)]
+    }
+    pixels <- which(bin[, i] == TRUE)
+    indexes <- c(i, min(pixels), ceiling(median(pixels)), max(pixels))
+  }else{
+    if(length(row) > 1){
+      warning("'row' must be an escalar. The fist element will be used")
+      row <- row[1]
+    }
+    pixels <- which(bin[, row] == TRUE)
+    indexes <- c(row, min(pixels), ceiling(median(pixels)), max(pixels))
+  }
+  return(indexes)
+}
+
+
+
+#' Calculate the apex and base angles of an object
+#'
+#' This function calculates the apex and base angles of an object. It takes as
+#' input either a logical matrix (binarized image) or a matrix of coordinates.
+#' The function returns the apex angle, base angle, and the coordinates of the
+#' apex and base as a list.
+#'
+#' @param x A logical matrix or matrix of coordinates representing the object
+#' @param percentiles A numeric vector of two percentiles between 0 and 1
+#' indicating the height of the points from the top to the bottom. The function
+#' calculates the apex angle between the two percentiles and the base angle
+#' between the lowest point and the highest point.
+#' @return A list containing the apex angle, base angle, apex coordinates, and
+#' base coordinates.
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("sev_leaf.jpg")
+#' bin <- image_binary(img, "NB", plot = FALSE)[[1]]
+#' angls <- poly_base_apex_angle(bin)
+#' plot(img)
+#' points(angls$apex_coords, pch = 16, cex = 2, col = "red")
+#' points(angls$base_coords, pch = 16, cex = 2, col = "red")
+#' angls
+poly_base_apex_angle <- function(x, percentiles = c(0.25, 0.75)){
+  if(inherits(x, "list")){
+    res <- lapply(x, poly_base_apex_angle, percentiles)
+    do.call(rbind, lapply(res, function(x){c(x$apex_angle, x$base_angle)}))
+  } else{
+    if(is.logical(x)){
+      bin <- x
+    } else{
+      nrowpoly <- nrow(x)
+      if(nrowpoly > 300){
+        n <- 300
+      } else{
+        n <- nrowpoly
+      }
+      bin <-
+        x |>
+        poly_align(plot = FALSE) |>
+        poly_sample(n = n) |>
+        polygon_to_binary() |>
+        EBImage::Image()
+    }
+    # top angles
+    ti <- pixel_index(bin)[c(3, 1)]
+    row_top <- floor(ncol(bin) * percentiles[1])
+    fpit <- pixel_index(bin, row = row_top)
+    lpt <- c(fpit[2], row_top)
+    rpt <- c(fpit[4], row_top)
+    coord_top <- rbind(ti, lpt, rpt)
+    angles_top <- help_poly_angles(coord_top)
+
+    # bottom angles
+    bi <- pixel_index(bin, direction = "downup")[c(3, 1)]
+    row_bottom <- floor(ncol(bin) * percentiles[2])
+    fpib <- pixel_index(bin, row = row_bottom)
+    lpb <- c(fpib[2], row_bottom)
+    rpb <- c(fpib[4], row_bottom)
+    coord_bottom <- rbind(bi, lpb, rpb)
+    angles_bottom <- help_poly_angles(coord_bottom)
+    return(list(apex_angle = angles_top[1],
+                base_angle = angles_bottom[1],
+                apex_coords = coord_top,
+                base_coords = coord_bottom))
+  }
 }
 

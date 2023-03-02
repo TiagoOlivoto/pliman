@@ -32,5 +32,11 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    lattice
+    doParallel,
+    foreach,
+    lattice,
+    Rcpp
 LazyData: true
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo

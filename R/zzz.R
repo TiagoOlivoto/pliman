@@ -15,6 +15,7 @@
 #' * `sev_back.jpg` A blue palette representing the background of `sev_leaf`.
 #' * `sev_healthy.jpg` Healthy area of `sev_leaf`.
 #' * `sev_sympt.jpg` The symptomatic area `sev_leaf`.
+#' * `shadow.jpg` A shaded leaf, useful to test adaptive thresholding
 #' * `soy_green.jpg` Soybean grains with a white background.
 #' * `soybean_grain.jpg` A sample palette of the grains in `soy_green`.
 #' * `soybean_touch.jpg` Soybean grains with a cyan background touching one each
@@ -32,7 +33,7 @@
 NULL
 
 .onAttach <- function(libname, pkgname) {
-  vers <-  "1.2.0"
+  vers <-  "1.2.0.9000"
   packageStartupMessage("|==========================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")            |")
   packageStartupMessage("| Author: Tiago Olivoto                                    |")
@@ -48,7 +49,9 @@ if (getRversion() >= "2.15.1") {
     c("Contorno", "display", "CODE", "dir_original" ,"dir_processada",
       "Spectrum", "value", "area", "id", ".", "object", "s.radius.max",
       "s.radius.min", "y", "s.area", "s.perimeter", "symptomatic", "m.eccentricity",
-      "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames", "s.radius.sd"))
+      "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames", "s.radius.sd",
+      "perimeter", "radius_max", "radius_mean", "radius_min", "radius_sd", "X1",
+      "X2", "%dopar%", "i"))
 }
 
 

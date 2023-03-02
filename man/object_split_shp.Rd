@@ -4,7 +4,14 @@
 \alias{object_split_shp}
 \title{Splits image objects based on a shape file}
 \usage{
-object_split_shp(img, rows = 1, cols = 1, interactive = FALSE, ...)
+object_split_shp(
+  img,
+  rows = 1,
+  cols = 1,
+  interactive = FALSE,
+  only_shp = FALSE,
+  ...
+)
 }
 \arguments{
 \item{img}{An object of class \code{Image}}
@@ -16,6 +23,10 @@ object_split_shp(img, rows = 1, cols = 1, interactive = FALSE, ...)
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
 that will contain the grid.}
+
+\item{only_shp}{If \code{TRUE} returns only the shapefiles with the coordinates
+for each image. If \code{FALSE} (default) returns the splitted image according
+to \code{rows} and \code{cols} arguments.}
 
 \item{...}{Other arguments passed on to \code{\link[=image_shp]{image_shp()}}}
 }

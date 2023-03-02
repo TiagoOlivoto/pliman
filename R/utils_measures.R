@@ -496,6 +496,68 @@ plot_measures <- function(object,
 }
 
 
+#' Plot length and width lines on objects
+#'
+#' This function plots the length and width lines given an `object` computed
+#' with [analyze_objects()]. The function does not call `plot.new`, so it must
+#' be called after an image is plotted. This can be done either using, e.g.,
+#' `plot(img)`, or `analyze_objects(..., plot = TRUE)`.
+#'
+#' @param object An object computed with [analyze_objects()].
+#' @param col_length The color of the length line. Default is `"red"`.
+#' @param col_width The color of the width line. Default is `"green"`.
+#' @param lwd_length The line width of the length line. Default is 2.
+#' @param lwd_width The line width of the width line. Default is 2.
+#'
+#' @details This function takes an object computed with [analyze_objects()] and
+#'   plots the length and width lines of each object onto an image. The length
+#'   and width lines are calculated based on the position and orientation of the
+#'   object, and are plotted using the specified colors and line widths.
+#'
+#' @importFrom graphics lines
+#' @export
+#'
+#' @examples
+#' img <- image_pliman("flax_leaves.jpg")
+#' res <- analyze_objects(img, watershed = FALSE, show_contour = FALSE)
+#' plot_lw(res)
+plot_lw <- function(object,
+                    col_length = "red",
+                    col_width = "green",
+                    lwd_length = 2,
+                    lwd_width = 2){
+  if(inherits(object, "anal_obj")){
+    rest <- object$results
+  } else{
+    rest <- object
+  }
+  if(!all(c("x", "y", "length", "width", "theta") %in% colnames(rest))){
+    stop("`object` must be an object computed with `analyze_objects() or a data.frame with the columns `x`, `y`, `length`, `width`, and `theta`", call. = FALSE)
+  }
+  xc <- rest$x
+  yc <- rest$y
+  length <- rest$length
+  width <- rest$width
+  theta <- rest$theta
+
+  theta_degrees <- theta * 180 / pi
+  # Calculate the endpoints of the length line
+  xls <- xc - (length/2)*cos(theta)
+  yls <- yc - (length/2)*sin(theta)
+  xle <- xc + (length/2)*cos(theta)
+  yle <- yc + (length/2)*sin(theta)
+  # Calculate the endpoints of the width line
+  xws <- xc - (width/2)*cos(theta + pi/2)
+  yws <- yc - (width/2)*sin(theta + pi/2)
+  xwe <- xc + (width/2)*cos(theta + pi/2)
+  ywe <- yc + (width/2)*sin(theta + pi/2)
+  # Plot the lines
+  segments(xws, yws, xwe,  ywe, col = col_width, lwd = lwd_width)
+  segments(xls, yls, xle, yle, col = col_length, lwd = lwd_length)
+}
+
+
+
 #' Summary an object index
 #'
 #' If more than one index is available, the function performs a Principal
@@ -663,95 +725,122 @@ names_measures <- function(){
     "circularity",
     "circularity_haralick",
     "circularity_norm",
-    "coverage",
-    "asm",
-    "con",
-    "cor",
-    "var",
-    "idm",
-    "sav",
-    "sva",
-    "sen",
-    "ent",
-    "dva",
-    "den",
-    "f12",
-    "f13")
+    "coverage")
+}
+
+har_names <- function(){
+  c( "asm",
+     "con",
+     "cor",
+     "var",
+     "idm",
+     "sav",
+     "sva",
+     "sen",
+     "ent",
+     "dva",
+     "den",
+     "f12",
+     "f13")
+}
+
+## helper function to compute the measures based on a mask
+
+
+
+features_moment <- function(x){
+  mc <- poly_mass(x)
+  moms <- t(sapply(x, function(x){
+    help_moments(x)
+  }))
+  res <- cbind(mc, moms)
+  colnames(res) <- c("mx", "my", "maj_axis", "min_axis", "eccentricity", "theta")
+  return(data.frame(res))
+}
+
+features_shape <- function(x){
+  perimeter <- sapply(x, function(x) {
+    sum(help_distpts(x))
+  })
+  distp <- lapply(x, function(x) {
+    help_centdist(x)
+  })
+  rmean <- mean_list(distp)
+  rmin <- min_list(distp)
+  rmax <- max_list(distp)
+  rsd <- sd_list(distp)
+  res <- data.frame(perimeter = perimeter,
+                    radius_mean = rmean,
+                    radius_min = rmin,
+                    radius_max = rmax,
+                    radius_sd = rsd)
+  return(res)
 }
 
 ## helper function to compute the measures based on a mask
 compute_measures <- function(mask,
-                             img,
-                             har_nbins = 32,
-                             har_scales = 1,
-                             har_band = 1){
+                              img,
+                              haralick =  FALSE,
+                              har_nbins = 32,
+                              har_scales = 1,
+                              har_band = 1){
   ocont <- EBImage::ocontour(mask)
-  valid <- which(sapply(ocont, length) > 4)
   shape <-
-    cbind(
-      data.frame(EBImage::computeFeatures.shape(mask)),
-      data.frame(EBImage::computeFeatures.moment(mask))
-    )[valid, ]
-  coverage <- length(which(mask == 1)) / length(mask)
+    cbind(features_moment(ocont),
+          cbind(area = get_area_mask(mask), features_shape(ocont)))
+  valid <- which(shape$mx != "NaN")
+  shape <- shape[valid, ]
+  coverage <- length(which(mask != 0)) / length(mask)
   ocont <- ocont[valid]
   names(ocont) <- valid
   ch <- conv_hull(ocont)
-  area_ch <- trunc(as.numeric(unlist(poly_area(ch))))
-  shape$s.perimeter = poly_perimeter(ocont)
+  area_ch <- help_area(ch)
   caliper = poly_caliper(ocont)
-  lw <- poly_lw(ocont)
+  lw <- help_lw(ocont)
   shape <- transform(shape,
                      id = as.numeric(valid),
-                     radius_ratio = s.radius.max / s.radius.min,
-                     diam_mean = s.radius.mean * 2,
-                     diam_min = s.radius.min * 2,
-                     diam_max = s.radius.max * 2,
+                     radius_ratio = radius_max / radius_min,
+                     diam_mean = radius_mean * 2,
+                     diam_min = radius_min * 2,
+                     diam_max = radius_max * 2,
                      length = lw[, 1],
                      width = lw[, 2],
-                     coverage = s.area / length(mask),
+                     coverage = area / length(mask),
                      area_ch =   area_ch,
-                     solidity = s.area / area_ch,
+                     solidity = area / area_ch,
                      caliper = caliper,
-                     form_factor = 4 * pi * s.area / s.perimeter ^ 2,
+                     form_factor = 4 * pi * area / perimeter ^ 2,
                      narrow_factor =  caliper / lw[, 1],
                      asp_ratio = lw[, 1] / lw[, 2],
-                     rectangularity = lw[, 1]  * lw[, 2] / s.area,
-                     pd_ratio = s.perimeter / caliper,
-                     plw_ratio = s.perimeter / (lw[, 1]  + lw[, 2]),
+                     rectangularity = lw[, 1]  * lw[, 2] / area,
+                     pd_ratio = perimeter / caliper,
+                     plw_ratio = perimeter / (lw[, 1]  + lw[, 2]),
                      convexity = poly_convexity(ocont),
                      elongation = poly_elongation(ocont),
-                     circularity = s.perimeter ^ 2 / s.area,
-                     circularity_haralick = s.radius.mean / s.radius.sd,
-                     circularity_norm = poly_circularity_norm(ocont),
-                     minor_axis = m.majoraxis*sqrt(1 - m.eccentricity^2),
-                     m.eccentricity = poly_eccentricity(ocont))
-  hal <- data.frame(
-    EBImage::computeFeatures.haralick(mask,
-                                      img[,,har_band],
-                                      haralick.nbins = har_nbins,
-                                      haralick.scales = har_scales)
-  )
+                     circularity = perimeter ^ 2 / area,
+                     circularity_haralick = radius_mean / radius_sd,
+                     circularity_norm = poly_circularity_norm(ocont))
   shape <- shape[, c("id",
-                     "m.cx",
-                     "m.cy",
-                     "s.area",
+                     "mx",
+                     "my",
+                     "area",
                      "area_ch",
-                     "s.perimeter",
-                     "s.radius.mean",
-                     "s.radius.min",
-                     "s.radius.max",
-                     "s.radius.sd",
+                     "perimeter",
+                     "radius_mean",
+                     "radius_min",
+                     "radius_max",
+                     "radius_sd",
                      "diam_mean",
                      "diam_min",
                      "diam_max",
-                     "m.majoraxis",
-                     "minor_axis",
+                     "maj_axis",
+                     "min_axis",
                      "caliper",
                      "length",
                      "width",
                      "radius_ratio",
-                     "m.theta",
-                     "m.eccentricity",
+                     "theta",
+                     "eccentricity",
                      "form_factor",
                      "narrow_factor",
                      "asp_ratio",
@@ -765,12 +854,22 @@ compute_measures <- function(mask,
                      "circularity_haralick",
                      "circularity_norm",
                      "coverage")]
-  shape <- cbind(shape, hal[valid, ])
   colnames(shape) <- names_measures()
+  if(isTRUE(haralick)){
+    hal <- data.frame(
+      EBImage::computeFeatures.haralick(mask,
+                                        img[,,har_band],
+                                        haralick.nbins = har_nbins,
+                                        haralick.scales = har_scales)
+    )
+    shape <- cbind(shape, hal[valid, ])
+    colnames(shape) <- c(names_measures(), har_names())
+  }
   return(list(shape = shape,
               cont = ocont,
               ch = ch))
 }
+
 
 # Helper functions to apply stats on a list
 

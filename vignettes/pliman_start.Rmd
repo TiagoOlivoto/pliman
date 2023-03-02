@@ -114,10 +114,6 @@ rgb <-
   analyze_objects(img,
                   object_index = "B",
                   marker = "id")
-
-analyze_objects(img,
-                  object_index = "B",
-                  marker = "id")
 # plot the distribution of RGB values of each object
 plot(rgb)
 ```

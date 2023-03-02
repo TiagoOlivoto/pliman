@@ -17,6 +17,7 @@
 \alias{image_opening}
 \alias{image_closing}
 \alias{image_skeleton}
+\alias{image_thinning}
 \alias{image_filter}
 \alias{image_blur}
 \alias{image_contrast}
@@ -165,6 +166,16 @@ image_skeleton(
   ...
 )
 
+image_thinning(
+  image,
+  niter = 3,
+  parallel = FALSE,
+  workers = NULL,
+  verbose = TRUE,
+  plot = FALSE,
+  ...
+)
+
 image_filter(
   image,
   size = 2,
@@ -257,6 +268,10 @@ resolution (megapixels) times 20.
 \code{box}, \code{disc}, \code{diamond}, \code{Gaussian} or \code{line}. Default is \code{disc}.}
 
 \item{...}{Additional arguments passed on to \code{\link[=image_binary]{image_binary()}}.}
+
+\item{niter}{The number of iterations to perform in the thinning procedure.
+Defaults to 3. Set to \code{NULL} to iterate until the binary image is no longer
+changing.}
 
 \item{cache}{The the L2 cache size of the system CPU in kB (integer).
 Defaults to \code{512}.}

@@ -18,7 +18,6 @@ measure_disease_byl(
   extension = NULL,
   tolerance = NULL,
   object_size = "large",
-  keep_location = FALSE,
   dir_original = NULL,
   img_healthy = NULL,
   img_symptoms = NULL,
@@ -105,10 +104,6 @@ which is the highest.}
 (e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
 peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
-\item{keep_location}{A logical argument (defaults to \code{TRUE}). If \code{FALSE}, the
-new image is created with the object in the exactly position of the
-original image.}
-
 \item{dir_original}{The directory containing the original and processed images.
 Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
 current working directory.}
@@ -162,8 +157,7 @@ indexes \code{by} each \code{l}eaf of an image. This allows, for example, proces
 replicates of the same treatment  and obtaining the results for each
 replication with a single image. To do that, leaf samples are first splitten
 with \code{\link[=object_split]{object_split()}} and then, \code{\link[=measure_disease]{measure_disease()}} is applied to the list of
-leaves. Arguments \code{img} to \code{keep_location} are passed on to \code{\link[=object_split]{object_split()}}.
-Arguments \code{dir_original} to \code{...} are passed on to \code{\link[=measure_disease]{measure_disease()}}.
+leaves.
 }
 \examples{
 library(pliman)

@@ -32,6 +32,8 @@
    - `landmarks_dist()`:	Distances between landmarks
    - `landmarks_regradi()`:	Pseudolandmarks with equally spaced angles
    
+* `object_edge()` to detect edges in images using Sobel-Feldman Operator.
+
 
 ## New features
 * [Haralick's features](https://ieeexplore.ieee.org/document/4309314) that quantify pixel texture for image objects were included.
@@ -46,6 +48,10 @@
 
 * Logical arguments `reference_larger` and `reference_smaller` included in `analyze_objects()`. Those indicates when the larger/smaller object in the image must be used as the reference object. This only is valid when `reference = TRUE` and `reference_area` indicates the area of the reference object. **IMPORTANT**. When `reference_smaller` is used, objects with an area smaller than 1% of the mean of all the objects are ignored. This is used to remove possible noise in the image such as dust. So, be sure the reference object has an area that will be not removed by that cutpoint.
 
+* `Rcpp` and `RcppArmadillo` dependencies were included, allowing the implementation of `C++` code. This will dramatically reduce the time computing of some functions/procesures. As an example, we wave.
+  - Reduction in time processing from more than 5 minutes to less than 1 second using the new `object_rgb()` function to extract the RGB values from an image (1445 x 1084) with ~1400 objects.
+  - Reduction in time processing of the set of `*_poly()` functions.
+
 
 ## Minor changes
 * `get_measures()` now remove known objects from the results when using the `id` argument.
@@ -54,6 +60,10 @@
 * New argument `reference` in `analyze_objects()` to adjust measures using a reference object in the image.
 * Argument `object_index` in `analyze_objects()` now recognizes the names of built-in indexes (see ?`pliman_indexes()`).
 * `plot.image_index()` not limits the number of pixels to reduce plotting time.
+* `show_image` argument changed with `plot` to standardize the argument across functions.
+* `rgb_to_hsb()` optimized using `C++`.
+
+
 
 # pliman 1.1.0
 ## New functions

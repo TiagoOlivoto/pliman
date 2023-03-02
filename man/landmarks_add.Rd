@@ -34,16 +34,16 @@ library(pliman)
 plot_polygon(contours[[4]])
 ldm <- landmarks_regradi(contours[[4]], plot = FALSE)
 points(ldm$coords, pch = 16)
-segments(mean(ldm$coords$x),
-         mean(ldm$coords$y),
-         ldm$coords$x,
-         ldm$coords$y)
+segments(mean(ldm$coords[,1]),
+         mean(ldm$coords[,2]),
+         ldm$coords[,1],
+         ldm$coords[,2])
 
 ldm_add <- landmarks_add(ldm, plot = FALSE)
 points(ldm_add, col = "red")
 points(ldm$coords, pch = 16)
 
 # smoothed version
-ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 50)
+ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 10)
 lines(ldm_add_smo, col = "blue", lwd = 3)
 }

@@ -127,6 +127,7 @@ round_cols <- function(.data, digits = 2){
 #' @export
 #' @name utils_pca
 #' @importFrom  stats lm cov
+#' @importFrom  graphics arrows
 #' @importFrom  graphics  axis box mtext plot.new plot.window polygon title
 #'
 #' @examples
@@ -440,35 +441,6 @@ plot.pca <- function(x,
 
 
 
-################## used internaly
-# convert rgb to hsv
-rgb_to_hsb_help <-  function(r, g, b){
-  help_h <- function(r, g, b){
-    rgbvals <- c(r, g, b)
-    # hue
-    if(max(rgbvals) ==  rgbvals[1]){
-      h <- 60*((g - b) / (max(r, g, b) - min(r, g, b)))
-    }
-    if(max(rgbvals) ==  rgbvals[2]){
-      h <- 60*(2 + ((b - r) / (max(r, g, b) - min(r, g, b))))
-    }
-    if(max(rgbvals) ==  rgbvals[3]){
-      h <- 60*(4 + ((r - g) / (max(r, g, b) - min(r, g, b))))
-    }
-    return(h)
-  }
-  help_s <- function(r, g, b){
-    (max(r, g, b) - min(r, g, b)) / max(r, g, b) *100
-  }
-  help_b <- function(r, g, b){
-    max(r, g, b)  * 100
-  }
-  h <- mapply(help_h, r, g, b)
-  s <- mapply(help_s, r, g, b)
-  b <- mapply(help_b, r, g, b)
-  return(data.frame(h = h, s = s, b = b))
-}
-
 # Progress bar
 # used in metan R package
 # https://github.com/TiagoOlivoto/metan/blob/master/R/utils_progress.R
@@ -655,7 +627,8 @@ separate_col <- function(.data, col, into, sep = "[^[:alnum:]]+"){
 #' library(pliman)
 #' random_color(n = 3)
 random_color <- function(n = 1, distinct = FALSE){
-  return(sample(colors(distinct = distinct), n))
+  replace <- ifelse(n > length(colors()), TRUE, FALSE)
+  return(sample(colors(distinct = distinct), n, replace = replace))
 }
 
 

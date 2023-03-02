@@ -4,7 +4,7 @@
 \alias{efourier_inv}
 \title{Inverse Elliptical Fourier Analysis}
 \usage{
-efourier_inv(x, nharm = NULL, npoints = 500)
+efourier_inv(x, nharm = NULL, a0 = NULL, c0 = NULL, npoints = 500)
 }
 \arguments{
 \item{x}{An object of class \code{efourier} or \code{efourier_lst} computed with
@@ -12,6 +12,10 @@ efourier_inv(x, nharm = NULL, npoints = 500)
 
 \item{nharm}{An integer indicating the number of harmonics to use. If not
 specified the number of harmonics used in \code{x} is used.}
+
+\item{a0, c0}{the estimates of the coordinates of the centroid of the
+configuration. If \code{NULL} (default), the generated coordinates will be
+centered on the position of the original shape given by \code{\link[=efourier]{efourier()}}.}
 
 \item{npoints}{The number of interpolated points on the constructed outline.
 Defaults to 500.}

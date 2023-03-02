@@ -64,7 +64,11 @@
 #' R band. To chance this default, use the argument `har_band`. For example,
 #' `har_band = 2` will compute the features with the green band.
 #'
-#' If `efourier = TRUE` is used, an Elliptical Fourier Analysis (Kuhl and Giardina, 1982) is computed for each object contour. should be
+#' If `efourier = TRUE` is used, an Elliptical Fourier Analysis (Kuhl and
+#' Giardina, 1982) is computed for each object contour.
+#'
+#' @inheritParams image_binary
+#'
 #' @param img The image to be analyzed.
 #' @param foreground,background A color palette for the foregrond and
 #'   background, respectively (optional). If a chacarceter is used (eg.,
@@ -116,6 +120,15 @@
 #'   If `FALSE`, all pixels for each connected set of foreground pixels are set
 #'   to a unique object. This is faster but is not able to segment touching
 #'   objects.
+#' @param veins Logical argument indicating whether vein features are computed.
+#'   This will call [object_edge()] and applies the Sobel-Feldman Operator to
+#'   detect edges. The result is the proportion of edges in relation to the
+#'   entire area of the object(s) in the image. Note that **THIS WILL BE AN
+#'   OPERATION ON AN IMAGE LEVEL, NOT OBJECT!**.
+#' @param sigma_veins Gaussian kernel standard deviation used in the gaussian
+#'   blur in the edge detection algorithm
+#' @param haralick Logical value indicating whether Haralick features are
+#'   computed. Defaults to `FALSE`.
 #' @param har_nbins An integer indicating the number of bins using to compute
 #'   the Haralick matrix. Defaults to 32. See Details
 #' @param har_scales A integer vector indicating the number of scales to use to
@@ -165,11 +178,6 @@
 #'   coefficients are returned.
 #' @param nharm An integer indicating the number of harmonics to use. Defaults
 #'   to 10. For more details see [efourier()].
-#' @param threshold By default (`threshold = "Otsu"`), a threshold value based
-#'   on Otsu's method is used to reduce the grayscale image to a binary image.
-#'   If a numeric value is informed, this value will be used as a threshold.
-#'   Inform any non-numeric value different than "Otsu" to iteratively chosen
-#'   the threshold based on a raster plot showing pixel intensity of the index.
 #' @param tolerance The minimum height of the object in the units of image
 #'   intensity between its highest point (seed) and the point where it contacts
 #'   another object (checked for every contact pixel). If the height is smaller
@@ -177,15 +185,20 @@
 #'   which is the highest.
 #' @param extension Radius of the neighborhood in pixels for the detection of
 #'   neighboring objects. Higher value smooths out small objects.
+#' @param lower_noise To prevent noise from affecting the image analysis,
+#'   objects with lesser than 10% of the mean area of all objects are removed
+#'   (`lower_noise = 0.1`). Increasing this value will remove larger noises
+#'   (such as dust points), but can remove desired objects too. To define an
+#'   explicit lower or upper size, use the `lower_size` and `upper_size`
+#'   arguments.
 #' @param lower_size,upper_size Lower and upper limits for size for the image
-#'   analysis. Plant images often contain dirt and dust. To prevent dust from
-#'   affecting the image analysis, objects with lesser than 10% of the mean of
-#'   all objects are removed. Upper limit is set to `NULL`, i.e., no upper
-#'   limit used. One can set a known area or use `lower_limit = 0` to select all
-#'   objects (not advised). Objects that matches the size of a given range of
-#'   sizes can be selected by setting up the two arguments. For example, if
-#'   `lower_size = 120` and `upper_size = 140`, objects with size greater than
-#'   or equal 120 and less than or equal 140 will be considered.
+#'   analysis. Plant images often contain dirt and dust.  Upper limit is set to
+#'   `NULL`, i.e., no upper limit used. One can set a known area or use
+#'   `lower_limit = 0` to select all objects (not advised). Objects that matches
+#'   the size of a given range of sizes can be selected by setting up the two
+#'   arguments. For example, if `lower_size = 120` and `upper_size = 140`,
+#'   objects with size greater than or equal 120 and less than or equal 140 will
+#'   be considered.
 #' @param topn_lower,topn_upper Select the top `n` objects based on its area.
 #'   `topn_lower` selects the `n` elements with the smallest area whereas
 #'   `topn_upper` selects the `n` objects with the largest area.
@@ -197,7 +210,7 @@
 #' @param randomize Randomize the lines before training the model?
 #' @param nrows The number of lines to be used in training step. Defaults to
 #'   2000.
-#' @param show_image Show image after processing?
+#' @param plot Show image after processing?
 #' @param show_original Show the count objects in the original image?
 #' @param show_chull Show the convex hull around the objects? Defaults to
 #'   `FALSE`.
@@ -205,6 +218,8 @@
 #'   to `TRUE`.
 #' @param contour_col,contour_size The color and size for the contour line
 #'   around objects. Defaults to `contour_col = "red"` and `contour_size = 1`.
+#' @param show_lw If `TRUE`, plots the length and width lines on each object
+#'   calling [plot_lw()].
 #' @param show_background Show the background? Defaults to `TRUE`. A white
 #'   background is shown by default when `show_original = FALSE`.
 #' @param show_segmentation Shows the object segmentation colored with random
@@ -336,7 +351,7 @@
 #'  * `statistics`: A data frame with the summary statistics for the area of the
 #'  objects.
 #'  * `count`: If `pattern` is used, shows the number of objects in each image.
-#'  * `object_rgb`: If `object_index` is used, returns the R, G, and B values
+#'  * `obj_rgb`: If `object_index` is used, returns the R, G, and B values
 #'  for each pixel of each object.
 #'  * `object_index`: If `object_index` is used, returns the index computed for
 #'  each object.
@@ -351,6 +366,9 @@
 #'        outline. For more details see [efourier_error()].
 #'     - `efourier_power`: The spectrum of harmonic Fourier power.
 #'        For more details see [efourier_power()].
+#'
+#'  * `veins`: If `veins = TRUE` is used, returns, for each image, the
+#'  proportion of veins (in fact the object edges) related to the total object(s)' area.
 #'
 #'  * `analyze_objects_iter()` returns a data.frame containing the features
 #'  described in the `results` object of [analyze_objects()].
@@ -441,6 +459,9 @@ analyze_objects <- function(img,
                             parallel = FALSE,
                             workers = NULL,
                             watershed = TRUE,
+                            veins = FALSE,
+                            sigma_veins = 1,
+                            haralick = FALSE,
                             har_nbins = 32,
                             har_scales = 1,
                             har_band = 1,
@@ -455,8 +476,11 @@ analyze_objects <- function(img,
                             efourier = FALSE,
                             nharm = 10,
                             threshold = "Otsu",
+                            k = 0.1,
+                            windowsize = NULL,
                             tolerance = NULL,
                             extension = NULL,
+                            lower_noise = 0.1,
                             lower_size = NULL,
                             upper_size = NULL,
                             topn_lower = NULL,
@@ -467,12 +491,13 @@ analyze_objects <- function(img,
                             upper_circ = NULL,
                             randomize = TRUE,
                             nrows = 1000,
-                            show_image = TRUE,
+                            plot = TRUE,
                             show_original = TRUE,
                             show_chull = FALSE,
                             show_contour = TRUE,
                             contour_col = "red",
                             contour_size = 1,
+                            show_lw = FALSE,
                             show_background = TRUE,
                             show_segmentation = FALSE,
                             col_foreground = NULL,
@@ -485,7 +510,6 @@ analyze_objects <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  check_ebi()
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
@@ -509,9 +533,11 @@ analyze_objects <- function(img,
              paste0("./", dir_processed))
   }
   help_count <-
-    function(img, foreground, background, resize, fill_hull, threshold, filter, tolerance, extension,
-             randomize, nrows, show_image, show_original, show_background, marker,
-             marker_col, marker_size, save_image, prefix, dir_original, dir_processed, verbose){
+    function(img, foreground, background, resize, fill_hull, threshold, filter,
+             tolerance, extension, randomize, nrows, plot, show_original,
+             show_background, marker, marker_col, marker_size, save_image,
+             prefix, dir_original, dir_processed, verbose, col_background,
+             col_foreground, lower_noise){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -608,9 +634,11 @@ analyze_objects <- function(img,
                                invert = invert,
                                fill_hull = fill_hull,
                                threshold = threshold,
+                               k = k,
+                               windowsize = windowsize,
                                filter = filter,
                                resize = FALSE,
-                               show_image = FALSE)[[1]]
+                               plot = FALSE)[[1]]
           if(isTRUE(watershed)){
             parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
             res <- length(img2)
@@ -633,10 +661,11 @@ analyze_objects <- function(img,
           nmask <- EBImage::fillHull(nmask)
         }
         shape <- compute_measures(mask = nmask,
-                                  img = img,
-                                  har_nbins = har_nbins,
-                                  har_scales = har_scales,
-                                  har_band = har_band)
+                                   img = img,
+                                   haralick = haralick,
+                                   har_nbins = har_nbins,
+                                   har_scales = har_scales,
+                                   har_band = har_band)
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape
@@ -655,10 +684,13 @@ analyze_objects <- function(img,
           }
           img_bf <-
             image_binary(img,
+                         threshold = threshold,
                          index = back_fore_index,
                          filter = filter,
+                         k = k,
+                         windowsize = windowsize,
                          invert = invert1,
-                         show_image = FALSE,
+                         plot = FALSE,
                          fill_hull = fill_hull,
                          verbose = FALSE)[[1]]
           img3 <- img
@@ -675,10 +707,13 @@ analyze_objects <- function(img,
           }
           img4 <-
             image_binary(img3,
+                         threshold = threshold,
                          index = fore_ref_index,
                          filter = filter,
+                         k = k,
+                         windowsize = windowsize,
                          invert = invert2,
-                         show_image = FALSE,
+                         plot = FALSE,
                          verbose = FALSE)[[1]]
           mask <- img_bf
           pix_ref <- which(img4 != 1)
@@ -706,29 +741,36 @@ analyze_objects <- function(img,
             nmask <- EBImage::bwlabel(mask)
           }
           shape <- compute_measures(mask = nmask,
-                                    img = img,
-                                    har_nbins = har_nbins,
-                                    har_scales = har_scales,
-                                    har_band = har_band)
+                                     img = img,
+                                     haralick = haralick,
+                                     har_nbins = har_nbins,
+                                     har_scales = har_scales,
+                                     har_band = har_band)
           object_contour <- shape$cont
           ch <- shape$ch
           shape <- shape$shape
+          if(isTRUE(show_lw)){
+            shape_ori <- shape
+          }
           # correct measures based on the area of the reference object
           px_side <- sqrt(reference_area / npix_ref)
           shape$area <- shape$area * px_side^2
           shape$area_ch <- shape$area_ch * px_side^2
-          shape[6:17] <- apply(shape[6:17], 2, function(x){
+          shape[6:18] <- apply(shape[6:18], 2, function(x){
             x * px_side
           })
         } else{
           # correct the measures based on larger or smaller objects
           mask <-
             image_binary(img,
+                         threshold = threshold,
                          index = index,
+                         k = k,
+                         windowsize = windowsize,
                          filter = filter,
                          invert = invert,
                          fill_hull = fill_hull,
-                         show_image = FALSE,
+                         plot = FALSE,
                          verbose = FALSE)[[1]]
           if(isTRUE(watershed)){
             parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
@@ -746,27 +788,34 @@ analyze_objects <- function(img,
             nmask <- EBImage::bwlabel(mask)
           }
           shape <- compute_measures(mask = nmask,
-                                    img = img,
-                                    har_nbins = har_nbins,
-                                    har_scales = har_scales,
-                                    har_band = har_band)
+                                     img = img,
+                                     haralick = haralick,
+                                     har_nbins = har_nbins,
+                                     har_scales = har_scales,
+                                     har_band = har_band)
           object_contour <- shape$cont
           ch <- shape$ch
           shape <- shape$shape
+          if(isTRUE(show_lw)){
+            shape_ori <- shape
+          }
+
           if(isTRUE(reference_larger)){
-            shape <- shape[shape$area > mean(shape$area) * 0.05, ]
             id_ref <- which.max(shape$area)
             npix_ref <- shape[id_ref, 4]
+            shape <- shape[-id_ref,]
+            shape <- shape[shape$area > mean(shape$area) * lower_noise, ]
           } else{
-            shape <- shape[shape$area > mean(shape$area) * 0.05, ]
+            shape <- shape[shape$area > mean(shape$area) * lower_noise, ]
             id_ref <- which.min(shape$area)
             npix_ref <- shape[id_ref, 4]
+            shape <- shape[-id_ref,]
           }
-          shape <- shape[-id_ref,]
+
           px_side <- sqrt(reference_area / npix_ref)
           shape$area <- shape$area * px_side ^ 2
           shape$area_ch <- shape$area_ch * px_side ^ 2
-          shape[6:17] <- apply(shape[6:17], 2, function(x){
+          shape[6:18] <- apply(shape[6:18], 2, function(x){
             x * px_side
           })
         }
@@ -776,7 +825,7 @@ analyze_objects <- function(img,
       }
       ifelse(!is.null(lower_size),
              shape <- shape[shape$area > lower_size, ],
-             shape <- shape[shape$area > mean(shape$area) * 0.05, ])
+             shape <- shape[shape$area > mean(shape$area) * lower_noise, ])
       if(!is.null(upper_size)){
         shape <- shape[shape$area < upper_size, ]
       }
@@ -801,6 +850,7 @@ analyze_objects <- function(img,
       object_contour <- object_contour[as.character(shape$id)]
       ch <- ch[as.character(shape$id)]
 
+      # check if fourier is computed
       if(isTRUE(efourier)){
         efr <-
           efourier(object_contour,
@@ -822,6 +872,14 @@ analyze_objects <- function(img,
         min_harm <- NULL
       }
 
+      # check if veins is computed
+      if(isTRUE(veins)){
+        vein <- object_edge(img, sigma = sigma_veins, plot = FALSE)
+        prop_veins <- data.frame(prop_veins = sum(vein) / sum(shape$area))
+      } else{
+        prop_veins <- NULL
+      }
+
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
@@ -834,39 +892,13 @@ analyze_objects <- function(img,
         }
         ind_name <- object_index
         data_mask <- nmask@.Data
-        get_rgb <- function(img, data_mask, index){
-          data.frame(id = index,
-                     R = img@.Data[,,1][which(data_mask == index)],
-                     G = img@.Data[,,2][which(data_mask == index)],
-                     B = img@.Data[,,3][which(data_mask == index)])
-        }
-        if(isTRUE(parallel)){
-          nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-          clust <- makeCluster(nworkers)
-          clusterExport(clust,
-                        varlist = c("img", "data_mask", "get_rgb"),
-                        envir=environment())
-          on.exit(stopCluster(clust))
-          object_rgb <-
-            do.call(rbind,
-                    parLapply(clust, 1:max(data_mask),
-                              function(i){
-                                get_rgb(img, data_mask, i)
-                              })
-            )
-        } else{
-          object_rgb <-
-            do.call(rbind,
-                    lapply(1:max(data_mask), function(i){
-                      get_rgb(img, data_mask, i)
-                    }))
-        }
-        object_rgb <- subset(object_rgb, id %in% shape$id)
-        object_rgb <- cbind(object_rgb, rgb_to_hsb(object_rgb[, 2:4]))
+        obj_rgb <- object_rgb(img, data_mask)
+        obj_rgb <- subset(obj_rgb, id %in% shape$id)
+        obj_rgb <- cbind(obj_rgb, rgb_to_hsb(obj_rgb[, 2:4]))
         # indexes by id
         tmp <-
-          by(object_rgb,
-             INDICES = object_rgb$id,
+          by(obj_rgb,
+             INDICES = obj_rgb$id,
              FUN = function(x){
                data.frame(
                  do.call(cbind,
@@ -882,12 +914,12 @@ analyze_objects <- function(img,
                   lapply(tmp, data.frame)
           )
         colnames(tmp) <- ind_name
-        object_rgb <- cbind(object_rgb, tmp)
-        indexes <- data.frame(cbind(id = object_rgb$id, tmp))
+        obj_rgb <- cbind(obj_rgb, tmp)
+        indexes <- data.frame(cbind(id = obj_rgb$id, tmp))
         colnames(indexes) <- c("id", ind_name)
         indexes <- aggregate(. ~ id, indexes, mean, na.rm = TRUE)
       } else{
-        object_rgb <- NULL
+        obj_rgb <- NULL
         indexes <- NULL
       }
       stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
@@ -900,15 +932,20 @@ analyze_objects <- function(img,
                                     sum(shape$area)))
       results <- list(results = shape,
                       statistics = stats,
-                      object_rgb = object_rgb,
+                      object_rgb = obj_rgb,
                       object_index = indexes,
                       efourier = efr,
                       efourier_norm = efrn,
                       efourier_error = efer,
                       efourier_power = efpow,
-                      efourier_minharm = min_harm)
+                      efourier_minharm = min_harm,
+                      veins = prop_veins)
       class(results) <- "anal_obj"
-      if(show_image == TRUE | save_image == TRUE){
+      if(plot == TRUE | save_image == TRUE){
+        if(!interactive()){
+          pdf(NULL)
+        }
+
         backg <- !is.null(col_background)
 
         # color for background
@@ -974,7 +1011,7 @@ analyze_objects <- function(img,
         }
         marker_col <- ifelse(is.null(marker_col), "white", marker_col)
         marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
-        if(show_image == TRUE){
+        if(plot == TRUE){
           if(marker != "point"){
             plot(im2)
             if(isTRUE(show_contour) & isTRUE(show_original)){
@@ -1001,6 +1038,14 @@ analyze_objects <- function(img,
                      col = marker_col,
                      pch = 16,
                      cex = marker_size)
+            }
+          }
+          # plot length and width
+          if(isTRUE(show_lw)){
+            if(isTRUE(reference)){
+              plot_lw(shape_ori)
+            } else{
+              plot_lw(results)
             }
           }
         }
@@ -1039,6 +1084,13 @@ analyze_objects <- function(img,
                      cex = marker_size)
             }
           }
+          if(isTRUE(show_lw)){
+            if(isTRUE(reference)){
+              plot_lw(shape_ori)
+            } else{
+              plot_lw(results)
+            }
+          }
           dev.off()
         }
       }
@@ -1047,9 +1099,10 @@ analyze_objects <- function(img,
 
   if(missing(pattern)){
     help_count(img, foreground, background, resize, fill_hull, threshold, filter,
-               tolerance , extension, randomize, nrows, show_image, show_original,
+               tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
-               dir_original, dir_processed, verbose)
+               dir_original, dir_processed, verbose, col_background,
+               col_foreground, lower_noise)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -1066,35 +1119,40 @@ analyze_objects <- function(img,
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     if(parallel == TRUE){
+      init_time <- Sys.time()
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust,
-                    varlist = c("names_plant"),
-                    envir=environment())
-      on.exit(stopCluster(clust))
+      cl <- parallel::makePSOCKcluster(nworkers)
+      doParallel::registerDoParallel(cl)
+      on.exit(stopCluster(cl))
+
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
+      ## declare alias for dopar command
+      `%dopar%` <- foreach::`%dopar%`
+
       results <-
-        parLapply(clust, names_plant,
-                  function(x){
-                    help_count(x,
-                               foreground, background, resize, fill_hull, threshold,
-                               filter, tolerance , extension, randomize,
-                               nrows, show_image, show_original, show_background,
-                               marker, marker_col, marker_size, save_image, prefix,
-                               dir_original, dir_processed, verbose =  FALSE)
-                  })
+        foreach::foreach(i = seq_along(names_plant), .packages = c("pliman", "EBImage")) %dopar%{
+          help_count(names_plant[[i]],
+                     foreground, background, resize, fill_hull, threshold,
+                     filter, tolerance , extension, randomize,
+                     nrows, plot, show_original, show_background,
+                     marker, marker_col, marker_size, save_image, prefix,
+                     dir_original, dir_processed, verbose =  FALSE, col_background,
+                     col_foreground, lower_noise)
+        }
 
     } else{
+      init_time <- Sys.time()
       pb <- progress(max = length(plants), style = 4)
       foo <- function(plants, ...){
         run_progress(pb, ...)
         help_count(img  = plants,
                    foreground, background, resize, fill_hull, threshold, filter,
-                   tolerance, extension, randomize, nrows, show_image, show_original,
+                   tolerance, extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image,
-                   prefix, dir_original, dir_processed, verbose)
+                   prefix, dir_original, dir_processed, verbose, col_background,
+                   col_foreground, lower_noise)
       }
       results <-
         lapply(seq_along(names_plant), function(i){
@@ -1103,6 +1161,8 @@ analyze_objects <- function(img,
               text = paste("Processing image", names_plant[i]))
         })
     }
+
+    ## bind the results
     names(results) <- names_plant
     stats <-
       do.call(rbind,
@@ -1111,15 +1171,16 @@ analyze_objects <- function(img,
                           id =  names(results[i]))[,c(3, 1, 2)]
               })
       )
+
     if(!is.null(object_index)){
-      object_rgb <-
+      obj_rgb <-
         do.call(rbind,
                 lapply(seq_along(results), function(i){
                   transform(results[[i]][["object_rgb"]],
                             img =  names(results[i]))
                 })
         )
-      object_rgb <- object_rgb[, c(ncol(object_rgb), 1:ncol(object_rgb) - 1)]
+      obj_rgb <- obj_rgb[, c(ncol(obj_rgb), 1:ncol(obj_rgb) - 1)]
       object_index <-
         do.call(rbind,
                 lapply(seq_along(results), function(i){
@@ -1129,7 +1190,7 @@ analyze_objects <- function(img,
         )
       object_index <- object_index[, c(ncol(object_index), 1:ncol(object_index) - 1)]
     } else{
-      object_rgb <- NULL
+      obj_rgb <- NULL
       object_index <- NULL
     }
     if(!isFALSE(efourier)){
@@ -1192,6 +1253,20 @@ analyze_objects <- function(img,
       efourier_minharm <- NULL
     }
 
+    if(isTRUE(veins)){
+      veins <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["veins"]],
+                            img =  names(results[i]))
+                })
+        )
+
+      veins <- veins[, c(ncol(veins), 1:ncol(veins)-1)]
+    } else{
+      veins <- NULL
+    }
+
     results <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
@@ -1210,19 +1285,22 @@ analyze_objects <- function(img,
       print(summ, row.names = FALSE)
       cat("--------------------------------------------\n")
       message("Done!")
+      message("Elapsed time: ", sec_to_hms(as.numeric(difftime(Sys.time(),  init_time, units = "secs"))))
 
     }
+
     invisible(
       structure(
         list(statistics = stats,
              count = summ,
              results = results,
-             object_rgb = object_rgb,
+             obj_rgb = obj_rgb,
              object_index = object_index,
              efourier = efourier,
              efourier_norm = efourier_norm,
              efourier_error = efourier_error,
-             efourier_minharm = efourier_minharm),
+             efourier_minharm = efourier_minharm,
+             veins = veins),
         class = "anal_obj_ls"
       )
     )
@@ -1241,6 +1319,7 @@ analyze_objects <- function(img,
 #'   used?. Defaults to `FALSE`.
 #' @method plot anal_obj
 #' @importFrom lattice densityplot levelplot
+#' @importFrom grDevices pdf
 #' @export
 #'
 #' @examples

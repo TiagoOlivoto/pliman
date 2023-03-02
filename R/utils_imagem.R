@@ -101,6 +101,9 @@ image_combine <- function(...,
 #' @param path A character vector of full path names; the default corresponds to
 #'   the working directory, [getwd()]. It will overwrite (if given) the path
 #'   informed in `image` argument.
+#' @param resize Resize the image after importation? Defaults to `FALSE`. Use a
+#'   numeric value of range 0-100 (proportion of the size of the original
+#'   image).
 #' @param plot Plots the image after importing? Defaults to `FALSE`.
 #' @param nrow,ncol Passed on to [image_combine()]. The number of rows and
 #'   columns to use in the composite image when `plot = TRUE`.
@@ -128,6 +131,7 @@ image_import <- function(image,
                          which = 1,
                          pattern = NULL,
                          path = NULL,
+                         resize = FALSE,
                          plot = FALSE,
                          nrow = NULL,
                          ncol = NULL){
@@ -159,6 +163,12 @@ image_import <- function(image,
     if(isTRUE(plot)){
       image_combine(list_img, nrow = nrow, ncol = ncol)
     }
+    if(resize != FALSE){
+      if(!is.numeric(resize)){
+        stop("Argument `resize` must be numeric.", call. = FALSE)
+      }
+      list_img <- image_resize(list_img, resize)
+    }
     return(list_img)
   } else{
     img_dir <- ifelse(is.null(path), file_dir(image), path)
@@ -179,6 +189,12 @@ image_import <- function(image,
       if(isTRUE(plot)){
         image_combine(ls, nrow = nrow, ncol = ncol)
       }
+      if(resize != FALSE){
+        if(!is.numeric(resize)){
+          stop("Argument `resize` must be numeric.", call. = FALSE)
+        }
+        ls <- image_resize(ls, resize)
+      }
       return(ls)
     } else{
       if(file_extension(image) %in% c("tif", "TIF", "tiff", "TIFF")){
@@ -188,6 +204,12 @@ image_import <- function(image,
       }
       if(isTRUE(plot)){
         plot(img)
+      }
+      if(resize != FALSE){
+        if(!is.numeric(resize)){
+          stop("Argument `resize` must be numeric.", call. = FALSE)
+        }
+        img <- image_resize(img, resize)
       }
       return(img)
     }
@@ -347,6 +369,9 @@ image_pliman <- function(image, plot = FALSE){
 #' 100:200
 #' @param kern An `Image` object or an array, containing the structuring
 #'   element. Defaults to a brushe generated with [EBImage::makeBrush()].
+#' @param niter The number of iterations to perform in the thinning procedure.
+#'   Defaults to 3. Set to `NULL` to iterate until the binary image is no longer
+#'   changing.
 #' @param shape A character vector indicating the shape of the brush. Can be
 #'   `box`, `disc`, `diamond`, `Gaussian` or `line`. Default is `disc`.
 #' @param size
@@ -419,8 +444,8 @@ image_autocrop <- function(image,
                               edge = edge,
                               plot = FALSE,
                               filter = filter)
-    segmented <- image[conv_hull$row_min:conv_hull$row_max,
-                       conv_hull$col_min:conv_hull$col_max,
+    segmented <- image[conv_hull[1]:conv_hull[2],
+                       conv_hull[3]:conv_hull[4],
                        1:3]
     if(isTRUE(plot)){
       plot(segmented)
@@ -437,7 +462,6 @@ image_crop <- function(image,
                        workers = NULL,
                        verbose = TRUE,
                        plot = FALSE){
-  # check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -953,7 +977,6 @@ image_opening <- function(image,
                           workers = NULL,
                           verbose = TRUE,
                           plot = FALSE){
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1000,7 +1023,6 @@ image_closing <- function(image,
                           workers = NULL,
                           verbose = TRUE,
                           plot = FALSE){
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1037,6 +1059,7 @@ image_closing <- function(image,
     return(img)
   }
 }
+
 #' @name utils_transform
 #' @export
 image_skeleton <- function(image,
@@ -1046,7 +1069,6 @@ image_skeleton <- function(image,
                            verbose = TRUE,
                            plot = FALSE,
                            ...){
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1063,9 +1085,9 @@ image_skeleton <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_erode)
+      parLapply(clust, image, image_skeleton)
     } else{
-      lapply(image, image_erode)
+      lapply(image, image_skeleton)
     }
   } else{
     if(EBImage::colorMode(image) != 0){
@@ -1091,6 +1113,69 @@ image_skeleton <- function(image,
     return(img)
   }
 }
+
+#' @name utils_transform
+#' @export
+image_thinning <- function(image,
+                           niter = 3,
+                           parallel = FALSE,
+                           workers = NULL,
+                           verbose = TRUE,
+                           plot = FALSE,
+                           ...){
+  check_ebi()
+  if(is.list(image)){
+    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+                           "img_mat_list", "palette_list")){
+      image <- lapply(image, function(x){x[[1]]})
+    }
+    if(!all(sapply(image, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "image")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, image, image_thinning, niter)
+    } else{
+      lapply(image, image_thinning, niter)
+    }
+  } else{
+    if(EBImage::colorMode(image) != 0){
+      image <- image_binary(image, ..., resize = FALSE, plot = FALSE)[[1]]
+    }
+
+    if(is.null(niter)){
+      li <- sum(image)
+      lf <- 1
+      while((li - lf) != 0){
+        li <- sum(image)
+        tin <- help_edge_thinning(image)
+        image <- tin
+        lf <- sum(image)
+      }
+    } else{
+      for(i in 1:niter){
+        tin <- help_edge_thinning(image)
+        image <- tin
+      }
+    }
+    img <- EBImage::Image(image)
+    if (plot == TRUE) {
+      plot(img)
+    }
+    return(img)
+  }
+}
+
+
+
+
+
 #' @name utils_transform
 #' @export
 image_filter <- function(image,
@@ -1103,7 +1188,6 @@ image_filter <- function(image,
   if(size < 2){
     stop("Using `size` < 2 will crash you R section. Please, consider using 2 or more.")
   }
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1140,7 +1224,6 @@ image_blur <- function(image,
                        workers = NULL,
                        verbose = TRUE,
                        plot = FALSE){
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1176,7 +1259,6 @@ image_contrast <- function(image,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
-  check_ebi()
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -1635,7 +1717,6 @@ image_index <- function(image,
                         parallel = FALSE,
                         workers = NULL,
                         verbose = TRUE){
-  check_ebi()
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
@@ -2000,7 +2081,6 @@ image_segment <- function(image,
                           parallel = FALSE,
                           workers = NULL,
                           verbose = TRUE){
-  check_ebi()
   threshold <- threshold[[1]]
   if(inherits(image, "img_segment")){
     image <- image[[1]]
@@ -2396,10 +2476,17 @@ image_segment_kmeans <-   function (image,
 
 #' Image segmentation by hand
 #'
-#' Segments image objects 'by hand'. The user will need to pick the perimeter of
-#' the object to be segmented. So, this only works in an interactive section.
+#' This R code is a function that allows the user to manually segment an image based on the parameters provided. This only works in an interactive section.
+#'
+#' @details If the shape is "free", it allows the user to draw a perimeter to
+#'   select/remove objects. If the shape is "circle", it allows the user to
+#'   click on the center and edge of the circle to define the desired area. If
+#'   the shape is "rectangle", it allows the user to select two points to define
+#'   the area.
 #'
 #' @param image An `Image` object.
+#' @param shape The type of shape to use. Defaults to "free". Other possible
+#'   values are "circle" and "rectangle". Partial matching is allowed.
 #' @param type The type of segmentation. By default (`type = "select"`) objects
 #'   are selected. Use `type = "remove"` to remove the selected area from the
 #'   image.
@@ -2421,35 +2508,67 @@ image_segment_kmeans <-   function (image,
 #'
 #' }
 image_segment_manual <-  function(image,
+                                  shape = c("free", "circle", "rectangle"),
                                   type = c("select", "remove"),
                                   resize = TRUE,
                                   edge = 5,
                                   plot = TRUE){
+  vals <- c("free", "circle", "rectangle")
+  shape <- vals[[pmatch(shape, vals)]]
   if (isTRUE(interactive())) {
-    plot(image)
-    message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
-    stop <- FALSE
-    n <- 1e+06
-    coor <- NULL
-    a <- 0
-    while (isFALSE(stop)) {
-      if (a > 1) {
-        if (nrow(coor) > 1) {
-          lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
-                                                              1):nrow(coor), 2], col = "red")
+    if(shape == "free"){
+      plot(image)
+      message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
+      stop <- FALSE
+      n <- 1e+06
+      coor <- NULL
+      a <- 0
+      while (isFALSE(stop)) {
+        if (a > 1) {
+          if (nrow(coor) > 1) {
+            lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
+                                                                1):nrow(coor), 2], col = "red")
+          }
+        }
+        x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+        if (is.null(x)){
+          stop <- TRUE
+        }
+        coor <- rbind(coor, x)
+        a <- a + 1
+        if (a >= n) {
+          stop = TRUE
         }
       }
-      x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
-      if (is.null(x)){
-        stop <- TRUE
-      }
-      coor <- rbind(coor, x)
-      a <- a + 1
-      if (a >= n) {
-        stop = TRUE
-      }
+      coor <- rbind(coor, coor[1, ])
     }
-    coor <- rbind(coor, coor[1, ])
+
+    if(shape == "circle"){
+      plot(image)
+      message("Click on the center of the circle")
+      cent = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+      message("Click on the edge of the circle")
+      ext = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+      radius = sqrt(sum((cent - ext)^2))
+      x1 = seq(-1, 1, l = 2000)
+      x2 = x1
+      y1 = sqrt(1 - x1^2)
+      y2 = (-1) * y1
+      x = c(x1, x2) * radius + cent[1]
+      y = c(y1, y2) * radius + cent[2]
+      coor = cbind(x, y)
+    }
+
+    if(shape == "rectangle"){
+      plot(image)
+      message("Select 2 points drawing the diagonal that includes the area of interest.")
+      cord <- unlist(locator(type = "p", n = 2, col = "red", pch = 19))
+      coor <-
+        rbind(c(cord[1], cord[3]),
+              c(cord[2], cord[3]),
+              c(cord[2], cord[4]),
+              c(cord[1], cord[4]))
+    }
     mat <- NULL
     for (i in 1:(nrow(coor) - 1)) {
       c1<-  coor[i, ]
@@ -2996,6 +3115,7 @@ rgb_to_hsb <- function(object){
       rgb_to_hsb_help(r = object[,1],
                       g = object[,2],
                       b = object[,3])
+    colnames(hsb) <- c("h", "s", "b")
   }
   if (any(class(object)  %in% c("anal_obj", "anal_obj_ls"))){
     if(!is.null(object$object_rgb)){
@@ -3007,6 +3127,7 @@ rgb_to_hsb <- function(object){
                           b = c(tmp[,5]))
         hsb <- data.frame(cbind(tmp[,1:2], hsb))
         colnames(hsb)[1:2] <- c("img", "id")
+        colnames(hsb)[3:5] <- c("h", "s", "b")
       }
       hsb <-
         rgb_to_hsb_help(r = c(tmp[,2]),
@@ -3014,6 +3135,7 @@ rgb_to_hsb <- function(object){
                         b = c(tmp[,4]))
       hsb <- data.frame(cbind(tmp[,1], hsb))
       colnames(hsb)[1] <- "id"
+      colnames(hsb)[2:4] <- c("h", "s", "b")
     } else{
       stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
     }
@@ -3023,10 +3145,10 @@ rgb_to_hsb <- function(object){
       rgb_to_hsb_help(r = c(object[,,1]),
                       g = c(object[,,2]),
                       b = c(object[,,3]))
+    colnames(hsb) <- c("h", "s", "b")
   }
-  return(hsb)
+  return(data.frame(hsb))
 }
-
 
 
 #' @export
