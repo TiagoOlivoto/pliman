@@ -11,7 +11,13 @@ analyze_objects_shp(
   cols = 1,
   interactive = FALSE,
   plot = TRUE,
-  object_size = "large",
+  parallel = FALSE,
+  workers = NULL,
+  object_size = "medium",
+  efourier = FALSE,
+  object_index = NULL,
+  veins = FALSE,
+  verbose = TRUE,
   ...
 )
 }
@@ -30,8 +36,38 @@ that will contain the grid.}
 
 \item{plot}{Plots the processed images? Defaults to \code{TRUE}.}
 
+\item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel) in
+separate R sessions running in the background on the same machine. It may
+speed up the processing time, especially when \code{pattern} is used is informed.
+When \code{object_index} is informed, multiple sections will be used to extract
+the RGB values for each object in the image. This may significantly speed up
+processing time when an image has lots of objects (say >1000).}
+
+\item{workers}{A positive numeric scalar or a function specifying the number
+of parallel processes that can be active at the same time. By default, the
+number of sections is set up to 50\% of available cores.}
+
 \item{object_size}{Argument to control control the watershed segmentation.
 See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}
+
+\item{efourier}{Logical argument indicating if Elliptical Fourier should be
+computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
+\code{efourier = TRUE} is used, both standard and normalized Fourier coefficients
+are returned.}
+
+\item{object_index}{Defaults to \code{FALSE}. If an index is informed, the average
+value for each object is returned. It can be the R, G, and B values or any
+operation involving them, e.g., \code{object_index = "R/B"}. In this case, it
+will return for each object in the image, the average value of the R/B
+ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equations of available indexes.}
+
+\item{veins}{Logical argument indicating whether vein features are computed.
+This will call \code{\link[=object_edge]{object_edge()}} and applies the Sobel-Feldman Operator to
+detect edges. The result is the proportion of edges in relation to the
+entire area of the object(s) in the image. Note that \strong{THIS WILL BE AN
+OPERATION ON AN IMAGE LEVEL, NOT OBJECT!}.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
 \item{...}{Aditional arguments passed on to \link{analyze_objects}.}
 }
@@ -56,6 +92,6 @@ res <-
                        object_index = "DGCI")
 plot(flax)
 plot(res$shapefiles)
-plot_measures(e, measure = "DGCI")
+plot_measures(res, measure = "DGCI")
 }
 }

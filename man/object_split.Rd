@@ -45,10 +45,10 @@ objects.}
 images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
 is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
 \verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
-reference from the foreground using \code{back_fore_index} is performed using
-the default (not inverted), and the segmentation of objects from the
-reference is performed by inverting the selection (selecting pixels higher
-than the threshold).}
+reference from the foreground using \code{back_fore_index} is performed using the
+default (not inverted), and the segmentation of objects from the reference
+is performed by inverting the selection (selecting pixels higher than the
+threshold).}
 
 \item{fill_hull}{Fill holes in the binary image? Defaults to \code{FALSE}. This is
 useful to fill holes in objects that have portions with a color similar to
@@ -58,8 +58,8 @@ image.}
 
 \item{filter}{Performs median filtering in the binary image? See more at
 \code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
-size of the median filtering. Larger values are effective at removing
-noise, but adversely affect edges.}
+size of the median filtering. Larger values are effective at removing noise,
+but adversely affect edges.}
 
 \item{threshold}{The theshold method to be used.
 \itemize{
@@ -84,8 +84,8 @@ which is the highest.}
 
 \item{object_size}{The size of the object. Used to automatically set up
 \code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
-(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
-peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
+(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g, peanut
+grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
 \item{edge}{The number of pixels to be added in the edge of the segmented
 object. Defaults to 5.}

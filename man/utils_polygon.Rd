@@ -151,10 +151,10 @@ to the center of mass.
 }
 }
 \description{
-Several useful functions for analyzing polygons. All of them are based on a set
-of coordinate points that describe the edge of the object(s). If a list of
-polygons is provided, it loops through the list and computes what is needed
-for each element of the list.
+Several useful functions for analyzing polygons. All of them are based on a
+set of coordinate points that describe the edge of the object(s). If a list
+of polygons is provided, it loops through the list and computes what is
+needed for each element of the list.
 \itemize{
 \item Polygon measures
 \itemize{
@@ -208,7 +208,7 @@ are used to calculate the circularity, CH, of a shape as \code{CH = m/sd}.
 between the perimeter of the convex hull and the perimeter of the polygon.
 \item \code{poly_eccentricity()} computes the eccentricity of a shape using the
 ratio of the eigenvalues (inertia axes of coordinates).
-\item \code{poly_elongation()} computes the elongation of a shape as 1 - width / length.
+\item \code{poly_elongation()} computes the elongation of a shape as \code{1 - width / length}.
 }
 \item Utilities for polygons
 \itemize{

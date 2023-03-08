@@ -8,6 +8,7 @@
 \verb{*.jpg} format
 \itemize{
 \item \code{flax_leaves.jpg} Flax leaves in a white background
+\item \code{flax_grains.jpg} Flax grains with background light.
 \item \code{la_back.jpg} A cyan palette representing the background of images
 la_pattern, la_leaves, and soybean_touch.
 \item \code{la_leaf.jpg} A sample of the leaves in \code{la_leaves}

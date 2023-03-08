@@ -81,11 +81,11 @@ apply_fun_to_imgs <- function(pattern,
                          ...,
                          diretorio_original,
                          diretorio_processada,
-                         prefix,
-                         suffix){
+                         prefix = prefix,
+                         suffix = suffix){
     img_file <- image_import(img, path = diretorio_original)
     img_list <- list(img_file)
-    names(img_list) <- paste0(prefix, img, suffix)
+    names(img_list) <- paste0(prefix, file_name(img), suffix, ".", file_extension(img))
     res <- lapply(img_list, fun, ...)
     image_export(res, subfolder = diretorio_processada)
   }
@@ -94,7 +94,7 @@ apply_fun_to_imgs <- function(pattern,
     workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
     cl <- parallel::makePSOCKcluster(workers)
     doParallel::registerDoParallel(cl)
-    on.exit(stopCluster(cl))
+    on.exit(parallel::stopCluster(cl))
 
     ## declare alias for dopar command
     `%dopar%` <- foreach::`%dopar%`
@@ -125,8 +125,8 @@ apply_fun_to_imgs <- function(pattern,
                  ...,
                  diretorio_original = diretorio_original,
                  diretorio_processada = diretorio_processada,
-                 prefix = "",
-                 suffix = "")
+                 prefix = prefix,
+                 suffix = suffix)
     }
   }
 }

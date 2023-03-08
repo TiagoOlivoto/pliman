@@ -77,8 +77,8 @@ neighboring objects. Higher value smooths out small objects.}
 
 \item{object_size}{The size of the object. Used to automatically set up
 \code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
-(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
-peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
+(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g, peanut
+grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
 \item{plot}{Show image after processing?}
 

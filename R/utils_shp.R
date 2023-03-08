@@ -241,142 +241,6 @@ image_align <- function(img,
   return(img2)
 }
 
-
-#' Analyzes objects using shapefiles
-#'
-#' This function calls [analyze_objects()] in each image polygon of a shapefile
-#' object generated with generated with [image_shp()] and bind the results into
-#' read-ready data frames.
-#'
-#' @param img An `Image` object
-#' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
-#'   (default), both `rows` and `cols` must be declared.
-#' @param rows,cols The number of rows and columns to generate the shapefile
-#'   when `shapefile` is not declared. Defaults to `1`.
-#' @param interactive If `FALSE` (default) the grid is created automatically
-#'   based on the image dimension and number of rows/columns. If `interactive =
-#'   TRUE`, users must draw points at the diagonal of the desired bounding box
-#'   that will contain the grid.
-#' @param plot Plots the processed images? Defaults to `TRUE`.
-#' @param object_size Argument to control control the watershed segmentation.
-#'   See [analyze_objects()] for more details.
-#' @param ... Aditional arguments passed on to [analyze_objects].
-#'
-#' @return An object of class `anal_obj`. See more details in the `Value`
-#'   section of [analyze_objects()].
-#' @export
-#'
-#' @examples
-#' if(interactive()){
-#' library(pliman)
-#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
-#' res <-
-#'    analyze_objects_shp(flax,
-#'                        rows = 3,
-#'                        cols = 5,
-#'                        plot = FALSE,
-#'                        object_index = "DGCI")
-#' plot(flax)
-#' plot(res$shapefiles)
-#' plot_measures(e, measure = "DGCI")
-#' }
-analyze_objects_shp <- function(img,
-                                shapefile = NULL,
-                                rows = 1,
-                                cols = 1,
-                                interactive = FALSE,
-                                plot = TRUE,
-                                object_size = "large",
-                                ...){
-  if(is.null(shapefile)){
-    tmp <- object_split_shp(img, rows, cols, interactive = interactive)
-    spl <- tmp$imgs
-    shapes <- tmp$shapefile
-    shps <- tmp$shapefile
-  } else{
-    shps <- shapefile
-    shapes <- shps$shapefiles
-    spl <- list()
-    rows <- shapefile$rows
-    cols <- shapefile$cols
-    get_borders <- function(x){
-      min_x <- min(x[,1])
-      max_x <- max(x[,1])
-      min_y <- min(x[,2])
-      max_y <- max(x[,2])
-      return(list(min_x, max_x, min_y, max_y))
-    }
-    for (i in 1:length(shapes)) {
-      tmp <- shapes[[i]][-1]
-      borders <- get_borders(tmp)
-      spl[[paste0("shp", i)]] <-
-        image_crop(img,
-                   width = borders[[1]]:borders[[2]],
-                   height = borders[[3]]:borders[[4]])
-    }
-  }
-  if(isTRUE(plot)){
-    op <- par(mfrow = c(rows, cols))
-    on.exit(par(op))
-  }
-  list <- lapply(spl,
-                 analyze_objects,
-                 img,
-                 plot = plot,
-                 object_size = object_size,
-                 ...)
-  results <-
-    do.call(rbind,
-            lapply(list, function(x){x$results}))
-  vect <- rownames(results)
-  results$img <-
-    sapply(seq_along(vect),
-           function(i){
-             strsplit(vect[[i]], split = "\\.")[[1]][[1]]
-           })
-  results <- results[, c(ncol(results), 1:(ncol(results) - 1))]
-  rownames(results) <- NULL
-
-  statistics <-
-    do.call(rbind,
-            lapply(seq_along(list), function(x){
-              transform(list[[x]][["statistics"]], img = names(list[x]))[,c(3, 1, 2)]
-            }))
-
-  if(!is.null(list[[1]][["object_rgb"]])){
-    object_rgb <-
-      do.call(rbind,
-              lapply(seq_along(list), function(i){
-                transform(list[[i]][["object_rgb"]], img = names(list[i]))
-              }))
-    object_rgb <- object_rgb[, c(ncol(object_rgb), 1:(ncol(object_rgb) - 1))]
-  } else{
-    object_rgb <- NULL
-  }
-
-  if(!is.null(list[[1]][["object_index"]])){
-    object_index <-
-      do.call(rbind,
-              lapply(seq_along(list), function(i){
-                transform(list[[i]][["object_index"]], img = names(list[i]))
-              }))
-    object_index <- object_index[, c(ncol(object_index), 1:(ncol(object_index) - 1))]
-  } else{
-    object_index <- NULL
-  }
-
-  return(structure(
-    list(results = results,
-         statistics = statistics,
-         object_rgb = object_rgb,
-         object_index = object_index,
-         shapefiles = shps),
-    class = "anal_obj"))
-
-}
-
-
-
 #' Analyzes objects using shapefiles
 #'
 #' This function calls [analyze_objects()] in each image polygon of a shapefile
@@ -415,22 +279,22 @@ analyze_objects_shp <- function(img,
 #'                        object_index = "DGCI")
 #' plot(flax)
 #' plot(res$shapefiles)
-#' plot_measures(e, measure = "DGCI")
+#' plot_measures(res, measure = "DGCI")
 #' }
-analyze_objects_shp2 <- function(img,
-                                 shapefile = NULL,
-                                 rows = 1,
-                                 cols = 1,
-                                 interactive = FALSE,
-                                 plot = TRUE,
-                                 parallel = FALSE,
-                                 workers = NULL,
-                                 object_size = "medium",
-                                 efourier = FALSE,
-                                 object_index = NULL,
-                                 veins = FALSE,
-                                 verbose = TRUE,
-                                 ...){
+analyze_objects_shp <- function(img,
+                                shapefile = NULL,
+                                rows = 1,
+                                cols = 1,
+                                interactive = FALSE,
+                                plot = TRUE,
+                                parallel = FALSE,
+                                workers = NULL,
+                                object_size = "medium",
+                                efourier = FALSE,
+                                object_index = NULL,
+                                veins = FALSE,
+                                verbose = TRUE,
+                                ...){
   if(is.null(shapefile)){
     tmp <- object_split_shp(img, rows, cols, interactive = interactive, only_shp = FALSE)
     imgs <- tmp$imgs

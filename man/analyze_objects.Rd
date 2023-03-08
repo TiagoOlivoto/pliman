@@ -10,6 +10,7 @@ analyze_objects(
   img,
   foreground = NULL,
   background = NULL,
+  pick_palettes = FALSE,
   reference = FALSE,
   reference_area = NULL,
   back_fore_index = "R/(G/B)",
@@ -87,54 +88,58 @@ analyze_objects_iter(pattern, known_area, verbose = TRUE, ...)
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{foreground, background}{A color palette for the foregrond and
-background, respectively (optional). If a chacarceter is used (eg.,
-\code{foreground = "fore"}), the function will search in the current working
-directory a valid image that contains "fore" in the name.}
+\item{foreground, background}{A color palette for the foregrond and background,
+respectively (optional). If a chacarceter is used (eg., \code{foreground = "fore"}), the function will search in the current working directory a valid
+image named "fore".}
+
+\item{pick_palettes}{Logical argument indicating wheater the user needs to
+pick up the color palettes for foreground and background for the image. If
+\code{TRUE} \code{\link[=pick_palette]{pick_palette()}} will be called internally so that the user can sample
+color points representing foreground and background.}
 
 \item{reference}{Logical to indicate if a reference object is present in the
 image. This is useful to adjust measures when images are not obtained with
 standard resolution (e.g., field images). See more in the details section.}
 
-\item{reference_area}{The known area of the reference objects. The measures
-of all the objects in the image will be corrected using the same unit of
-the area informed here.}
+\item{reference_area}{The known area of the reference objects. The measures of
+all the objects in the image will be corrected using the same unit of the
+area informed here.}
 
 \item{back_fore_index}{A character value to indicate the index to segment the
 foreground (objects and reference) from the background. Defaults to
-\code{"R/(G/B)"}. This index is optimized to segment white backgrounds from
-green leaves and a blue reference object.}
+\code{"R/(G/B)"}. This index is optimized to segment white backgrounds from green
+leaves and a blue reference object.}
 
 \item{fore_ref_index}{A character value to indicate the index to segment
 objects and the reference object. It can be either an available index in
-\code{pliman} (see \code{\link[=pliman_indexes]{pliman_indexes()}} or an own index computed with the R, G,
-and B bands. Defaults to \code{"B-R"}. This index is optimized to segment green
+\code{pliman} (see \code{\link[=pliman_indexes]{pliman_indexes()}} or an own index computed with the R, G, and
+B bands. Defaults to \code{"B-R"}. This index is optimized to segment green
 leaves from a blue reference object after a white background has been
 removed.}
 
-\item{reference_larger, reference_smaller}{Logical argument indicating when
-the larger/smaller object in the image must be used as the reference
-object. This only is valid when \code{reference} is set to \code{TRUE} and
-\code{reference_area} indicates the area of the reference object. IMPORTANT.
-When \code{reference_smaller} is used, objects with an area smaller than 1\% of
-the mean of all the objects are ignored. This is used to remove possible
-noise in the image such as dust. So, be sure the reference object has an
-area that will be not removed by that cutpoint.}
+\item{reference_larger, reference_smaller}{Logical argument indicating when the
+larger/smaller object in the image must be used as the reference object.
+This only is valid when \code{reference} is set to \code{TRUE} and \code{reference_area}
+indicates the area of the reference object. IMPORTANT. When
+\code{reference_smaller} is used, objects with an area smaller than 1\% of the
+mean of all the objects are ignored. This is used to remove possible noise
+in the image such as dust. So, be sure the reference object has an area that
+will be not removed by that cutpoint.}
 
 \item{pattern}{A pattern of file name used to identify images to be imported.
-For example, if \code{pattern = "im"} all images in the current working
-directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
-will be imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-, 2.-, and so on. An error
-will be returned if the pattern matches any file that is not supported
-(e.g., img1.pdf).}
+For example, if \code{pattern = "im"} all images in the current working directory
+that the name matches the pattern (e.g., img1.-, image1.-, im2.-) will be
+imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"})
+will select images that are named as 1.-, 2.-, and so on. An error will be
+returned if the pattern matches any file that is not supported (e.g.,
+img1.pdf).}
 
-\item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel)
-in separate R sessions running in the background on the same machine. It
-may speed up the processing time, especially when \code{pattern} is used is
-informed. When \code{object_index} is informed, multiple sections will be used
-to extract the RGB values for each object in the image. This may
-significantly speed up processing time when an image has lots of objects
-(say >1000).}
+\item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel) in
+separate R sessions running in the background on the same machine. It may
+speed up the processing time, especially when \code{pattern} is used is informed.
+When \code{object_index} is informed, multiple sections will be used to extract
+the RGB values for each object in the image. This may significantly speed up
+processing time when an image has lots of objects (say >1000).}
 
 \item{workers}{A positive numeric scalar or a function specifying the number
 of parallel processes that can be active at the same time. By default, the
@@ -158,8 +163,8 @@ blur in the edge detection algorithm}
 \item{haralick}{Logical value indicating whether Haralick features are
 computed. Defaults to \code{FALSE}.}
 
-\item{har_nbins}{An integer indicating the number of bins using to compute
-the Haralick matrix. Defaults to 32. See Details}
+\item{har_nbins}{An integer indicating the number of bins using to compute the
+Haralick matrix. Defaults to 32. See Details}
 
 \item{har_scales}{A integer vector indicating the number of scales to use to
 compute the Haralick features. See Details.}
@@ -168,8 +173,7 @@ compute the Haralick features. See Details.}
 B). Defaults to 1.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
-numeric value of range 0-100 (proportion of the size of the original
-image).}
+numeric value of range 0-100 (proportion of the size of the original image).}
 
 \item{trim}{Number of pixels removed from edges in the analysis. The edges of
 images are often shaded, which can affect image analysis. The edges of
@@ -184,22 +188,22 @@ image.}
 
 \item{filter}{Performs median filtering in the binary image? See more at
 \code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
-size of the median filtering. Larger values are effective at removing
-noise, but adversely affect edges.}
+size of the median filtering. Larger values are effective at removing noise,
+but adversely affect edges.}
 
 \item{invert}{Inverts the binary image if desired. This is useful to process
 images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
 is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
 \verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
-reference from the foreground using \code{back_fore_index} is performed using
-the default (not inverted), and the segmentation of objects from the
-reference is performed by inverting the selection (selecting pixels higher
-than the threshold).}
+reference from the foreground using \code{back_fore_index} is performed using the
+default (not inverted), and the segmentation of objects from the reference
+is performed by inverting the selection (selecting pixels higher than the
+threshold).}
 
 \item{object_size}{The size of the object. Used to automatically set up
 \code{tolerance} and \code{extension} parameters. One of the following. \code{"small"}
-(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g,
-peanut grains), and \code{"elarge"} (e.g, soybean pods)`.}
+(e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g, peanut
+grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
 \item{index}{A character value specifying the target mode for conversion to
 binary image when \code{foreground} and \code{background} are not declared. Defaults
@@ -214,11 +218,11 @@ ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equa
 
 \item{efourier}{Logical argument indicating if Elliptical Fourier should be
 computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
-\code{efourier = TRUE} is used, both standard and normalized Fourier
-coefficients are returned.}
+\code{efourier = TRUE} is used, both standard and normalized Fourier coefficients
+are returned.}
 
-\item{nharm}{An integer indicating the number of harmonics to use. Defaults
-to 10. For more details see \code{\link[=efourier]{efourier()}}.}
+\item{nharm}{An integer indicating the number of harmonics to use. Defaults to
+10. For more details see \code{\link[=efourier]{efourier()}}.}
 
 \item{threshold}{The theshold method to be used.
 \itemize{
@@ -249,12 +253,11 @@ which is the highest.}
 \item{extension}{Radius of the neighborhood in pixels for the detection of
 neighboring objects. Higher value smooths out small objects.}
 
-\item{lower_noise}{To prevent noise from affecting the image analysis,
-objects with lesser than 10\% of the mean area of all objects are removed
-(\code{lower_noise = 0.1}). Increasing this value will remove larger noises
-(such as dust points), but can remove desired objects too. To define an
-explicit lower or upper size, use the \code{lower_size} and \code{upper_size}
-arguments.}
+\item{lower_noise}{To prevent noise from affecting the image analysis, objects
+with lesser than 10\% of the mean area of all objects are removed
+(\code{lower_noise = 0.1}). Increasing this value will remove larger noises (such
+as dust points), but can remove desired objects too. To define an explicit
+lower or upper size, use the \code{lower_size} and \code{upper_size} arguments.}
 
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
 analysis. Plant images often contain dirt and dust.  Upper limit is set to
@@ -287,11 +290,11 @@ to \code{NULL} (i.e., no lower and upper limits).}
 \item{show_chull}{Show the convex hull around the objects? Defaults to
 \code{FALSE}.}
 
-\item{show_contour}{Show a contour line around the objects? Defaults
-to \code{TRUE}.}
+\item{show_contour}{Show a contour line around the objects? Defaults to
+\code{TRUE}.}
 
-\item{contour_col, contour_size}{The color and size for the contour line
-around objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
+\item{contour_col, contour_size}{The color and size for the contour line around
+objects. Defaults to \code{contour_col = "red"} and \code{contour_size = 1}.}
 
 \item{show_lw}{If \code{TRUE}, plots the length and width lines on each object
 calling \code{\link[=plot_lw]{plot_lw()}}.}
@@ -318,12 +321,11 @@ given in \code{img}.}
 \code{"proc_"}.}
 
 \item{dir_original, dir_processed}{The directory containing the original and
-processed images. Defaults to \code{NULL}. In this case, the function will
-search for the image \code{img} in the current working directory. After
-processing, when \code{save_image = TRUE}, the processed image will be also
-saved in such a directory. It can be either a full path, e.g.,
-\code{"C:/Desktop/imgs"}, or a subfolder within the current working directory,
-e.g., \code{"/imgs"}.}
+processed images. Defaults to \code{NULL}. In this case, the function will search
+for the image \code{img} in the current working directory. After processing, when
+\code{save_image = TRUE}, the processed image will be also saved in such a
+directory. It can be either a full path, e.g., \code{"C:/Desktop/imgs"}, or a
+subfolder within the current working directory, e.g., \code{"/imgs"}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
@@ -446,71 +448,117 @@ of the pixels, optionally  for each object when \code{facet = TRUE} is used.
 \itemize{
 \item \code{\link[=analyze_objects]{analyze_objects()}} provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
-more at \strong{Details} section.
+more at the \strong{Details} section.
 \item \code{\link[=analyze_objects_iter]{analyze_objects_iter()}} provides an iterative section to measure object
 features using an object with a known area.
-\item \code{\link[=plot.anal_obj]{plot.anal_obj()}} Produces an histogram for the R, G, and B values when
+\item \code{\link[=plot.anal_obj]{plot.anal_obj()}} produces a histogram for the R, G, and B values when
 argument \code{object_index} is used in the function \code{\link[=analyze_objects]{analyze_objects()}}.
 }
 }
 \details{
-A binary image is first generated to segment the foreground and background.
-The argument \code{index} is useful to choose a proper index to segment the image
-(see \code{\link[=image_binary]{image_binary()}} for more details). Then, the number of objects in the
-foreground is counted. By setting up arguments such as \code{lower_size},
-\code{upper_size} it is possible to set a threshold for lower and upper sizes of
-the objects, respectively. The argument \code{object_size} can be used to set up
-pre-defined values of \code{tolerance} and \code{extension} depending on the image
-resolution. This will influence the watershed-based object segmentation. Users
-can also tune-up \code{tolerance} and \code{extension} explicitly to a better precision
-of watershed segmentation.
+A binary image is first generated to segment the foreground and
+background. The argument \code{index} is useful to choose a proper index to
+segment the image (see \code{\link[=image_binary]{image_binary()}} for more details). It is also
+possible to provide color palettes for background and foreground (arguments
+\code{background} and \code{foreground}, respectively). When this is used, a general
+linear model (binomial family) fitted to the RGB values to segment fore- and
+background.
+
+Then, the number of objects in the  foreground is counted. By setting up
+arguments such as \code{lower_size} and \code{upper_size}, it is possible to set a
+threshold for lower and upper sizes of the objects, respectively. The
+argument \code{object_size} can be used to set up pre-defined values of
+\code{tolerance} and \code{extension} depending on the image resolution. This will
+influence the watershed-based object segmentation. Users can also tune up
+\code{tolerance} and \code{extension} explicitly for a better precision of watershed
+segmentation.
 
 If \code{watershed = FALSE} is used, all pixels for each connected set of
-foreground pixels in \code{img} are set to a unique object. This is faster
-(specially for a large number of objects) but is not able to segment touching
-objects.
+foreground pixels in \code{img} are set to a unique object. This is faster,
+especially for a large number of objects, but it is not able to segment
+touching objects.
 
-If color palettes are provided, a general linear model (binomial family)
-fitted to the RGB values is used to segment fore- and background. If a color
-palette for a \code{reference} object with a known area (\code{reference_area}) is
-informed. The measures of the objects in the image will be corrected
-considering the unit of measure informed in \code{reference_area}. Sample palettes
-can be produced with \code{\link[=image_palette]{image_palette()}}.
+There are some ways to correct the measures based on a reference object. If
+a reference object with a known area (\code{reference_area}) is used in the image
+and \code{reference = TRUE} is used, the measures of the objects will be
+corrected, considering the unit of measure informed in \code{reference_area}.
+There are two main ways to work with reference objects.
+\itemize{
+\item The first, is to provide a reference object that has a contrasting color with
+both the background and object of interest. In this case, the arguments
+\code{back_fore_index} and \code{fore_ref_index} can be used to define an index to
+first segment the reference object and objects to be measured from the
+background, then the reference object from objects to be measured.
+\item The second one is to use a reference object that has a similar color to the
+objects to be measured, but has a contrasting size. For example, if we are
+counting small brown grains, we can use a brown reference template that has
+an area larger (says 3 times the area of the grains) and then uses
+\code{reference_larger = TRUE}. With this, the larger object in the image will be
+used as the reference object. This is particularly useful when images are
+captured with background light, such as the example  2. Some types: (i) It
+is suggested that the reference object is not too much larger than the
+objects of interest (mainly when the \code{watershed = TRUE}). In some cases, the
+reference object can be broken into several pieces due to the watershed
+algorithm. (ii) Since the reference object will increase the mean area of
+the object, the argument \code{lower_noise} can be increased. By default
+(\code{lower_noise = 0.1}) objects with lesser than 10\% of the mean area of all
+objects are removed. Since the mean area will be increased, increasing
+\code{lower_noise} will remove dust and noises more reliably. The argument
+\code{reference_smaller} can be used in the same way
+}
 
-By using \code{pattern} it is possible to process several images with common
+By using \code{pattern}, it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
-subdirectory informed in \code{dir_original}'. To speed up the computation time,
+subdirectory informed in \code{dir_original}. To speed up the computation time,
 one can set \code{parallel = TRUE}.
 
 \code{\link[=analyze_objects_iter]{analyze_objects_iter()}} can be used to process several images using an
 object with a known area as a template. In this case, all the images in the
-current working directory that matches the \code{pattern} will be processed. For
+current working directory that match the \code{pattern} will be processed. For
 each image, the function will compute the features for the objects and show
 the identification (id) of each object. The user only needs to inform which
-is the id of the known object. Then, given the \code{known_area}, all the measures
-will be adjusted. In the end, a data.frame with the adjusted measures will be
-returned. This is useful when the images are taken at different heights. In
-such cases, the image resolution cannot be conserved. Consequently, the
-measures cannot be adjusted using the argument \code{dpi} from \code{\link[=get_measures]{get_measures()}},
-since each image will have a different resolution. NOTE: This will only work
-in an interactive section.
-
-The function computes 13 Haralick texture features for each object based on a
-gray-level co-occurrence matrix (Haralick et al. 1979). Haralick features
-depend on the configuration of the parameters  \code{har_nbins} and \code{har_scales}.
-\code{har_nbins} controls the number of bins used to compute the Haralick matrix.
-A smaller \code{har_nbins} can give more accurate estimates of the correlation
-because the number of events per bin is higher. While a higher value will
-give more sensitivity. \code{har_scales} controls the number of scales used to
-compute the Haralick features. Since Haralick features compute the
-correlation of intensities of neighboring pixels it is possible to identify
-textures with different scales, e.g., a texture that is repeated every two
-pixels or 10 pixels. By default, the Haralick features are computed with the
-R band. To chance this default, use the argument \code{har_band}. For example,
-\code{har_band = 2} will compute the features with the green band.
-
-If \code{efourier = TRUE} is used, an Elliptical Fourier Analysis (Kuhl and
-Giardina, 1982) is computed for each object contour.
+is the id of the known object. Then, given the \code{known_area}, all the
+measures will be adjusted. In the end, a data.frame with the adjusted
+measures will be returned. This is useful when the images are taken at
+different heights. In such cases, the image resolution cannot be conserved.
+Consequently, the measures cannot be adjusted using the argument \code{dpi} from
+\code{\link[=get_measures]{get_measures()}}, since each image will have a different resolution. NOTE:
+This will only work in an interactive section.
+\itemize{
+\item Additional measures: By default, some measures are not computed, mainly due to
+computational efficiency when the user only needs simple measures such as
+area, length, and width.
+\itemize{
+\item If \code{haralick = TRUE}, The function computes 13 Haralick texture features for
+each object based on a gray-level co-occurrence matrix (Haralick et al.
+1979). Haralick features depend on the configuration of the parameters
+\code{har_nbins} and \code{har_scales}. \code{har_nbins} controls the number of bins used
+to compute the Haralick matrix. A smaller \code{har_nbins} can give more accurate
+estimates of the correlation because the number of events per bin is higher.
+While a higher value will give more sensitivity. \code{har_scales} controls the
+number of scales used to compute the Haralick features. Since Haralick
+features compute the correlation of intensities of neighboring pixels it is
+possible to identify textures with different scales, e.g., a texture that is
+repeated every two pixels or 10 pixels. By default, the Haralick features
+are computed with the R band. To chance this default, use the argument
+\code{har_band}. For example, \code{har_band = 2} will compute the features with the
+green band.
+\item If \code{efourier = TRUE} is used, an Elliptical Fourier Analysis (Kuhl and
+Giardina, 1982) is computed for each object contour using \code{\link[=efourier]{efourier()}}.
+\item If \code{veins = TRUE} (experimental), vein features are computed. This will call
+\code{\link[=object_edge]{object_edge()}} and applies the Sobel-Feldman Operator to detect edges. The
+result is the proportion of edges in relation to the entire area of the
+object(s) in the image. Note that THIS WILL BE AN OPERATION ON AN IMAGE
+LEVEL, NOT an OBJECT LEVEL! So, If vein features need to be computed for
+leaves, it is strongly suggested to use one leaf per image.
+\item If \code{apex_base_angles = TRUE} the apex and base angles of each object are
+computed with \code{\link[=poly_apex_base_angle]{poly_apex_base_angle()}}. By default, the function computes
+the angle from the first pixel of the apex of the object to the two pixels
+that slice the object at the 25th percentile of the object height (apex
+angle). The base angle is computed in the same way but from the first base
+pixel.
+}
+}
 }
 \examples{
 \donttest{
@@ -519,24 +567,30 @@ img <- image_pliman("soybean_touch.jpg")
 obj <- analyze_objects(img)
 obj$statistics
 
+########################### Example 1 #########################
 # Enumerate the objects in the original image
 # Return the top-5 grains with the largest area
-
 top <-
  analyze_objects(img,
                  marker = "id",
                  topn_upper = 5)
 top$results
 
-# Correct the measures based on the area of the largest object
 
-img <- image_pliman("objects_300dpi.jpg") |> image_resize(20)
+#' ########################### Example 1 #########################
+# Correct the measures based on the area of the largest object
+# note that since the reference object
+
+img <- image_pliman("flax_grains.jpg")
 res <-
- analyze_objects(img,
-                 reference = TRUE,
-                 reference_area = 100,
-                 reference_larger = TRUE,
-                 marker = "area")
+  analyze_objects(img,
+                  index = "GRAY",
+                  marker = "point",
+                  show_contour = FALSE,
+                  reference = TRUE,
+                  reference_area = 6,
+                  reference_larger = TRUE,
+                  lower_noise = 0.3)
 }
 
 \donttest{

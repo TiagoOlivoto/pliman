@@ -2,6 +2,7 @@
 #' @description Sample images installed with the \pkg{pliman} package
 #' @format `*.jpg` format
 #' * `flax_leaves.jpg` Flax leaves in a white background
+#' * `flax_grains.jpg` Flax grains with background light.
 #' *  `la_back.jpg` A cyan palette representing the background of images
 #' la_pattern, la_leaves, and soybean_touch.
 #' * `la_leaf.jpg` A sample of the leaves in `la_leaves`

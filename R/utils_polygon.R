@@ -1,10 +1,10 @@
 #' Utilities for Polygons
 #'
 #' @description
-#' Several useful functions for analyzing polygons. All of them are based on a set
-#' of coordinate points that describe the edge of the object(s). If a list of
-#' polygons is provided, it loops through the list and computes what is needed
-#' for each element of the list.
+#' Several useful functions for analyzing polygons. All of them are based on a
+#' set of coordinate points that describe the edge of the object(s). If a list
+#' of polygons is provided, it loops through the list and computes what is
+#' needed for each element of the list.
 #'
 #'* Polygon measures
 #'
@@ -74,7 +74,7 @@
 #'    - `poly_eccentricity()` computes the eccentricity of a shape using the
 #' ratio of the eigenvalues (inertia axes of coordinates).
 #'
-#'    - `poly_elongation()` computes the elongation of a shape as 1 - width / length.
+#'    - `poly_elongation()` computes the elongation of a shape as `1 - width / length`.
 #'
 #'
 #' * Utilities for polygons
@@ -1218,20 +1218,22 @@ pixel_index <- function(bin,
 #' library(pliman)
 #' img <- image_pliman("sev_leaf.jpg")
 #' bin <- image_binary(img, "NB", plot = FALSE)[[1]]
-#' angls <- poly_base_apex_angle(bin)
+#' angls <- poly_apex_base_angle(bin)
 #' plot(img)
 #' points(angls$apex_coords, pch = 16, cex = 2, col = "red")
 #' points(angls$base_coords, pch = 16, cex = 2, col = "red")
 #' angls
-poly_base_apex_angle <- function(x, percentiles = c(0.25, 0.75)){
+poly_apex_base_angle <- function(x, percentiles = c(0.25, 0.75)){
   if(inherits(x, "list")){
-    res <- lapply(x, poly_base_apex_angle, percentiles)
+    res <- lapply(x, poly_apex_base_angle, percentiles)
     do.call(rbind, lapply(res, function(x){c(x$apex_angle, x$base_angle)}))
   } else{
     if(is.logical(x)){
       bin <- x
     } else{
       nrowpoly <- nrow(x)
+      # avoid high consuming computation time
+      # 300 pixels are enough to describe the object contour
       if(nrowpoly > 300){
         n <- 300
       } else{
