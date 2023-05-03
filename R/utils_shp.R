@@ -47,7 +47,7 @@ image_shp <- function(img,
   bbox <-
     data.frame(x = c(c1[1], c1[2], c1[2], c1[1], c1[1]),
                y = c(c1[3], c1[3], c1[4], c1[4], c1[3]))
-  shps <- help_shp(img[,,1], rows, cols, c1)
+  shps <- help_shp(rows, cols, c1)
   shps <- data.frame(plot = paste0(rep(1:(cols * rows), each = 5)), shps)
   colnames(shps) <- c("plot", "x", "y")
   coords <- split(shps, shps$plot)

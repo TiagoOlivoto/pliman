@@ -28,6 +28,8 @@ object_coord(
 
 object_contour(
   image,
+  pattern = NULL,
+  dir_original = NULL,
   center = FALSE,
   index = "NB",
   invert = FALSE,
@@ -40,7 +42,8 @@ object_contour(
   object_size = "medium",
   parallel = FALSE,
   workers = NULL,
-  plot = TRUE
+  plot = TRUE,
+  verbose = TRUE
 )
 
 object_isolate(image, id = NULL, parallel = FALSE, workers = NULL, ...)
@@ -97,7 +100,21 @@ number of parallel processes that can be active at the same time.}
 \item{plot}{Shows the image with bounding rectangles? Defaults to
 \code{TRUE}.}
 
+\item{pattern}{A pattern of file name used to identify images to be imported.
+For example, if \code{pattern = "im"} all images in the current working directory
+that the name matches the pattern (e.g., img1.-, image1.-, im2.-) will be
+imported as a list. Providing any number as pattern (e.g., \code{pattern = "1"})
+will select images that are named as 1.-, 2.-, and so on. An error will be
+returned if the pattern matches any file that is not supported (e.g.,
+img1.pdf).}
+
+\item{dir_original}{The directory containing the original images. Defaults
+to \code{NULL}, which means that the current working directory will be
+considered.}
+
 \item{center}{If \code{TRUE} returns the object contours centered on the origin.}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
 \item{...}{\itemize{
 \item For \code{object_isolate()}, further arguments passed on to \code{\link[=object_coord]{object_coord()}}.

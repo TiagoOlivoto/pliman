@@ -92,6 +92,9 @@ density (\code{type = "density"}) plot of the index values computed with
 \details{
 The following indexes are available in pliman.
 \itemize{
+\item RGB color space
+}
+\itemize{
 \item \code{R} red
 \item \code{G} green
 \item \code{B} blue
@@ -110,7 +113,7 @@ The following indexes are available in pliman.
 \item \code{NDGBI} Normalized green blue difference index \code{(G-B)/(G+B)}
 \item \code{NDRBI} Normalized red blue difference index \code{(R-B)/(R+B)}
 \item \code{I}     R+G+B
-\item \code{S}     ((R+G+B)-3*B)/(R+G+B)
+\item \code{S}     \code{((R+G+B)-3*B)/(R+G+B)}
 \item \code{L}     R+G+B/3
 \item \code{VARI} A Visible Atmospherically Resistant Index \code{(G-R)/(G+R-B)}
 \item \code{HUE} Overall Hue Index \code{atan(2*(B-G-R)/30.5*(G-R))}
@@ -123,7 +126,15 @@ The following indexes are available in pliman.
 \item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}
 \item \code{SHP} Shape Index \code{2*(R-G-B)/(G-B)}
 \item \code{RI} Redness Index \code{R**2/(B*G**3)}
-\item \code{DGCI} Dark Green Color Index, based on HSB color space \code{60*((G - B) / (max(R, G, B) - min(R, G, B)))}
+}
+\itemize{
+\item HSB color space
+\item \code{DGCI} Dark Green Color Index, based on HSB color space \verb{60\\*((G - B) / (max(R, G, B) - min(R, G, B)))}
+\item CIE-Lab color space
+}
+\itemize{
+\item \verb{L*}: relative luminance \code{(0.2126 * R + 0.7152 * G + 0.0722 * B)}
+\item \verb{a*}: \code{0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))}
 }
 }
 \examples{

@@ -49,6 +49,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rgb_to_srgb_help
+arma::mat rgb_to_srgb_help(const arma::mat& rgb);
+RcppExport SEXP _pliman_rgb_to_srgb_help(SEXP rgbSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type rgb(rgbSEXP);
+    rcpp_result_gen = Rcpp::wrap(rgb_to_srgb_help(rgb));
+    return rcpp_result_gen;
+END_RCPP
+}
 // help_edge_thinning
 NumericMatrix help_edge_thinning(NumericMatrix img);
 RcppExport SEXP _pliman_help_edge_thinning(SEXP imgSEXP) {
@@ -139,16 +150,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // help_shp
-NumericMatrix help_shp(NumericMatrix img, int rows, int cols, NumericVector dims);
-RcppExport SEXP _pliman_help_shp(SEXP imgSEXP, SEXP rowsSEXP, SEXP colsSEXP, SEXP dimsSEXP) {
+NumericMatrix help_shp(int rows, int cols, NumericVector dims);
+RcppExport SEXP _pliman_help_shp(SEXP rowsSEXP, SEXP colsSEXP, SEXP dimsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type img(imgSEXP);
     Rcpp::traits::input_parameter< int >::type rows(rowsSEXP);
     Rcpp::traits::input_parameter< int >::type cols(colsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dims(dimsSEXP);
-    rcpp_result_gen = Rcpp::wrap(help_shp(img, rows, cols, dims));
+    rcpp_result_gen = Rcpp::wrap(help_shp(rows, cols, dims));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -368,6 +378,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_threshold_adaptive", (DL_FUNC) &_pliman_threshold_adaptive, 4},
     {"_pliman_sobel_help", (DL_FUNC) &_pliman_sobel_help, 1},
     {"_pliman_rgb_to_hsb_help", (DL_FUNC) &_pliman_rgb_to_hsb_help, 3},
+    {"_pliman_rgb_to_srgb_help", (DL_FUNC) &_pliman_rgb_to_srgb_help, 1},
     {"_pliman_help_edge_thinning", (DL_FUNC) &_pliman_help_edge_thinning, 1},
     {"_pliman_help_dist_transform", (DL_FUNC) &_pliman_help_dist_transform, 1},
     {"_pliman_help_watershed", (DL_FUNC) &_pliman_help_watershed, 3},
@@ -375,7 +386,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_bounding_box", (DL_FUNC) &_pliman_bounding_box, 2},
     {"_pliman_isolate_objects5", (DL_FUNC) &_pliman_isolate_objects5, 2},
     {"_pliman_help_isolate_object", (DL_FUNC) &_pliman_help_isolate_object, 6},
-    {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 4},
+    {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 3},
     {"_pliman_help_area", (DL_FUNC) &_pliman_help_area, 1},
     {"_pliman_help_slide", (DL_FUNC) &_pliman_help_slide, 2},
     {"_pliman_help_distpts", (DL_FUNC) &_pliman_help_distpts, 1},

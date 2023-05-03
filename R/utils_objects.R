@@ -7,6 +7,8 @@
 #' of each object in the image.
 #' * `object_isolate()` isolates an object from an image.
 #' @name utils_objects
+#'
+#' @inheritParams analyze_objects
 #' @param image An image of class `Image` or a list of `Image` objects.
 #' @param center If `TRUE` returns the object contours centered on the origin.
 #' @param id
@@ -15,6 +17,10 @@
 #' "all"` to compute the coordinates for all objects in the image. If `id =
 #' NULL` (default) a bounding rectangle is drawn including all the objects.
 #' * For `object_isolate()`, a scalar that identifies the object to be extracted.
+#'
+#' @param dir_original The directory containing the original images. Defaults
+#'    to `NULL`, which means that the current working directory will be
+#'    considered.
 #' @param index The index to produce a binary image used to compute bounding
 #'   rectangle coordinates. See [image_binary()] for more details.
 #' @param invert Inverts the binary image, if desired. Defaults to `FALSE`.
@@ -165,9 +171,13 @@ object_coord <- function(image,
   }
 }
 #' @name utils_objects
+#' @inheritParams analyze_objects
 #' @export
 #'
+
 object_contour <- function(image,
+                           pattern = NULL,
+                           dir_original = NULL,
                            center =  FALSE,
                            index = "NB",
                            invert = FALSE,
@@ -180,8 +190,18 @@ object_contour <- function(image,
                            object_size = "medium",
                            parallel = FALSE,
                            workers = NULL,
-                           plot = TRUE){
-  if(inherits(image, "list")){
+                           plot = TRUE,
+                           verbose = TRUE){
+  if(is.null(dir_original)){
+    diretorio_original <- paste0("./")
+  } else{
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
+  }
+
+  if(missing(pattern) && inherits(image, "list")){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -191,58 +211,152 @@ object_contour <- function(image,
       clusterExport(clust, "image")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_contour, center, index, invert, filter, fill_hull, threshold,
+      parLapply(clust, image, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
                 watershed, extension, tolerance, object_size, plot = plot)
     } else{
-      lapply(image, object_contour, center, index, invert, filter, fill_hull, threshold,
+      lapply(image, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
              watershed, extension, tolerance, object_size, plot = plot)
     }
   } else{
-    img2 <- image_binary(image,
-                         index = index,
-                         invert = invert,
-                         filter = filter,
-                         fill_hull = fill_hull,
-                         threshold = threshold,
-                         plot = FALSE,
-                         resize = FALSE)[[1]]
-    if(isTRUE(watershed)){
-      res <- length(img2)
-      parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-      parms2 <- parms[parms$object_size == object_size,]
-      rowid <-
-        which(sapply(as.character(parms2$resolution), function(x) {
-          eval(parse(text=x))}))
-      ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-      tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-      nmask <- EBImage::watershed(EBImage::distmap(img2),
-                                  tolerance = tol,
-                                  ext = ext)
-    } else{
-      nmask <- EBImage::bwlabel(img2)
-    }
-    contour <- EBImage::ocontour(nmask)
-    if(isTRUE(center)){
-      contour <-
-        lapply(contour, function(x){
-          transform(x,
-                    X1 = X1 - mean(X1),
-                    X2 = X2 - mean(X2))
-        })
-    }
-    dims <- sapply(contour, function(x){dim(x)[1]})
-    contour <- contour[which(dims > mean(dims * 0.1))]
-    if(isTRUE(plot)){
-      if(isTRUE(center)){
-        plot_polygon(contour)
+    if(missing(pattern)){
+      img2 <- image_binary(image,
+                           index = index,
+                           invert = invert,
+                           filter = filter,
+                           fill_hull = fill_hull,
+                           threshold = threshold,
+                           plot = FALSE,
+                           resize = FALSE)[[1]]
+      if(isTRUE(watershed)){
+        res <- length(img2)
+        parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+        parms2 <- parms[parms$object_size == object_size,]
+        rowid <-
+          which(sapply(as.character(parms2$resolution), function(x) {
+            eval(parse(text=x))}))
+        ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+        tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+        nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                    tolerance = tol,
+                                    ext = ext)
       } else{
-        plot(image)
-        plot_contour(contour, col = "red")
+        nmask <- EBImage::bwlabel(img2)
       }
+      contour <- EBImage::ocontour(nmask)
+      if(isTRUE(center)){
+        contour <-
+          lapply(contour, function(x){
+            transform(x,
+                      X1 = X1 - mean(X1),
+                      X2 = X2 - mean(X2))
+          })
+      }
+      dims <- sapply(contour, function(x){dim(x)[1]})
+      contour <- contour[which(dims > mean(dims * 0.1))]
+      if(isTRUE(plot)){
+        if(isTRUE(center)){
+          plot_polygon(contour)
+        } else{
+          plot(image)
+          plot_contour(contour, col = "red")
+        }
+      }
+      return(contour)
+    } else{
+      if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+        pattern <- "^[0-9].*$"
+      }
+      plants <- list.files(pattern = pattern, diretorio_original)
+      extensions <- as.character(sapply(plants, file_extension))
+      names_plant <- as.character(sapply(plants, file_name))
+      if(length(grep(pattern, names_plant)) == 0){
+        stop(paste("Pattern '", pattern, "' not found in '",
+                   paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
+             call. = FALSE)
+      }
+      if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
+        stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+      }
+
+
+      help_contour <- function(img){
+        image <- image_import(img)
+        img2 <- image_binary(image,
+                             index = index,
+                             invert = invert,
+                             filter = filter,
+                             fill_hull = fill_hull,
+                             threshold = threshold,
+                             plot = FALSE,
+                             resize = FALSE)[[1]]
+        if(isTRUE(watershed)){
+          res <- length(img2)
+          parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+          parms2 <- parms[parms$object_size == object_size,]
+          rowid <-
+            which(sapply(as.character(parms2$resolution), function(x) {
+              eval(parse(text=x))}))
+          ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+          tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+          nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                      tolerance = tol,
+                                      ext = ext)
+        } else{
+          nmask <- EBImage::bwlabel(img2)
+        }
+        contour <- EBImage::ocontour(nmask)
+        if(isTRUE(center)){
+          contour <-
+            lapply(contour, function(x){
+              transform(x,
+                        X1 = X1 - mean(X1),
+                        X2 = X2 - mean(X2))
+            })
+        }
+        dims <- sapply(contour, function(x){dim(x)[1]})
+        contour[which(dims > mean(dims * 0.1))]
+      }
+
+
+      if(parallel == TRUE){
+        init_time <- Sys.time()
+        nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
+        cl <- parallel::makePSOCKcluster(nworkers)
+        doParallel::registerDoParallel(cl)
+        on.exit(parallel::stopCluster(cl))
+
+        if(verbose == TRUE){
+          message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
+        }
+        ## declare alias for dopar command
+        `%dopar%` <- foreach::`%dopar%`
+        results <-
+          foreach::foreach(i = seq_along(plants), .packages = c("pliman", "EBImage")) %dopar%{
+            help_contour(plants[[i]])
+          }
+
+      } else{
+
+        pb <- progress(max = length(plants), style = 4)
+        foo <- function(plants, ...){
+          run_progress(pb, ...)
+          help_contour(plants)
+        }
+        results <-
+          lapply(seq_along(plants), function(i){
+            foo(plants[i],
+                actual = i,
+                text = paste("Processing image", names_plant[i]))
+          })
+
+      }
+      names(results) <- plants
+      return(results)
     }
-    return(contour)
   }
 }
+
+
 
 #' @name utils_objects
 #' @export

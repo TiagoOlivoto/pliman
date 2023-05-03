@@ -5,7 +5,7 @@
 \alias{image_palette}
 \title{Create image palettes}
 \usage{
-image_palette(image, npal = 2, proportional = TRUE, plot = TRUE)
+image_palette(image, npal = 5, proportional = TRUE, plot = TRUE)
 }
 \arguments{
 \item{image}{An image object.}
@@ -22,6 +22,8 @@ the number of pixels in the image? Defaults to \code{TRUE}.}
 \itemize{
 \item \code{palette_list} A list with \code{npal} color palettes of class \code{Image}.
 \item \code{joint} An object of class \code{Image} with the color palettes
+\item \code{proportions} The proportion of the entire image corresponding to each color in the palette
+\item \code{rgbs} The average RGB value for each palette
 }
 }
 \description{

@@ -107,7 +107,7 @@
 #'  LEVEL, NOT an OBJECT LEVEL! So, If vein features need to be computed for
 #'  leaves, it is strongly suggested to use one leaf per image.
 #'
-#'     - If `apex_base_angles = TRUE` the apex and base angles of each object are
+#'     - If `ab_angles = TRUE` the apex and base angles of each object are
 #'  computed with [poly_apex_base_angle()]. By default, the function computes
 #'  the angle from the first pixel of the apex of the object to the two pixels
 #'  that slice the object at the 25th percentile of the object height (apex
@@ -177,6 +177,15 @@
 #'  OPERATION ON AN IMAGE LEVEL, NOT OBJECT!**.
 #'@param sigma_veins Gaussian kernel standard deviation used in the gaussian
 #'  blur in the edge detection algorithm
+#' @param ab_angles  Logical argument indicating whether apex and base angles
+#'   should be computed. Defaults to `FALSE`. If `TRUE`, `poly_apex_base_angle()`
+#'   are called and the base and apex angles are computed considering the 25th
+#'   and 75th percentiles of the object height. These percentiles can be changed
+#'   with the argument `ab_angles_percentiles`.
+#' @param ab_angles_percentiles The percentiles indicating the heights of the
+#'   object for which the angle should be computed (from the apex and the
+#'   bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
+#'   75th percentiles of the object height.
 #'@param haralick Logical value indicating whether Haralick features are
 #'  computed. Defaults to `FALSE`.
 #'@param har_nbins An integer indicating the number of bins using to compute the
@@ -221,6 +230,8 @@
 #'  operation involving them, e.g., `object_index = "R/B"`. In this case, it
 #'  will return for each object in the image, the average value of the R/B
 #'  ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
+#' @param pixel_level_index Return the indexes computed in `object_index` in the
+#'   pixel level? Defaults to `FALSE` to avoid returning large data.frames.
 #'@param efourier Logical argument indicating if Elliptical Fourier should be
 #'  computed for each object. This will call [efourier()] internally. It
 #'  `efourier = TRUE` is used, both standard and normalized Fourier coefficients
@@ -515,6 +526,8 @@ analyze_objects <- function(img,
                             watershed = TRUE,
                             veins = FALSE,
                             sigma_veins = 1,
+                            ab_angles = FALSE,
+                            ab_angles_percentiles = c(0.25, 0.75),
                             haralick = FALSE,
                             har_nbins = 32,
                             har_scales = 1,
@@ -527,6 +540,7 @@ analyze_objects <- function(img,
                             object_size = "medium",
                             index = "NB",
                             object_index = NULL,
+                            pixel_level_index = FALSE,
                             efourier = FALSE,
                             nharm = 10,
                             threshold = "Otsu",
@@ -591,7 +605,7 @@ analyze_objects <- function(img,
              tolerance, extension, randomize, nrows, plot, show_original,
              show_background, marker, marker_col, marker_size, save_image,
              prefix, dir_original, dir_processed, verbose, col_background,
-             col_foreground, lower_noise){
+             col_foreground, lower_noise, ab_angles, ab_angles_percentiles){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -1039,6 +1053,13 @@ analyze_objects <- function(img,
         min_harm <- NULL
       }
 
+      # check if angles should be computed
+      if(isTRUE(ab_angles)){
+        angles <- poly_apex_base_angle(object_contour, ab_angles_percentiles)
+      } else{
+        angles <- NULL
+      }
+
       # check if veins is computed
       if(isTRUE(veins)){
         vein <- object_edge(img, sigma = sigma_veins, plot = FALSE)
@@ -1085,6 +1106,9 @@ analyze_objects <- function(img,
         indexes <- data.frame(cbind(id = obj_rgb$id, tmp))
         colnames(indexes) <- c("id", ind_name)
         indexes <- aggregate(. ~ id, indexes, mean, na.rm = TRUE)
+        if(isFALSE(pixel_level_index)){
+          obj_rgb <- NULL
+        }
       } else{
         obj_rgb <- NULL
         indexes <- NULL
@@ -1106,7 +1130,8 @@ analyze_objects <- function(img,
                       efourier_error = efer,
                       efourier_power = efpow,
                       efourier_minharm = min_harm,
-                      veins = prop_veins)
+                      veins = prop_veins,
+                      angles = angles)
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){
         if(!interactive()){
@@ -1269,7 +1294,7 @@ analyze_objects <- function(img,
                tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose, col_background,
-               col_foreground, lower_noise)
+               col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -1306,7 +1331,7 @@ analyze_objects <- function(img,
                      nrows, plot, show_original, show_background,
                      marker, marker_col, marker_size, save_image, prefix,
                      dir_original, dir_processed, verbose =  FALSE, col_background,
-                     col_foreground, lower_noise)
+                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
         }
 
     } else{
@@ -1319,7 +1344,7 @@ analyze_objects <- function(img,
                    tolerance, extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image,
                    prefix, dir_original, dir_processed, verbose, col_background,
-                   col_foreground, lower_noise)
+                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
       }
       results <-
         lapply(seq_along(names_plant), function(i){
@@ -1331,6 +1356,7 @@ analyze_objects <- function(img,
 
     ## bind the results
     names(results) <- names_plant
+
     stats <-
       do.call(rbind,
               lapply(seq_along(results), function(i){
@@ -1340,14 +1366,18 @@ analyze_objects <- function(img,
       )
 
     if(!is.null(object_index)){
-      obj_rgb <-
-        do.call(rbind,
-                lapply(seq_along(results), function(i){
-                  transform(results[[i]][["object_rgb"]],
-                            img =  names(results[i]))
-                })
-        )
-      obj_rgb <- obj_rgb[, c(ncol(obj_rgb), 1:ncol(obj_rgb) - 1)]
+      if(!is.null(results[[1]][["object_rgb"]])){
+        obj_rgb <-
+          do.call(rbind,
+                  lapply(seq_along(results), function(i){
+                    transform(results[[i]][["object_rgb"]],
+                              img =  names(results[i]))
+                  })
+          )
+        obj_rgb <- obj_rgb[, c(ncol(obj_rgb), 1:ncol(obj_rgb) - 1)]
+      } else{
+        obj_rgb <- NULL
+      }
       object_index <-
         do.call(rbind,
                 lapply(seq_along(results), function(i){
@@ -1360,6 +1390,9 @@ analyze_objects <- function(img,
       obj_rgb <- NULL
       object_index <- NULL
     }
+
+
+
     if(!isFALSE(efourier)){
       efourier <-
         do.call(rbind,
@@ -1420,6 +1453,8 @@ analyze_objects <- function(img,
       efourier_minharm <- NULL
     }
 
+
+
     if(isTRUE(veins)){
       veins <-
         do.call(rbind,
@@ -1433,6 +1468,23 @@ analyze_objects <- function(img,
     } else{
       veins <- NULL
     }
+
+
+
+    if(isTRUE(ab_angles)){
+      angles <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["angles"]],
+                            img =  names(results[i]))
+                })
+        )
+
+      angles <- angles[, c(ncol(angles), 1:ncol(angles)-1)]
+    } else{
+      angles <- NULL
+    }
+
 
     results <-
       do.call(rbind,
@@ -1467,7 +1519,8 @@ analyze_objects <- function(img,
              efourier_norm = efourier_norm,
              efourier_error = efourier_error,
              efourier_minharm = efourier_minharm,
-             veins = veins),
+             veins = veins,
+             angles = angles),
         class = "anal_obj_ls"
       )
     )
@@ -1500,7 +1553,8 @@ analyze_objects <- function(img,
 #' rgb <-
 #'    analyze_objects(img,
 #'                    marker = "id",
-#'                    object_index = "B")
+#'                    object_index = "B",
+#'                    pixel_level_index = TRUE)
 #' # density of area
 #' plot(rgb)
 #'
@@ -1543,7 +1597,7 @@ plot.anal_obj <- function(x,
   } else{
     rgb <- x$object_rgb
     if(is.null(rgb)){
-      stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.", call. = FALSE)
+      stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.\nHave you accidentally missed the argument `pixel_level_index = TRUE`?", call. = FALSE)
     }
     rgb$id <- rownames(rgb)
     rgb <-

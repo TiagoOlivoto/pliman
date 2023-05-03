@@ -3,10 +3,13 @@
 \name{utils_colorspace}
 \alias{utils_colorspace}
 \alias{rgb_to_hsb}
+\alias{rgb_to_srgb}
 \alias{rgb_to_lab}
 \title{Convert between colour spaces}
 \usage{
 rgb_to_hsb(object)
+
+rgb_to_srgb(object)
 
 rgb_to_lab(object)
 }
@@ -20,10 +23,12 @@ is required.}
 A data frame with the columns of the converted color space
 }
 \description{
+\code{rgb_to_srgb()} Transforms colors from RGB space (red/green/blue) to
+Standard Red Green Blue (sRGB), using a gamma correction of 2.2.
 \itemize{
-\item \code{rgb_to_hsb()} Transforms colors from RGB space (red/green/blue) into HSB
+\item \code{rgb_to_hsb()} Transforms colors from RGB space (red/green/blue) to HSB
 space (hue/saturation/brightness).
-\item \code{rgb_to_lab()} Transforms colors from RGB space (red/green/blue) into
+\item \code{rgb_to_lab()} Transforms colors from RGB space (red/green/blue) to
 CIE-LAB space
 }
 
@@ -35,7 +40,7 @@ img <- image_pliman("sev_leaf.jpg")
 rgb_to_lab(img)
 
 # analyze the object and convert the pixels
-anal <- analyze_objects(img, object_index = "B")
+anal <- analyze_objects(img, object_index = "B", pixel_level_index = TRUE)
 rgb_to_lab(anal)
 }
 \author{

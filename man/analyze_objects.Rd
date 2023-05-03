@@ -23,6 +23,8 @@ analyze_objects(
   watershed = TRUE,
   veins = FALSE,
   sigma_veins = 1,
+  ab_angles = FALSE,
+  ab_angles_percentiles = c(0.25, 0.75),
   haralick = FALSE,
   har_nbins = 32,
   har_scales = 1,
@@ -35,6 +37,7 @@ analyze_objects(
   object_size = "medium",
   index = "NB",
   object_index = NULL,
+  pixel_level_index = FALSE,
   efourier = FALSE,
   nharm = 10,
   threshold = "Otsu",
@@ -160,6 +163,17 @@ OPERATION ON AN IMAGE LEVEL, NOT OBJECT!}.}
 \item{sigma_veins}{Gaussian kernel standard deviation used in the gaussian
 blur in the edge detection algorithm}
 
+\item{ab_angles}{Logical argument indicating whether apex and base angles
+should be computed. Defaults to \code{FALSE}. If \code{TRUE}, \code{poly_apex_base_angle()}
+are called and the base and apex angles are computed considering the 25th
+and 75th percentiles of the object height. These percentiles can be changed
+with the argument \code{ab_angles_percentiles}.}
+
+\item{ab_angles_percentiles}{The percentiles indicating the heights of the
+object for which the angle should be computed (from the apex and the
+bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
+75th percentiles of the object height.}
+
 \item{haralick}{Logical value indicating whether Haralick features are
 computed. Defaults to \code{FALSE}.}
 
@@ -215,6 +229,9 @@ value for each object is returned. It can be the R, G, and B values or any
 operation involving them, e.g., \code{object_index = "R/B"}. In this case, it
 will return for each object in the image, the average value of the R/B
 ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equations of available indexes.}
+
+\item{pixel_level_index}{Return the indexes computed in \code{object_index} in the
+pixel level? Defaults to \code{FALSE} to avoid returning large data.frames.}
 
 \item{efourier}{Logical argument indicating if Elliptical Fourier should be
 computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
@@ -551,7 +568,7 @@ result is the proportion of edges in relation to the entire area of the
 object(s) in the image. Note that THIS WILL BE AN OPERATION ON AN IMAGE
 LEVEL, NOT an OBJECT LEVEL! So, If vein features need to be computed for
 leaves, it is strongly suggested to use one leaf per image.
-\item If \code{apex_base_angles = TRUE} the apex and base angles of each object are
+\item If \code{ab_angles = TRUE} the apex and base angles of each object are
 computed with \code{\link[=poly_apex_base_angle]{poly_apex_base_angle()}}. By default, the function computes
 the angle from the first pixel of the apex of the object to the two pixels
 that slice the object at the 25th percentile of the object height (apex
@@ -603,7 +620,8 @@ img <- image_pliman("soy_green.jpg")
 rgb <-
    analyze_objects(img,
                    marker = "id",
-                   object_index = "B")
+                   object_index = "B",
+                   pixel_level_index = TRUE)
 # density of area
 plot(rgb)
 

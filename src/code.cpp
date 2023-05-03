@@ -1,6 +1,9 @@
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 #include <queue>
 using namespace Rcpp;
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
 
 // adapted from imagerExtra  https://bit.ly/3HtxumB
 Rcpp::NumericMatrix int_sum(Rcpp::NumericMatrix mat) {
@@ -247,6 +250,24 @@ NumericMatrix rgb_to_hsb_help(NumericVector r, NumericVector g, NumericVector b)
 }
 
 
+// [[Rcpp::export]]
+arma::mat rgb_to_srgb_help(const arma::mat& rgb) {
+  double gamma = 2.2;
+  arma::mat rgb_gamma = pow(rgb, gamma);
+
+  arma::mat matrix = {
+    { 3.2406, -1.5372, -0.4986 },
+    { -0.9689, 1.8758, 0.0415 },
+    { 0.0557, -0.2040, 1.0570 }
+  };
+  arma::mat rgb_srgb = rgb_gamma * matrix;
+
+  rgb_srgb.elem(find(rgb_srgb < 0)).zeros();
+  rgb_srgb.elem(find(rgb_srgb > 1)).ones();
+  return rgb_srgb;
+}
+
+
 
 // [[Rcpp::export]]
 NumericMatrix help_edge_thinning(NumericMatrix img) {
@@ -283,6 +304,7 @@ NumericMatrix help_edge_thinning(NumericMatrix img) {
   }
   return thinned;
 }
+
 
 // DISTANCE TRANSFORM
 // [[Rcpp::export]]
@@ -577,10 +599,10 @@ List help_isolate_object(NumericMatrix R, NumericMatrix G, NumericMatrix B, Inte
 
 // COORDINATES OF A SHAPEFILE
 // [[Rcpp::export]]
-NumericMatrix help_shp(NumericMatrix img, int rows, int cols, NumericVector dims) {
-  double xmin = dims[2];
+NumericMatrix help_shp(int rows, int cols, NumericVector dims) {
+  double xmin = dims[0];
   double xmax = dims[1];
-  double ymin = dims[4];
+  double ymin = dims[2];
   double ymax = dims[3];
   double xr = xmax - xmin;
   double yr = ymax - ymin;

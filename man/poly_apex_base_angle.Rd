@@ -4,15 +4,25 @@
 \alias{poly_apex_base_angle}
 \title{Calculate the apex and base angles of an object}
 \usage{
-poly_apex_base_angle(x, percentiles = c(0.25, 0.75))
+poly_apex_base_angle(
+  x,
+  percentiles = c(0.25, 0.75),
+  invert = FALSE,
+  plot = TRUE
+)
 }
 \arguments{
-\item{x}{A logical matrix or matrix of coordinates representing the object}
+\item{x}{A matrix of coordinates representing the contour of the object,
+often obtained with \code{\link[=object_contour]{object_contour()}}.}
 
 \item{percentiles}{A numeric vector of two percentiles between 0 and 1
 indicating the height of the points from the top to the bottom. The function
 calculates the apex angle between the two percentiles and the base angle
 between the lowest point and the highest point.}
+
+\item{invert}{If \code{TRUE}, aligns the object along the horizontal axis.}
+
+\item{plot}{Plots the polygon with the points? Defaults to \code{TRUE}.}
 }
 \value{
 A list containing the apex angle, base angle, apex coordinates, and
@@ -20,17 +30,16 @@ base coordinates.
 }
 \description{
 This function calculates the apex and base angles of an object. It takes as
-input either a logical matrix (binarized image) or a matrix of coordinates.
-The function returns the apex angle, base angle, and the coordinates of the
-apex and base as a list.
+input a matrix of coordinates and returns the apex angle, base angle, and the
+coordinates of the apex and base as a list. The angles are computed after the
+object is aligned in the vertical axis with \code{poly_align()}.
 }
 \examples{
 library(pliman)
-img <- image_pliman("sev_leaf.jpg")
-bin <- image_binary(img, "NB", plot = FALSE)[[1]]
-angls <- poly_apex_base_angle(bin)
-plot(img)
-points(angls$apex_coords, pch = 16, cex = 2, col = "red")
-points(angls$base_coords, pch = 16, cex = 2, col = "red")
+# a matrix of coordinates
+angls <- poly_apex_base_angle(contours[[2]])
 angls
+
+# or a list of coordinates
+poly_apex_base_angle(contours)
 }

@@ -1628,40 +1628,45 @@ image_binary <- function(image,
 #'
 #' @details
 #' The following indexes are available in pliman.
+#' * RGB color space
+#' - `R` red
+#' - `G` green
+#' - `B` blue
+#' - `NR` normalized red `R/(R+G+B)`.
+#' - `NG` normalized green `G/(R+G+B)`
+#' - `NB` normalized blue `B/(R+G+B)`
+#' - `GB` green blue ratio `G/B`
+#' - `RB` red blue ratio `R/B`
+#' - `GR` green red ratio `G/R`
+#' - `BI` brightness Index `sqrt((R^2+G^2+B^2)/3)`
+#' - `BIM` brightness Index 2 `sqrt((R*2+G*2+B*2)/3)`
+#' - `SCI` Soil Colour Index `(R-G)/(R+G)`
+#' - `GLI` Green leaf index Vis Louhaichi et al. (2001) `(2*G-R-B)/(2*G+R+B)`
+#' - `HI` Primary colours Hue Index    (2*R-G-B)/(G-B)
+#' - `NDGRI` Normalized green red difference index (Tucker, 1979) `(G-R)/(G+R)`
+#' - `NDGBI` Normalized green blue difference index `(G-B)/(G+B)`
+#' - `NDRBI` Normalized red blue difference index `(R-B)/(R+B)`
+#' - `I`     R+G+B
+#' - `S`     `((R+G+B)-3*B)/(R+G+B)`
+#' - `L`     R+G+B/3
+#' - `VARI` A Visible Atmospherically Resistant Index `(G-R)/(G+R-B)`
+#' - `HUE` Overall Hue Index `atan(2*(B-G-R)/30.5*(G-R))`
+#' - `HUE2`  atan(2*(R-G-R)/30.5*(G-B))
+#' - `BGI`   B/G
+#' - `GRAY`	`0.299*R + 0.587*G + 0.114*B`
+#' - `GRAY2` `((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2`
+#' - `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
+#' - `CI` Coloration Index `(R-B)/R`
+#' - `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
+#' - `SHP` Shape Index `2*(R-G-B)/(G-B)`
+#' - `RI` Redness Index `R**2/(B*G**3)`
 #'
-#' * `R` red
-#' * `G` green
-#' * `B` blue
-#' * `NR` normalized red `R/(R+G+B)`.
-#' * `NG` normalized green `G/(R+G+B)`
-#' * `NB` normalized blue `B/(R+G+B)`
-#' * `GB` green blue ratio `G/B`
-#' * `RB` red blue ratio `R/B`
-#' * `GR` green red ratio `G/R`
-#' * `BI` brightness Index `sqrt((R^2+G^2+B^2)/3)`
-#' * `BIM` brightness Index 2 `sqrt((R*2+G*2+B*2)/3)`
-#' * `SCI` Soil Colour Index `(R-G)/(R+G)`
-#' * `GLI` Green leaf index Vis Louhaichi et al. (2001) `(2*G-R-B)/(2*G+R+B)`
-#' * `HI` Primary colours Hue Index    (2*R-G-B)/(G-B)
-#' * `NDGRI` Normalized green red difference index (Tucker, 1979) `(G-R)/(G+R)`
-#' * `NDGBI` Normalized green blue difference index `(G-B)/(G+B)`
-#' * `NDRBI` Normalized red blue difference index `(R-B)/(R+B)`
-#' * `I`     R+G+B
-#' * `S`     ((R+G+B)-3*B)/(R+G+B)
-#' * `L`     R+G+B/3
-#' * `VARI` A Visible Atmospherically Resistant Index `(G-R)/(G+R-B)`
-#' * `HUE` Overall Hue Index `atan(2*(B-G-R)/30.5*(G-R))`
-#' * `HUE2`  atan(2*(R-G-R)/30.5*(G-B))
-#' * `BGI`   B/G
-#' * `GRAY`	`0.299*R + 0.587*G + 0.114*B`
-#' * `GRAY2` `((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2`
-#' * `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
-#' * `CI` Coloration Index `(R-B)/R`
-#' * `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
-#' * `SHP` Shape Index `2*(R-G-B)/(G-B)`
-#' * `RI` Redness Index `R**2/(B*G**3)`
-#' * `DGCI` Dark Green Color Index, based on HSB color space `60*((G - B) /
-#' (max(R, G, B) - min(R, G, B)))`
+#' * HSB color space
+#' * `DGCI` Dark Green Color Index, based on HSB color space `60\*((G - B) / (max(R, G, B) - min(R, G, B)))`
+#'
+#' * CIE-Lab color space
+#' - `L*`: relative luminance `(0.2126 * R + 0.7152 * G + 0.0722 * B)`
+#' - `a*`: `0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))`
 #'
 #' @name image_index
 #' @param image An image object.
@@ -2697,6 +2702,8 @@ image_to_mat <- function(image,
 #' @return `image_palette()` returns a list with two elements:
 #' * `palette_list` A list with `npal` color palettes of class `Image`.
 #' * `joint` An object of class `Image` with the color palettes
+#' * `proportions` The proportion of the entire image corresponding to each color in the palette
+#' * `rgbs` The average RGB value for each palette
 #' @name palettes
 #' @export
 #' @importFrom stats na.omit
@@ -2710,7 +2717,7 @@ image_to_mat <- function(image,
 #'
 #'}
 image_palette <- function (image,
-                           npal = 2,
+                           npal = 5,
                            proportional = TRUE,
                            plot = TRUE) {
   id <- matrix(TRUE,
@@ -2731,17 +2738,23 @@ image_palette <- function (image,
     MAT = cbind(MAT, c(r = r, g = g, b = b))
   }
   pal_list <- list()
+  pal_rgb <- list()
   for(i in 1:ncol(MAT)){
     R <- matrix(rep(MAT[[1, i]], 10000), 100, 100)
     G <- matrix(rep(MAT[[2, i]], 10000), 100, 100)
     B <- matrix(rep(MAT[[3, i]], 10000), 100, 100)
     pal_list[[paste0("pal_", i)]] <- EBImage::rgbImage(R, G, B)
+    pal_rgb[[paste0("pal_", i)]] <- c(R = R[1], G = G[1], B = B[1])
   }
   MATn <- NULL
   for (i in unique(na.omit(c(ck)))) {
     r <- length(na.omit(image@.Data[, , 1][ck == i]))
     MATn <- cbind(MATn, r = r)
   }
+  props <- data.frame(class = paste0("c", 1:length(MATn)),
+                      pixels = t(MATn),
+                      prop = t(MATn/sum(MATn)))
+  rownames(props) <- NULL
   if (proportional == FALSE) {
     n <- ncol(MAT)
     ARR <- array(NA, dim = c(150, 66 * n, 3))
@@ -2779,7 +2792,9 @@ image_palette <- function (image,
     plot(im2)
   }
   return(list(palette_list = pal_list,
-              joint = im2))
+              joint = im2,
+              proportions = props,
+              rgbs = pal_rgb))
 }
 
 
@@ -3087,9 +3102,11 @@ distance <- function(image, plot = TRUE){
 
 #' Convert between colour spaces
 #' @description
-#' * `rgb_to_hsb()` Transforms colors from RGB space (red/green/blue) into HSB
+#'  `rgb_to_srgb()` Transforms colors from RGB space (red/green/blue) to
+#'  Standard Red Green Blue (sRGB), using a gamma correction of 2.2.
+#' * `rgb_to_hsb()` Transforms colors from RGB space (red/green/blue) to HSB
 #' space (hue/saturation/brightness).
-#' * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) into
+#' * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) to
 #' CIE-LAB space
 #'
 #' It is assumed that
@@ -3107,7 +3124,7 @@ distance <- function(image, plot = TRUE){
 #' rgb_to_lab(img)
 #'
 #' # analyze the object and convert the pixels
-#' anal <- analyze_objects(img, object_index = "B")
+#' anal <- analyze_objects(img, object_index = "B", pixel_level_index = TRUE)
 #' rgb_to_lab(anal)
 rgb_to_hsb <- function(object){
   if (any(class(object) %in%  c("data.frame", "matrix"))){
@@ -3137,7 +3154,7 @@ rgb_to_hsb <- function(object){
       colnames(hsb)[1] <- "id"
       colnames(hsb)[2:4] <- c("h", "s", "b")
     } else{
-      stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
+      stop("Cannot obtain the RGB for each object since `object_index` argument was not used. \nHave you accidentally missed the argument `pixel_level_index = TRUE`?")
     }
   }
   if (any(class(object) == "Image")){
@@ -3150,43 +3167,46 @@ rgb_to_hsb <- function(object){
   return(data.frame(hsb))
 }
 
-
 #' @export
 #' @name utils_colorspace
-rgb_to_lab <- function(object){
+rgb_to_srgb <- function(object){
   if (any(class(object) %in%  c("data.frame", "matrix"))){
-    rgb <- data.frame(r = object[, 1],
-                      g = object[, 2],
-                      b = object[, 3])
-    lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+    srgb <- rgb_to_srgb_help(object[, 1:3])
+    colnames(srgb) <- c("sR", "sG", "sB")
   }
   if (any(class(object)  %in% c("anal_obj", "anal_obj_ls"))){
     if(!is.null(object$object_rgb)){
       tmp <- object$object_rgb
       if ("img" %in% colnames(tmp)){
-        rgb <- data.frame(r = tmp[, 3],
-                          g = tmp[, 4],
-                          b = tmp[, 5])
-        lab <- convertColor(rgb, from = "sRGB", to = "Lab")
-        lab <- data.frame(cbind(tmp[,1:2], lab))
-        colnames(lab)[1:2] <- c("img", "id")
+        srgb <- rgb_to_srgb_help(as.matrix(tmp[, 3:5]))
+        srgb <- data.frame(cbind(tmp[,1:2], srgb))
+        colnames(srgb)[1:2] <- c("img", "id")
+        colnames(srgb)[3:5] <- c("sR", "sG", "sB")
       } else{
-        rgb <- data.frame(r = tmp[, 2],
-                          g = tmp[, 3],
-                          b = tmp[, 4])
-        lab <- convertColor(rgb, from = "sRGB", to = "Lab")
-        lab <- data.frame(cbind(tmp[,1], lab))
-        colnames(lab)[1] <- "id"
+        srgb <- rgb_to_srgb_help(as.matrix(tmp[,2:4]))
+        srgb <- data.frame(cbind(tmp[,1], srgb))
+        colnames(srgb)[1] <- "id"
+        colnames(srgb)[2:4] <- c("sR", "sG", "sB")
       }
     } else{
-      stop("Cannot obtain the RGB for each object since `object_index` argument was not used.")
+      stop("Cannot obtain the RGB for each object since `object_index` argument was not used. \nHave you accidentally missed the argument `pixel_level_index = TRUE`?")
     }
   }
   if (any(class(object) == "Image")){
-    rgb <- data.frame(r = c(object[,,1]),
-                      g = c(object[,,2]),
-                      b = c(object[,,3]))
-    lab <- convertColor(rgb, from = "sRGB", to = "Lab")
+    srgb <- rgb_to_srgb_help(cbind(c(object[,,1]), c(object[,,2]), c(object[,,3])))
+    colnames(srgb) <- c("sR", "sG", "sB")
   }
+  return(data.frame(srgb))
+}
+
+
+#' @export
+#' @name utils_colorspace
+rgb_to_lab <- function(object){
+  object <- rgb_to_srgb(object)
+  srgb <- data.frame(r = object[, 1],
+                     g = object[, 2],
+                     b = object[, 3])
+  lab <- convertColor(srgb, from = "sRGB", to = "Lab")
   return(lab)
 }

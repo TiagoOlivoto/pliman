@@ -7,8 +7,6 @@
 #'
 #' @name utils_measures
 #' @param object An object computed with [analyze_objects()].
-#' @param dpi A known resolution of the image in DPI (dots per inch).
-#' @param id An object in the image to indicate a known value.
 #' @param measure For `plot_measures()`, a character string; for
 #'   `get_measures()`, a two-sided formula, e.g., `measure = area ~ 100`
 #'   indicating the known value of object `id`. The right-hand side is the known
@@ -22,6 +20,8 @@
 #' * `radius_max` The known maximum radius of the object. If the object is a
 #' square, then the `radius_max` of such object according to the Pythagorean
 #' theorem will be `L x sqrt(2) / 2` where `L` is the length of the square side.
+#' @param id An object in the image to indicate a known value.
+#' @param dpi A known resolution of the image in DPI (dots per inch).
 #' @param sep Regular expression to manage file names. The function combines in
 #'   the `merge` object the object measures (sum of area and mean of all the
 #'   other measures) of all images that share the same filename prefix, defined
@@ -94,8 +94,8 @@
 #'              area ~ 100)
 #'}
 get_measures <- function(object,
-                         id = NULL,
                          measure = NULL,
+                         id = NULL,
                          dpi = NULL,
                          sep = "\\_|-",
                          verbose = TRUE,
@@ -207,6 +207,29 @@ get_measures <- function(object,
 
   if("img" %in% names(res)){
     if(!inherits(object, "plm_disease_byl") & !inherits(object, "anal_obj")){
+
+      # bind object_index, if it exists
+      if(!is.null(object$object_index)){
+        if(ncol(object$object_index) < 4){
+          nam_res <- colnames(res)
+          nam_ind <- colnames(object$object_index)[3]
+          res <- cbind(res, object$object_index[, 3])
+          colnames(res) <- c(nam_res, nam_ind)
+        } else{
+          res <- cbind(res, object$object_index[, -c(1:2)])
+        }
+      }
+
+      # bind efourier coefficients, if it exists
+      if(!is.null(object$efourier)){
+        res <- cbind(res, object$efourier_norm[, -c(1:2)])
+      }
+
+      # bind apex and base angles if it exists
+      if(!is.null(object$angles)){
+        res <- cbind(res, object$angles[, -c(1:2)])
+      }
+
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -240,9 +263,9 @@ get_measures <- function(object,
       mergt$img <- unique(merg$img)
       mergt <- mergt[,c(ncol(mergt), 1:ncol(mergt)-1)]
       names(mergt) <- names(smr)
-      if(!is.null(object$efourier)){
-        res <- cbind(res, object$efourier_norm[, -c(1:2)])
-      }
+
+
+
       smr[,3:ncol(smr)] <- apply(smr[,3:ncol(smr)], 2, round, digits)
       res[,3:ncol(res)] <- apply(res[,3:ncol(res)], 2, round, digits)
       rownames(res) <- NULL
@@ -326,6 +349,30 @@ get_measures <- function(object,
       }
       res_img <- res$img
       res$img <- as.numeric(gsub(pattern = "shp", x = res$img, replacement = ""))
+
+      # bind object_index, if it exists
+      if(!is.null(object$object_index)){
+        if(ncol(object$object_index) < 4){
+          nam_res <- colnames(res)
+          nam_ind <- colnames(object$object_index)[3]
+          res <- cbind(res, object$object_index[, 3])
+          colnames(res) <- c(nam_res, nam_ind)
+        } else{
+          res <- cbind(res, object$object_index[, -c(1:2)])
+        }
+      }
+
+      # bind efourier coefficients, if it exists
+      if(!is.null(object$efourier)){
+        res <- cbind(res, object$efourier_norm[, -c(1:2)])
+      }
+
+      # bind apex and base angles if it exists
+      if(!is.null(object$angles)){
+        res <- cbind(res, object$angles[, -c(1:2)])
+      }
+
+
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -352,9 +399,7 @@ get_measures <- function(object,
       smr$y <- coords$y
       smr <- smr[, c(c("img", "x", "y", "n"), setdiff(colnames(smr), c("img", "x", "y", "n")))]
       rownames(res) <- NULL
-      if(!is.null(object$efourier)){
-        res <- cbind(res, object$efourier_norm[, -c(1:2)])
-      }
+
       class(res) <- c("data.frame", "measures")
       class(smr) <- c("data.frame", "measures")
       out <-
@@ -365,9 +410,31 @@ get_measures <- function(object,
     class(out) <- c("measures_ls")
     return(out)
   } else{
+
+
+
+    # bind object_index, if it exists
+    if(!is.null(object$object_index)){
+      if(ncol(object$object_index) < 3){
+        nam_res <- colnames(res)
+        nam_ind <- colnames(object$object_index)[2]
+        res <- cbind(res, object$object_index[, 2])
+        colnames(res) <- c(nam_res, nam_ind)
+      } else{
+        res <- cbind(res, object$object_index[, -1])
+      }
+    }
+
+
+    # bind efourier coefficients, if it exists
     if(!is.null(object$efourier)){
       res <- cbind(res, object$efourier_norm[, -1])
     }
+    # bind apex and base angles if it exists
+    if(!is.null(object$angles)){
+      res <- cbind(res, object$angles[, -1])
+    }
+
     res <- round_cols(res, digits = digits)
     class(res) <- c("data.frame", "measures")
     return(res)
@@ -607,7 +674,7 @@ plot_lw <- function(object,
 #' @examples
 #' library(pliman)
 #' soy <- image_pliman("soy_green.jpg")
-#' anal <- analyze_objects(soy, object_index = "G")
+#' anal <- analyze_objects(soy, object_index = "G", pixel_level_index = TRUE)
 #' plot_measures(anal, measure = "G")
 #'
 #' summary_index(anal, index = "G", cut_point = 0.5)

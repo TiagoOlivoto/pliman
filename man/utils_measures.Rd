@@ -8,8 +8,8 @@
 \usage{
 get_measures(
   object,
-  id = NULL,
   measure = NULL,
+  id = NULL,
   dpi = NULL,
   sep = "\\\\_|-",
   verbose = TRUE,
@@ -31,8 +31,6 @@ plot_measures(
 \arguments{
 \item{object}{An object computed with \code{\link[=analyze_objects]{analyze_objects()}}.}
 
-\item{id}{An object in the image to indicate a known value.}
-
 \item{measure}{For \code{plot_measures()}, a character string; for
 \code{get_measures()}, a two-sided formula, e.g., \code{measure = area ~ 100}
 indicating the known value of object \code{id}. The right-hand side is the known
@@ -48,6 +46,8 @@ length of the square side.
 square, then the \code{radius_max} of such object according to the Pythagorean
 theorem will be \verb{L x sqrt(2) / 2} where \code{L} is the length of the square side.
 }}
+
+\item{id}{An object in the image to indicate a known value.}
 
 \item{dpi}{A known resolution of the image in DPI (dots per inch).}
 

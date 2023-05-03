@@ -559,7 +559,7 @@ poly_sample <- function(x, n = 50) {
   } else{
     coord <- poly_check(x)
     if (nrow(coord) < n){
-      stop("Less coordinates than n, try coo_interpolate", call. = FALSE)
+      stop("Less coordinates than n", call. = FALSE)
     }
     sampled <- round(seq(1, nrow(coord), len = n + 1)[-(n + 1)])
     return(coord[sampled, ])
@@ -1197,74 +1197,72 @@ pixel_index <- function(bin,
 }
 
 
-
 #' Calculate the apex and base angles of an object
 #'
 #' This function calculates the apex and base angles of an object. It takes as
-#' input either a logical matrix (binarized image) or a matrix of coordinates.
-#' The function returns the apex angle, base angle, and the coordinates of the
-#' apex and base as a list.
+#' input a matrix of coordinates and returns the apex angle, base angle, and the
+#' coordinates of the apex and base as a list. The angles are computed after the
+#' object is aligned in the vertical axis with `poly_align()`.
 #'
-#' @param x A logical matrix or matrix of coordinates representing the object
+#' @param x A matrix of coordinates representing the contour of the object,
+#'   often obtained with [object_contour()].
 #' @param percentiles A numeric vector of two percentiles between 0 and 1
 #' indicating the height of the points from the top to the bottom. The function
 #' calculates the apex angle between the two percentiles and the base angle
 #' between the lowest point and the highest point.
+#' @param invert If `TRUE`, aligns the object along the horizontal axis.
+#' @param plot Plots the polygon with the points? Defaults to `TRUE`.
 #' @return A list containing the apex angle, base angle, apex coordinates, and
 #' base coordinates.
 #' @export
 #'
 #' @examples
 #' library(pliman)
-#' img <- image_pliman("sev_leaf.jpg")
-#' bin <- image_binary(img, "NB", plot = FALSE)[[1]]
-#' angls <- poly_apex_base_angle(bin)
-#' plot(img)
-#' points(angls$apex_coords, pch = 16, cex = 2, col = "red")
-#' points(angls$base_coords, pch = 16, cex = 2, col = "red")
+#' # a matrix of coordinates
+#' angls <- poly_apex_base_angle(contours[[2]])
 #' angls
-poly_apex_base_angle <- function(x, percentiles = c(0.25, 0.75)){
+#'
+#' # or a list of coordinates
+#' poly_apex_base_angle(contours)
+poly_apex_base_angle <- function(x,
+                                 percentiles = c(0.25, 0.75),
+                                 invert = FALSE,
+                                 plot = TRUE){
   if(inherits(x, "list")){
-    res <- lapply(x, poly_apex_base_angle, percentiles)
-    do.call(rbind, lapply(res, function(x){c(x$apex_angle, x$base_angle)}))
+    res <- lapply(x, poly_apex_base_angle, percentiles, invert, plot = FALSE)
+    angles <- data.frame(do.call(rbind, lapply(res, function(x){c(x$apex_angle, x$base_angle)})))
+    angles$id <- rownames(angles)
+    colnames(angles) <- c("apex_angle", "base_angle", "id")
+    return(angles[, c(3, 1, 2)])
   } else{
-    if(is.logical(x)){
-      bin <- x
-    } else{
-      nrowpoly <- nrow(x)
-      # avoid high consuming computation time
-      # 300 pixels are enough to describe the object contour
-      if(nrowpoly > 300){
-        n <- 300
-      } else{
-        n <- nrowpoly
-      }
-      bin <-
-        x |>
-        poly_align(plot = FALSE) |>
-        poly_sample(n = n) |>
-        polygon_to_binary() |>
-        EBImage::Image()
+    x <- poly_align(x, plot = FALSE)
+    if(isTRUE(invert)){
+      x <- poly_rotate(x, angle = 90)
     }
-    # top angles
-    ti <- pixel_index(bin)[c(3, 1)]
-    row_top <- floor(ncol(bin) * percentiles[1])
-    fpit <- pixel_index(bin, row = row_top)
-    lpt <- c(fpit[2], row_top)
-    rpt <- c(fpit[4], row_top)
-    coord_top <- rbind(ti, lpt, rpt)
-    angles_top <- help_poly_angles(coord_top)
+    bp <- x[which.min(x[, 2]), ]
+    tp <- x[which.max(x[, 2]), ]
 
-    # bottom angles
-    bi <- pixel_index(bin, direction = "downup")[c(3, 1)]
-    row_bottom <- floor(ncol(bin) * percentiles[2])
-    fpib <- pixel_index(bin, row = row_bottom)
-    lpb <- c(fpib[2], row_bottom)
-    rpb <- c(fpib[4], row_bottom)
-    coord_bottom <- rbind(bi, lpb, rpb)
-    angles_bottom <- help_poly_angles(coord_bottom)
-    return(list(apex_angle = angles_top[1],
-                base_angle = angles_bottom[1],
+    # base points
+    yqant <- ((tp[2] - bp[2]) * percentiles[1])  + bp[2]
+    yc1 <- which.min(abs(x[, 2] - yqant))
+    yc2 <- which.min(abs(x[-seq(yc1 - 2, yc1 + 2), 2] - yqant))
+    coord_bottom <- rbind(bp, x[yc1, ], x[yc2, ])
+    rownames(coord_bottom) <- c("base", "left", "right")
+
+    # top points
+    yqant <- ((tp[2] - bp[2]) * percentiles[2])  + bp[2]
+    yc1 <- which.min(abs(x[,2] - yqant))
+    yc2 <- which.min(abs(x[-seq(yc1 - 2, yc1 + 2), 2] - yqant))
+    coord_top <- rbind(tp, x[yc1, ], x[yc2, ])
+    rownames(coord_top) <- c("apex", "left", "right")
+
+    if(isTRUE(plot)){
+      plot_polygon(x)
+      points(coord_top, col = "red", pch = 16)
+      points(coord_bottom, col = "blue", pch = 16)
+    }
+    return(list(apex_angle = help_poly_angles(coord_top)[1],
+                base_angle =  help_poly_angles(coord_bottom)[1],
                 apex_coords = coord_top,
                 base_coords = coord_bottom))
   }

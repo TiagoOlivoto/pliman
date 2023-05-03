@@ -13,6 +13,10 @@ rgb_to_hsb_help <- function(r, g, b) {
     .Call(`_pliman_rgb_to_hsb_help`, r, g, b)
 }
 
+rgb_to_srgb_help <- function(rgb) {
+    .Call(`_pliman_rgb_to_srgb_help`, rgb)
+}
+
 help_edge_thinning <- function(img) {
     .Call(`_pliman_help_edge_thinning`, img)
 }
@@ -41,8 +45,8 @@ help_isolate_object <- function(R, G, B, labels, remove_bg, edge) {
     .Call(`_pliman_help_isolate_object`, R, G, B, labels, remove_bg, edge)
 }
 
-help_shp <- function(img, rows, cols, dims) {
-    .Call(`_pliman_help_shp`, img, rows, cols, dims)
+help_shp <- function(rows, cols, dims) {
+    .Call(`_pliman_help_shp`, rows, cols, dims)
 }
 
 help_area <- function(coord) {
