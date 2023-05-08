@@ -667,14 +667,15 @@ measure_disease <- function(img,
       healthy <- 100 - symptomatic
       severity <- data.frame(healthy = healthy,
                              symptomatic = symptomatic)
-      has_lesion <- max(nmask) > 0
-      if(isTRUE(show_features) & has_lesion){
+      has_any_sev <- length(which(nmask != 0)) > 0
+      if(has_any_sev){
+        shape <- compute_measures_disease(mask = nmask)
+        has_lesion <- nrow(shape$shape) > 0
+      } else{
+        has_lesion <- FALSE
+      }
 
-        shape <- compute_measures(mask = nmask,
-                                  img = img,
-                                  har_nbins = har_nbins,
-                                  har_scales = har_scales,
-                                  har_band = har_band)
+      if(isTRUE(show_features) & has_lesion & has_any_sev){
         object_contour <- shape$cont
         ch <- shape$ch
         shape <- shape$shape

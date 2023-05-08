@@ -154,11 +154,11 @@ get_measures <- function(object,
       res$area <- corrected
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[8:20] <- apply(res[8:20], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:18] <- apply(res[6:18], 2, function(x){
+        res[4:16] <- apply(res[4:16], 2, function(x){
           x * px_side
         })
       }
@@ -170,11 +170,11 @@ get_measures <- function(object,
       res$area <- res$area * px_side^2
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[8:20] <- apply(res[8:20], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:18] <- apply(res[6:18], 2, function(x){
+        res[4:16] <- apply(res[4:16], 2, function(x){
           x * px_side
         })
       }
@@ -190,17 +190,20 @@ get_measures <- function(object,
       cat("-----------------------------------------\n")
     }
   }
+
   if(!is.null(dpi)){
     dpc <- dpi * 1 / 2.54
     res$area <- res$area * 1/dpc^2
-    res$area_ch <- res$area_ch * 1/dpc^2
+    if(!inherits(object, c("plm_disease", "plm_disease_byl"))){
+      res$area_ch <- res$area_ch * 1/dpc^2
+    }
     if(inherits(object, "plm_disease_byl")){
-      res[8:20] <- apply(res[8:20], 2, pixels_to_cm, dpi = dpi)
+      res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
     } else{
       if("img" %in% colnames(res)){
-        res[7:19] <- apply(res[7:19], 2, pixels_to_cm, dpi = dpi)
+        res[5:17] <- apply(res[5:17], 2, pixels_to_cm, dpi = dpi)
       } else{
-        res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
+        res[4:16] <- apply(res[4:16], 2, pixels_to_cm, dpi = dpi)
       }
     }
   }
@@ -846,11 +849,11 @@ features_shape <- function(x){
 
 ## helper function to compute the measures based on a mask
 compute_measures <- function(mask,
-                              img,
-                              haralick =  FALSE,
-                              har_nbins = 32,
-                              har_scales = 1,
-                              har_band = 1){
+                             img,
+                             haralick =  FALSE,
+                             har_nbins = 32,
+                             har_scales = 1,
+                             har_band = 1){
   ocont <- EBImage::ocontour(mask)
   shape <-
     cbind(features_moment(ocont),
@@ -935,6 +938,46 @@ compute_measures <- function(mask,
   return(list(shape = shape,
               cont = ocont,
               ch = ch))
+}
+
+## helper function to compute the measures based on a mask
+compute_measures_disease <- function(mask){
+  ocont <- EBImage::ocontour(mask)
+  shape <-
+    cbind(features_moment(ocont),
+          cbind(area = get_area_mask(mask), features_shape(ocont)))
+  valid <- which(shape$mx != "NaN")
+  shape <- shape[valid, ]
+  ocont <- ocont[valid]
+  names(ocont) <- valid
+  lw <- help_lw(ocont)
+  shape <- transform(shape,
+                     id = as.numeric(valid),
+                     radius_ratio = radius_max / radius_min,
+                     diam_mean = radius_mean * 2,
+                     diam_min = radius_min * 2,
+                     diam_max = radius_max * 2,
+                     length = lw[, 1],
+                     width = lw[, 2],
+                     form_factor = 4 * pi * area / perimeter ^ 2)
+  shape <- shape[, c("id",
+                     "mx",
+                     "my",
+                     "area",
+                     "perimeter",
+                     "radius_mean",
+                     "radius_min",
+                     "radius_max",
+                     "radius_sd",
+                     "diam_mean",
+                     "diam_min",
+                     "diam_max",
+                     "maj_axis",
+                     "min_axis",
+                     "length",
+                     "width")]
+  return(list(shape = shape,
+              cont = ocont))
 }
 
 
