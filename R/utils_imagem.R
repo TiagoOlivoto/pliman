@@ -1758,7 +1758,7 @@ image_index <- function(image,
         }
     }
     nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
-    hsb_ind <- as.character(ind$Index[ind$Band == "hsb"])
+    hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
 
     R <- try(image@.Data[,,1], TRUE)
     G <- try(image@.Data[,,2], TRUE)
