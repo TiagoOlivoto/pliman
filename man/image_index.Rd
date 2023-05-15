@@ -20,7 +20,15 @@ image_index(
   verbose = TRUE
 )
 
-\method{plot}{image_index}(x, type = "raster", nrow = NULL, ncol = NULL, npixel = 60000, ...)
+\method{plot}{image_index}(
+  x,
+  type = "raster",
+  individual_key = FALSE,
+  nrow = NULL,
+  ncol = NULL,
+  npixel = 30000,
+  ...
+)
 }
 \arguments{
 \item{image}{An image object.}
@@ -68,10 +76,14 @@ number of parallel processes that can be active at the same time.}
 raster plot showing the intensity of the pixels for each image index or
 \code{type = "density"} to produce a density plot with the pixels' intensity.}
 
+\item{individual_key}{key If \code{TRUE} shows an individual color key for each plot
+panel. This is useful when computing image indexes that have different
+scales}
+
 \item{npixel}{The number of pixels to be plotted. This is used to reduce the
-plotting time when high-resolution images are used. By default, 60.000 are
+plotting time when high-resolution images are used. By default, 30.000 are
 plotted. When \code{type = "raster"} the gray-level image is resized to match
-~60.000 pixels keeping the same aspect ratio.}
+~30.000 pixels keeping the same aspect ratio.}
 
 \item{...}{Currently not used}
 }
@@ -145,8 +157,10 @@ library(pliman)
 img <- image_pliman("sev_leaf.jpg")
 
 # resize the image to 30\% of the original size
-ind <- image_index(img, resize = 30, plot = FALSE)
+# compute the index
+ind <- image_index(img, index = c("R, G, B, HUE, S, I"), plot = FALSE)
 plot(ind)
+plot(ind, individual_key = TRUE)
 }
 \references{
 Nobuyuki Otsu, "A threshold selection method from gray-level

@@ -1862,12 +1862,15 @@ image_index <- function(image,
 #' @param type The type of plot. Use `type = "raster"` (default) to produce a
 #'   raster plot showing the intensity of the pixels for each image index or
 #'   `type = "density"` to produce a density plot with the pixels' intensity.
+#' @param individual_key key If `TRUE` shows an individual color key for each plot
+#'   panel. This is useful when computing image indexes that have different
+#'   scales
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param npixel The number of pixels to be plotted. This is used to reduce the
-#'   plotting time when high-resolution images are used. By default, 60.000 are
+#'   plotting time when high-resolution images are used. By default, 30.000 are
 #'   plotted. When `type = "raster"` the gray-level image is resized to match
-#'   ~60.000 pixels keeping the same aspect ratio.
+#'   ~30.000 pixels keeping the same aspect ratio.
 #' @param ... Currently not used
 #' @method plot image_index
 #' @export
@@ -1879,13 +1882,16 @@ image_index <- function(image,
 #' img <- image_pliman("sev_leaf.jpg")
 #'
 #' # resize the image to 30% of the original size
-#' ind <- image_index(img, resize = 30, plot = FALSE)
+#' # compute the index
+#' ind <- image_index(img, index = c("R, G, B, HUE, S, I"), plot = FALSE)
 #' plot(ind)
+#' plot(ind, individual_key = TRUE)
 plot.image_index <- function(x,
                              type = "raster",
+                             individual_key = FALSE,
                              nrow = NULL,
                              ncol = NULL,
-                             npixel = 60000,
+                             npixel = 30000,
                              ...){
   if(!type %in% c("raster", "density")){
     stop("`type` must be one of the 'raster' or 'density'. ")
@@ -1953,6 +1959,7 @@ plot.image_index <- function(x,
       pixels$spectrum <- spectrum
       return(pixels)
     }
+
     pixels <-
       do.call(rbind,
               lapply(seq_along(x), function(i){
@@ -1968,7 +1975,8 @@ plot.image_index <- function(x,
                 get_pixels(x2, names(x[i]))
               })
       )
-    num_plots <-length(unique(pixels$spectrum))
+    spects <- unique(pixels$spectrum)
+    num_plots <-length(unique(spects))
     if (is.null(nrow) && is.null(ncol)){
       ncol <- ceiling(sqrt(num_plots))
       nrow <- ceiling(num_plots/ncol)
@@ -1979,17 +1987,50 @@ plot.image_index <- function(x,
     if (is.null(nrow)){
       nrow <- ceiling(num_plots/ncol)
     }
-    p <-
+
+    if(isTRUE(individual_key)){
+      plot_lits <- list()
+      for(i  in 1:num_plots){
+        plot_lits[[i]] <-
+          levelplot(value ~ id * y | spectrum,
+                    pretty = TRUE,
+                    cuts = 300,
+                    data = pixels[pixels$spectrum == spects[i], ],
+                    xlab = NULL,
+                    ylab = NULL,
+                    useRaster = TRUE,
+                    aspect = "fill",
+                    col.regions = terrain.colors(1000),
+                    colorkey = list(interpolate = TRUE,
+                                    raster = TRUE,
+                                    width = 1,
+                                    space = "bottom"))
+      }
+      gp <- expand.grid(1:ncol, 1:nrow)
+      for (i in 1:length(plot_lits)) {
+        if(i == 1){
+          print(plot_lits[[i]], split=c(gp[i, 1], gp[i, 2], ncol, nrow))
+        } else{
+          print(plot_lits[[i]], split=c(gp[i, 1], gp[i, 2], ncol, nrow), newpage=FALSE)
+        }
+
+      }
+    } else{
+
       levelplot(value ~ id * y | spectrum,
                 layout = c(ncol, nrow),
                 data = pixels,
+                pretty = TRUE,
+                cuts = 300,
                 xlab = NULL,
                 ylab = NULL,
                 useRaster = TRUE,
                 col.regions = terrain.colors(300),
                 colorkey = list(interpolate = TRUE,
                                 raster = TRUE))
-    return(p)
+
+    }
+
   }
 }
 

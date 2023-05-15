@@ -6,9 +6,9 @@
 \usage{
 analyze_objects_shp(
   img,
-  shapefile = NULL,
   rows = 1,
   cols = 1,
+  shapefile = NULL,
   interactive = FALSE,
   plot = TRUE,
   parallel = FALSE,
@@ -24,11 +24,11 @@ analyze_objects_shp(
 \arguments{
 \item{img}{An \code{Image} object}
 
-\item{shapefile}{(Optional) An object created with \code{\link[=image_shp]{image_shp()}}. If \code{NULL}
-(default), both \code{rows} and \code{cols} must be declared.}
-
 \item{rows, cols}{The number of rows and columns to generate the shapefile
 when \code{shapefile} is not declared. Defaults to \code{1}.}
+
+\item{shapefile}{(Optional) An object created with \code{\link[=image_shp]{image_shp()}}. If \code{NULL}
+(default), both \code{rows} and \code{cols} must be declared.}
 
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
@@ -77,8 +77,8 @@ section of \code{\link[=analyze_objects]{analyze_objects()}}.
 }
 \description{
 This function calls \code{\link[=analyze_objects]{analyze_objects()}} in each image polygon of a shapefile
-object generated with generated with \code{\link[=image_shp]{image_shp()}} and bind the results into
-read-ready data frames.
+object generated with \code{\link[=image_shp]{image_shp()}} and bind the results into read-ready data
+frames.
 }
 \examples{
 if(interactive()){
