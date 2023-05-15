@@ -6,8 +6,8 @@
 \usage{
 measure_disease_shp(
   img,
-  rows = 1,
-  cols = 1,
+  nrow = 1,
+  ncol = 1,
   index_lb = "HUE2",
   index_dh = "NGRDI",
   pattern = NULL,
@@ -29,7 +29,7 @@ character string containing the image name. In the last, the image will be
 searched in the root directory. Declare dir_original to inform a subfolder
 that contains the images to be processed.}
 
-\item{rows, cols}{The number of rows and columns to generate the shapefile.
+\item{nrow, ncol}{The number of rows and columns to generate the shapefile.
 Defaults to \code{1}.}
 
 \item{index_lb}{The index used to segment the foreground (e.g., leaf) from
@@ -97,8 +97,8 @@ if(interactive()){
 img <- image_pliman("mult_leaves.jpg", plot = TRUE)
 sev <-
  measure_disease_shp(img = img,
-                     rows = 1,
-                     cols = 3,
+                     nrow = 1,
+                     ncol = 3,
                      index_lb = "B",
                      index_dh = "NGRDI")
 sev$severity

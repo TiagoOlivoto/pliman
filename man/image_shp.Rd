@@ -6,8 +6,8 @@
 \usage{
 image_shp(
   img,
-  rows = 1,
-  cols = 1,
+  nrow = 1,
+  ncol = 1,
   interactive = FALSE,
   col_line = "red",
   size_line = 2,
@@ -19,9 +19,9 @@ image_shp(
 \arguments{
 \item{img}{An object of class \code{Image}}
 
-\item{rows}{The number of desired rows in the grid. Defaults to \code{1}.}
+\item{nrow}{The number of desired rows in the grid. Defaults to \code{1}.}
 
-\item{cols}{The number of desired columns in the grid. Defaults to \code{1}.}
+\item{ncol}{The number of desired columns in the grid. Defaults to \code{1}.}
 
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
@@ -39,14 +39,14 @@ that will contain the grid.}
 A list with \code{row * col} objects containing the plot coordinates.
 }
 \description{
-Creates a list of object coordinates given the desired number of rows and
+Creates a list of object coordinates given the desired number of nrow and
 columns. It starts by selecting 4 points at the corners of objects of
-interest in the plot space. Then, given \code{rows} and \code{cols}, a grid is drawn
+interest in the plot space. Then, given \code{nrow} and \code{ncol}, a grid is drawn
 and the objects' coordinates are returned.
 }
 \examples{
 library(pliman)
 flax <- image_pliman("flax_leaves.jpg")
-shape <- image_shp(flax, rows = 3, cols = 5)
+shape <- image_shp(flax, nrow = 3, ncol = 5)
 
 }

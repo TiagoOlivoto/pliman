@@ -6,8 +6,8 @@
 \usage{
 object_split_shp(
   img,
-  rows = 1,
-  cols = 1,
+  nrow = 1,
+  ncol = 1,
   interactive = FALSE,
   only_shp = FALSE,
   ...
@@ -16,9 +16,9 @@ object_split_shp(
 \arguments{
 \item{img}{An object of class \code{Image}}
 
-\item{rows}{The number of desired rows in the grid. Defaults to \code{1}.}
+\item{nrow}{The number of desired rows in the grid. Defaults to \code{1}.}
 
-\item{cols}{The number of desired columns in the grid. Defaults to \code{1}.}
+\item{ncol}{The number of desired columns in the grid. Defaults to \code{1}.}
 
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
@@ -26,7 +26,7 @@ that will contain the grid.}
 
 \item{only_shp}{If \code{TRUE} returns only the shapefiles with the coordinates
 for each image. If \code{FALSE} (default) returns the splitted image according
-to \code{rows} and \code{cols} arguments.}
+to \code{nrow} and \code{ncol} arguments.}
 
 \item{...}{Other arguments passed on to \code{\link[=image_shp]{image_shp()}}}
 }
@@ -42,7 +42,7 @@ number of rows and columns. Then, using the object coordinates, a list of
 if(interactive()){
 library(pliman)
 flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
-objects <- object_split_shp(flax, rows = 3, cols = 5)
+objects <- object_split_shp(flax, nrow = 3, ncol = 5)
 image_combine(objects$imgs)
 }
 }

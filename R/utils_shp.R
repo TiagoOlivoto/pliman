@@ -1,13 +1,13 @@
 #' Construct a shape file from an image
 #'
-#' Creates a list of object coordinates given the desired number of rows and
+#' Creates a list of object coordinates given the desired number of nrow and
 #' columns. It starts by selecting 4 points at the corners of objects of
-#' interest in the plot space. Then, given `rows` and `cols`, a grid is drawn
+#' interest in the plot space. Then, given `nrow` and `ncol`, a grid is drawn
 #' and the objects' coordinates are returned.
 #'
 #' @param img An object of class `Image`
-#' @param rows The number of desired rows in the grid. Defaults to `1`.
-#' @param cols The number of desired columns in the grid. Defaults to `1`.
+#' @param nrow The number of desired rows in the grid. Defaults to `1`.
+#' @param ncol The number of desired columns in the grid. Defaults to `1`.
 #' @param interactive If `FALSE` (default) the grid is created automatically
 #'   based on the image dimension and number of rows/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
@@ -23,11 +23,11 @@
 #' @examples
 #' library(pliman)
 #' flax <- image_pliman("flax_leaves.jpg")
-#' shape <- image_shp(flax, rows = 3, cols = 5)
+#' shape <- image_shp(flax, nrow = 3, ncol = 5)
 #'
 image_shp <- function(img,
-                      rows = 1,
-                      cols = 1,
+                      nrow = 1,
+                      ncol = 1,
                       interactive = FALSE,
                       col_line = "red",
                       size_line = 2,
@@ -47,8 +47,8 @@ image_shp <- function(img,
   bbox <-
     data.frame(x = c(c1[1], c1[2], c1[2], c1[1], c1[1]),
                y = c(c1[3], c1[3], c1[4], c1[4], c1[3]))
-  shps <- help_shp(rows, cols, c1)
-  shps <- data.frame(plot = paste0(rep(1:(cols * rows), each = 5)), shps)
+  shps <- help_shp(nrow, ncol, c1)
+  shps <- data.frame(plot = paste0(rep(1:(ncol * nrow), each = 5)), shps)
   colnames(shps) <- c("plot", "x", "y")
   coords <- split(shps, shps$plot)
   names(coords) <- paste0("plot_", names(coords))
@@ -63,8 +63,8 @@ image_shp <- function(img,
   }
   lst <- list(shapefiles = coords,
               bbox = bbox,
-              rows = rows,
-              cols = cols)
+              nrow = nrow,
+              ncol = ncol)
   return(structure(lst, class = "image_shp"))
 }
 
@@ -85,7 +85,7 @@ image_shp <- function(img,
 #' @examples
 #' library(pliman)
 #' flax <- image_pliman("flax_leaves.jpg")
-#' shape <- image_shp(flax, rows = 3, cols = 5)
+#' shape <- image_shp(flax, nrow = 3, ncol = 5)
 #'
 #' # grid on the existing image
 #' plot(flax)
@@ -134,7 +134,7 @@ plot.image_shp <- function(x,
 #' @inheritParams  image_shp
 #' @param only_shp If `TRUE` returns only the shapefiles with the coordinates
 #'   for each image. If `FALSE` (default) returns the splitted image according
-#'   to `rows` and `cols` arguments.
+#'   to `nrow` and `ncol` arguments.
 #' @param ... Other arguments passed on to [image_shp()]
 #' @return A list of `Image` objects
 #' @export
@@ -143,16 +143,16 @@ plot.image_shp <- function(x,
 #' if(interactive()){
 #' library(pliman)
 #' flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
-#' objects <- object_split_shp(flax, rows = 3, cols = 5)
+#' objects <- object_split_shp(flax, nrow = 3, ncol = 5)
 #' image_combine(objects$imgs)
 #' }
 object_split_shp <- function(img,
-                             rows = 1,
-                             cols = 1,
+                             nrow = 1,
+                             ncol = 1,
                              interactive = FALSE,
                              only_shp = FALSE,
                              ...){
-  shps <- image_shp(img, rows, cols, interactive = interactive, plot = FALSE, ...)
+  shps <- image_shp(img, nrow, ncol, interactive = interactive, plot = FALSE, ...)
   shapefile <- shps$shapefiles
   if(!isTRUE(only_shp)){
     imgs <- list()
@@ -250,12 +250,12 @@ image_align <- function(img,
 #' @inheritParams analyze_objects
 #'
 #' @param img An `Image` object
-#' @param rows,cols The number of rows and columns to generate the shapefile
+#' @param nrow,ncol The number of rows and columns to generate the shapefile
 #'   when `shapefile` is not declared. Defaults to `1`.
 #' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
-#'   (default), both `rows` and `cols` must be declared.
+#'   (default), both `nrow` and `ncol` must be declared.
 #' @param interactive If `FALSE` (default) the grid is created automatically
-#'   based on the image dimension and number of rows/columns. If `interactive =
+#'   based on the image dimension and number of nrow/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
 #'   that will contain the grid.
 #' @param plot Plots the processed images? Defaults to `TRUE`.
@@ -273,8 +273,8 @@ image_align <- function(img,
 #' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 #' res <-
 #'    analyze_objects_shp(flax,
-#'                        rows = 3,
-#'                        cols = 5,
+#'                        nrow = 3,
+#'                        ncol = 5,
 #'                        plot = FALSE,
 #'                        object_index = "DGCI")
 #' plot(flax)
@@ -282,8 +282,8 @@ image_align <- function(img,
 #' plot_measures(res, measure = "DGCI")
 #' }
 analyze_objects_shp <- function(img,
-                                rows = 1,
-                                cols = 1,
+                                nrow = 1,
+                                ncol = 1,
                                 shapefile = NULL,
                                 interactive = FALSE,
                                 plot = TRUE,
@@ -296,13 +296,13 @@ analyze_objects_shp <- function(img,
                                 verbose = TRUE,
                                 ...){
   if(is.null(shapefile)){
-    tmp <- object_split_shp(img, rows, cols, interactive = interactive, only_shp = FALSE)
+    tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
   } else{
     shapes <- shapefile
-    rows <- shapefile$rows
-    cols <- shapefile$cols
+    nrow <- shapefile$nrow
+    ncol <- shapefile$ncol
   }
 
   if(parallel == TRUE){
@@ -511,7 +511,7 @@ plot_shp <- function(coords,
 #'   character string containing the image name. In the last, the image will be
 #'   searched in the root directory. Declare dir_original to inform a subfolder
 #'   that contains the images to be processed.
-#' @param rows,cols The number of rows and columns to generate the shapefile.
+#' @param nrow,ncol The number of rows and columns to generate the shapefile.
 #'   Defaults to `1`.
 #' @param dir_original The directory containing the original and processed images.
 #'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
@@ -532,16 +532,16 @@ plot_shp <- function(coords,
 #' img <- image_pliman("mult_leaves.jpg", plot = TRUE)
 #' sev <-
 #'  measure_disease_shp(img = img,
-#'                      rows = 1,
-#'                      cols = 3,
+#'                      nrow = 1,
+#'                      ncol = 3,
 #'                      index_lb = "B",
 #'                      index_dh = "NGRDI")
 #' sev$severity
 #' }
 
 measure_disease_shp <- function(img,
-                                rows = 1,
-                                cols = 1,
+                                nrow = 1,
+                                ncol = 1,
                                 index_lb = "HUE2",
                                 index_dh = "NGRDI",
                                 pattern = NULL,
@@ -568,8 +568,8 @@ measure_disease_shp <- function(img,
 
   # helper function
   help_meas_shp <- function(img,
-                            rows,
-                            cols,
+                            nrow,
+                            ncol,
                             index_lb,
                             index_dh,
                             threshold,
@@ -588,12 +588,12 @@ measure_disease_shp <- function(img,
       extens_ori <- "jpg"
     }
 
-    tmp <- object_split_shp(img, rows, cols, interactive = interactive, only_shp = FALSE)
+    tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
 
     if(isTRUE(plot)){
-      op <- par(mfrow = c(rows, cols))
+      op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
     }
 
@@ -659,8 +659,8 @@ measure_disease_shp <- function(img,
   ## apply the function to the image list
   if(missing(pattern)){
     results <- help_meas_shp(img,
-                             rows,
-                             cols,
+                             nrow,
+                             ncol,
                              index_lb,
                              index_dh,
                              threshold,
@@ -694,8 +694,8 @@ measure_disease_shp <- function(img,
       results <-
         foreach::foreach(i = seq_along(names_plant), .packages = "pliman") %dopar%{
           help_meas_shp(names_plant[[i]],
-                        rows,
-                        cols,
+                        nrow,
+                        ncol,
                         index_lb,
                         index_dh,
                         threshold,
@@ -712,8 +712,8 @@ measure_disease_shp <- function(img,
                        text = paste("Processing image", names_plant[i]))
         }
         results[[i]] <- help_meas_shp(img  = names_plant[i],
-                                      rows,
-                                      cols,
+                                      nrow,
+                                      ncol,
                                       index_lb,
                                       index_dh,
                                       threshold,

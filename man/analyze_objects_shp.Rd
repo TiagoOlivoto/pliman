@@ -6,8 +6,8 @@
 \usage{
 analyze_objects_shp(
   img,
-  rows = 1,
-  cols = 1,
+  nrow = 1,
+  ncol = 1,
   shapefile = NULL,
   interactive = FALSE,
   plot = TRUE,
@@ -24,14 +24,14 @@ analyze_objects_shp(
 \arguments{
 \item{img}{An \code{Image} object}
 
-\item{rows, cols}{The number of rows and columns to generate the shapefile
+\item{nrow, ncol}{The number of rows and columns to generate the shapefile
 when \code{shapefile} is not declared. Defaults to \code{1}.}
 
 \item{shapefile}{(Optional) An object created with \code{\link[=image_shp]{image_shp()}}. If \code{NULL}
-(default), both \code{rows} and \code{cols} must be declared.}
+(default), both \code{nrow} and \code{ncol} must be declared.}
 
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
-based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
+based on the image dimension and number of nrow/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
 that will contain the grid.}
 
 \item{plot}{Plots the processed images? Defaults to \code{TRUE}.}
@@ -86,8 +86,8 @@ library(pliman)
 flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 res <-
    analyze_objects_shp(flax,
-                       rows = 3,
-                       cols = 5,
+                       nrow = 3,
+                       ncol = 5,
                        plot = FALSE,
                        object_index = "DGCI")
 plot(flax)
