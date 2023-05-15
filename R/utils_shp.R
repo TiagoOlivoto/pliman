@@ -244,16 +244,16 @@ image_align <- function(img,
 #' Analyzes objects using shapefiles
 #'
 #' This function calls [analyze_objects()] in each image polygon of a shapefile
-#' object generated with generated with [image_shp()] and bind the results into
-#' read-ready data frames.
+#' object generated with [image_shp()] and bind the results into read-ready data
+#' frames.
 #'
 #' @inheritParams analyze_objects
 #'
 #' @param img An `Image` object
-#' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
-#'   (default), both `rows` and `cols` must be declared.
 #' @param rows,cols The number of rows and columns to generate the shapefile
 #'   when `shapefile` is not declared. Defaults to `1`.
+#' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
+#'   (default), both `rows` and `cols` must be declared.
 #' @param interactive If `FALSE` (default) the grid is created automatically
 #'   based on the image dimension and number of rows/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
@@ -282,9 +282,9 @@ image_align <- function(img,
 #' plot_measures(res, measure = "DGCI")
 #' }
 analyze_objects_shp <- function(img,
-                                shapefile = NULL,
                                 rows = 1,
                                 cols = 1,
+                                shapefile = NULL,
                                 interactive = FALSE,
                                 plot = TRUE,
                                 parallel = FALSE,
@@ -303,13 +303,6 @@ analyze_objects_shp <- function(img,
     shapes <- shapefile
     rows <- shapefile$rows
     cols <- shapefile$cols
-  }
-  get_borders <- function(x){
-    min_x <- min(x[,2])
-    max_x <- max(x[,2])
-    min_y <- min(x[,3])
-    max_y <- max(x[,3])
-    return(c(min_x, max_x, min_y, max_y))
   }
 
   if(parallel == TRUE){
@@ -485,7 +478,6 @@ analyze_objects_shp <- function(img,
 
 }
 
-
 plot_shp <- function(coords,
                      col_line = "red",
                      size_line = 1,
@@ -501,3 +493,269 @@ plot_shp <- function(coords,
   })
 }
 
+
+
+
+
+
+
+#' Measure disease using shapefiles
+#'
+#' This function calls [measure_disease()] in each image polygon of a shapefile
+#' object generated with [image_shp()] and bind the results into read-ready data
+#' frames.
+#'
+#' @inheritParams measure_disease
+#'
+#' @param img The image to be analyzed. Either an image of class `Image` or a
+#'   character string containing the image name. In the last, the image will be
+#'   searched in the root directory. Declare dir_original to inform a subfolder
+#'   that contains the images to be processed.
+#' @param rows,cols The number of rows and columns to generate the shapefile.
+#'   Defaults to `1`.
+#' @param dir_original The directory containing the original and processed images.
+#'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
+#'   current working directory.
+#' @param interactive If `FALSE` (default) the grid is created automatically
+#'   based on the image dimension and number of rows/columns. If `interactive =
+#'   TRUE`, users must draw points at the diagonal of the desired bounding box
+#'   that will contain the grid.
+#' @param ... Aditional arguments passed on to [measure_disease].
+#'
+#' @return An object of class `plm_disease_byl`. See more details in the `Value`
+#'   section of [measure_disease()].
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' # severity for the three leaflets (from left to right)
+#' img <- image_pliman("mult_leaves.jpg", plot = TRUE)
+#' sev <-
+#'  measure_disease_shp(img = img,
+#'                      rows = 1,
+#'                      cols = 3,
+#'                      index_lb = "B",
+#'                      index_dh = "NGRDI")
+#' sev$severity
+#' }
+
+measure_disease_shp <- function(img,
+                                rows = 1,
+                                cols = 1,
+                                index_lb = "HUE2",
+                                index_dh = "NGRDI",
+                                pattern = NULL,
+                                threshold = NULL,
+                                invert = FALSE,
+                                dir_original = NULL,
+                                show_features = FALSE,
+                                interactive = FALSE,
+                                plot = TRUE,
+                                parallel = FALSE,
+                                workers = NULL,
+                                verbose = TRUE,
+                                ...){
+  if(is.null(dir_original)){
+    diretorio_original <- paste("./", sep = "")
+  } else{
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
+  }
+  ## declare alias for dopar command
+  `%dopar%` <- foreach::`%dopar%`
+
+  # helper function
+  help_meas_shp <- function(img,
+                            rows,
+                            cols,
+                            index_lb,
+                            index_dh,
+                            threshold,
+                            invert,
+                            show_features,
+                            ...){
+    if(is.character(img)){
+      all_files <- sapply(list.files(diretorio_original), file_name)
+      check_names_dir(img, all_files, diretorio_original)
+      imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
+      name_ori <- file_name(imag)
+      extens_ori <- file_extension(imag)
+      img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+    } else{
+      name_ori <- match.call()[[2]]
+      extens_ori <- "jpg"
+    }
+
+    tmp <- object_split_shp(img, rows, cols, interactive = interactive, only_shp = FALSE)
+    imgs <- tmp$imgs
+    shapes <- tmp$shapefile$shapefiles
+
+    if(isTRUE(plot)){
+      op <- par(mfrow = c(rows, cols))
+      on.exit(par(op))
+    }
+
+    results <-
+      lapply(seq_along(imgs), function(i){
+        measure_disease(imgs[[i]],
+                        name = names(imgs[i]),
+                        prefix = "",
+                        index_lb = index_lb,
+                        index_dh = index_dh,
+                        invert = invert,
+                        threshold = threshold,
+                        show_features = show_features,
+                        plot = plot,
+                        ...)
+      })
+
+
+    names(results) <- paste0("shp", 1:length(shapes))
+
+    # severity
+    res <-
+      do.call(rbind,
+              lapply(results, function(x){x$severity}))
+    vect <- rownames(res)
+
+    res$img <-
+      sapply(seq_along(vect),
+             function(i){
+               strsplit(vect[[i]], split = "\\.")[[1]][[1]]
+             })
+    res <- res[, c(ncol(res), 1:(ncol(res) - 1))]
+    rownames(res) <- NULL
+
+    # shape
+    if(!is.null(results$shp1$shape[[1]])){
+      shape <-
+        do.call(rbind,
+                lapply(seq_along(results), function(x){
+                  transform(results[[x]][["shape"]], img = names(results[x]))[,c(17, 1:16)]
+                }))
+      statistics <-
+        do.call(rbind,
+                lapply(seq_along(results), function(x){
+                  transform(results[[x]][["statistics"]], img = names(results[x]))[,c(3, 1, 2)]
+                }))
+    } else{
+      shape <- NULL
+      statistics <- NULL
+    }
+
+
+    return(
+      structure(
+        list(severity = res,
+             shape = shape,
+             statistics = statistics),
+        class = "plm_disease_byl"
+      )
+    )
+  }
+
+  ## apply the function to the image list
+  if(missing(pattern)){
+    results <- help_meas_shp(img,
+                             rows,
+                             cols,
+                             index_lb,
+                             index_dh,
+                             threshold,
+                             invert,
+                             show_features,
+                             ...)
+  } else{
+    if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      pattern <- "^[0-9].*$"
+    }
+    plants <- list.files(pattern = pattern, diretorio_original)
+    extensions <- as.character(sapply(plants, file_extension))
+    names_plant <- as.character(sapply(plants, file_name))
+    if(length(grep(pattern, names_plant)) == 0){
+      stop(paste("'", pattern, "' pattern not found in '",
+                 paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
+           call. = FALSE)
+    }
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
+      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+    }
+
+    if(parallel == TRUE){
+      workers2 <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+      cl2 <- parallel::makePSOCKcluster(workers2)
+      doParallel::registerDoParallel(cl2)
+      on.exit(stopCluster(cl2))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",workers2, "). Please wait.")
+      }
+      results <-
+        foreach::foreach(i = seq_along(names_plant), .packages = "pliman") %dopar%{
+          help_meas_shp(names_plant[[i]],
+                        rows,
+                        cols,
+                        index_lb,
+                        index_dh,
+                        threshold,
+                        invert,
+                        show_features,
+                        ...)
+        }
+    } else{
+      results <- list()
+      pb <- progress(max = length(plants), style = 4)
+      for (i in 1:length(plants)) {
+        if(verbose == TRUE){
+          run_progress(pb, actual = i,
+                       text = paste("Processing image", names_plant[i]))
+        }
+        results[[i]] <- help_meas_shp(img  = names_plant[i],
+                                      rows,
+                                      cols,
+                                      index_lb,
+                                      index_dh,
+                                      threshold,
+                                      invert,
+                                      show_features,
+                                      ...)
+      }
+    }
+    names(results) <- names_plant
+    if(isTRUE(show_features)){
+      stats <-
+        do.call(rbind,
+                lapply(seq_along(results), function(x){
+                  transform(results[[x]][["statistics"]],
+                            shp = img,
+                            img = names(results[x]))
+                }))[, c(1, 4, 2, 3)]
+      shape <-
+        do.call(rbind,
+                lapply(seq_along(results), function(x){
+                  transform(results[[x]][["shape"]],
+                            shp = img,
+                            img = names(results[x]))
+                }))[, c(1, 18, 2:17)]
+    } else{
+      shape <- NULL
+      stats <- NULL
+    }
+    severity <-
+      do.call(rbind,
+              lapply(seq_along(results), function(x){
+                transform(results[[x]][["severity"]],
+                          shp = img,
+                          img = names(results[x]))
+              }))[, c(1, 4, 2, 3)]
+
+    results <- list(severity = severity,
+                    shape = shape,
+                    statistics = stats)
+  }
+  return(structure(
+    results, class = "plm_disease_byl"
+  ))
+
+}

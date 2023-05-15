@@ -14,9 +14,6 @@ measure_disease(
   filter = 10,
   parallel = FALSE,
   workers = NULL,
-  har_nbins = 32,
-  har_scales = 1,
-  har_band = 1,
   resize = FALSE,
   fill_hull = TRUE,
   index_lb = NULL,
@@ -90,15 +87,6 @@ number of sections is set up to 70\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
-
-\item{har_nbins}{An integer indicating the number of bins using to compute
-the Haralick matrix. Defaults to 32. See Details}
-
-\item{har_scales}{A integer vector indicating the number of scales to use to
-compute the Haralick features. See Details.}
-
-\item{har_band}{The band to compute the Haralick features (1 = R, 2 = G, 3 =
-B). Defaults to 1.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original
