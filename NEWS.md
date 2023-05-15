@@ -2,6 +2,7 @@
 ## New functions
 * `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.
 * `measure_disease_byl()` to measure disease severity '`by` `l`eaf' in an image with several leaves.
+
 * `object_split()` to split multiples objects of an image into a list of images.
 * `pca()`, `plot.pca()`, `get_biplot()` as helper functions to perform Principal Component Analysis.
 * `rownames_to_column()`, `column_to_rownames()`, `separate_col()`, `round_cols()` as helper functions to manipulate data.
@@ -34,6 +35,11 @@
    
 * `object_edge()` to detect edges in images using Sobel-Feldman Operator.
 
+* A new family of `*_shp()` functions to analyze shape files.
+   - `image_shp()` to construct a shape file from an image.
+   - `object_split_shp()` to splits image objects based on a shapefile.
+   - `analyze_objects_shp()` to analyze objects using shapefiles.
+   - `measure_disease_shp()` to measure disease using shapefiles.
 
 ## New features
 * [Haralick's features](https://ieeexplore.ieee.org/document/4309314) that quantify pixel texture for image objects were included.
@@ -62,6 +68,8 @@
 * `plot.image_index()` not limits the number of pixels to reduce plotting time.
 * `show_image` argument changed with `plot` to standardize the argument across functions.
 * `rgb_to_hsb()` optimized using `C++`.
+* Change `rows` and `cols` with `nrow` and `ncol`, respectively, in functions `analyze_objects_shp()`, `image_shp()`, `measure_disease_shp()`, and `object_split_shp()`, to standardize the arguments across functions.
+
 
 
 
