@@ -105,7 +105,7 @@ measure_disease_byl <- function(img,
       imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
       name_ori <- file_name(imag)
       extens_ori <- file_extension(imag)
-      img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+      img <- image_import(paste(name_ori, ".", extens_ori, sep = ""), path = diretorio_original)
     } else{
       name_ori <- match.call()[[2]]
       extens_ori <- "jpg"

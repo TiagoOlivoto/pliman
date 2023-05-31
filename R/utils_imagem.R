@@ -143,6 +143,11 @@ image_import <- function(image,
     }
     path <- ifelse(is.null(path), getwd(), path)
     imgs <- list.files(pattern = pattern, path)
+    if(length(grep(pattern, imgs)) == 0){
+      stop(paste("'", pattern, "' pattern not found in '",
+                 paste0(dir)),
+           call. = FALSE)
+    }
     extensions <- as.character(sapply(imgs, file_extension))
     all_valid <- extensions %in% valid_extens
     if(any(all_valid == FALSE)){
@@ -150,11 +155,7 @@ image_import <- function(image,
               "' of invalid format ignored.", call. = FALSE)
     }
     imgs <- paste0(path, "/", imgs[all_valid])
-    if(length(grep(pattern, imgs)) == 0){
-      stop(paste("'", pattern, "' pattern not found in '",
-                 paste0(dir)),
-           call. = FALSE)
-    }
+
     list_img <-
       lapply(imgs, function(x){
         EBImage::readImage(x)
@@ -174,7 +175,7 @@ image_import <- function(image,
     img_dir <- ifelse(is.null(path), file_dir(image), path)
     all_files <- sapply(list.files(img_dir), file_name)
     img_name <- file_name(image)
-    test <- img_name %in% all_files
+    test <- image %in% list.files(img_dir)
     if(!any(grepl("http", img_dir, fixed = TRUE)) & !all(test)){
       stop(" '",img_name[which(test == FALSE)],"' not found in ", img_dir[which(test == FALSE)],  call. = FALSE)
     }
@@ -1868,9 +1869,9 @@ image_index <- function(image,
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
 #'   `NULL`, i.e., a square grid is produced.
 #' @param npixel The number of pixels to be plotted. This is used to reduce the
-#'   plotting time when high-resolution images are used. By default, 30.000 are
+#'   plotting time when high-resolution images are used. By default, 65.000 are
 #'   plotted. When `type = "raster"` the gray-level image is resized to match
-#'   ~30.000 pixels keeping the same aspect ratio.
+#'   ~65.000 pixels keeping the same aspect ratio.
 #' @param ... Currently not used
 #' @method plot image_index
 #' @export
@@ -1891,7 +1892,7 @@ plot.image_index <- function(x,
                              individual_key = FALSE,
                              nrow = NULL,
                              ncol = NULL,
-                             npixel = 30000,
+                             npixel = 65000,
                              ...){
   if(!type %in% c("raster", "density")){
     stop("`type` must be one of the 'raster' or 'density'. ")

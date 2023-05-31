@@ -270,6 +270,8 @@ image_align <- function(img,
 #' @examples
 #' if(interactive()){
 #' library(pliman)
+#'
+#' # Computes the DGCI index for each flax leaf
 #' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 #' res <-
 #'    analyze_objects_shp(flax,
@@ -305,6 +307,10 @@ analyze_objects_shp <- function(img,
     ncol <- shapefile$ncol
   }
 
+  if(isTRUE(plot)){
+    op <- par(mfrow = c(nrow, ncol))
+    on.exit(par(op))
+  }
   if(parallel == TRUE){
     workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
     cl <- parallel::makePSOCKcluster(workers)
@@ -582,7 +588,7 @@ measure_disease_shp <- function(img,
       imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
       name_ori <- file_name(imag)
       extens_ori <- file_extension(imag)
-      img <- image_import(paste(diretorio_original, "/", name_ori, ".", extens_ori, sep = ""))
+      img <- image_import(paste(name_ori, ".", extens_ori, sep = ""), path = diretorio_original)
     } else{
       name_ori <- match.call()[[2]]
       extens_ori <- "jpg"
