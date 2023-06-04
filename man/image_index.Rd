@@ -26,7 +26,7 @@ image_index(
   individual_key = FALSE,
   nrow = NULL,
   ncol = NULL,
-  npixel = 30000,
+  npixel = 65000,
   ...
 )
 }
@@ -81,9 +81,9 @@ panel. This is useful when computing image indexes that have different
 scales}
 
 \item{npixel}{The number of pixels to be plotted. This is used to reduce the
-plotting time when high-resolution images are used. By default, 30.000 are
+plotting time when high-resolution images are used. By default, 65.000 are
 plotted. When \code{type = "raster"} the gray-level image is resized to match
-~30.000 pixels keeping the same aspect ratio.}
+~65.000 pixels keeping the same aspect ratio.}
 
 \item{...}{Currently not used}
 }

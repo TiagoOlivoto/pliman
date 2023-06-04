@@ -162,6 +162,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// help_otsu
+double help_otsu(const NumericVector& image);
+RcppExport SEXP _pliman_help_otsu(SEXP imageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type image(imageSEXP);
+    rcpp_result_gen = Rcpp::wrap(help_otsu(image));
+    return rcpp_result_gen;
+END_RCPP
+}
 // help_area
 Rcpp::RObject help_area(Rcpp::RObject coord);
 RcppExport SEXP _pliman_help_area(SEXP coordSEXP) {
@@ -387,6 +398,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_isolate_objects5", (DL_FUNC) &_pliman_isolate_objects5, 2},
     {"_pliman_help_isolate_object", (DL_FUNC) &_pliman_help_isolate_object, 6},
     {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 3},
+    {"_pliman_help_otsu", (DL_FUNC) &_pliman_help_otsu, 1},
     {"_pliman_help_area", (DL_FUNC) &_pliman_help_area, 1},
     {"_pliman_help_slide", (DL_FUNC) &_pliman_help_slide, 2},
     {"_pliman_help_distpts", (DL_FUNC) &_pliman_help_distpts, 1},

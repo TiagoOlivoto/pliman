@@ -175,7 +175,7 @@ image_import <- function(image,
     img_dir <- ifelse(is.null(path), file_dir(image), path)
     all_files <- sapply(list.files(img_dir), file_name)
     img_name <- file_name(image)
-    test <- image %in% list.files(img_dir)
+    test <- img_name %in% file_name(list.files(img_dir))
     if(!any(grepl("http", img_dir, fixed = TRUE)) & !all(test)){
       stop(" '",img_name[which(test == FALSE)],"' not found in ", img_dir[which(test == FALSE)],  call. = FALSE)
     }
@@ -1092,7 +1092,7 @@ image_skeleton <- function(image,
     }
   } else{
     if(EBImage::colorMode(image) != 0){
-      image <- image_binary(image, ..., resize = FALSE, plot = FALSE)[[1]]
+      image <- help_binary(image, ..., resize = FALSE)
     }
     s <- matrix(1, nrow(image), ncol(image))
     skel <- matrix(0, nrow(image), ncol(image))
@@ -1147,7 +1147,7 @@ image_thinning <- function(image,
     }
   } else{
     if(EBImage::colorMode(image) != 0){
-      image <- image_binary(image, ..., resize = FALSE, plot = FALSE)[[1]]
+      image <- help_binary(image, ..., resize = FALSE)
     }
 
     if(is.null(niter)){
@@ -1539,11 +1539,14 @@ image_binary <- function(image,
         }
         imgs <- EBImage::Image(threshold_adaptive(as.matrix(imgs), k, windowsize, 0.5))
       }
+
       if(threshold != "adaptive"){
-        no_inf <- imgs[!is.infinite(imgs)]
         if(threshold == "Otsu"){
-          threshold <- EBImage::otsu(imgs, range = c(min(no_inf, na.rm = TRUE),
-                                                     max(no_inf, na.rm = TRUE)))
+          if(any(is.infinite(imgs))){
+            threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data)])
+          } else{
+            threshold <- help_otsu(imgs@.Data)
+          }
         } else{
           if(is.numeric(threshold)){
             threshold <- threshold
@@ -2174,7 +2177,7 @@ image_segment <- function(image,
     }
     for(i in 1:length(index)){
       indx <- index[[i]]
-      img2 <- image_binary(image,
+      img2 <- help_binary(image,
                            index = indx,
                            threshold = threshold,
                            k = k,
@@ -2184,9 +2187,7 @@ image_segment <- function(image,
                            fill_hull = fill_hull,
                            filter = filter,
                            re = re,
-                           nir = nir,
-                           plot = FALSE,
-                           invert = invert)[[1]]
+                           nir = nir)
       ID <- which(img2@.Data == FALSE)
       img <- image
       img@.Data[,,1][ID] <- col_background[1]
@@ -3251,4 +3252,202 @@ rgb_to_lab <- function(object){
                      b = object[, 3])
   lab <- convertColor(srgb, from = "sRGB", to = "Lab")
   return(lab)
+}
+
+
+
+
+# Faster alternatives (makes only the needed)
+help_segment <- function(image,
+                         index = NULL,
+                         threshold = c("Otsu", "adaptive"),
+                         k = 0.1,
+                         windowsize = NULL,
+                         col_background = NULL,
+                         has_white_bg = FALSE,
+                         fill_hull = FALSE,
+                         filter = FALSE,
+                         re = NULL,
+                         nir = NULL,
+                         invert = FALSE){
+  img2 <- help_binary(image,
+                      index = index,
+                      threshold = threshold,
+                      k = k,
+                      windowsize = windowsize,
+                      has_white_bg = has_white_bg,
+                      resize = FALSE,
+                      fill_hull = fill_hull,
+                      filter = filter,
+                      re = re,
+                      nir = nir,
+                      invert = invert)
+  ID <- which(img2@.Data == FALSE)
+  image@.Data[,,1][ID] <- 1
+  image@.Data[,,2][ID] <- 1
+  image@.Data[,,3][ID] <- 1
+  invisible(image)
+}
+
+
+
+help_binary <- function(image,
+                        index = NULL,
+                        threshold = c("Otsu", "adaptive"),
+                        k = 0.1,
+                        windowsize = NULL,
+                        has_white_bg = FALSE,
+                        resize = FALSE,
+                        fill_hull = FALSE,
+                        filter = FALSE,
+                        re = NULL,
+                        nir = NULL,
+                        invert = FALSE){
+  threshold <- threshold[[1]]
+
+  bin_img <- function(imgs,
+                      invert,
+                      fill_hull,
+                      threshold,
+                      filter){
+    # adapted from imagerExtra  https://bit.ly/3Wp4pwv
+    if(threshold == "adaptive"){
+      if(is.null(windowsize)){
+        windowsize <- min(dim(imgs)) / 3
+        if(windowsize %% 2 == 0){
+          windowsize <- as.integer(windowsize + 1)
+        }
+      }
+      if (windowsize <= 2){
+        stop("windowsize must be greater than or equal to 3", call. = FALSE)
+      }
+      if (windowsize %% 2 == 0){
+        warning(sprintf("windowsize is even (%d). windowsize will be treated as %d", windowsize, windowsize + 1), call. = FALSE)
+        windowsize <- as.integer(windowsize + 1)
+      }
+      if (windowsize >= dim(imgs)[[1]] || windowsize >= dim(imgs)[[2]]){
+        warning("windowsize is too large. Setting to `min(dim(image)) / 3`", call. = FALSE)
+        windowsize <- min(dim(imgs)) / 3
+      }
+      if (k > 1){
+        stop("k is out of range. k must be in [0, 1].", call. = FALSE)
+      }
+      imgs <- EBImage::Image(threshold_adaptive(as.matrix(imgs), k, windowsize, 0.5))
+    }
+    if(threshold != "adaptive"){
+      if(threshold == "Otsu"){
+        if(any(is.infinite(imgs))){
+          threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data)])
+        } else{
+          threshold <- help_otsu(imgs@.Data)
+        }
+      } else{
+        if(is.numeric(threshold)){
+          threshold <- threshold
+        } else{
+          pixels <- data.frame(imgs@.Data)
+          colnames(pixels) <- 1:ncol(pixels)
+          pixels$id <- 1:nrow(pixels)
+          pixels <-
+            reshape(pixels,
+                    direction = "long",
+                    varying = list(names(pixels)[1:ncol(pixels)-1]),
+                    v.names = "value",
+                    idvar = "id",
+                    timevar = "y",
+                    times = names(pixels)[1:ncol(pixels)-1])
+          pixels$y <- as.numeric(pixels$y)
+          p <-
+            levelplot(value ~ id * y,
+                      data = pixels,
+                      xlab = NULL,
+                      ylab = NULL,
+                      useRaster = TRUE,
+                      col.regions = terrain.colors(300),
+                      colorkey = list(interpolate = TRUE,
+                                      raster = TRUE))
+          plot(p)
+          threshold <- readline("Selected threshold: ")
+        }
+      }
+      imgs <- EBImage::Image(imgs < threshold)
+    }
+
+    if(invert == TRUE){
+      imgs <- 1 - imgs
+    }
+
+    imgs[which(is.na(imgs))] <- FALSE
+    if(isTRUE(fill_hull)){
+      imgs <- EBImage::fillHull(imgs)
+    }
+    if(is.numeric(filter) & filter > 1){
+      imgs <- EBImage::medianFilter(imgs, filter)
+    }
+    return(imgs)
+  }
+
+  gray_img <- help_imageindex(image, index, resize, re, nir, has_white_bg)
+  bin_img <- bin_img(gray_img,
+                     invert,
+                     fill_hull,
+                     threshold,
+                     filter)
+  invisible(bin_img)
+}
+
+
+
+help_imageindex <- function(image,
+                            index = NULL,
+                            resize = FALSE,
+                            re = NULL,
+                            nir = NULL,
+                            has_white_bg = FALSE){
+  if(resize != FALSE){
+    image <- image_resize(image, resize)
+  }
+  ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+
+  nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
+  hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
+
+  R <- try(image@.Data[,,1], TRUE)
+  G <- try(image@.Data[,,2], TRUE)
+  B <- try(image@.Data[,,3], TRUE)
+
+  if(any(index %in% hsb_ind)){
+    hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
+    h <- matrix(hsb$h, nrow = nrow(image), ncol = ncol(image))
+    s <- matrix(hsb$s, nrow = nrow(image), ncol = ncol(image))
+    b <- matrix(hsb$b, nrow = nrow(image), ncol = ncol(image))
+  }
+
+  if(!is.null(re)|!is.null(nir)){
+    if(index %in% nir_ind & is.null(nir)){
+      stop(paste("Index ", index, " need NIR/RedEdge band to be calculated."), call. = FALSE)
+    }
+    if(!is.null(re)){
+      RE <-  try(image@.Data[,,re], TRUE)
+    }
+    if(!is.null(nir)){
+      NIR <- try(image@.Data[,,nir], TRUE)
+    }
+    test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
+    if(isTRUE(test_nir_ne)){
+      stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
+    }
+  }
+  if(isTRUE(has_white_bg)){
+    R[which(R == 1 & G == 1 & B == 1)] <- NA
+    G[which(R == 1 & G == 1 & B == 1)] <- NA
+    B[which(R == 1 & G == 1 & B == 1)] <- NA
+  }
+
+  if(index %in% ind$Index){
+    img_gray <- EBImage::Image(eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index]))))
+  } else{
+    img_gray <- EBImage::Image(eval(parse(text = as.character(index))))
+  }
+  invisible(img_gray)
 }

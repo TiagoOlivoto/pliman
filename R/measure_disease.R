@@ -573,13 +573,12 @@ measure_disease <- function(img,
         } else{
           invert2 <- FALSE
         }
-        img2 <- image_binary(img,
+        img2 <- help_binary(img,
                              index = index_dh,
                              threshold = my_thresh2,
                              invert = invert2,
                              has_white_bg = has_white_bg,
-                             resize = FALSE,
-                             plot = FALSE)[[1]]
+                             resize = FALSE)
         img2@.Data[is.na(img2@.Data)] <- FALSE
         # which(is.na(img2@.Data))
         res <- length(img2)

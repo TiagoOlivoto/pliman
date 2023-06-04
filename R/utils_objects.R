@@ -111,14 +111,12 @@ object_coord <- function(image,
              edge, extension, tolerance, object_size, plot)
     }
   } else{
-    img2 <- image_binary(image,
-                         index = index,
-                         invert = invert,
-                         filter = filter,
-                         fill_hull = fill_hull,
-                         threshold = threshold,
-                         plot = FALSE,
-                         resize = FALSE)[[1]]
+    img2 <- help_binary(image,
+                        index = index,
+                        invert = invert,
+                        filter = filter,
+                        fill_hull = fill_hull,
+                        threshold = threshold)
     if(is.null(id)){
       data_mask <- img2@.Data
       coord <- t(as.matrix(bounding_box(data_mask, edge)))
@@ -219,14 +217,12 @@ object_contour <- function(image,
     }
   } else{
     if(missing(pattern)){
-      img2 <- image_binary(image,
-                           index = index,
-                           invert = invert,
-                           filter = filter,
-                           fill_hull = fill_hull,
-                           threshold = threshold,
-                           plot = FALSE,
-                           resize = FALSE)[[1]]
+      img2 <- help_binary(image,
+                          index = index,
+                          invert = invert,
+                          filter = filter,
+                          fill_hull = fill_hull,
+                          threshold = threshold)
       if(isTRUE(watershed)){
         res <- length(img2)
         parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
@@ -281,14 +277,12 @@ object_contour <- function(image,
 
       help_contour <- function(img){
         image <- image_import(img)
-        img2 <- image_binary(image,
-                             index = index,
-                             invert = invert,
-                             filter = filter,
-                             fill_hull = fill_hull,
-                             threshold = threshold,
-                             plot = FALSE,
-                             resize = FALSE)[[1]]
+        img2 <- help_binary(image,
+                            index = index,
+                            invert = invert,
+                            filter = filter,
+                            fill_hull = fill_hull,
+                            threshold = threshold)
         if(isTRUE(watershed)){
           res <- length(img2)
           parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
@@ -459,14 +453,12 @@ object_split <- function(img,
                          verbose = TRUE,
                          ...){
 
-  img2 <- image_binary(img,
-                       filter = filter,
-                       index = index,
-                       invert = invert,
-                       fill_hull = fill_hull,
-                       threshold = threshold,
-                       resize = FALSE,
-                       plot = FALSE)[[1]]
+  img2 <- help_binary(img,
+                      filter = filter,
+                      index = index,
+                      invert = invert,
+                      fill_hull = fill_hull,
+                      threshold = threshold)
   if(isTRUE(watershed)){
     parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     res <- length(img2)
@@ -580,10 +572,9 @@ object_to_color <- function(image,
                             color = "blue",
                             plot = TRUE,
                             ...){
-  bin <- image_binary(image,
-                      index = index,
-                      plot = FALSE,
-                      ...)[[1]]
+  bin <- help_binary(image,
+                     index = index,
+                     ...)
   pix_ref <- which(bin == 1)
   colto <- col2rgb(color) / 255
   image@.Data[,,1][pix_ref] <- colto[1]

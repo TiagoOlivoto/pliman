@@ -716,16 +716,15 @@ analyze_objects <- function(img,
           }
 
         } else{
-          img2 <- image_binary(img,
-                               index = index,
-                               invert = invert,
-                               fill_hull = fill_hull,
-                               threshold = threshold,
-                               k = k,
-                               windowsize = windowsize,
-                               filter = filter,
-                               resize = FALSE,
-                               plot = FALSE)[[1]]
+          img2 <- help_binary(img,
+                              index = index,
+                              invert = invert,
+                              fill_hull = fill_hull,
+                              threshold = threshold,
+                              k = k,
+                              windowsize = windowsize,
+                              filter = filter,
+                              resize = FALSE)
           if(isTRUE(watershed)){
             parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
             res <- length(img2)
@@ -770,16 +769,14 @@ analyze_objects <- function(img,
             invert1 <- FALSE
           }
           img_bf <-
-            image_binary(img,
-                         threshold = threshold,
-                         index = back_fore_index,
-                         filter = filter,
-                         k = k,
-                         windowsize = windowsize,
-                         invert = invert1,
-                         plot = FALSE,
-                         fill_hull = fill_hull,
-                         verbose = FALSE)[[1]]
+            help_binary(img,
+                        threshold = threshold,
+                        index = back_fore_index,
+                        filter = filter,
+                        k = k,
+                        windowsize = windowsize,
+                        invert = invert1,
+                        fill_hull = fill_hull)
           img3 <- img
           img3@.Data[,,1][which(img_bf != 1)] <- 2
           img3@.Data[,,2][which(img_bf != 1)] <- 2
@@ -793,15 +790,13 @@ analyze_objects <- function(img,
             invert2 <- FALSE
           }
           img4 <-
-            image_binary(img3,
-                         threshold = threshold,
-                         index = fore_ref_index,
-                         filter = filter,
-                         k = k,
-                         windowsize = windowsize,
-                         invert = invert2,
-                         plot = FALSE,
-                         verbose = FALSE)[[1]]
+            help_binary(img3,
+                        threshold = threshold,
+                        index = fore_ref_index,
+                        filter = filter,
+                        k = k,
+                        windowsize = windowsize,
+                        invert = invert2)
           mask <- img_bf
           pix_ref <- which(img4 != 1)
           img@.Data[,,1][pix_ref] <- 1
@@ -939,16 +934,14 @@ analyze_objects <- function(img,
 
 
             mask <-
-              image_binary(img,
-                           threshold = threshold,
-                           index = index,
-                           k = k,
-                           windowsize = windowsize,
-                           filter = filter,
-                           invert = invert,
-                           fill_hull = fill_hull,
-                           plot = FALSE,
-                           verbose = FALSE)[[1]]
+              help_binary(img,
+                          threshold = threshold,
+                          index = index,
+                          k = k,
+                          windowsize = windowsize,
+                          filter = filter,
+                          invert = invert,
+                          fill_hull = fill_hull)
             if(isTRUE(watershed)){
               parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
               res <- length(mask)

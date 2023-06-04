@@ -144,3 +144,29 @@ object_label <- function(img,
   }
   invisible(labels)
 }
+
+#' Calculate Otsu's threshold
+#'
+#' Given a numeric vector with the pixel's intensities, returns the threshold
+#' value based on Otsu's method, which minimizes the combined intra-class
+#' variance
+#'
+#' @param values A numeric vector with the pixel values.
+#'
+#' @return
+#' A double (threshold value).
+#'
+#' @references Otsu, N. 1979. Threshold selection method from gray-level
+#'   histograms. IEEE Trans Syst Man Cybern SMC-9(1): 62–66. doi:
+#'   \doi{10.1109/tsmc.1979.4310076}
+
+#' @export
+#'
+#' @examples
+#' img <- image_pliman("soybean_touch.jpg")
+#' thresh <- otsu(img@.Data[,,3])
+#' plot(img[,,3] < thresh)
+#'
+otsu <- function(values){
+  help_otsu(values)
+}

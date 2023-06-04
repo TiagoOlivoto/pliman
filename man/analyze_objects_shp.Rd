@@ -83,6 +83,8 @@ frames.
 \examples{
 if(interactive()){
 library(pliman)
+
+# Computes the DGCI index for each flax leaf
 flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 res <-
    analyze_objects_shp(flax,

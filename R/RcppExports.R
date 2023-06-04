@@ -49,6 +49,10 @@ help_shp <- function(rows, cols, dims) {
     .Call(`_pliman_help_shp`, rows, cols, dims)
 }
 
+help_otsu <- function(image) {
+    .Call(`_pliman_help_otsu`, image)
+}
+
 help_area <- function(coord) {
     .Call(`_pliman_help_area`, coord)
 }

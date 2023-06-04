@@ -41,7 +41,7 @@ object_edge <- function(image,
   edata <- sobel_help(gray)
 
   if (threshold == "Otsu") {
-    threshold <- EBImage::otsu(edata, range = range(edata, na.rm = TRUE))
+    threshold <- help_otsu(edata@.Data)
   }
   else {
     if (is.numeric(threshold)) {

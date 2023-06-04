@@ -637,3 +637,70 @@ NumericMatrix help_shp(int rows, int cols, NumericVector dims) {
   }
   return coords;
 }
+
+
+
+
+// Function to compute Otsu's threshold
+// [[Rcpp::export]]
+double help_otsu(const NumericVector& image) {
+  int n = image.size();
+
+  double x_max = max(image);
+  double x_min = min(image);
+
+  // Compute histogram
+  std::vector<int> histogram(256, 0);
+  for (int i = 0; i < n; i++) {
+    int intensity = (int)(((1 - 0) / (x_max - x_min) * (image[i] - x_max) + 1) * 255);
+    histogram[intensity]++;
+  }
+
+  // Compute total number of pixels
+  int totalPixels = n;
+
+  // Compute sum of intensities
+  double sum = 0;
+  for (int i = 0; i < 256; i++) {
+    sum += i * histogram[i];
+  }
+
+  // Compute sum of background intensities
+  double sumBackground = 0;
+  int backgroundPixels = 0;
+
+  // Initialize variables for storing optimal threshold and maximum between-class variance
+  double maxVariance = 0;
+  double threshold = 0;
+
+
+  // Iterate through all possible thresholds
+  for (int i = 0; i < 256; i++) {
+    // Update background sum and number of background pixels
+    backgroundPixels += histogram[i];
+    sumBackground += i * histogram[i];
+
+    // Calculate foreground and background weights
+    double weightBackground = (double)backgroundPixels / totalPixels;
+    double weightForeground = 1 - weightBackground;
+
+    // Calculate mean intensities
+    double meanBackground = sumBackground / backgroundPixels;
+    double meanForeground = (sum - sumBackground) / (totalPixels - backgroundPixels);
+
+    // Calculate between-class variance
+    double variance = weightBackground * weightForeground * pow((meanBackground - meanForeground), 2);
+
+    // Update maximum variance and threshold
+    if (variance > maxVariance) {
+      maxVariance = variance;
+      threshold = i;
+    }
+  }
+
+  // Scale the threshold value back to the range of 0-1
+
+  return threshold * (x_max - x_min) / 255 + x_min;
+}
+
+

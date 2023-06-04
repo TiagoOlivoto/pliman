@@ -25,7 +25,6 @@ BGI;B/G;RGB
 L;R+G+B/3;RGB
 GRAY;0.299*R + 0.587*G + 0.114*B;RGB
 GLAI;(25*(G-R)/(G+R-B)+1.25);RGB
-SAT;(max(R,G,B) - min(R,G,B)) / max(R,G,B);RGB
 CI;(R-B)/R;RGB
 SHP;2*(R-G-B)/(G-B);RGB
 RI;R**2/(B*G**3);RGB
