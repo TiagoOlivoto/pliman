@@ -3,26 +3,49 @@
 \name{utils_pick}
 \alias{utils_pick}
 \alias{pick_count}
+\alias{pick_coords}
 \alias{pick_rgb}
 \alias{pick_palette}
-\title{Picking up points in an image}
+\title{Utilities for picking up points in an image}
 \usage{
 pick_count(
   image,
   n = Inf,
   col = "red",
+  viewer = get_pliman_viewer(),
   size = 0.8,
   plot = TRUE,
   verbose = TRUE
 )
 
-pick_rgb(image, n = Inf, col = "red", size = 0.8, plot = TRUE, verbose = TRUE)
+pick_coords(
+  image,
+  n = Inf,
+  col = "red",
+  viewer = get_pliman_viewer(),
+  size = 0.8,
+  verbose = TRUE
+)
+
+pick_rgb(
+  image,
+  n = Inf,
+  col = "red",
+  viewer = get_pliman_viewer(),
+  size = 0.8,
+  plot = TRUE,
+  verbose = TRUE
+)
 
 pick_palette(
   image,
   n = Inf,
-  r = 3,
+  r = 1,
   shape = "box",
+  viewer = get_pliman_viewer(),
+  show = "rgb",
+  title = "Pick colors in the image",
+  index = "B",
   random = TRUE,
   width = 100,
   height = 100,
@@ -41,11 +64,21 @@ This means that picking will run until the user press Esc.}
 
 \item{col, size}{The color and size for the marker point.}
 
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
+
 \item{plot}{Call a new \code{plot(image)} before processing? Defaults to \code{TRUE}.}
 
 \item{verbose}{If \code{TRUE} (default) shows a counter in the console.}
 
-\item{r}{The radius of neighborhood pixels. Defaults to \code{3}.}
+\item{r}{The radius of neighborhood pixels. Defaults to \code{1}.}
 
 \item{shape}{A character vector indicating the shape of the brush around the
 selected pixel. It  can be \code{"box"}, \code{"disc"}, \code{"diamond"}, \code{"Gaussian"} or
@@ -53,6 +86,12 @@ selected pixel. It  can be \code{"box"}, \code{"disc"}, \code{"diamond"}, \code{
 surrounding pixels are sampled. Setting to \code{"disc"} and increasing the
 radius (\code{r}) will select surrounding pixels towards the format of a sphere
 around the selected pixel.}
+
+\item{show}{How to plot in mapview viewer, either \verb{'rgb} or \code{'index'}.}
+
+\item{title}{The title of the map view when \code{viewer}is used.}
+
+\item{index}{The index to use for the index view. Defaults to 'B'.}
 
 \item{random}{Randomize the selected pixels? Defaults to \code{TRUE}.}
 
@@ -76,7 +115,8 @@ selected point(s).
 click in the image to count objects (points) manually. In each mouse click, a
 point is drawn and an upward counter is shown in the console. After \code{n}
 counts or after the user press Esc, the interactive process is terminated and
-a data.frame with the \code{x} and \code{y} coordinates for each point is returned.
+the number of counts is returned.
+\item \code{pick_coord()} Picks coordinates from the image
 \item \code{pick_palette()}  creates an image palette by picking up color point(s)
 from the image.
 \item \code{pick_rgb()} Picks up the RGB values from selected point(s) in the image.

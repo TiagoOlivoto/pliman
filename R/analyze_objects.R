@@ -232,6 +232,7 @@
 #'  ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
 #' @param pixel_level_index Return the indexes computed in `object_index` in the
 #'   pixel level? Defaults to `FALSE` to avoid returning large data.frames.
+#' @param mask Returns the mask for the analyzed image? Defaults to `FALSE`.
 #'@param efourier Logical argument indicating if Elliptical Fourier should be
 #'  computed for each object. This will call [efourier()] internally. It
 #'  `efourier = TRUE` is used, both standard and normalized Fourier coefficients
@@ -306,8 +307,6 @@
 #'@param ... Depends on the function:
 #' * For [analyze_objects_iter()], further arguments passed on to
 #'  [analyze_objects()].
-#' * For [plot.anal_obj()], further argument passed on to [lattice::histogram()]
-#'  or [lattice::densityplot()]
 #'@return `analyze_objects()` returns a list with the following objects:
 #'  * `results` A data frame with the following variables for each object in the
 #'  image:
@@ -471,9 +470,9 @@
 #' @export
 #' @name analyze_objects
 #' @importFrom  utils install.packages
-#' @importFrom grDevices col2rgb dev.off jpeg png rgb
-#' @importFrom graphics lines par points rect text
-#' @importFrom stats aggregate binomial glm kmeans predict sd runif dist var
+#' @importFrom grDevices col2rgb dev.off jpeg png rgb hcl.colors
+#' @importFrom graphics lines par points rect text hist
+#' @importFrom stats aggregate binomial glm kmeans predict sd runif dist var density
 #' @importFrom utils menu
 #' @md
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -541,6 +540,7 @@ analyze_objects <- function(img,
                             index = "NB",
                             object_index = NULL,
                             pixel_level_index = FALSE,
+                            mask = FALSE,
                             efourier = FALSE,
                             nharm = 10,
                             threshold = "Otsu",
@@ -1106,6 +1106,11 @@ analyze_objects <- function(img,
         obj_rgb <- NULL
         indexes <- NULL
       }
+      if(isTRUE(mask)){
+        mask <- nmask
+      } else{
+        mask <- NULL
+      }
       stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
                                    "sd_area", "sum_area"),
                           value = c(length(shape$area),
@@ -1124,7 +1129,9 @@ analyze_objects <- function(img,
                       efourier_power = efpow,
                       efourier_minharm = min_harm,
                       veins = prop_veins,
-                      angles = angles)
+                      angles = angles,
+                      mask = mask,
+                      parms = list(index = index))
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){
         if(!interactive()){
@@ -1528,10 +1535,7 @@ analyze_objects <- function(img,
 #' @param measure The measure to plot. Defaults to `"area"`.
 #' @param type The type of plot. Either `"hist"` or `"density"`. Partial matches
 #'   are recognized.
-#' @param facet Create a facet plot for each object when `which = "index"` is
-#'   used?. Defaults to `FALSE`.
 #' @method plot anal_obj
-#' @importFrom lattice densityplot levelplot
 #' @importFrom grDevices pdf
 #' @export
 #'
@@ -1560,8 +1564,7 @@ analyze_objects <- function(img,
 plot.anal_obj <- function(x,
                           which = "measure",
                           measure = "area",
-                          type = "density",
-                          facet = FALSE,
+                          type = c("density", "histogram"),
                           ...){
   if(!which %in% c("measure", "index")){
     stop("'which' must be one of 'measure' or 'index'", call. = FALSE)
@@ -1574,53 +1577,40 @@ plot.anal_obj <- function(x,
     }
     temp <- x$results[[measure]]
     types <- c("density", "histogram")
-    matches <- grepl(type, types)
+    matches <- grepl(type[1], types)
     type <- types[matches]
     if(type == "histogram"){
-      lattice::histogram(temp,
-                         type = "count",
-                         xlab = paste(measure, "(pixels)"),
-                         ...)
+      hist(temp,  xlab = paste(measure, "(pixels)"), main = NA, col = "cyan")
     } else{
-      lattice::densityplot(temp,
-                           xlab = paste(measure, "(pixels)"),
-                           col = "blue",
-                           ...)
+      density_data <- density(temp)  # Calculate the density for the column
+      plot(density_data, col = "red", main = NA, lwd = 2, xlab = paste(measure, "(pixels)"), ylab = "Density")  # Create the density plot
+      points(x = temp, y = rep(0, length(temp)), col = "red")
     }
   } else{
     rgb <- x$object_rgb
     if(is.null(rgb)){
       stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.\nHave you accidentally missed the argument `pixel_level_index = TRUE`?", call. = FALSE)
     }
-    rgb$id <- rownames(rgb)
-    rgb <-
-      reshape(rgb,
-              direction = "long",
-              varying = list(names(rgb)[2:4]),
-              v.names = "value",
-              idvar = "id",
-              timevar = "Spectrum",
-              times = c("r", "g", "b"))
-    rgb$Spectrum <- factor( rgb$Spectrum, levels = unique( rgb$Spectrum))
-    if(isTRUE(facet)){
-      densityplot(~value | factor(id),
-                  data = rgb,
-                  groups = Spectrum,
-                  par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
-                  xlab = "Pixel value",
-                  plot.points = FALSE,
-                  ...)
-    } else{
-      densityplot(~value,
-                  data = rgb,
-                  groups = Spectrum,
-                  par.settings = list(superpose.line = list(col = c("red", "green","blue"))),
-                  xlab = "Pixel value",
-                  plot.points = FALSE,
-                  ...)
-    }
+    plot(density(rgb$R),
+         main = NA,
+         col = "red",
+         lwd = 2,
+         xlim = c(min(rgb$R, rgb$G, rgb$B), max(rgb$R, rgb$G, rgb$B)),
+         ylim = c(0, max(density(rgb$R)$y, density(rgb$G)$y, density(rgb$B)$y)),
+         xlab = "Pixel value",
+         ylab = "Density")
+
+    # Add the density curves for G and B
+    lines(density(rgb$G), col = "green", lwd = 2)
+    lines(density(rgb$B), col = "blue", lwd = 2)
+    # Add a legend
+    legend("topright", legend = c("R", "G", "B"), col = c("red", "green", "blue"), lty = 1,
+           lwd = 2)
+
   }
 }
+
+
 
 #' @export
 #' @name analyze_objects

@@ -1,16 +1,12 @@
-citHeader("Please, support this project by citing it in your publications!")
-  citEntry(key         = "Olivoto2022",
-           entry       = "Article",
-           author      = personList(person("Tiago", "Olivoto")),
-	         title       = "Lights, camera, pliman! An R package for plant image analysis",
-	         journal     = {"Methods in Ecology and Evolution"},
-	         volume      = {"13"},
-	         number      = {"4"},
-	         pages       = {"789-798"},
-	         year        = "2022",
-	         doi         = "10.1111/2041-210X.13803",
-	         textVersion =
-	         paste("Olivoto, T.(2022).",
-	               "Lights, camera, pliman! An R package for plant image analysis.",
-	               "Methods Ecol Evol. 13:789-798",
-	               "doi:10.1111/2041-210X.13803"))
+bibentry(
+  "Article",
+  header = "Please, support this project by citing it in your publications!",
+  title = "Lights, camera, pliman! An R package for plant image analysis",
+	author = "Tiago Olivoto",
+  year = 2022,
+  journal = "Methods in Ecology and Evolution",
+  volume = 13,
+  number = 4,
+  pages = "789-798",
+  doi = "10.1111/2041-210X.13803",
+)

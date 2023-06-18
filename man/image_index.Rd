@@ -20,15 +20,7 @@ image_index(
   verbose = TRUE
 )
 
-\method{plot}{image_index}(
-  x,
-  type = "raster",
-  individual_key = FALSE,
-  nrow = NULL,
-  ncol = NULL,
-  npixel = 65000,
-  ...
-)
+\method{plot}{image_index}(x, type = c("raster", "density"), nrow = NULL, ncol = NULL, ...)
 }
 \arguments{
 \item{image}{An image object.}
@@ -76,29 +68,18 @@ number of parallel processes that can be active at the same time.}
 raster plot showing the intensity of the pixels for each image index or
 \code{type = "density"} to produce a density plot with the pixels' intensity.}
 
-\item{individual_key}{key If \code{TRUE} shows an individual color key for each plot
-panel. This is useful when computing image indexes that have different
-scales}
-
-\item{npixel}{The number of pixels to be plotted. This is used to reduce the
-plotting time when high-resolution images are used. By default, 65.000 are
-plotted. When \code{type = "raster"} the gray-level image is resized to match
-~65.000 pixels keeping the same aspect ratio.}
-
-\item{...}{Currently not used}
+\item{...}{Additional arguments passed to \code{\link[=plot_index]{plot_index()}} for customization.}
 }
 \value{
 A list containing Grayscale images. The length will depend on the
 number of indexes used.
 
-A \code{trellis} object containing the distribution of the pixels for each
-index.
+A \code{NULL} object
 }
 \description{
 \code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
 
-\code{plot.image_index()} produces a raster (\code{type = "raster"}, default) or a
-density (\code{type = "density"}) plot of the index values computed with
+Generates a raster or density plot of the index values computed with
 \code{image_index()}.
 }
 \details{
@@ -148,19 +129,27 @@ The following indexes are available in pliman.
 \item \verb{L*}: relative luminance \code{(0.2126 * R + 0.7152 * G + 0.0722 * B)}
 \item \verb{a*}: \code{0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))}
 }
+
+When \code{type = "raster"} (default), the function calls \code{\link[=plot_index]{plot_index()}}
+to create a raster plot for each index present in \code{x}. If \code{type = "density"},
+a for loop is used to create a density plot for each index. Both types of
+plots can be arranged in a grid controlled by the \code{ncol} and \code{nrow}
+arguments.
 }
 \examples{
 library(pliman)
 img <- image_pliman("soybean_touch.jpg")
 image_index(img, index = c("R, NR"))
+
+# Example for S3 method plot()
 library(pliman)
 img <- image_pliman("sev_leaf.jpg")
-
-# resize the image to 30\% of the original size
 # compute the index
-ind <- image_index(img, index = c("R, G, B, HUE, S, I"), plot = FALSE)
+ind <- image_index(img, index = c("R, G, B, NGRDI"), plot = FALSE)
 plot(ind)
-plot(ind, individual_key = TRUE)
+
+# density plot
+plot(ind, type = "density")
 }
 \references{
 Nobuyuki Otsu, "A threshold selection method from gray-level

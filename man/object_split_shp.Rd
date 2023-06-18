@@ -9,6 +9,7 @@ object_split_shp(
   nrow = 1,
   ncol = 1,
   interactive = FALSE,
+  viewer = get_pliman_viewer(),
   only_shp = FALSE,
   ...
 )
@@ -23,6 +24,16 @@ object_split_shp(
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
 that will contain the grid.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
 
 \item{only_shp}{If \code{TRUE} returns only the shapefiles with the coordinates
 for each image. If \code{FALSE} (default) returns the splitted image according

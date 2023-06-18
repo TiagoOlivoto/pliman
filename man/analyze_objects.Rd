@@ -38,6 +38,7 @@ analyze_objects(
   index = "NB",
   object_index = NULL,
   pixel_level_index = FALSE,
+  mask = FALSE,
   efourier = FALSE,
   nharm = 10,
   threshold = "Otsu",
@@ -81,8 +82,7 @@ analyze_objects(
   x,
   which = "measure",
   measure = "area",
-  type = "density",
-  facet = FALSE,
+  type = c("density", "histogram"),
   ...
 )
 
@@ -233,6 +233,8 @@ ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equa
 \item{pixel_level_index}{Return the indexes computed in \code{object_index} in the
 pixel level? Defaults to \code{FALSE} to avoid returning large data.frames.}
 
+\item{mask}{Returns the mask for the analyzed image? Defaults to \code{FALSE}.}
+
 \item{efourier}{Logical argument indicating if Elliptical Fourier should be
 computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
 \code{efourier = TRUE} is used, both standard and normalized Fourier coefficients
@@ -356,15 +358,10 @@ subfolder within the current working directory, e.g., \code{"/imgs"}.}
 \item{type}{The type of plot. Either \code{"hist"} or \code{"density"}. Partial matches
 are recognized.}
 
-\item{facet}{Create a facet plot for each object when \code{which = "index"} is
-used?. Defaults to \code{FALSE}.}
-
 \item{...}{Depends on the function:
 \itemize{
 \item For \code{\link[=analyze_objects_iter]{analyze_objects_iter()}}, further arguments passed on to
 \code{\link[=analyze_objects]{analyze_objects()}}.
-\item For \code{\link[=plot.anal_obj]{plot.anal_obj()}}, further argument passed on to \code{\link[lattice:histogram]{lattice::histogram()}}
-or \code{\link[lattice:histogram]{lattice::densityplot()}}
 }}
 
 \item{known_area}{The known area of the template object.}

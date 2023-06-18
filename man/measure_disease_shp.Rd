@@ -8,6 +8,8 @@ measure_disease_shp(
   img,
   nrow = 1,
   ncol = 1,
+  prepare = FALSE,
+  viewer = "mapview",
   index_lb = "HUE2",
   index_dh = "NGRDI",
   pattern = NULL,
@@ -31,6 +33,20 @@ that contains the images to be processed.}
 
 \item{nrow, ncol}{The number of rows and columns to generate the shapefile.
 Defaults to \code{1}.}
+
+\item{prepare}{Logical value indicating whether to prepare the image for
+analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. This allows to align and crop
+the image before processing. Defaults to \code{FALSE}.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
 
 \item{index_lb}{The index used to segment the foreground (e.g., leaf) from
 the background. If not declared, the entire image area (pixels) will be

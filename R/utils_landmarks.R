@@ -27,6 +27,15 @@ create_mat <- function(vect, nr){
 #' @param img An `Image` object.
 #' @param n The number of landmarks to produce. Defaults to `Inf`. In this case,
 #'   landmarks are chosen up to the user press Esc.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param scale A known scale of the coordinate values. If `NULL` (default)
 #'   `scale = 1` is used.
 #' @param calibrate A logical argument indicating whether a calibration step
@@ -50,6 +59,7 @@ create_mat <- function(vect, nr){
 #' }
 landmarks <- function(img,
                       n = Inf,
+                      viewer = get_pliman_viewer(),
                       scale = NULL,
                       calibrate = FALSE){
   if (isTRUE(interactive())) {
@@ -63,26 +73,34 @@ landmarks <- function(img,
         scale <- scale
       }
     }
-    plot(img)
-    on.exit(return(coords))
-    message("Use the first mouse button to select landmarks in the plot.\nPress Esc to exit.")
-    i <- 1
-    coords <- data.frame(x = NA, y = NA)
-    while (i <= n) {
-      d <- unlist(locator(n = 1))
-      if (is.null(d)) {
-        break
+    viewopt <- c("base", "mapview")
+    viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
+    if(viewopt == "base"){
+      plot(img)
+      on.exit(return(coords))
+      message("Use the first mouse button to select landmarks in the plot.\nPress Esc to exit.")
+      i <- 1
+      coords <- data.frame(x = NA, y = NA)
+      while (i <= n) {
+        d <- unlist(locator(n = 1))
+        if (is.null(d)) {
+          break
+        }
+        coords[i, 1] <- d[[1]] / scale
+        coords[i, 2] <- d[[2]] / scale
+        rownames(coords)[[i]] <- paste0("L", i)
+        points(d[[1]], d[[2]], type = "p", col = "red", cex = 1, pch = 19)
+        text(d[[1]], d[[2]], pos=2, labels=paste0("L", i))
+        cat("Number of landmarks:", i, "\r")
+        i <- i + 1
       }
-      coords[i, 1] <- d[[1]] / scale
-      coords[i, 2] <- d[[2]] / scale
-      rownames(coords)[[i]] <- paste0("L", i)
-      points(d[[1]], d[[2]], type = "p", col = "red", cex = 1, pch = 19)
-      text(d[[1]], d[[2]], pos=2, labels=paste0("L", i))
-      cat("Number of landmarks:", i, "\r")
-      i <- i + 1
-    }
-    if (i >= n) {
-      warning("Number of landmarks achieved.", call. = FALSE)
+      if (i >= n) {
+        warning("Number of landmarks achieved.", call. = FALSE)
+      }
+    } else{
+      coords <- mv_points(img, title = "Use the first mouse button to select landmarks in the plot. Press 'Done' to exit.")
+      rownames(coords) <- paste0("L", 1:nrow(coords))
+      return(coords)
     }
   }
 }
@@ -230,7 +248,7 @@ landmarks_regradi <- function(x,
 #' # smoothed version
 #' ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 10)
 #' lines(ldm_add_smo, col = "blue", lwd = 3)
-landmarks_add<-function(x,
+landmarks_add <- function(x,
                         n = 3,
                         smooth_iter = 0,
                         plot = TRUE,
@@ -287,7 +305,15 @@ landmarks_add<-function(x,
 #' with a scale (e.g., ruler, micrometer...).
 #'
 #' @param img An `Image` object
-#'
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @return A numeric (`double`) scalar value indicating the scale (in pixels per
 #'   unit of known distance).
 #' @references
@@ -312,11 +338,21 @@ landmarks_add<-function(x,
 #' # scale ~118
 #' # 118 * 2.54 ~300 DPI
 #' }
-calibrate <- function(img){
-  message("Use the first mouse button to create a line in the plot.")
-  plot(img)
-  a <- locator(2,type="o",pch=8,lwd=2,col="red",lty="11")
-  scale <- sqrt(sum(diff(a$x)^2 + diff(a$y)^2))
+calibrate <- function(img, viewer = get_pliman_viewer()){
+  viewopt <- c("base", "mapview")
+  viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
+  if(viewopt == "base"){
+    message("Use the first mouse button to create a line in the plot.")
+    plot(img)
+    a <- locator(2,type="o",pch=8,lwd=2,col="red",lty="11")
+    scale <- sqrt(sum(diff(a$x)^2 + diff(a$y)^2))
+  } else{
+    mv <- mv_two_points(img,
+                        title = "Use the 'Draw Polyline' tool to create a line in the plot")
+    a <- abs(mv[[1]] - mv[[3]])
+    b <- abs(mv[[2]] - mv[[4]])
+    scale <- sqrt(a ^ 2 + b ^ 2)
+  }
   known <- as.numeric(readline("known distance (cm): "))
   scale / known
 }

@@ -42,26 +42,13 @@ object_edge <- function(image,
 
   if (threshold == "Otsu") {
     threshold <- help_otsu(edata@.Data)
-  }
-  else {
+  }  else {
     if (is.numeric(threshold)) {
       threshold <- threshold
     }
     else {
-      pixels <- data.frame(edata@.Data)
-      colnames(pixels) <- 1:ncol(pixels)
-      pixels$id <- 1:nrow(pixels)
-      pixels <- reshape(pixels, direction = "long",
-                        varying = list(names(pixels)[1:ncol(pixels) -
-                                                       1]), v.names = "value", idvar = "id",
-                        timevar = "y", times = names(pixels)[1:ncol(pixels) -
-                                                               1])
-      pixels$y <- as.numeric(pixels$y)
-      p <- levelplot(value ~ id * y, data = pixels,
-                     xlab = NULL, ylab = NULL, useRaster = TRUE,
-                     col.regions = terrain.colors(300), colorkey = list(interpolate = TRUE,
-                                                                        raster = TRUE))
-      plot(p)
+      pixels <- raster::raster(t(edata@.Data))
+      plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
       threshold <- readline("Selected threshold: ")
     }
   }

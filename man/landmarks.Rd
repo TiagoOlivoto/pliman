@@ -4,13 +4,29 @@
 \alias{landmarks}
 \title{Create image landmarks}
 \usage{
-landmarks(img, n = Inf, scale = NULL, calibrate = FALSE)
+landmarks(
+  img,
+  n = Inf,
+  viewer = get_pliman_viewer(),
+  scale = NULL,
+  calibrate = FALSE
+)
 }
 \arguments{
 \item{img}{An \code{Image} object.}
 
 \item{n}{The number of landmarks to produce. Defaults to \code{Inf}. In this case,
 landmarks are chosen up to the user press Esc.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
 
 \item{scale}{A known scale of the coordinate values. If \code{NULL} (default)
 \code{scale = 1} is used.}

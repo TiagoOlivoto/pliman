@@ -53,7 +53,15 @@ measure_disease(
   verbose = TRUE
 )
 
-measure_disease_iter(img, has_background = TRUE, r = 5, ...)
+measure_disease_iter(
+  img,
+  has_background = TRUE,
+  r = 5,
+  viewer = get_pliman_viewer(),
+  show = "rgb",
+  index = "NGRDI",
+  ...
+)
 }
 \arguments{
 \item{img}{The image to be analyzed.}
@@ -220,6 +228,21 @@ be segmented before processing.}
 
 \item{r}{The radius of neighborhood pixels. Defaults to \code{5}. A square is
 drawn indicating the selected pixels.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
+
+\item{show}{The show option for the mapview viewer, either \code{"rgb"} or
+\code{"index"}.}
+
+\item{index}{The index to be shown when \code{show = "rgb"}.}
 
 \item{...}{Further parameters passed on to \code{measure_disease()}.}
 }

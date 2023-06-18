@@ -40,8 +40,16 @@
    - `object_split_shp()` to splits image objects based on a shapefile.
    - `analyze_objects_shp()` to analyze objects using shapefiles.
    - `measure_disease_shp()` to measure disease using shapefiles.
+   
+* New `plot_index()` function to plot an image index using raster package, and optionaly using the mapview package to show the image index.
+
+* New `image_view()` function to create an interactive map view of an image. This function allows users to interactively edit and analyze an image using [mapview](https://r-spatial.github.io/mapview/) and [mapedit](https://github.com/r-spatial/mapedit) packages.
+
+* New `image_prepare_mv()` function to prepare an image to be analyzed for `analyze_objects_shp()`. This function aligns and crops the image using either base or mapview visualization.
 
 ## New features
+* New `viewer` option added. Now, iterative functions such as `pick_palette()` and `measure_disease_iter()` have an argument `viewer`. If not provided, the value is retrieved using `get_pliman_viewer()`. This option controls the type of viewer to use for interactive plotting. The available options are "base" and "mapview". If set to "base", the base R graphics system is used for interactive plotting. If set to "mapview", the [mapview](https://r-spatial.github.io/mapview/) package is used, allowing the users to draw shapes like points and polygons with [mapedit](https://github.com/r-spatial/mapedit) package. To set this argument globally for all functions in the package, you can use the `set_pliman_viewer()` function. For example, you can run `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for all functions.
+
 * [Haralick's features](https://ieeexplore.ieee.org/document/4309314) that quantify pixel texture for image objects were included.
 
 * Several measures were added in `analyze_objects()`. The function now wraps some `poly_*()` functions to compute shape measures such as width, length, elongation, circularity. Haralick's features are now computed by default. .  This improvement was at cost of a slight increase in computation time.

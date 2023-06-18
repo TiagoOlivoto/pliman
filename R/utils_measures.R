@@ -448,8 +448,8 @@ get_measures <- function(object,
 #' @name utils_measures
 #' @export
 plot_measures <- function(object,
-                          id = NULL,
                           measure = "id",
+                          id = NULL,
                           hjust = NULL,
                           vjust = NULL,
                           digits = 2,

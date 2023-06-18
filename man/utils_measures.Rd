@@ -18,8 +18,8 @@ get_measures(
 
 plot_measures(
   object,
-  id = NULL,
   measure = "id",
+  id = NULL,
   hjust = NULL,
   vjust = NULL,
   digits = 2,

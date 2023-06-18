@@ -110,6 +110,7 @@ image_combine <- function(...,
 #' @param ... Alternative arguments passed to the corresponding functions from
 #'   the `jpeg`, `png`, and `tiff` packages.
 #' @md
+#' @importFrom raster stack as.array
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return
@@ -135,8 +136,8 @@ image_import <- function(image,
                          plot = FALSE,
                          nrow = NULL,
                          ncol = NULL){
-  check_ebi()
-  valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF", "TIF", "tif")
+  # check_ebi()
+  valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF", "TIF", "tif", "gri", "grd")
   if(!is.null(pattern)){
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -184,7 +185,19 @@ image_import <- function(image,
       ls <-
         lapply(seq_along(img_name),
                function(x){
-                 EBImage::readImage(img_name[x], ...)
+                 if(file_extension(img_name[[1]]) %in% c("tif", "TIF", "tiff", "TIFF", "gri", "grd")){
+                   tmp <- raster::stack(img_name[x])
+                   nlayers <- length(tmp@layers)
+                   dims <- dim(tmp@layers[[1]])
+                   list_layers <- raster::as.array(tmp)
+                   if(max(list_layers[,,1]) > 1){
+                     list_layers <- apply(list_layers, c(1, dim(list_layers)[3]), function(x){x / 255})
+                   }
+                   img <- EBImage::Image(list_layers, colormode='Color')
+                 } else{
+                   EBImage::readImage(img_name[x], ...)
+                 }
+
                })
       names(ls) <- basename(img_name)
       if(isTRUE(plot)){
@@ -198,8 +211,14 @@ image_import <- function(image,
       }
       return(ls)
     } else{
-      if(file_extension(image) %in% c("tif", "TIF", "tiff", "TIFF")){
-        img <- suppressWarnings(EBImage::readImage(img_name, all = which, ...))
+      if(file_extension(img_name) %in% c("tif", "TIF", "tiff", "TIFF", "gri", "grd")){
+        tmp <- raster::stack(img_name)
+        tmp_dir <- tempdir()
+        png(paste0(tmp_dir, "tmpimg.png"), height = nrow(tmp), width = ncol(tmp))
+        raster::plotRGB(tmp, maxpixels = raster::ncell(tmp))
+        dev.off()
+        img <- EBImage::readImage(paste0(tmp_dir, "tmpimg.png"))
+        aaa <- file.remove(paste0(tmp_dir, "tmpimg.png"))
       } else{
         img <- EBImage::readImage(img_name, ...)
       }
@@ -335,10 +354,22 @@ image_pliman <- function(image, plot = FALSE){
 #' * `image_blur()` Performs blurring filter of images. See more at
 #' [EBImage::gblur()].
 #' * `image_skeleton()` Performs image skeletonization.
+#'
+#'
 #' @name utils_transform
 #' @param image An image or a list of images of class `Image`.
 #' @param index The index to segment the image. See [image_index()] for more
 #'   details. Defaults to `"NB"` (normalized blue).
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
+#' @param show How to plot in mapview viewer, either `"rgb"` or `"index"`.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
@@ -456,13 +487,18 @@ image_autocrop <- function(image,
 }
 #' @name utils_transform
 #' @export
+
 image_crop <- function(image,
                        width = NULL,
                        height = NULL,
+                       viewer = get_pliman_viewer(),
+                       show = "rgb",
                        parallel = FALSE,
                        workers = NULL,
                        verbose = TRUE,
                        plot = FALSE){
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(is.list(image)){
     if(class(image) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
@@ -479,9 +515,9 @@ image_crop <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_crop, width, height)
+      res <- parLapply(clust, image, image_crop, width, height, viewer)
     } else{
-      res <- lapply(image, image_crop, width, height)
+      res <- lapply(image, image_crop, width, height, viewer)
     }
     return(res)
   } else{
@@ -503,16 +539,26 @@ image_crop <- function(image,
       image@.Data <- image@.Data[width, height, ]
     }
     if (is.null(width) & is.null(height)) {
-      message("Use the left mouse buttom to crop the image.")
-      plot(image)
-      cord <- locator(type = "p", n = 2, col = "red", pch = 19)
-      w <- round(cord$x[[1]], 0):round(cord$x[[2]], 0)
-      h <- round(cord$y[[1]], 0):round(cord$y[[2]], 0)
-      cord <- apply(data.frame(do.call(rbind, cord)), 2, round, digits = 0)
+      if(vieweropt == "base"){
+        message("Use the left mouse buttom to crop the image.")
+        plot(image)
+        cord <- locator(type = "p", n = 2, col = "red", pch = 19)
+        minw <- min(cord$x[[1]], cord$x[[2]])
+        maxw <- max(cord$x[[1]], cord$x[[2]])
+        minh <- min(cord$y[[1]], cord$y[[2]])
+        maxh <- max(cord$y[[1]], cord$y[[2]])
+        w <- round(minw, 0):round(maxw, 0)
+        h <- round(minh, 0):round(maxh, 0)
+      } else{
+        nc <- ncol(image)
+        mv <- mv_rectangle(image, show = show)
+        w <- round(min(mv[,1]):max(mv[,1]))
+        h <- round((min(mv[,2]))):round(max(mv[,2]))
+      }
       image@.Data <- image@.Data[w, h, ]
       if(isTRUE(verbose)){
-        cat(paste0("width = ", cord[1, 1], ":", cord[1, 2]), "\n")
-        cat(paste0("height = ", cord[2, 1], ":", cord[2, 2]), "\n")
+        cat(paste0("width = ", w[1], ":", w[length(w)]), "\n")
+        cat(paste0("height = ", h[1], ":", h[length(h)]), "\n")
       }
     }
     if (isTRUE(plot)) {
@@ -521,6 +567,8 @@ image_crop <- function(image,
     return(image)
   }
 }
+
+
 #' @name utils_transform
 #' @export
 image_dimension <- function(image,
@@ -1551,28 +1599,8 @@ image_binary <- function(image,
           if(is.numeric(threshold)){
             threshold <- threshold
           } else{
-            pixels <- data.frame(imgs@.Data)
-            colnames(pixels) <- 1:ncol(pixels)
-            pixels$id <- 1:nrow(pixels)
-            pixels <-
-              reshape(pixels,
-                      direction = "long",
-                      varying = list(names(pixels)[1:ncol(pixels)-1]),
-                      v.names = "value",
-                      idvar = "id",
-                      timevar = "y",
-                      times = names(pixels)[1:ncol(pixels)-1])
-            pixels$y <- as.numeric(pixels$y)
-            p <-
-              levelplot(value ~ id * y,
-                        data = pixels,
-                        xlab = NULL,
-                        ylab = NULL,
-                        useRaster = TRUE,
-                        col.regions = terrain.colors(300),
-                        colorkey = list(interpolate = TRUE,
-                                        raster = TRUE))
-            plot(p)
+            pixels <- raster::raster(t(imgs@.Data))
+            plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
             threshold <- readline("Selected threshold: ")
           }
         }
@@ -1826,29 +1854,11 @@ image_index <- function(image,
       }
     }
     names(imgs) <- index
+    class(imgs) <- "image_index"
     if(plot == TRUE){
-      num_plots <- length(imgs)
-      if (is.null(nrow) && is.null(ncol)){
-        ncol <- ifelse(num_plots == 3, 3, ceiling(sqrt(num_plots)))
-        nrow <- ceiling(num_plots/ncol)
-      }
-      if (is.null(ncol)){
-        ncol <- ceiling(num_plots/nrow)
-      }
-      if (is.null(nrow)){
-        nrow <- ceiling(num_plots/ncol)
-      }
-      op <- par(mfrow = c(nrow, ncol))
-      on.exit(par(op))
-      for(i in 1:length(imgs)){
-        plot(imgs[[i]])
-        if(verbose == TRUE){
-          dim <- image_dimension(imgs[[i]], verbose = FALSE)
-          text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
-        }
-      }
+      plot_index(imgs, nrow = nrow, ncol = ncol)
     }
-    invisible(structure(imgs, class = "image_index"))
+    invisible(imgs)
   }
 }
 
@@ -1857,50 +1867,50 @@ image_index <- function(image,
 
 #' Plots an `image_index` object
 #'
-#' `plot.image_index()` produces a raster (`type = "raster"`, default) or a
-#' density (`type = "density"`) plot of the index values computed with
+#' Generates a raster or density plot of the index values computed with
 #' `image_index()`.
+
+#'
+#' @details When `type = "raster"` (default), the function calls [plot_index()]
+#' to create a raster plot for each index present in `x`. If `type = "density"`,
+#' a for loop is used to create a density plot for each index. Both types of
+#' plots can be arranged in a grid controlled by the `ncol` and `nrow`
+#' arguments.
+#'
 #'
 #' @name image_index
 #' @param x An object of class `image_index`.
 #' @param type The type of plot. Use `type = "raster"` (default) to produce a
 #'   raster plot showing the intensity of the pixels for each image index or
 #'   `type = "density"` to produce a density plot with the pixels' intensity.
-#' @param individual_key key If `TRUE` shows an individual color key for each plot
-#'   panel. This is useful when computing image indexes that have different
-#'   scales
-#' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
-#'   `NULL`, i.e., a square grid is produced.
-#' @param npixel The number of pixels to be plotted. This is used to reduce the
-#'   plotting time when high-resolution images are used. By default, 65.000 are
-#'   plotted. When `type = "raster"` the gray-level image is resized to match
-#'   ~65.000 pixels keeping the same aspect ratio.
-#' @param ... Currently not used
+#' @param ... Additional arguments passed to [plot_index()] for customization.
 #' @method plot image_index
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
-#' @return A `trellis` object containing the distribution of the pixels for each
-#'   index.
+#' @return A `NULL` object
 #' @examples
+#'
+#' # Example for S3 method plot()
 #' library(pliman)
 #' img <- image_pliman("sev_leaf.jpg")
-#'
-#' # resize the image to 30% of the original size
 #' # compute the index
-#' ind <- image_index(img, index = c("R, G, B, HUE, S, I"), plot = FALSE)
+#' ind <- image_index(img, index = c("R, G, B, NGRDI"), plot = FALSE)
 #' plot(ind)
-#' plot(ind, individual_key = TRUE)
+#'
+#' # density plot
+#' plot(ind, type = "density")
 plot.image_index <- function(x,
-                             type = "raster",
-                             individual_key = FALSE,
+                             type = c("raster", "density"),
                              nrow = NULL,
                              ncol = NULL,
-                             npixel = 65000,
                              ...){
-  if(!type %in% c("raster", "density")){
+  typeop <- c("raster", "density")
+  typeop <- typeop[pmatch(type[1], typeop)]
+
+  if(!typeop %in% c("raster", "density")){
     stop("`type` must be one of the 'raster' or 'density'. ")
   }
-  if(type == "density"){
+  if(typeop == "density"){
     mat <-
       as.data.frame(
         do.call(cbind,
@@ -1908,133 +1918,31 @@ plot.image_index <- function(x,
                   as.vector(i)}
                 ))
       )
-    mat <- data.frame(mat[sample(1:nrow(mat), npixel),])
+    mat <- data.frame(mat[sample(1:nrow(mat), 70000, replace = TRUE),])
     colnames(mat) <- names(x)
-    mat$id <- rownames(mat)
-    if(length(x) == 1){
-      mat$Spectrum <- colnames(mat)[1]
-      colnames(mat)[1] <- "value"
-      a <- mat
-    } else{
-      a <-
-        reshape(data.frame(mat),
-                idvar = "id",
-                varying = list(1:length(x)),
-                times = names(x),
-                timevar = "Spectrum",
-                v.names = "value",
-                direction = "long")
-    }
-    a$Spectrum <- factor(a$Spectrum, levels = names(x))
-    num_plots <- nlevels(a$Spectrum)
+    num_plots <- ncol(mat)
+
     if (is.null(nrow) && is.null(ncol)){
-      ncol <- ceiling(sqrt(num_plots))
-      nrow <- ceiling(num_plots/ncol)
+      ncols <- ceiling(sqrt(num_plots))
+      nrows <- ceiling(num_plots/ncols)
     }
     if (is.null(ncol)){
-      ncol <- ceiling(num_plots/nrow)
+      ncols <- ceiling(num_plots/nrows)
     }
     if (is.null(nrow)){
-      nrow <- ceiling(num_plots/ncol)
+      nrows <- ceiling(num_plots/ncols)
     }
-    p <-
-      densityplot(~value | factor(Spectrum),
-                  data = a,
-                  groups = Spectrum,
-                  scales=list(relation="free"),
-                  xlab = "Pixel value",
-                  layout = c(ncol, nrow),
-                  plot.points = FALSE)
-    return(p)
+    op <- par(mfrow = c(nrows, ncols),
+              mar = c(3, 2.5, 3, 3))
+    on.exit(par(op))
+
+    for (col in names(mat)) {
+      density_data <- density(mat[[col]])  # Calculate the density for the column
+      plot(density_data, main = col, col = "red", lwd = 2, xlab = NA, ylab = "Density")  # Create the density plot
+    }
+
   } else{
-    get_pixels <- function(x, spectrum){
-      pixels <- data.frame(x@.Data)
-      colnames(pixels) <- 1:ncol(pixels)
-      pixels$id <- 1:nrow(pixels)
-      pixels <-
-        reshape(pixels,
-                direction = "long",
-                varying = list(names(pixels)[1:ncol(pixels)-1]),
-                v.names = "value",
-                idvar = "id",
-                timevar = "y",
-                times = names(pixels)[1:ncol(pixels)-1])
-      pixels$y <- as.numeric(pixels$y)
-      pixels$spectrum <- spectrum
-      return(pixels)
-    }
-
-    pixels <-
-      do.call(rbind,
-              lapply(seq_along(x), function(i){
-                ntpix <- prod(dim(x[[i]]))
-                if(ntpix > npixel){
-                  rows <- dim(x[[i]])[1]
-                  corfac <- sqrt(npixel / ntpix)
-                  nrow_new <- ceiling(rows * corfac)
-                  x2 <- EBImage::resize(x[[i]], nrow_new)
-                } else{
-                  x2 <- x[i]
-                }
-                get_pixels(x2, names(x[i]))
-              })
-      )
-    spects <- unique(pixels$spectrum)
-    num_plots <-length(unique(spects))
-    if (is.null(nrow) && is.null(ncol)){
-      ncol <- ceiling(sqrt(num_plots))
-      nrow <- ceiling(num_plots/ncol)
-    }
-    if (is.null(ncol)){
-      ncol <- ceiling(num_plots/nrow)
-    }
-    if (is.null(nrow)){
-      nrow <- ceiling(num_plots/ncol)
-    }
-
-    if(isTRUE(individual_key)){
-      plot_lits <- list()
-      for(i  in 1:num_plots){
-        plot_lits[[i]] <-
-          levelplot(value ~ id * y | spectrum,
-                    pretty = TRUE,
-                    cuts = 300,
-                    data = pixels[pixels$spectrum == spects[i], ],
-                    xlab = NULL,
-                    ylab = NULL,
-                    useRaster = TRUE,
-                    aspect = "fill",
-                    col.regions = terrain.colors(1000),
-                    colorkey = list(interpolate = TRUE,
-                                    raster = TRUE,
-                                    width = 1,
-                                    space = "bottom"))
-      }
-      gp <- expand.grid(1:ncol, 1:nrow)
-      for (i in 1:length(plot_lits)) {
-        if(i == 1){
-          print(plot_lits[[i]], split=c(gp[i, 1], gp[i, 2], ncol, nrow))
-        } else{
-          print(plot_lits[[i]], split=c(gp[i, 1], gp[i, 2], ncol, nrow), newpage=FALSE)
-        }
-
-      }
-    } else{
-
-      levelplot(value ~ id * y | spectrum,
-                layout = c(ncol, nrow),
-                data = pixels,
-                pretty = TRUE,
-                cuts = 300,
-                xlab = NULL,
-                ylab = NULL,
-                useRaster = TRUE,
-                col.regions = terrain.colors(300),
-                colorkey = list(interpolate = TRUE,
-                                raster = TRUE))
-
-    }
-
+    plot_index(x, ncol = ncol, nrow = nrow, ...)
   }
 }
 
@@ -2178,16 +2086,16 @@ image_segment <- function(image,
     for(i in 1:length(index)){
       indx <- index[[i]]
       img2 <- help_binary(image,
-                           index = indx,
-                           threshold = threshold,
-                           k = k,
-                           windowsize = windowsize,
-                           has_white_bg = has_white_bg,
-                           resize = FALSE,
-                           fill_hull = fill_hull,
-                           filter = filter,
-                           re = re,
-                           nir = nir)
+                          index = indx,
+                          threshold = threshold,
+                          k = k,
+                          windowsize = windowsize,
+                          has_white_bg = has_white_bg,
+                          resize = FALSE,
+                          fill_hull = fill_hull,
+                          filter = filter,
+                          re = re,
+                          nir = nir)
       ID <- which(img2@.Data == FALSE)
       img <- image
       img@.Data[,,1][ID] <- col_background[1]
@@ -2538,6 +2446,15 @@ image_segment_kmeans <-   function (image,
 #' @param type The type of segmentation. By default (`type = "select"`) objects
 #'   are selected. Use `type = "remove"` to remove the selected area from the
 #'   image.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param resize By default, the segmented object is resized to fill the
 #'   original image size. Use `resize = FALSE` to keep the segmented object in
 #'   the original scale.
@@ -2558,64 +2475,90 @@ image_segment_kmeans <-   function (image,
 image_segment_manual <-  function(image,
                                   shape = c("free", "circle", "rectangle"),
                                   type = c("select", "remove"),
+                                  viewer = get_pliman_viewer(),
                                   resize = TRUE,
                                   edge = 5,
                                   plot = TRUE){
   vals <- c("free", "circle", "rectangle")
-  shape <- vals[[pmatch(shape, vals)]]
+  shape <- vals[[pmatch(shape[1], vals)]]
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if (isTRUE(interactive())) {
     if(shape == "free"){
-      plot(image)
-      message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
-      stop <- FALSE
-      n <- 1e+06
-      coor <- NULL
-      a <- 0
-      while (isFALSE(stop)) {
-        if (a > 1) {
-          if (nrow(coor) > 1) {
-            lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
-                                                                1):nrow(coor), 2], col = "red")
+      if(vieweropt == "base"){
+        plot(image)
+        message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
+        stop <- FALSE
+        n <- 1e+06
+        coor <- NULL
+        a <- 0
+        while (isFALSE(stop)) {
+          if (a > 1) {
+            if (nrow(coor) > 1) {
+              lines(coor[(nrow(coor) - 1):nrow(coor), 1], coor[(nrow(coor) -
+                                                                  1):nrow(coor), 2], col = "red")
+            }
+          }
+          x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+          if (is.null(x)){
+            stop <- TRUE
+          }
+          coor <- rbind(coor, x)
+          a <- a + 1
+          if (a >= n) {
+            stop = TRUE
           }
         }
-        x = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
-        if (is.null(x)){
-          stop <- TRUE
-        }
-        coor <- rbind(coor, x)
-        a <- a + 1
-        if (a >= n) {
-          stop = TRUE
-        }
+        coor <- rbind(coor, coor[1, ])
+      } else{
+        coor <- mv_polygon(image)
+        plot(image)
+
       }
-      coor <- rbind(coor, coor[1, ])
     }
 
     if(shape == "circle"){
-      plot(image)
-      message("Click on the center of the circle")
-      cent = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
-      message("Click on the edge of the circle")
-      ext = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
-      radius = sqrt(sum((cent - ext)^2))
-      x1 = seq(-1, 1, l = 2000)
-      x2 = x1
-      y1 = sqrt(1 - x1^2)
-      y2 = (-1) * y1
-      x = c(x1, x2) * radius + cent[1]
-      y = c(y1, y2) * radius + cent[2]
+      if(vieweropt == "base"){
+        plot(image)
+        message("Click on the center of the circle")
+        cent = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+        message("Click on the edge of the circle")
+        ext = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
+        radius = sqrt(sum((cent - ext)^2))
+        x1 = seq(-1, 1, l = 2000)
+        x2 = x1
+        y1 = sqrt(1 - x1^2)
+        y2 = (-1) * y1
+        x = c(x1, x2) * radius + cent[1]
+        y = c(y1, y2) * radius + cent[2]
+      } else{
+        mv <- mv_two_points(image)
+        radius = sqrt(sum((c(mv$x1, mv$y1) - c(mv$x2, mv$y2))^2))
+        x1 = seq(-1, 1, l = 2000)
+        x2 = x1
+        y1 = sqrt(1 - x1^2)
+        y2 = (-1) * y1
+        x = c(x1, x2) * radius + mv$x1
+        y = c(y1, y2) * radius + mv$y1
+      }
       coor = cbind(x, y)
+      plot(image)
     }
 
     if(shape == "rectangle"){
-      plot(image)
-      message("Select 2 points drawing the diagonal that includes the area of interest.")
-      cord <- unlist(locator(type = "p", n = 2, col = "red", pch = 19))
-      coor <-
-        rbind(c(cord[1], cord[3]),
-              c(cord[2], cord[3]),
-              c(cord[2], cord[4]),
-              c(cord[1], cord[4]))
+      if(vieweropt == "base"){
+        plot(image)
+        message("Select 2 points drawing the diagonal that includes the area of interest.")
+        cord <- unlist(locator(type = "p", n = 2, col = "red", pch = 19))
+        coor <-
+          rbind(c(cord[1], cord[3]),
+                c(cord[2], cord[3]),
+                c(cord[2], cord[4]),
+                c(cord[1], cord[4]))
+      } else{
+        coor <- mv_rectangle(image)
+        plot(image)
+      }
     }
     mat <- NULL
     for (i in 1:(nrow(coor) - 1)) {
@@ -3044,8 +2987,16 @@ image_square <- function(image, plot = TRUE, ...){
 #'
 #' @name utils_dpi
 #' @param image An image object.
-#' @param plot Call a new plot to `image`? Defaults to `TRUE`.
 #' @param dpi The image resolution in dots per inch.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param px The number of pixels.
 #' @param cm The size in centimeters.
 #' @return
@@ -3117,26 +3068,34 @@ npixels <- function(image){
 }
 #' @name utils_dpi
 #' @export
-dpi <- function(image, plot = TRUE){
+dpi <- function(image,
+                viewer = get_pliman_viewer()){
   if(isTRUE(interactive())){
-    pix <- distance(image, plot = plot)
+    pix <- distance(image, viewer = viewer)
     known <- as.numeric(readline("known distance (cm): "))
     pix / (known / 2.54)
   }
 }
+
 #' @name utils_dpi
 #' @export
-distance <- function(image, plot = TRUE){
+distance <- function(image,
+                     viewer = get_pliman_viewer()){
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(isTRUE(interactive())){
-    if(isTRUE(plot)){
+    if(vieweropt == "base"){
       plot(image)
+      message("Use the first mouse button to create a line in the plot.")
+      coords <- locator(type = "l",
+                        n = 2,
+                        lwd = 2,
+                        col = "red")
+      pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
+    } else{
+      coords2 <- mv_two_points(image)
+      pix <- sqrt((coords2$x1 - coords2$x2)^2 + (coords2$y1 - coords2$y2)^2)
     }
-    message("Use the first mouse button to create a line in the plot.")
-    coords <- locator(type = "l",
-                      n = 2,
-                      lwd = 2,
-                      col = "red")
-    pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
     return(pix)
   }
 }
@@ -3345,28 +3304,8 @@ help_binary <- function(image,
         if(is.numeric(threshold)){
           threshold <- threshold
         } else{
-          pixels <- data.frame(imgs@.Data)
-          colnames(pixels) <- 1:ncol(pixels)
-          pixels$id <- 1:nrow(pixels)
-          pixels <-
-            reshape(pixels,
-                    direction = "long",
-                    varying = list(names(pixels)[1:ncol(pixels)-1]),
-                    v.names = "value",
-                    idvar = "id",
-                    timevar = "y",
-                    times = names(pixels)[1:ncol(pixels)-1])
-          pixels$y <- as.numeric(pixels$y)
-          p <-
-            levelplot(value ~ id * y,
-                      data = pixels,
-                      xlab = NULL,
-                      ylab = NULL,
-                      useRaster = TRUE,
-                      col.regions = terrain.colors(300),
-                      colorkey = list(interpolate = TRUE,
-                                      raster = TRUE))
-          plot(p)
+          pixels <- raster::raster(t(imgs@.Data))
+          plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
           threshold <- readline("Selected threshold: ")
         }
       }
@@ -3451,3 +3390,48 @@ help_imageindex <- function(image,
   }
   invisible(img_gray)
 }
+
+
+#' Create an `Image` object
+#'
+#' This function is a simple wrapper around [EBImage::Image()].
+#'
+#' @param data A vector or array containing the pixel intensities of an image.
+#'   If missing, the default 1x1 zero-filled array is used.
+#' @param ... Additional arguments passed to [EBImage::Image()].
+#' @return An `Image` object.
+#' @export
+#'
+#' @examples
+#' img <-
+#' as_image(rnorm(150 * 150 * 3),
+#'          dim = c(150, 150, 3),
+#'          colormode = 'Color')
+#' plot(img)
+as_image <- function(data, ...){
+  EBImage::Image(data, ...)
+}
+
+
+#' Prepare images to analyze_objects_shp()
+#'
+#' It is a simple wrapper around [image_align()] and [image_crop()]. In this case, only the option `viewer = "base"` is used. To use `viewer = "mapview"`, please, use such functions separately.
+#'
+#' @param img A `Image` object
+#' @inheritParams image_align
+#'
+#' @return An aligned and cropped `Image` object.
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' img <- image_pliman("flax_leaves.jpg")
+#' prepare_to_shp(img)
+#' }
+prepare_to_shp <- function(img,
+                           align = "vertical"){
+  aligned <- image_align(img, viewer = "base")
+  cropped <- image_crop(aligned, viewer = "base", plot = TRUE)
+  return(cropped)
+}
+

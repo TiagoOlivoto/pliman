@@ -4,7 +4,12 @@
 \alias{image_align}
 \title{Aligns an \code{Image} object by hand}
 \usage{
-image_align(img, align = c("vertical", "horizontal"), plot = TRUE)
+image_align(
+  img,
+  align = c("vertical", "horizontal"),
+  viewer = get_pliman_viewer(),
+  plot = TRUE
+)
 }
 \arguments{
 \item{img}{An \code{Image} object}
@@ -12,22 +17,39 @@ image_align(img, align = c("vertical", "horizontal"), plot = TRUE)
 \item{align}{The desired alignment. Either \code{"vertical"} (default) or
 \code{"horizontal"}.}
 
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
+
 \item{plot}{Plots the aligned image? Defaults to \code{TRUE}.}
 }
 \value{
 The \code{img} aligned
 }
 \description{
-\code{\link[=image_rotate]{image_rotate()}} rotate an image given an informed angle. Here, users will
-need to draw a line along the y axis that corresponds to the alignment of the
-objects (e.g., field plots). By default, the aligment will be to the
-vertical, which means that if the drawed line have an angle < 90º parallel to
-the x axis, the rotation angle wil be negative (anticlocwise rotation). If
-the drawed line have an angle > 90º along the x axis, the rotation angle wil
-be positive (clocwise rotation). If the aligment is horizontal, the image
-will be rotated to align the drawed line paralell to the x axis assuming the
-shortest angle (left or right rotation if the angle is < 90º or > 90º,
-respectively)
+\code{\link[=image_rotate]{image_rotate()}} rotate an image given a line of desired aligment along the y
+axis that corresponds to the alignment of the objects (e.g., field plots). By
+default, the aligment will be to the vertical, which means that if the drawed
+line have an angle < 90º parallel to the x axis, the rotation angle wil be
+negative (anticlocwise rotation).
+}
+\details{
+The \code{image_align} function aligns an image along the vertical or horizontal
+axis based on user-selected points. The alignment can be performed in either
+the base plotting system or using the mapview package for interactive
+visualization. If the viewer option is set to "base", the function prompts
+the user to select two points on the image to define the alignment line. If
+the viewer option is set to "mapview", the function opens an interactive map
+where the user can draw a polyline to define the alignment line. The
+alignment angle is calculated based on the selected points, and the image is
+rotated accordingly using the \code{image_rotate} function. The function returns
+the aligned image object.
 }
 \examples{
 if(interactive()){

@@ -7,12 +7,13 @@ Authors@R:
            role = c("aut", "cre"),
            email = "tiagoolivoto@gmail.com",
            comment = c(ORCID = "0000-0002-0241-9636"))
-Description: Provides tools for image manipulation that will help you to
-    quantify plant leaf area, disease severity, number of disease lesions,
-    and obtain statistics of image objects such as grains, pods, pollen,
-    leaves, and more. Tools to segment images and create binary images
-    using the method of automatic threshold selection proposed by
-    Otsu (1979) <doi:10.1109/tsmc.1979.4310076> are also provided.
+Description: The pliman package provides a comprehensive set of tools for single
+    or batch image manipulation. It offers functionalities to accurately quantify
+    plant leaf area, assess disease severity, count objects, obtain shape measures, 
+    object landmarks, and compute Fourier analysis of the object outline.
+    Additionally, the package includes tools for analyzing grids, which enables
+    high throughput field phenotyping using RGB imagery captured by unmanned
+    aerial vehicles.
 License: GPL (>= 3)
 URL: https://github.com/TiagoOlivoto/pliman
 BugReports: https://github.com/TiagoOlivoto/pliman/issues
@@ -22,6 +23,10 @@ Suggests:
     BiocManager,
     EBImage,
     knitr,
+    leafem (>= 0.2.0),
+    leaflet (>= 2.1.2),
+    mapedit (>= 0.6.0),
+    mapview (>= 2.11.0),
     rmarkdown,
     rstudioapi
 VignetteBuilder: 
@@ -34,7 +39,7 @@ RoxygenNote: 7.2.3
 Imports: 
     doParallel,
     foreach,
-    lattice,
+    raster,
     Rcpp
 LazyData: true
 LinkingTo: 

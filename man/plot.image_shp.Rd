@@ -7,10 +7,10 @@
 \method{plot}{image_shp}(
   x,
   img = NULL,
-  col_line = "red",
+  col_line = "black",
   size_line = 2,
-  col_text = "red",
-  size_text = 1,
+  col_text = "black",
+  size_text = 0.75,
   ...
 )
 }

@@ -552,6 +552,32 @@ check_ebi <- function(){
   }
 }
 
+check_mapview <- function() {
+  packages <- c("raster", "mapview", "mapedit", "leaflet", "leafem")
+  rast <- !requireNamespace("raster", quietly = TRUE)
+  mapv <- !requireNamespace("mapview", quietly = TRUE)
+  mape <- !requireNamespace("mapedit", quietly = TRUE)
+  leafl <- !requireNamespace("leaflet", quietly = TRUE)
+  leafe <- !requireNamespace("leafem", quietly = TRUE)
+  missing_packages <- packages[c(rast, mapv, mape, leafl, leafe)]
+  if (length(missing_packages) > 0) {
+    if (interactive()) {
+      inst <- switch(menu(c("Yes", "No"),
+                          title = paste("Packages", paste(missing_packages, collapse = ", "),
+                                        "are required to use the `viewer = 'mapview' option`.\nDo you want to install them now?")),
+                     "yes", "no")
+      if (inst == "yes") {
+        install.packages(missing_packages, quiet = TRUE)
+      } else {
+        message("To use viewer = 'mapview', first install the required packages:", paste(missing_packages, collapse = ", "))
+      }
+    } else {
+      message("To use viewer = 'mapview', first install the required packages:", paste(missing_packages, collapse = ", "))
+    }
+  }
+}
+
+
 # get RGB values from a mask computed with EBImage::watershed()
 get_rgb <- function(img, data_mask, index){
   data.frame(object = index,

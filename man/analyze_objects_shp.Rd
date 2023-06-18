@@ -8,6 +8,9 @@ analyze_objects_shp(
   img,
   nrow = 1,
   ncol = 1,
+  prepare = TRUE,
+  viewer = get_pliman_viewer(),
+  index = "R",
   shapefile = NULL,
   interactive = FALSE,
   plot = TRUE,
@@ -18,6 +21,7 @@ analyze_objects_shp(
   object_index = NULL,
   veins = FALSE,
   verbose = TRUE,
+  invert = FALSE,
   ...
 )
 }
@@ -26,6 +30,25 @@ analyze_objects_shp(
 
 \item{nrow, ncol}{The number of rows and columns to generate the shapefile
 when \code{shapefile} is not declared. Defaults to \code{1}.}
+
+\item{prepare}{Logical value indicating whether to prepare the image for
+analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. This allows to align and crop
+the image before processing.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+\code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
+
+\item{index}{A character value specifying the target mode for conversion to
+binary image when \code{foreground} and \code{background} are not declared. Defaults
+to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details. User can
+also calculate your own index using the bands names, e.g. \code{index = "R+B/G"}}
 
 \item{shapefile}{(Optional) An object created with \code{\link[=image_shp]{image_shp()}}. If \code{NULL}
 (default), both \code{nrow} and \code{ncol} must be declared.}
@@ -69,6 +92,15 @@ OPERATION ON AN IMAGE LEVEL, NOT OBJECT!}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
+\item{invert}{Inverts the binary image if desired. This is useful to process
+images with a black background. Defaults to \code{FALSE}. If \code{reference = TRUE}
+is use, \code{invert} can be declared as a logical vector of length 2 (eg.,
+\verb{invert = c(FALSE, TRUE}). In this case, the segmentation of objects and
+reference from the foreground using \code{back_fore_index} is performed using the
+default (not inverted), and the segmentation of objects from the reference
+is performed by inverting the selection (selecting pixels higher than the
+threshold).}
+
 \item{...}{Aditional arguments passed on to \link{analyze_objects}.}
 }
 \value{
@@ -76,9 +108,25 @@ An object of class \code{anal_obj}. See more details in the \code{Value}
 section of \code{\link[=analyze_objects]{analyze_objects()}}.
 }
 \description{
-This function calls \code{\link[=analyze_objects]{analyze_objects()}} in each image polygon of a shapefile
-object generated with \code{\link[=image_shp]{image_shp()}} and bind the results into read-ready data
-frames.
+Analyzes objects using shapefiles
+}
+\details{
+The \code{analyze_objects_shp} function performs object analysis on an
+image and generates shapefiles representing the analyzed objects. The
+function first prepares the image for analysis using the \code{\link[=image_prepare_mv]{image_prepare_mv()}}
+function if the \code{prepare} argument is set to \code{TRUE}. If a shapefile object is
+provided, the number of rows and columns for splitting the image is obtained
+from the shapefile. Otherwise, the image is split into multiple sub-images
+based on the specified number of rows and columns using the
+\code{\link[=object_split_shp]{object_split_shp()}} function. The objects in each sub-image are analyzed
+using the \code{\link[=analyze_objects]{analyze_objects()}} function, and the results are stored in a list.
+If parallel processing is enabled, the analysis is performed in parallel
+using multiple workers. The analysis results is
+
+The output object provides access to various components of the analysis
+results, such as the analyzed object coordinates and properties.
+Additionally, the shapefiles representing the analyzed objects are included
+in the output object for further analysis or visualization.
 }
 \examples{
 if(interactive()){

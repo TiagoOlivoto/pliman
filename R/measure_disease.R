@@ -162,8 +162,20 @@
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @param has_background A logical indicating if the image has a background to
 #'   be segmented before processing.
-#' @param r The radius of neighborhood pixels. Defaults to `5`. A square is
+#' @param r The radius of neighborhood pixels. Defaults to `2`. A square is
 #'   drawn indicating the selected pixels.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
+#' @param show The show option for the mapview viewer, either `"rgb"` or
+#'   `"index"`.
+#' @param index The index to be shown when `show = "rgb"`.
 #' @param ... Further parameters passed on to `measure_disease()`.
 #' @return
 #' * `measure_disease()` returns a list with the following objects:
@@ -549,13 +561,11 @@ measure_disease <- function(img,
           } else{
             invert1 <- FALSE
           }
-          seg <- image_segment(img,
-                               index = index_lb,
-                               threshold = my_thresh,
-                               invert = invert1,
-                               filter = filter,
-                               plot = FALSE,
-                               fill_hull = FALSE)
+          seg <- help_segment(img,
+                              index = index_lb,
+                              threshold = my_thresh,
+                              invert = invert1,
+                              filter = filter)
 
           img <- seg
         }
@@ -574,11 +584,11 @@ measure_disease <- function(img,
           invert2 <- FALSE
         }
         img2 <- help_binary(img,
-                             index = index_dh,
-                             threshold = my_thresh2,
-                             invert = invert2,
-                             has_white_bg = has_white_bg,
-                             resize = FALSE)
+                            index = index_dh,
+                            threshold = my_thresh2,
+                            invert = invert2,
+                            has_white_bg = has_white_bg,
+                            resize = FALSE)
         img2@.Data[is.na(img2@.Data)] <- FALSE
         # which(is.na(img2@.Data))
         res <- length(img2)
@@ -896,88 +906,80 @@ measure_disease <- function(img,
 #' @export
 measure_disease_iter <- function(img,
                                  has_background = TRUE,
-                                 r = 5,
+                                 r = 2,
+                                 viewer = get_pliman_viewer(),
+                                 show = "rgb",
+                                 index = "NGRDI",
                                  ...){
-  if(interactive()){
-    done <- "n"
+  viewopt <- c("base", "mapview")
+  viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
+  if(viewopt == "base"){
     plot(img)
-    while(done != "y"){
-      if(isTRUE(has_background)){
-        message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
-        back <- pick_palette(img,
-                             r = r,
-                             verbose = FALSE,
-                             palette  = FALSE,
-                             plot = FALSE,
-                             col = "blue")
-      } else{
-        back <- NULL
-      }
-      message("Use the first mouse button to pick up LEAF colors. Press Est to exit")
-      leaf <- pick_palette(img,
-                           r = r,
-                           verbose = FALSE,
-                           palette  = FALSE,
-                           plot = FALSE,
-                           col = "black")
-      message("Use the first mouse button to pick up DISEASE colors. Press Est to exit")
-      disease <- pick_palette(img,
-                              r = r,
-                              verbose = FALSE,
-                              palette  = FALSE,
-                              plot = FALSE,
-                              col = "red")
-      temp <-
-        measure_disease(img = img,
-                        img_healthy = leaf,
-                        img_symptoms = disease,
-                        img_background = back,
-                        ...)
-      done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-      while(!done %in% c("y", "n", "Y", "N")){
-        message("Please, select one of 'y/Y' or 'n/N'")
-        done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-      }
-      while(done != "y"){
-        plot(img)
-        npix <- length(leaf)/3
-        samples <- sample(1:npix, 5000)
-        if(isTRUE(has_background)){
-          message("Use the first mouse button to pick up BACKGROUND colors. Press Est to skip")
-          tback <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
-          back@.Data[,,1][samples] <-  tback@.Data[,,1][samples]
-          back@.Data[,,2][samples] <-  tback@.Data[,,2][samples]
-          back@.Data[,,3][samples] <-  tback@.Data[,,3][samples]
-        } else{
-          back <- NULL
-        }
-        message("Use the first mouse button to pick up LEAF colors. Press Est to skip")
-        tleaf <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE, plot = FALSE)
-        leaf@.Data[,,1][samples] <-  tleaf@.Data[,,1][samples]
-        leaf@.Data[,,2][samples] <-  tleaf@.Data[,,2][samples]
-        leaf@.Data[,,3][samples] <-  tleaf@.Data[,,3][samples]
-
-        message("Use the first mouse button to pick up DISEASE colors. Press Est to skip")
-        tdisease <- pick_palette(img, r = r, verbose = FALSE, palette = FALSE)
-        disease@.Data[,,1][samples] <-  tdisease@.Data[,,1][samples]
-        disease@.Data[,,2][samples] <-  tdisease@.Data[,,2][samples]
-        disease@.Data[,,3][samples] <-  tdisease@.Data[,,3][samples]
-        temp <-
-          measure_disease(img = img,
-                          img_healthy = leaf,
-                          img_symptoms = disease,
-                          img_background = back,
-                          ...)
-        done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-        while(!done %in% c("y", "n", "Y", "N")){
-          message("Please, select one of 'y/Y' or 'n/N'")
-          done <- tolower(readline(prompt = "Are the selection correct? (y/n) "))
-        }
-      }
-    }
-    return(list(results = temp,
-                leaf = leaf,
-                disease = disease,
-                background = back))
   }
+  if(isTRUE(has_background)){
+    # Call the functions independently
+    # Call pick_background function
+    if(viewopt == "base"){
+      message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
+    }
+    back <- pick_palette(img,
+                         r = r,
+                         verbose = FALSE,
+                         palette = FALSE,
+                         plot = FALSE,
+                         viewer = viewopt,
+                         show = show,
+                         index = index,
+                         title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
+                         col = "blue")
+    if(viewopt != "base"){
+      image_view(img |> reduce_dimensions(2000))
+    }
+  } else{
+    back <- NULL
+  }
+  # Call pick_leaf function
+  if(viewopt == "base"){
+    message("Use the first mouse button to pick up LEAF colors. Press Est to exit")
+  }
+  leaf <- pick_palette(img,
+                       r = r,
+                       verbose = FALSE,
+                       palette = FALSE,
+                       plot = FALSE,
+                       viewer = viewopt,
+                       show = show,
+                       index = index,
+                       title = "Use the first mouse button to pick up LEAF colors. Click 'Done' to finish",
+                       col = "black")
+  if(viewopt != "base"){
+    image_view(img |> reduce_dimensions(2000))
+  }
+
+  # Call pick_disease function
+  if(viewopt == "base"){
+    message("Use the first mouse button to pick up DISEASE colors. Press Est to exit")
+  }
+  disease <- pick_palette(img,
+                          r = r,
+                          verbose = FALSE,
+                          palette = FALSE,
+                          plot = FALSE,
+                          viewer = viewopt,
+                          show = show,
+                          index = index,
+                          title = "Use the first mouse button to pick up DISEASE colors. Click 'Done' to finish",
+                          col = "red")
+
+  temp <-
+    measure_disease(img = img,
+                    img_healthy = leaf,
+                    img_symptoms = disease,
+                    img_background = back,
+                    ...)
+
+  return(list(results = temp,
+              leaf = leaf,
+              disease = disease,
+              background = back))
 }

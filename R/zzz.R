@@ -43,6 +43,7 @@ NULL
   packageStartupMessage("| Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |")
   packageStartupMessage("|==========================================================|")
   check_ebi()
+  check_mapview()
 }
 
 if (getRversion() >= "2.15.1") {
@@ -75,4 +76,46 @@ if (getRversion() >= "2.15.1") {
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @keywords data
 NULL
+
+#' Global option for controlling the viewer in pliman package
+#'
+#' Users can set the value of this option using `options("pliman_viewer", value)`.
+#' The default value is "base". Use "mapview" to allow image to be
+#' plotted/edited using the R packages mapview and mapedit
+#'
+#' @name pliman_viewer
+#' @aliases pliman_viewer
+#' @rdname pliman_viewer
+NULL
+
+
+#' Get the value of the pliman_viewer option
+#'
+#' Retrieves the current value of the pliman_viewer option used in the package.
+#'
+#' @return The current value of the pliman_viewer option.
+#' @export
+get_pliman_viewer <- function() {
+  option_value <- options("pliman_viewer")[[1]]
+  if (!is.null(option_value)) {
+    option_value
+  } else {
+    "base"  # Default value
+  }
+}
+
+#' Set the value of the pliman_viewer option
+#'
+#' Sets the value of the pliman_viewer option used in the package.
+#'
+#' @param value The value to be set for the pliman_viewer option.
+#' @export
+set_pliman_viewer <- function(value) {
+  options(pliman_viewer = value)
+}
+
+### Utilities for defining viewer options
+.onLoad <- function(libname, pkgname) {
+  options(pliman_viewer = "base")
+}
 

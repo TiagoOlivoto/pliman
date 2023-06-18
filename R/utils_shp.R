@@ -12,6 +12,15 @@
 #'   based on the image dimension and number of rows/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
 #'   that will contain the grid.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param col_line,col_text The color of the line/text in the grid. Defaults to
 #'   `"red"`.
 #' @param size_line,size_text The size of the line/text in the grid. Defaults to
@@ -29,17 +38,25 @@ image_shp <- function(img,
                       nrow = 1,
                       ncol = 1,
                       interactive = FALSE,
+                      viewer = get_pliman_viewer(),
                       col_line = "red",
                       size_line = 2,
                       col_text = "red",
                       size_text = 1,
                       plot = TRUE){
+  viewopt <- c("base", "mapview")
+  viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
   if(isTRUE(interactive)){
-    message("Select 2 points drawing the diagonal that includes the objects of interest.")
-    plot(img)
-    cord <- locator(type = "p", n = 2, col = "red", pch = 19)
-    c1 <- data.frame(do.call(rbind, cord)) |> t()
-    c1 <- c(min(c1[,1]), max(c1[,1]), min(c1[,2]), max(c1[,2]))
+    if(viewopt == "base"){
+      message("Select 2 points drawing the diagonal that includes the objects of interest.")
+      plot(img)
+      cord <- locator(type = "p", n = 2, col = "red", pch = 19)
+      c1 <- data.frame(do.call(rbind, cord)) |> t()
+      c1 <- c(min(c1[,1]), max(c1[,1]), min(c1[,2]), max(c1[,2]))
+    } else{
+      coords <- mv_rectangle(img)
+      c1 <- c(min(coords[,1]), max(coords[,1]), min(coords[,2]), max(coords[,2]))
+    }
   } else{
     imgd <- dim(img)
     c1 <- c(0, imgd[1], 0, imgd[2])
@@ -92,10 +109,10 @@ image_shp <- function(img,
 #' plot(shape)
 plot.image_shp <- function(x,
                            img = NULL,
-                           col_line = "red",
+                           col_line = "black",
                            size_line = 2,
-                           col_text = "red",
-                           size_text = 1,
+                           col_text = "black",
+                           size_text = 0.75,
                            ...){
   shapefiles <- x$shapefiles
   bbox <- x$bbox
@@ -150,9 +167,12 @@ object_split_shp <- function(img,
                              nrow = 1,
                              ncol = 1,
                              interactive = FALSE,
+                             viewer = get_pliman_viewer(),
                              only_shp = FALSE,
                              ...){
-  shps <- image_shp(img, nrow, ncol, interactive = interactive, plot = FALSE, ...)
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
+  shps <- image_shp(img, nrow, ncol, interactive = interactive, plot = FALSE, viewer = vieweropt, ...)
   shapefile <- shps$shapefiles
   if(!isTRUE(only_shp)){
     imgs <- list()
@@ -181,20 +201,36 @@ object_split_shp <- function(img,
 
 #' Aligns an `Image` object by hand
 #'
-#' [image_rotate()] rotate an image given an informed angle. Here, users will
-#' need to draw a line along the y axis that corresponds to the alignment of the
-#' objects (e.g., field plots). By default, the aligment will be to the
-#' vertical, which means that if the drawed line have an angle < 90º parallel to
-#' the x axis, the rotation angle wil be negative (anticlocwise rotation). If
-#' the drawed line have an angle > 90º along the x axis, the rotation angle wil
-#' be positive (clocwise rotation). If the aligment is horizontal, the image
-#' will be rotated to align the drawed line paralell to the x axis assuming the
-#' shortest angle (left or right rotation if the angle is < 90º or > 90º,
-#' respectively)
+#' [image_rotate()] rotate an image given a line of desired aligment along the y
+#' axis that corresponds to the alignment of the objects (e.g., field plots). By
+#' default, the aligment will be to the vertical, which means that if the drawed
+#' line have an angle < 90º parallel to the x axis, the rotation angle wil be
+#' negative (anticlocwise rotation).
+#'
+#' @details
+#' The `image_align` function aligns an image along the vertical or horizontal
+#' axis based on user-selected points. The alignment can be performed in either
+#' the base plotting system or using the mapview package for interactive
+#' visualization. If the viewer option is set to "base", the function prompts
+#' the user to select two points on the image to define the alignment line. If
+#' the viewer option is set to "mapview", the function opens an interactive map
+#' where the user can draw a polyline to define the alignment line. The
+#' alignment angle is calculated based on the selected points, and the image is
+#' rotated accordingly using the `image_rotate` function. The function returns
+#' the aligned image object.
 #'
 #' @param img An `Image` object
 #' @param align The desired alignment. Either `"vertical"` (default) or
 #'   `"horizontal"`.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param plot Plots the aligned image? Defaults to `TRUE`.
 #'
 #' @return The `img` aligned
@@ -208,19 +244,33 @@ object_split_shp <- function(img,
 #' }
 image_align <- function(img,
                         align = c("vertical", "horizontal"),
+                        viewer = get_pliman_viewer(),
                         plot = TRUE){
-  message("Select 2 points drawing a line of desired aligment along the y axis.")
-  plot(img)
-  cord <- locator(type = "p", n = 2, col = "red", pch = 19)
-  c1 <- data.frame(do.call(rbind, cord)) |> t()
-  lines(c1, col = "red", lty = 2, lwd = 2)
-  a <- abs(cord$x[1] - cord$x[2])
-  b <- abs(cord$y[1] - cord$y[2])
+  alignopt <- c("vertical", "horizontal")
+  alignopt <- alignopt[pmatch(align[1], alignopt)]
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
+  if(viewer[[1]] == "base"){
+    message("Select 2 points drawing a line of desired aligment along the y axis.")
+    plot(img)
+    cord <- locator(type = "p", n = 2, col = "red", pch = 19)
+    c1 <- data.frame(do.call(rbind, cord)) |> t()
+    lines(c1, col = "red", lty = 2, lwd = 2)
+    a <- abs(cord$x[1] - cord$x[2])
+    b <- abs(cord$y[1] - cord$y[2])
+  } else{
+    mv <- mv_two_points(img,
+                        title = "Use the 'Draw Polyline' tool to Select 2 points drawing a line of desired aligment")
+    a <- abs(mv[[1]] - mv[[3]])
+    b <- abs(mv[[2]] - mv[[4]])
+    c1 <- data.frame(x = c(mv[[1]], mv[[3]]),
+                     y = c(mv[[2]], mv[[4]]))
+  }
   angle <- (atan(b / a) * 180) / pi
   if(svd(var(c1))$u[2] >= 0){
     anglev <- angle - 90
     angleh <- angle
-    if(align[[1]] == "vertical"){
+    if(alignopt[[1]] == "vertical"){
       img2 <- image_rotate(img, angle = anglev, plot = plot)
     } else{
       img2 <- image_rotate(img, angle = angleh, plot = plot)
@@ -230,7 +280,7 @@ image_align <- function(img,
   } else{
     anglev <- 90 - angle
     angleh <- angle * -1
-    if(align[[1]] == "vertical"){
+    if(vieweropt == "vertical"){
       img2 <- image_rotate(img, angle = anglev, plot = plot)
     } else{
       img2 <- image_rotate(img, angle = angleh, plot = plot)
@@ -243,15 +293,42 @@ image_align <- function(img,
 
 #' Analyzes objects using shapefiles
 #'
-#' This function calls [analyze_objects()] in each image polygon of a shapefile
-#' object generated with [image_shp()] and bind the results into read-ready data
-#' frames.
+#' @details The `analyze_objects_shp` function performs object analysis on an
+#' image and generates shapefiles representing the analyzed objects. The
+#' function first prepares the image for analysis using the [image_prepare_mv()]
+#' function if the `prepare` argument is set to `TRUE`. If a shapefile object is
+#' provided, the number of rows and columns for splitting the image is obtained
+#' from the shapefile. Otherwise, the image is split into multiple sub-images
+#' based on the specified number of rows and columns using the
+#' [object_split_shp()] function. The objects in each sub-image are analyzed
+#' using the [analyze_objects()] function, and the results are stored in a list.
+#' If parallel processing is enabled, the analysis is performed in parallel
+#' using multiple workers. The analysis results is
+#'
+#' The output object provides access to various components of the analysis
+#' results, such as the analyzed object coordinates and properties.
+#' Additionally, the shapefiles representing the analyzed objects are included
+#' in the output object for further analysis or visualization.
+#'
+#'
 #'
 #' @inheritParams analyze_objects
 #'
 #' @param img An `Image` object
 #' @param nrow,ncol The number of rows and columns to generate the shapefile
 #'   when `shapefile` is not declared. Defaults to `1`.
+#' @param prepare Logical value indicating whether to prepare the image for
+#'   analysis using [image_prepare_mv()] function. This allows to align and crop
+#'   the image before processing.
+#' @param viewer The viewer option. If not provided, the value is retrieved
+#'   using [get_pliman_viewer()]. This option controls the type of viewer to use
+#'   for interactive plotting. The available options are "base" and "mapview".
+#'   If set to "base", the base R graphics system is used for interactive
+#'   plotting. If set to "mapview", the mapview package is used. To set this
+#'   argument globally for all functions in the package, you can use the
+#'   [set_pliman_viewer()] function. For example, you can run
+#'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
+#'   all functions.
 #' @param shapefile (Optional) An object created with [image_shp()]. If `NULL`
 #'   (default), both `nrow` and `ncol` must be declared.
 #' @param interactive If `FALSE` (default) the grid is created automatically
@@ -286,6 +363,9 @@ image_align <- function(img,
 analyze_objects_shp <- function(img,
                                 nrow = 1,
                                 ncol = 1,
+                                prepare = TRUE,
+                                viewer = get_pliman_viewer(),
+                                index = "R",
                                 shapefile = NULL,
                                 interactive = FALSE,
                                 plot = TRUE,
@@ -296,21 +376,36 @@ analyze_objects_shp <- function(img,
                                 object_index = NULL,
                                 veins = FALSE,
                                 verbose = TRUE,
+                                invert = FALSE,
                                 ...){
+  if(isTRUE(prepare)){
+    img <- image_prepare_mv(img, viewer = viewer)
+  }
+  mask <- analyze_objects(img,
+                          index = index,
+                          invert = invert,
+                          plot = FALSE,
+                          mask = TRUE,
+                          object_size = object_size,
+                          object_index = object_index)$mask
+  object_index_used <- object_index
   if(is.null(shapefile)){
     tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
   } else{
-    shapes <- shapefile
     nrow <- shapefile$nrow
     ncol <- shapefile$ncol
+    tmp <- object_split_shp(img, nrow, ncol, interactive = FALSE, only_shp = FALSE)
+    imgs <- tmp$imgs
+    shapes <- tmp$shapefile$shapefiles
   }
 
   if(isTRUE(plot)){
     op <- par(mfrow = c(nrow, ncol))
     on.exit(par(op))
   }
+
   if(parallel == TRUE){
     workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
     cl <- parallel::makePSOCKcluster(workers)
@@ -324,22 +419,28 @@ analyze_objects_shp <- function(img,
     results <-
       foreach::foreach(i = seq_along(imgs), .packages = "pliman") %dopar%{
         analyze_objects(imgs[[i]],
+                        index = index,
                         plot = plot,
                         object_size = object_size,
                         object_index = object_index,
                         veins = veins,
                         efourier = efourier,
+                        invert = invert,
+                        mask = FALSE,
                         ...)
       }
   } else{
     results <-
       lapply(seq_along(imgs), function(i){
         analyze_objects(imgs[[i]],
+                        index = index,
                         plot = plot,
                         object_size = object_size,
                         object_index = object_index,
                         veins = veins,
                         efourier = efourier,
+                        invert = invert,
+                        mask = FALSE,
                         ...)
       })
   }
@@ -477,12 +578,17 @@ analyze_objects_shp <- function(img,
            efourier_power = efourier_power,
            efourier_minharm = efourier_minharm,
            veins = veins,
-           shapefiles = tmp$shapefile),
+           shapefiles = tmp$shapefile,
+           mask = mask,
+           index = index,
+           object_index_computed = object_index_used,
+           final_image = img),
       class = "anal_obj"
     )
   )
-
 }
+
+
 
 plot_shp <- function(coords,
                      col_line = "red",
@@ -499,12 +605,6 @@ plot_shp <- function(coords,
   })
 }
 
-
-
-
-
-
-
 #' Measure disease using shapefiles
 #'
 #' This function calls [measure_disease()] in each image polygon of a shapefile
@@ -519,6 +619,9 @@ plot_shp <- function(coords,
 #'   that contains the images to be processed.
 #' @param nrow,ncol The number of rows and columns to generate the shapefile.
 #'   Defaults to `1`.
+#' @param prepare Logical value indicating whether to prepare the image for
+#'   analysis using [image_prepare_mv()] function. This allows to align and crop
+#'   the image before processing. Defaults to `FALSE`.
 #' @param dir_original The directory containing the original and processed images.
 #'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
 #'   current working directory.
@@ -548,6 +651,8 @@ plot_shp <- function(coords,
 measure_disease_shp <- function(img,
                                 nrow = 1,
                                 ncol = 1,
+                                prepare = FALSE,
+                                viewer = "mapview",
                                 index_lb = "HUE2",
                                 index_dh = "NGRDI",
                                 pattern = NULL,
@@ -561,6 +666,9 @@ measure_disease_shp <- function(img,
                                 workers = NULL,
                                 verbose = TRUE,
                                 ...){
+  if(isTRUE(prepare)){
+    img <- image_prepare_mv(img, viewer = viewer)
+  }
   if(is.null(dir_original)){
     diretorio_original <- paste("./", sep = "")
   } else{
@@ -571,7 +679,6 @@ measure_disease_shp <- function(img,
   }
   ## declare alias for dopar command
   `%dopar%` <- foreach::`%dopar%`
-
   # helper function
   help_meas_shp <- function(img,
                             nrow,
