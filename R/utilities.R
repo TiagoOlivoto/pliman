@@ -551,6 +551,28 @@ check_ebi <- function(){
     }
   }
 }
+# correct coordinates in analyze_objects_shp()
+correct_coords <- function(coords, nrowimg, ncolimg, nrow, ncol){
+  get_row_number <- function(vector, rows, cols) {
+    row_numbers <- ((vector - 1) %/% cols) + 1
+    return(row_numbers)
+  }
+  npixperrow <- ncolimg / nrow
+  npixpercol <- nrowimg / ncol
+
+  coords <-
+    coords |>
+    transform(plotn = as.numeric(gsub("[^0-9]", "", img)),
+              row = get_row_number(as.numeric(gsub("[^0-9]", "", img)), nrow, ncol)) |>
+    transform(col = ifelse(row == 1, plotn, plotn -  ncol * (row - 1))) |>
+    transform(y = ifelse(row == 1, y, y + npixperrow * (row - 1)),
+              x = ifelse(col == 1, x, x + npixpercol * (col - 1)))
+
+  return(coords[, 1:4])
+}
+
+
+
 
 check_mapview <- function() {
   packages <- c("raster", "mapview", "mapedit", "leaflet", "leafem")

@@ -1590,8 +1590,8 @@ image_binary <- function(image,
 
       if(threshold != "adaptive"){
         if(threshold == "Otsu"){
-          if(any(is.infinite(imgs))){
-            threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data)])
+          if(any(is.infinite(imgs)) | any(is.na(imgs))){
+            threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data) & !is.na(imgs@.Data)])
           } else{
             threshold <- help_otsu(imgs@.Data)
           }
@@ -3295,8 +3295,8 @@ help_binary <- function(image,
     }
     if(threshold != "adaptive"){
       if(threshold == "Otsu"){
-        if(any(is.infinite(imgs))){
-          threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data)])
+        if(any(is.infinite(imgs)) | any(is.na(imgs))){
+          threshold <- help_otsu(imgs@.Data[!is.infinite(imgs@.Data) & !is.na(imgs@.Data)])
         } else{
           threshold <- help_otsu(imgs@.Data)
         }

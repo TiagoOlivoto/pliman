@@ -380,6 +380,8 @@ analyze_objects_shp <- function(img,
                                 ...){
   if(isTRUE(prepare)){
     img <- image_prepare_mv(img, viewer = viewer)
+  } else{
+    img <- img
   }
   mask <- analyze_objects(img,
                           index = index,
@@ -565,7 +567,7 @@ analyze_objects_shp <- function(img,
   } else{
     veins <- NULL
   }
-
+  res[, 1:4] <- correct_coords(res[, 1:4],  nrow(img),  ncol(img), nrow, ncol)
   return(
     structure(
       list(results = res,

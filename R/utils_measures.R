@@ -154,11 +154,11 @@ get_measures <- function(object,
       res$area <- corrected
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[6:18] <- apply(res[6:18], 2, function(x){
+        res[7:19] <- apply(res[7:19], 2, function(x){
           x * px_side
         })
       } else{
-        res[4:16] <- apply(res[4:16], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       }
@@ -170,11 +170,11 @@ get_measures <- function(object,
       res$area <- res$area * px_side^2
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[6:18] <- apply(res[6:18], 2, function(x){
+        res[7:19] <- apply(res[7:19], 2, function(x){
           x * px_side
         })
       } else{
-        res[4:16] <- apply(res[4:16], 2, function(x){
+        res[6:18] <- apply(res[6:18], 2, function(x){
           x * px_side
         })
       }
@@ -201,9 +201,9 @@ get_measures <- function(object,
       res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
     } else{
       if("img" %in% colnames(res)){
-        res[5:17] <- apply(res[5:17], 2, pixels_to_cm, dpi = dpi)
+        res[7:19] <- apply(res[7:19], 2, pixels_to_cm, dpi = dpi)
       } else{
-        res[4:16] <- apply(res[4:16], 2, pixels_to_cm, dpi = dpi)
+        res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
       }
     }
   }
@@ -375,7 +375,6 @@ get_measures <- function(object,
         res <- cbind(res, object$angles[, -c(1:2)])
       }
 
-
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -414,8 +413,6 @@ get_measures <- function(object,
     return(out)
   } else{
 
-
-
     # bind object_index, if it exists
     if(!is.null(object$object_index)){
       if(ncol(object$object_index) < 3){
@@ -427,8 +424,6 @@ get_measures <- function(object,
         res <- cbind(res, object$object_index[, -1])
       }
     }
-
-
     # bind efourier coefficients, if it exists
     if(!is.null(object$efourier)){
       res <- cbind(res, object$efourier_norm[, -1])

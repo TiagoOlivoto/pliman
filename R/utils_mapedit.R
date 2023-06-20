@@ -97,7 +97,7 @@ image_view <- function(img,
 #' library(pliman)
 #' custom_palette(n = 5)
 #'
-custom_palette <- function(colors = c("steelblue", "salmon", "forestgreen"), n = 100){
+custom_palette <- function(colors = c("#4B0055", "#00588B", "#009B95", "#53CC67", "yellow"), n = 100){
   grDevices::colorRampPalette(colors)(n)
 }
 
@@ -423,60 +423,7 @@ reduce_dimensions <- function(img, target_pixels = 2500000) {
   EBImage::resize(img, new_rows)
 }
 
-# help_imageindex: Assists in calculating different image indexes based on an image object and index name.
-help_imageindex <- function(image,
-                            index = NULL,
-                            resize = FALSE,
-                            re = NULL,
-                            nir = NULL,
-                            has_white_bg = FALSE){
-  if(resize != FALSE){
-    image <- image_resize(image, resize)
-  }
-  ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
 
-  nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
-  hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
-
-  R <- try(image@.Data[,,1], TRUE)
-  G <- try(image@.Data[,,2], TRUE)
-  B <- try(image@.Data[,,3], TRUE)
-
-  if(any(index %in% hsb_ind)){
-    hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
-    h <- matrix(hsb$h, nrow = nrow(image), ncol = ncol(image))
-    s <- matrix(hsb$s, nrow = nrow(image), ncol = ncol(image))
-    b <- matrix(hsb$b, nrow = nrow(image), ncol = ncol(image))
-  }
-
-  if(!is.null(re)|!is.null(nir)){
-    if(index %in% nir_ind & is.null(nir)){
-      stop(paste("Index ", index, " need NIR/RedEdge band to be calculated."), call. = FALSE)
-    }
-    if(!is.null(re)){
-      RE <-  try(image@.Data[,,re], TRUE)
-    }
-    if(!is.null(nir)){
-      NIR <- try(image@.Data[,,nir], TRUE)
-    }
-    test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
-    if(isTRUE(test_nir_ne)){
-      stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
-    }
-  }
-  if(isTRUE(has_white_bg)){
-    R[which(R == 1 & G == 1 & B == 1)] <- NA
-    G[which(R == 1 & G == 1 & B == 1)] <- NA
-    B[which(R == 1 & G == 1 & B == 1)] <- NA
-  }
-
-  if(index %in% ind$Index){
-    img_gray <- EBImage::Image(eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index]))))
-  } else{
-    img_gray <- EBImage::Image(eval(parse(text = as.character(index))))
-  }
-  invisible(img_gray)
-}
 
 # image_orientation: Determines the orientation of an image (vertical or horizontal).
 image_orientation <- function(img){

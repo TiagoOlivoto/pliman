@@ -17,30 +17,17 @@ downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](htt
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
 [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
+
 <!-- badges: end -->
 
-`pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant
-images, especially related to leaf analysis. You provide color palettes,
-tell `pliman` what each one represents, and it takes care of the
-details. Image indexes can also be used to segment images. The package
-will help you to:
-
-- Measure leaf area;
-- Measure disease severity;
-- Count the number of lesions;
-- Obtain the shape of lesions;
-- Produce Standard Area Diagrams;
-- Count objects in an image;
-- Get object features (area, perimeter, radius, circularity,
-  eccentricity, solidity);
-- Get the RGB values for each object in an image;
-- Get the object coordinates;
-- Get the object contours;
-- Get convex hulls;
-- Isolate objects;
-- Plot object measures;
-- Perform Elliptical Fourier Analysis;
-- 
+The pliman (**pl**ant **im**age **an**alysis) package is designed to
+analyze plant images, particularly for leaf and seed analysis. It offers
+a range of functionalities to assist with various tasks such as
+measuring disease severity, counting lesions, obtaining lesion shapes,
+counting objects in an image, extracting object characteristics,
+performing Fourier Analysis, obtaining RGB values, extracting object
+coordinates and outlines, isolating objects, and plotting object
+measurements.
 
 `pliman` also provides useful functions for image
 [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html),
@@ -77,10 +64,6 @@ install the latest version of
 
 # Basic usage
 
-The two main functions of pliman are `analyze objects()` and
-`measure disease()`, which can be used to compute object features and
-measure disease severity, respectively.
-
 ## Analyze objects
 
 The function `analyze_objects()` can be used to analyze objects such as
@@ -91,103 +74,118 @@ counts and computes several features of soybean grains of an image with
 ``` r
 library(pliman)
 # |==========================================================|
-# | Tools for Plant Image Analysis (pliman 1.2.0)            |
+# | Tools for Plant Image Analysis (pliman 1.2.0.9000)            |
 # | Author: Tiago Olivoto                                    |
 # | Type 'citation('pliman')' to know how to cite pliman     |
 # | Type 'vignette('pliman_start')' for a short tutorial     |
 # | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |
 # |==========================================================|
 img <-image_pliman("soybean_touch.jpg", plot = TRUE)
-soy <- analyze_objects(img, marker = "id")
 ```
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
+soy <- analyze_objects(img, marker = "id")
 str(soy$results)
-# 'data.frame': 30 obs. of  47 variables:
+# 'data.frame': 30 obs. of  34 variables:
 #  $ id                  : num  1 2 3 4 5 6 7 8 9 10 ...
-#  $ x                   : num  246 538 238 345 278 ...
-#  $ y                   : num  510 402 340 106 261 ...
-#  $ area                : num  2275 2299 2311 2443 2161 ...
-#  $ area_ch             : num  2302 2270 2289 2413 2123 ...
+#  $ x                   : num  245 537 237 344 277 ...
+#  $ y                   : num  509 401 339 105 260 ...
+#  $ area                : num  2279 2289 2310 2436 2159 ...
+#  $ area_ch             : num  2304 2262 2288 2408 2122 ...
 #  $ perimeter           : num  184 178 181 186 172 ...
 #  $ radius_mean         : num  26.5 26.6 26.7 27.5 25.8 ...
-#  $ radius_min          : num  22.9 25 24 24.3 24.2 ...
+#  $ radius_min          : num  23 24.8 24 24.3 24.2 ...
 #  $ radius_max          : num  29.4 28.7 29.4 30.5 28 ...
-#  $ radius_sd           : num  1.369 0.945 1.24 1.757 0.803 ...
-#  $ diam_mean           : num  52.9 53.2 53.4 55 51.5 ...
-#  $ diam_min            : num  45.9 49.9 48 48.7 48.5 ...
-#  $ diam_max            : num  58.9 57.4 58.9 61.1 56.1 ...
-#  $ major_axis          : num  56.1 56.5 57.5 60.9 54.1 ...
-#  $ minor_axis          : num  51.9 51.9 51.3 51.1 50.9 ...
+#  $ radius_sd           : num  1.375 0.966 1.238 1.74 0.801 ...
+#  $ diam_mean           : num  53 53.1 53.4 54.9 51.5 ...
+#  $ diam_min            : num  45.9 49.7 48 48.6 48.5 ...
+#  $ diam_max            : num  58.8 57.4 58.9 61.1 56.1 ...
+#  $ major_axis          : num  19.3 19.5 19.8 20.8 18.7 ...
+#  $ minor_axis          : num  18.2 18 17.9 18 17.7 ...
 #  $ caliper             : num  57.3 56.9 57.7 61 54.4 ...
 #  $ length              : num  56.6 56.5 57.2 61 54 ...
-#  $ width               : num  51.6 52.4 52 51 50.6 ...
-#  $ radius_ratio        : num  1.28 1.15 1.23 1.25 1.16 ...
-#  $ theta               : num  -0.889 -0.841 -0.565 -0.993 -0.218 ...
-#  $ eccentricity        : num  0.893 0.853 0.816 0.754 0.896 ...
-#  $ form_factor         : num  0.849 0.91 0.886 0.891 0.921 ...
+#  $ width               : num  51.5 52.4 52 51 50.5 ...
+#  $ radius_ratio        : num  1.28 1.16 1.23 1.26 1.16 ...
+#  $ theta               : num  -0.828 -0.804 -0.637 -0.979 -0.217 ...
+#  $ eccentricity        : num  0.328 0.387 0.428 0.495 0.325 ...
+#  $ form_factor         : num  0.85 0.906 0.886 0.889 0.92 ...
 #  $ narrow_factor       : num  1.01 1.01 1.01 1 1.01 ...
 #  $ asp_ratio           : num  1.1 1.08 1.1 1.2 1.07 ...
-#  $ rectangularity      : num  1.28 1.29 1.29 1.27 1.26 ...
+#  $ rectangularity      : num  1.28 1.29 1.29 1.28 1.26 ...
 #  $ pd_ratio            : num  3.2 3.13 3.14 3.04 3.16 ...
 #  $ plw_ratio           : num  1.7 1.64 1.66 1.66 1.64 ...
-#  $ solidity            : num  0.988 1.013 1.01 1.012 1.018 ...
-#  $ convexity           : num  0.886 0.881 0.911 0.915 0.898 ...
-#  $ elongation          : num  0.0884 0.0728 0.0911 0.1638 0.0642 ...
-#  $ circularity         : num  14.8 13.8 14.2 14.1 13.6 ...
-#  $ circularity_haralick: num  19.3 28.1 21.5 15.7 32.1 ...
-#  $ circularity_norm    : num  1.22 1.14 1.17 1.16 1.13 ...
-#  $ coverage            : num  0.00426 0.0043 0.00432 0.00457 0.00404 ...
-#  $ asm                 : num  0.0679 0.0886 0.0848 0.0869 0.0865 ...
-#  $ con                 : num  0.527 0.603 0.702 0.73 0.834 ...
-#  $ cor                 : num  0.961 0.959 0.95 0.945 0.944 ...
-#  $ var                 : num  7.68 8.37 7.98 7.58 8.46 ...
-#  $ idm                 : num  0.81 0.807 0.794 0.801 0.795 ...
-#  $ sav                 : num  40.5 40.7 40.7 40.6 40.9 ...
-#  $ sva                 : num  1566 1591 1590 1583 1606 ...
-#  $ sen                 : num  1.24 1.18 1.17 1.17 1.2 ...
-#  $ ent                 : num  1.4 1.36 1.36 1.36 1.4 ...
-#  $ dva                 : num  0.527 0.603 0.702 0.73 0.834 ...
-#  $ den                 : num  0.347 0.364 0.386 0.385 0.392 ...
-#  $ f12                 : num  0.569 0.56 0.535 0.544 0.542 ...
-#  $ f13                 : num  0.82 0.807 0.793 0.798 0.804 ...
+#  $ solidity            : num  0.989 1.012 1.009 1.012 1.017 ...
+#  $ convexity           : num  0.887 0.879 0.911 0.919 0.898 ...
+#  $ elongation          : num  0.089 0.0737 0.0911 0.1639 0.0643 ...
+#  $ circularity         : num  14.8 13.9 14.2 14.1 13.7 ...
+#  $ circularity_haralick: num  19.3 27.5 21.6 15.8 32.2 ...
+#  $ circularity_norm    : num  0.821 0.875 0.855 0.858 0.887 ...
+#  $ coverage            : num  0.00426 0.00428 0.00432 0.00456 0.00404 ...
 ```
 
-## Disease severity
+# Disease severity
+
+## Using image indexes
+
+To compute the percentage of symptomatic leaf area you can use the
+`measure_disease()` function you can use an image index to segment the
+entire leaf from the background and then separate the diseased tissue
+from the healthy tissue. Alternatively, you can provide color palette
+samples to the `measure_disease()` function. In this approach, the
+function fits a general linear model (binomial family) to the RGB values
+of the image. It then uses the color palette samples to segment the
+lesions from the healthy leaf.
+
+In the following example, we compute the symptomatic area of a soybean
+leaf. The proportion of healthy and symptomatic areas is given as a
+proportion of the total leaf area after segmenting the leaf from the
+background (blue).
 
 ``` r
-img <-image_pliman("sev_leaf.jpg")
-healthy <-image_pliman("sev_healthy.jpg")
-symptoms <-image_pliman("sev_sympt.jpg")
-background <-image_pliman("sev_back.jpg")
-image_combine(img, healthy, symptoms, background, ncol = 4)
+img <- image_pliman("sev_leaf.jpg")
+# Computes the symptomatic area
+measure_disease(img = img,
+                index_lb = "B", # to remove the background
+                index_dh = "NGRDI", # to isolate the diseased area
+                threshold = c("Otsu", 0), # You can also use the Otsu algorithm in both indexes (default)
+                plot = TRUE)
 ```
 
 ![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
+    # $severity
+    #    healthy symptomatic
+    # 1 92.62721    7.372791
+    # 
+    # $shape
+    # NULL
+    # 
+    # $statistics
+    # NULL
+    # 
+    # attr(,"class")
+    # [1] "plm_disease"
+
+## Interactive disease measurements
+
+An alternative approach to measuring disease percentage is available
+through the `measure_disease_iter()` function. This function offers an
+interactive interface that empowers users to manually select sample
+colors directly from the image. By doing so, it provides a highly
+customizable analysis method.
+
+One advantage of using `measure_disease_iter()` is the ability to
+utilize the “mapview” viewer, which enhances the analysis process by
+offering zoom-in options. This feature allows users to closely examine
+specific areas of the image, enabling detailed inspection and accurate
+disease measurement.
+
 ``` r
-sev <- 
-  measure_disease(img = img,
-                  img_healthy = healthy,
-                  img_symptoms = symptoms,
-                  img_background = background)
+img <- image_pliman("sev_leaf.jpg", plot = TRUE)
+measure_disease_iter(img, viewer = "mapview")
 ```
-
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
-
-``` r
-
-sev$severity
-#    healthy symptomatic
-# 1 89.20609    10.79391
-```
-
-`pliman` takes the advantage of several powerful functions from [EBImage
-package](https://bioconductor.org/packages/release/bioc/html/EBImage.html).
-Thanks to Andrzej Oleś and collaborators for the impressive job done
-with EBImage!
 
 # Citation
 
@@ -196,33 +194,35 @@ citation("pliman")
 
 Please, support this project by citing it in your publications!
 
-  Olivoto, T.(2022). Lights, camera, pliman! An R package for plant
-  image analysis. Methods Ecol Evol. 13:789-798
-  doi:10.1111/2041-210X.13803
+  Olivoto T (2022). "Lights, camera, pliman! An R package for plant
+  image analysis." _Methods in Ecology and Evolution_, *13*(4),
+  789-798. doi:10.1111/2041-210X.13803
+  <https://doi.org/10.1111/2041-210X.13803>.
 
 A BibTeX entry for LaTeX users is
 
-  @Article{Olivoto2022,
-    author = {Tiago Olivoto},
+  @Article{,
     title = {Lights, camera, pliman! An R package for plant image analysis},
+    author = {Tiago Olivoto},
+    year = {2022},
     journal = {Methods in Ecology and Evolution},
     volume = {13},
     number = {4},
     pages = {789-798},
-    year = {2022},
     doi = {10.1111/2041-210X.13803},
   }
 ```
 
 # Getting help
 
-- If you encounter a clear bug, please file a minimal reproducible
-  example on [github](https://github.com/TiagoOlivoto/pliman/issues).
-  The package [reprex](https://reprex.tidyverse.org/) may help you with
-  that.
+If you come across any clear bugs while using the package, please
+consider filing a minimal reproducible example on
+[github](https://github.com/TiagoOlivoto/pliman/issues). This will help
+the developers address the issue promptly.
 
-- Suggestions and criticisms to improve the quality and usability of the
-  package are welcome!
+Suggestions and criticisms aimed at improving the quality and usability
+of the package are highly encouraged. Your feedback is valuable in
+making {pliman} even better!
 
 # Code of Conduct
 
@@ -232,7 +232,7 @@ By contributing to this project, you agree to abide by its terms.
 
 <div align="center">
 
-<a href='https://www.free-website-hit-counter.com'><img src='https://www.free-website-hit-counter.com/c.php?d=9&id=144207&s=2' border='0' alt='Free Website Hit Counter'></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free
+<a href='https://www.free-website-hit-counter.com'><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" alt="Free Website Hit Counter" border="0"/></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free
 website hit counter</a></small>
 
 </div>
