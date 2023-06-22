@@ -335,7 +335,7 @@ image_align <- function(img,
 #'   based on the image dimension and number of nrow/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
 #'   that will contain the grid.
-#' @param plot Plots the processed images? Defaults to `TRUE`.
+#' @param plot Plots the processed images? Defaults to `FALSE`.
 #' @param object_size Argument to control control the watershed segmentation.
 #'   See [analyze_objects()] for more details.
 #' @param ... Aditional arguments passed on to [analyze_objects].
@@ -368,7 +368,7 @@ analyze_objects_shp <- function(img,
                                 index = "R",
                                 shapefile = NULL,
                                 interactive = FALSE,
-                                plot = TRUE,
+                                plot = FALSE,
                                 parallel = FALSE,
                                 workers = NULL,
                                 object_size = "medium",
@@ -568,6 +568,10 @@ analyze_objects_shp <- function(img,
     veins <- NULL
   }
   res[, 1:4] <- correct_coords(res[, 1:4],  nrow(img),  ncol(img), nrow, ncol)
+  img2 <- img
+  img2@.Data[,,1][which(mask@.Data == 0)] <- 1
+  img2@.Data[,,2][which(mask@.Data == 0)] <- 1
+  img2@.Data[,,3][which(mask@.Data == 0)] <- 1
   return(
     structure(
       list(results = res,
@@ -584,12 +588,119 @@ analyze_objects_shp <- function(img,
            mask = mask,
            index = index,
            object_index_computed = object_index_used,
-           final_image = img),
+           final_image = img,
+           final_image_masked = img2),
       class = "anal_obj"
     )
   )
 }
 
+#' Map Object Distances
+#'
+#' Computes distances between objects in an `anal_obj` object and returns a list
+#' of distances, coefficient of variation (CV), and means.
+#'
+#' @param object An `anal_obj` object computed with `analyze_objects_shp()`.
+#' @param by_column The column name in the object's results data frame to group
+#'   objects by. Default is "img".
+#' @param direction The direction of mapping. Should be one of "horizontal" or
+#'   "vertical". Default is "horizontal".
+#'
+#' @return A list with the following components:
+#' \item{distances}{A list of distances between objects grouped by unique values
+#' in the specified column/row.}
+#' \item{cvs}{A vector of coefficient of variation (CV) values for each column/row.}
+#' \item{means}{A vector of mean distances for each column/row.}
+
+#' @seealso \code{\link{analyze_objects_shp}}
+#'
+#' @export
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+#' res <-
+#'    analyze_objects_shp(flax,
+#'                        prepare = FALSE,
+#'                        nrow = 3,
+#'                        ncol = 1,
+#'                        watershed = FALSE,
+#'                        index = "R/(G/B)",
+#'                        plot = FALSE)
+#' plot(res$final_image_mask)
+#' plot(res$shapefiles)
+#'
+#' # distance from each leave within each row
+#' result <- object_map(res)
+#' result$distances
+#' result$cvs
+#' result$means
+#' }
+object_map <- function(object,
+                       by_column = "img",
+                       direction = c("horizontal", "vertical")) {
+  optdirec <- c("horizontal", "vertical")
+  optdirec <- pmatch(direction[[1]], optdirec)
+  if(!inherits(object, "anal_obj") | object$results[1,1] != "shp1"){
+    stop("Only objects computed with `analyze_objects_shp()` can be used.")
+  }
+  coordinates <- object$results[, c(1, 3, 4)]
+  unique_values <- unique(coordinates[, by_column])
+  distances <- vector("list", length(unique_values))
+  for (i in 1:length(unique_values)) {
+    subset_coords <- coordinates[coordinates[, by_column] == unique_values[i], 2:3]
+    n <- nrow(subset_coords)
+    nearest <- order(subset_coords[, optdirec])
+    subset_distances <- numeric(n - 1)
+    for (j in 1:(n - 1)) {
+      x1 <- subset_coords[nearest[j], 1]
+      y1 <- subset_coords[nearest[j], 2]
+      x2 <- subset_coords[nearest[j+1], 1]
+      y2 <- subset_coords[nearest[j+1], 2]
+      distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+      subset_distances[j] <- distance
+    }
+    distances[[i]] <- subset_distances
+  }
+  if(optdirec == 1){
+    names(distances) <- paste0("row", 1:length(distances))
+  } else{
+    names(distances) <- paste0("column", 1:length(distances))
+  }
+  cvs <- sapply(distances, function(x){
+    (sd(x) / mean(x)) * 100
+  })
+  means <- sapply(distances, mean)
+  return(list(distances = distances, cvs = cvs, means = means))
+}
+
+#' Mark Object Points
+#'
+#' Marks the coordinates of objects in an `anal_obj` object on a plot.
+#'
+#' @param object An `anal_obj` object computed with `analyze_objects_shp()` or
+#'   `analyze_objects_shp()`.
+#' @param col The color of the marked points. Default is "white".
+#'
+#' @seealso \code{\link{analyze_objects_shp}}
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+#' res <-
+#'    analyze_objects(flax,
+#'                        watershed = FALSE,
+#'                        index = "R/(G/B)",
+#'                        plot = FALSE)
+#' object_mark(res)
+object_mark <- function(object, col = "white"){
+  if(!inherits(object, "anal_obj")){
+    stop("Only objects computed with `analyze_objects_shp()` or `analyze_objects_shp()` can be used.")
+  }
+  coordinates <- object$results[, c("x", "y")]
+  points(coordinates, col = col, pch = 16)
+}
 
 
 plot_shp <- function(coords,

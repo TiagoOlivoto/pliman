@@ -4,7 +4,10 @@
 \alias{custom_palette}
 \title{Generate Custom Color Palette}
 \usage{
-custom_palette(colors = c("steelblue", "salmon", "forestgreen"), n = 100)
+custom_palette(
+  colors = c("#4B0055", "#00588B", "#009B95", "#53CC67", "yellow"),
+  n = 100
+)
 }
 \arguments{
 \item{colors}{A vector of colors to create the color palette. Default is

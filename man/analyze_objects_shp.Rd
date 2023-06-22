@@ -13,7 +13,7 @@ analyze_objects_shp(
   index = "R",
   shapefile = NULL,
   interactive = FALSE,
-  plot = TRUE,
+  plot = FALSE,
   parallel = FALSE,
   workers = NULL,
   object_size = "medium",
@@ -57,7 +57,7 @@ also calculate your own index using the bands names, e.g. \code{index = "R+B/G"}
 based on the image dimension and number of nrow/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
 that will contain the grid.}
 
-\item{plot}{Plots the processed images? Defaults to \code{TRUE}.}
+\item{plot}{Plots the processed images? Defaults to \code{FALSE}.}
 
 \item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel) in
 separate R sessions running in the background on the same machine. It may

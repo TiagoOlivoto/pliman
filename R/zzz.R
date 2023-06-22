@@ -111,6 +111,9 @@ get_pliman_viewer <- function() {
 #' @param value The value to be set for the pliman_viewer option.
 #' @export
 set_pliman_viewer <- function(value) {
+  if(!value %in% c("base", "mapview")){
+    stop("`value` must be either 'base' or 'mapview'.", call. = FALSE)
+  }
   options(pliman_viewer = value)
 }
 

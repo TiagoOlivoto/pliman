@@ -56,7 +56,7 @@ measure_disease(
 measure_disease_iter(
   img,
   has_background = TRUE,
-  r = 5,
+  r = 2,
   viewer = get_pliman_viewer(),
   show = "rgb",
   index = "NGRDI",
@@ -226,7 +226,7 @@ e.g., \code{"/imgs"}.}
 \item{has_background}{A logical indicating if the image has a background to
 be segmented before processing.}
 
-\item{r}{The radius of neighborhood pixels. Defaults to \code{5}. A square is
+\item{r}{The radius of neighborhood pixels. Defaults to \code{2}. A square is
 drawn indicating the selected pixels.}
 
 \item{viewer}{The viewer option. If not provided, the value is retrieved
