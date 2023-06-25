@@ -11,7 +11,7 @@ plot_index(
   remove_bg = TRUE,
   viewer = get_pliman_viewer(),
   layer = 1,
-  max_pixels = 2500000,
+  max_pixels = 1e+06,
   color_regions = custom_palette(),
   ncol = NULL,
   nrow = NULL,

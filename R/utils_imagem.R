@@ -1729,6 +1729,7 @@ image_binary <- function(image,
 #'   up to 70% of available cores.
 #' @param workers A positive numeric scalar or a function specifying the maximum
 #'   number of parallel processes that can be active at the same time.
+#' @param ... Additional arguments passed on to [plot index()].
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
 #' @references Nobuyuki Otsu, "A threshold selection method from gray-level
 #'   histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
@@ -1753,7 +1754,8 @@ image_index <- function(image,
                         ncol = NULL,
                         parallel = FALSE,
                         workers = NULL,
-                        verbose = TRUE){
+                        verbose = TRUE,
+                        ...){
   if(is.list(image)){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
@@ -1780,13 +1782,17 @@ image_index <- function(image,
     if(is.null(index)){
       index <- c("R", "G", "B", "NR", "NG", "NB")
     }else{
-      if(index %in% c("RGB", "NRGB", "all")){
+      if(index[[1]] %in% c("RGB", "NRGB", "all")){
         index <-  switch (index,
                           RGB = c("R", "G", "B"),
                           NRGB = c("NR", "NG", "NB"),
                           all = ind$Index
         )} else{
-          index <- strsplit(index, "\\s*(,)\\s*")[[1]]
+          if(length(index) > 1){
+            index <- index
+          } else{
+            index <- strsplit(index, "\\s*(,)\\s*")[[1]]
+          }
         }
     }
     nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
@@ -1856,7 +1862,7 @@ image_index <- function(image,
     names(imgs) <- index
     class(imgs) <- "image_index"
     if(plot == TRUE){
-      plot_index(imgs, nrow = nrow, ncol = ncol)
+      plot_index(imgs, nrow = nrow, ncol = ncol, ...)
     }
     invisible(imgs)
   }

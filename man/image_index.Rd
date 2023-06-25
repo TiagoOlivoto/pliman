@@ -17,7 +17,8 @@ image_index(
   ncol = NULL,
   parallel = FALSE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 
 \method{plot}{image_index}(x, type = c("raster", "density"), nrow = NULL, ncol = NULL, ...)
@@ -62,13 +63,13 @@ number of parallel processes that can be active at the same time.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
+\item{...}{Additional arguments passed to \code{\link[=plot_index]{plot_index()}} for customization.}
+
 \item{x}{An object of class \code{image_index}.}
 
 \item{type}{The type of plot. Use \code{type = "raster"} (default) to produce a
 raster plot showing the intensity of the pixels for each image index or
 \code{type = "density"} to produce a density plot with the pixels' intensity.}
-
-\item{...}{Additional arguments passed to \code{\link[=plot_index]{plot_index()}} for customization.}
 }
 \value{
 A list containing Grayscale images. The length will depend on the

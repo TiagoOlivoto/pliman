@@ -154,7 +154,7 @@ plot_index <- function(img = NULL,
                        remove_bg = TRUE,
                        viewer = get_pliman_viewer(),
                        layer = 1,
-                       max_pixels = 2500000,
+                       max_pixels = 1000000,
                        color_regions = custom_palette(),
                        ncol = NULL,
                        nrow = NULL,
@@ -163,22 +163,22 @@ plot_index <- function(img = NULL,
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(!is.null(img) & inherits(img, "image_index")){
     rast <- lapply(img, function(x){
-      if(npixels(x) > 50000){
-        x <- reduce_dimensions(x, 50000)
-      }
+      # if(npixels(x) > max_pixels){
+      #   # x <- reduce_dimensions(x, max_pixels)
+      # }
       raster::raster(t(x@.Data))
     })
 
     num_plots <-length(rast)
     if (is.null(nrow) && is.null(ncol)){
-      ncols <- ceiling(sqrt(num_plots))
-      nrows <- ceiling(num_plots/ncols)
+      ncol <- ceiling(sqrt(num_plots))
+      nrow <- ceiling(num_plots/ncol)
     }
     if (is.null(ncol)){
-      ncols <- ceiling(num_plots/nrows)
+      ncol <- ceiling(num_plots/nrow)
     }
     if (is.null(nrow)){
-      nrows <- ceiling(num_plots/ncols)
+      nrow <- ceiling(num_plots/ncol)
     }
     if(vieweropt == "base"){
       rbrick <- raster::brick(rast)
@@ -187,8 +187,8 @@ plot_index <- function(img = NULL,
       }
       raster::plot(rbrick,
                    axes = FALSE,
-                   nc = ncols,
-                   nr = nrows,
+                   nc = ncol,
+                   nr = nrow,
                    asp = aspect_ratio,
                    maxnl = raster::nlayers(rbrick),
                    col = color_regions)
@@ -380,7 +380,7 @@ mv_polygon <- function(img,
                        index = "NGRDI",
                        title = "Use the 'Draw Polygon' tool to create a polygon in the image"){
   e <- image_view(img, show = show, title = title, index = index)
-  if(!inherits(e$finished$geometry, "sfc_POLYGON")){
+  if(!inherits(e, "sfc_POLYGON")){
     stop("The geometry used is not valid. Please, use 'Draw Polygon' tool to select two points.", call. = FALSE)
   }
   nc <- ncol(img)
