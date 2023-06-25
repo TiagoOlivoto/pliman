@@ -452,34 +452,39 @@ plot_measures <- function(object,
                           col = "white",
                           ...){
   if("shapefiles" %in% names(object)){
-    meas <- get_measures(object)$summary
-    index <- object$object_index
-    shapefiles <- object$shapefiles$shapefiles
-    coords <-
-      do.call(rbind,
-              lapply(shapefiles, function(x){
-                data.frame(x = mean(x$x[-1]), y = mean(x$y[-1]))
-              }))
-    object <- cbind(shp = meas[,1], coords, meas[,2:ncol(meas)])
-
-    if(!is.null(index)){
-
-      index$img <- as.numeric(gsub(pattern = "shp", x = index$img, replacement = ""))
-      aggr <-
-        do.call(cbind,
-                lapply(3:ncol(index), function(i){
-                  aggregate(index[[i]] ~ img, index, mean, na.rm = TRUE)[2]
-                })
-        )
-      names(aggr) <- c(names(index[3:ncol(index)]))
-      aggr$img <- paste0("obj", unique(index$img))
-      aggr <- aggr[,c(ncol(aggr), 1:(ncol(aggr)-1))]
-      aggr <- cbind(obj = aggr[,1], coords, data.frame(aggr[,2:ncol(aggr)]))
-      colnames(aggr) <- c("obj", "x", "y", colnames(index)[3:ncol(index)])
-      index <- aggr
+    if(inherits(object, "plm_disease_byl")){
+      object <- object$severity
     } else{
-      index <- NULL
+      meas <- get_measures(object)$summary
+      index <- object$object_index
+      shapefiles <- object$shapefiles$shapefiles
+      coords <-
+        do.call(rbind,
+                lapply(shapefiles, function(x){
+                  data.frame(x = mean(x$x[-1]), y = mean(x$y[-1]))
+                }))
+      object <- cbind(shp = meas[,1], coords, meas[,2:ncol(meas)])
+
+      if(!is.null(index)){
+
+        index$img <- as.numeric(gsub(pattern = "shp", x = index$img, replacement = ""))
+        aggr <-
+          do.call(cbind,
+                  lapply(3:ncol(index), function(i){
+                    aggregate(index[[i]] ~ img, index, mean, na.rm = TRUE)[2]
+                  })
+          )
+        names(aggr) <- c(names(index[3:ncol(index)]))
+        aggr$img <- paste0("obj", unique(index$img))
+        aggr <- aggr[,c(ncol(aggr), 1:(ncol(aggr)-1))]
+        aggr <- cbind(obj = aggr[,1], coords, data.frame(aggr[,2:ncol(aggr)]))
+        colnames(aggr) <- c("obj", "x", "y", colnames(index)[3:ncol(index)])
+        index <- aggr
+      } else{
+        index <- NULL
+      }
     }
+
 
     if(measure %in% colnames(object)){
       hjust <- ifelse(is.null(hjust), 0, hjust)

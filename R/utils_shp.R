@@ -813,7 +813,6 @@ measure_disease_shp <- function(img,
       name_ori <- match.call()[[2]]
       extens_ori <- "jpg"
     }
-
     tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
@@ -871,12 +870,22 @@ measure_disease_shp <- function(img,
       statistics <- NULL
     }
 
+    xycoords <- do.call(rbind,
+                        lapply(tmp$shapefile$shapefiles, function(x){
+                          coords <- x[, 2:3]
+                          x <- mean(c(max(coords[, 1]), min(coords[, 1])))
+                          y <- mean(c(max(coords[, 2]), min(coords[, 2])))
+                          c(x, y)
+                        }))
+    res <- cbind(res[, 1], xycoords, res[, 2:3])
+    colnames(res) <- c("img", "x", "y",  "healthy", "symptomatic")
 
     return(
       structure(
         list(severity = res,
              shape = shape,
-             statistics = statistics),
+             statistics = statistics,
+             shapefiles = tmp$shapefile),
         class = "plm_disease_byl"
       )
     )
