@@ -163,9 +163,9 @@ plot_index <- function(img = NULL,
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(!is.null(img) & inherits(img, "image_index")){
     rast <- lapply(img, function(x){
-      # if(npixels(x) > max_pixels){
-      #   # x <- reduce_dimensions(x, max_pixels)
-      # }
+      if(npixels(x) > max_pixels){
+        x <- reduce_dimensions(x, max_pixels)
+      }
       raster::raster(t(x@.Data))
     })
 

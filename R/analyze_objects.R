@@ -232,7 +232,7 @@
 #'  ratio. Use [pliman_indexes_eq()] to see the equations of available indexes.
 #' @param pixel_level_index Return the indexes computed in `object_index` in the
 #'   pixel level? Defaults to `FALSE` to avoid returning large data.frames.
-#' @param mask Returns the mask for the analyzed image? Defaults to `FALSE`.
+#' @param return_mask Returns the mask for the analyzed image? Defaults to `FALSE`.
 #'@param efourier Logical argument indicating if Elliptical Fourier should be
 #'  computed for each object. This will call [efourier()] internally. It
 #'  `efourier = TRUE` is used, both standard and normalized Fourier coefficients
@@ -247,8 +247,8 @@
 #'@param extension Radius of the neighborhood in pixels for the detection of
 #'  neighboring objects. Higher value smooths out small objects.
 #'@param lower_noise To prevent noise from affecting the image analysis, objects
-#'  with lesser than 10% of the mean area of all objects are removed
-#'  (`lower_noise = 0.1`). Increasing this value will remove larger noises (such
+#'  with lesser than 25% of the mean area of all objects are removed
+#'  (`lower_noise = 0.25`). Increasing this value will remove larger noises (such
 #'  as dust points), but can remove desired objects too. To define an explicit
 #'  lower or upper size, use the `lower_size` and `upper_size` arguments.
 #'@param lower_size,upper_size Lower and upper limits for size for the image
@@ -540,7 +540,7 @@ analyze_objects <- function(img,
                             index = "NB",
                             object_index = NULL,
                             pixel_level_index = FALSE,
-                            mask = FALSE,
+                            return_mask = FALSE,
                             efourier = FALSE,
                             nharm = 10,
                             threshold = "Otsu",
@@ -548,7 +548,7 @@ analyze_objects <- function(img,
                             windowsize = NULL,
                             tolerance = NULL,
                             extension = NULL,
-                            lower_noise = 0.1,
+                            lower_noise = 0.25,
                             lower_size = NULL,
                             upper_size = NULL,
                             topn_lower = NULL,
@@ -605,7 +605,7 @@ analyze_objects <- function(img,
              tolerance, extension, randomize, nrows, plot, show_original,
              show_background, marker, marker_col, marker_size, save_image,
              prefix, dir_original, dir_processed, verbose, col_background,
-             col_foreground, lower_noise, ab_angles, ab_angles_percentiles){
+             col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -1106,7 +1106,7 @@ analyze_objects <- function(img,
         obj_rgb <- NULL
         indexes <- NULL
       }
-      if(isTRUE(mask)){
+      if(isTRUE(return_mask)){
         mask <- nmask
       } else{
         mask <- NULL
@@ -1294,7 +1294,7 @@ analyze_objects <- function(img,
                tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose, col_background,
-               col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
+               col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -1325,13 +1325,12 @@ analyze_objects <- function(img,
 
       results <-
         foreach::foreach(i = seq_along(names_plant), .packages = c("pliman", "EBImage")) %dopar%{
-          help_count(names_plant[[i]],
-                     foreground, background, pick_palettes, resize, fill_hull, threshold,
-                     filter, tolerance , extension, randomize,
-                     nrows, plot, show_original, show_background,
-                     marker, marker_col, marker_size, save_image, prefix,
-                     dir_original, dir_processed, verbose =  FALSE, col_background,
-                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
+          help_count(names_plant[i],
+                     foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
+                     tolerance , extension, randomize, nrows, plot, show_original,
+                     show_background, marker, marker_col, marker_size, save_image, prefix,
+                     dir_original, dir_processed, verbose, col_background,
+                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
         }
 
     } else{
@@ -1344,7 +1343,7 @@ analyze_objects <- function(img,
                    tolerance, extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image,
                    prefix, dir_original, dir_processed, verbose, col_background,
-                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles)
+                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
       }
       results <-
         lapply(seq_along(names_plant), function(i){

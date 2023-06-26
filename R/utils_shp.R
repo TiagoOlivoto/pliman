@@ -387,7 +387,7 @@ analyze_objects_shp <- function(img,
                           index = index,
                           invert = invert,
                           plot = FALSE,
-                          mask = TRUE,
+                          return_mask = TRUE,
                           object_size = object_size,
                           object_index = object_index)$mask
   object_index_used <- object_index
@@ -428,7 +428,7 @@ analyze_objects_shp <- function(img,
                         veins = veins,
                         efourier = efourier,
                         invert = invert,
-                        mask = FALSE,
+                        return_mask = FALSE,
                         ...)
       }
   } else{
@@ -442,7 +442,7 @@ analyze_objects_shp <- function(img,
                         veins = veins,
                         efourier = efourier,
                         invert = invert,
-                        mask = FALSE,
+                        return_mask = FALSE,
                         ...)
       })
   }

@@ -199,7 +199,7 @@ object_contour <- function(image,
              paste0("./", dir_original))
   }
 
-  if(missing(pattern) && inherits(image, "list")){
+  if(is.null(pattern) && inherits(image, "list")){
     if(!all(sapply(image, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
@@ -216,7 +216,7 @@ object_contour <- function(image,
              watershed, extension, tolerance, object_size, plot = plot)
     }
   } else{
-    if(missing(pattern)){
+    if(is.null(pattern)){
       img2 <- help_binary(image,
                           index = index,
                           invert = invert,
