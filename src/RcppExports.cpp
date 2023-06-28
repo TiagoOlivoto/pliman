@@ -384,6 +384,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// help_smoth
+NumericMatrix help_smoth(NumericMatrix coords, int niter);
+RcppExport SEXP _pliman_help_smoth(SEXP coordsSEXP, SEXP niterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type coords(coordsSEXP);
+    Rcpp::traits::input_parameter< int >::type niter(niterSEXP);
+    rcpp_result_gen = Rcpp::wrap(help_smoth(coords, niter));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_pliman_threshold_adaptive", (DL_FUNC) &_pliman_threshold_adaptive, 4},
@@ -418,6 +430,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_polygon_to_binary", (DL_FUNC) &_pliman_polygon_to_binary, 1},
     {"_pliman_sum_true_cols", (DL_FUNC) &_pliman_sum_true_cols, 1},
     {"_pliman_help_poly_angles", (DL_FUNC) &_pliman_help_poly_angles, 1},
+    {"_pliman_help_smoth", (DL_FUNC) &_pliman_help_smoth, 2},
     {NULL, NULL, 0}
 };
 

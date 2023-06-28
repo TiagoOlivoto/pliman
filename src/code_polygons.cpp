@@ -506,3 +506,23 @@ NumericVector help_poly_angles(NumericMatrix coords) {
   return angles;
 }
 
+
+// [[Rcpp::export]]
+NumericMatrix help_smoth(NumericMatrix coords, int niter) {
+  int p = coords.nrow();
+  NumericMatrix smoothedCoords(p, 2);
+
+  for (int a = 0; a < niter; a++) {
+    for (int i = 0; i < p; i++) {
+      int prevIndex = (i == 0) ? (p - 1) : (i - 1);
+      int nextIndex = (i == p - 1) ? 0 : (i + 1);
+
+      smoothedCoords(i, 0) = (coords(i, 0) + coords(prevIndex, 0) + coords(nextIndex, 0)) / 3.0;
+      smoothedCoords(i, 1) = (coords(i, 1) + coords(prevIndex, 1) + coords(nextIndex, 1)) / 3.0;
+    }
+
+    coords = smoothedCoords;
+  }
+
+  return smoothedCoords;
+}

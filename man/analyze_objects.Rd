@@ -29,6 +29,8 @@ analyze_objects(
   har_nbins = 32,
   har_scales = 1,
   har_band = 1,
+  pcv = FALSE,
+  pcv_niter = 100,
   resize = FALSE,
   trim = FALSE,
   fill_hull = FALSE,
@@ -38,7 +40,7 @@ analyze_objects(
   index = "NB",
   object_index = NULL,
   pixel_level_index = FALSE,
-  mask = FALSE,
+  return_mask = FALSE,
   efourier = FALSE,
   nharm = 10,
   threshold = "Otsu",
@@ -186,6 +188,8 @@ compute the Haralick features. See Details.}
 \item{har_band}{The band to compute the Haralick features (1 = R, 2 = G, 3 =
 B). Defaults to 1.}
 
+\item{pcv}{Computes the Perimeter Complexity Value? Defaults to \code{FALSE}.}
+
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original image).}
 
@@ -233,7 +237,7 @@ ratio. Use \code{\link[=pliman_indexes_eq]{pliman_indexes_eq()}} to see the equa
 \item{pixel_level_index}{Return the indexes computed in \code{object_index} in the
 pixel level? Defaults to \code{FALSE} to avoid returning large data.frames.}
 
-\item{mask}{Returns the mask for the analyzed image? Defaults to \code{FALSE}.}
+\item{return_mask}{Returns the mask for the analyzed image? Defaults to \code{FALSE}.}
 
 \item{efourier}{Logical argument indicating if Elliptical Fourier should be
 computed for each object. This will call \code{\link[=efourier]{efourier()}} internally. It
@@ -365,6 +369,9 @@ are recognized.}
 }}
 
 \item{known_area}{The known area of the template object.}
+
+\item{niter}{An integer specifying the number of smoothing iterations for
+computing the  Perimeter Complexity Value. Defaults to 100.}
 }
 \value{
 \code{analyze_objects()} returns a list with the following objects:

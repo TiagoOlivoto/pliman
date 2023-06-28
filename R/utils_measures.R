@@ -75,7 +75,8 @@
 #' # Count the objects using the blue band to segment the image
 #' results <-
 #'    analyze_objects(img,
-#'                  index = "B")
+#'                  index = "B",
+#'                  lower_noise = 0.1)
 #' plot_measures(results, measure = "id")
 #'
 #' # Get object measures by declaring the known resolution in dots per inch
@@ -93,6 +94,8 @@
 #'              id = 1,
 #'              area ~ 100)
 #'}
+#'
+#'
 get_measures <- function(object,
                          measure = NULL,
                          id = NULL,
@@ -109,16 +112,6 @@ get_measures <- function(object,
   if(any(class(object) %in% c("anal_obj", "anal_obj_ls"))){
     res <- object$results
   }
-  if(any(class(object) == "plm_la")){
-    obj <- as.numeric(class(object)[[3]])
-    res <- object[-obj,-ncol(object)]
-    if(verbose == TRUE){
-      cat("-----------------------------------------\n")
-      cat(paste0("Total leaf area  : ", round(sum(object$area), 3)), "\n")
-      cat(paste0("Average leaf area: ", round(mean(object$area), 3)), "\n")
-      cat("-----------------------------------------\n")
-    }
-  }
   if(any(inherits(object, "objects_rgb"))){
     res <- object[["objects"]]
   }
@@ -131,6 +124,8 @@ get_measures <- function(object,
   if(!is.null(id) & is.null(measure) ){
     stop("'measure' must be informed.", call. = FALSE)
   }
+  ncols <- ifelse(class(object)  %in%  c("plm_disease", "plm_disease_byl"), 16, 18)
+
   if(!is.null(id)){
     if(!inherits(measure, "formula")){
       stop("'measure' must be a two-sided formula, e.g., 'area ~ 25'.")
@@ -154,13 +149,19 @@ get_measures <- function(object,
       res$area <- corrected
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[7:19] <- apply(res[7:19], 2, function(x){
+        res[7:18] <- apply(res[7:18], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:18] <- apply(res[6:18], 2, function(x){
-          x * px_side
-        })
+        if(inherits(object, "plm_disease")){
+          res[5:ncols] <- apply(res[5:ncols], 2, function(x){
+            x * px_side
+          })
+        } else{
+          res[6:ncols] <- apply(res[6:ncols], 2, function(x){
+            x * px_side
+          })
+        }
       }
 
     }
@@ -170,13 +171,19 @@ get_measures <- function(object,
       res$area <- res$area * px_side^2
       res$area_ch <- res$area_ch * px_side^2
       if(inherits(object, "plm_disease_byl")){
-        res[7:19] <- apply(res[7:19], 2, function(x){
+        res[7:18] <- apply(res[7:18], 2, function(x){
           x * px_side
         })
       } else{
-        res[6:18] <- apply(res[6:18], 2, function(x){
-          x * px_side
-        })
+        if(inherits(object, "plm_disease")){
+          res[5:ncols] <- apply(res[5:ncols], 2, function(x){
+            x * px_side
+          })
+        } else{
+          res[6:ncols] <- apply(res[6:ncols], 2, function(x){
+            x * px_side
+          })
+        }
       }
     }
     res <- res[which(res$id != id),]
@@ -191,6 +198,8 @@ get_measures <- function(object,
     }
   }
 
+
+
   if(!is.null(dpi)){
     dpc <- dpi * 1 / 2.54
     res$area <- res$area * 1/dpc^2
@@ -198,12 +207,20 @@ get_measures <- function(object,
       res$area_ch <- res$area_ch * 1/dpc^2
     }
     if(inherits(object, "plm_disease_byl")){
-      res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
+      res[7:18] <- apply(res[7:18], 2, pixels_to_cm, dpi = dpi)
     } else{
       if("img" %in% colnames(res)){
-        res[7:19] <- apply(res[7:19], 2, pixels_to_cm, dpi = dpi)
+        if(inherits(object, "plm_disease")){
+          res[6:(ncols + 1)] <- apply(res[6:(ncols + 1)], 2, pixels_to_cm, dpi = dpi)
+        } else{
+          res[7:(ncols + 1)] <- apply(res[7:(ncols + 1)], 2, pixels_to_cm, dpi = dpi)
+        }
       } else{
-        res[6:18] <- apply(res[6:18], 2, pixels_to_cm, dpi = dpi)
+        if(inherits(object, "plm_disease")){
+          res[5:ncols] <- apply(res[5:ncols], 2, pixels_to_cm, dpi = dpi)
+        } else{
+          res[6:ncols] <- apply(res[6:ncols], 2, pixels_to_cm, dpi = dpi)
+        }
       }
     }
   }
@@ -232,7 +249,10 @@ get_measures <- function(object,
       if(!is.null(object$angles)){
         res <- cbind(res, object$angles[, -c(1:2)])
       }
-
+      # bind perimeter complexity value if it exists
+      if(!is.null(object$pcv)){
+        res <- cbind(res, pvc = object[["pcv"]][, 2])
+      }
       smr <-
         do.call(cbind,
                 lapply(5:ncol(res), function(i){
@@ -374,6 +394,10 @@ get_measures <- function(object,
       if(!is.null(object$angles)){
         res <- cbind(res, object$angles[, -c(1:2)])
       }
+      # bind perimeter complexity value if it exists
+      if(!is.null(object$pcv)){
+        res <- cbind(res, pvc = object$pcv)
+      }
 
       smr <-
         do.call(cbind,
@@ -431,6 +455,11 @@ get_measures <- function(object,
     # bind apex and base angles if it exists
     if(!is.null(object$angles)){
       res <- cbind(res, object$angles[, -1])
+    }
+
+    # bind perimeter complexity value if it exists
+    if(!is.null(object$pcv)){
+      res <- cbind(res, pvc = object[["pcv"]])
     }
 
     res <- round_cols(res, digits = digits)
@@ -517,7 +546,11 @@ plot_measures <- function(object,
       object <- object
     } else if(inherits(object, "anal_obj")){
       index <- object$object_index
-      object <- object$results
+      if(!is.null(object$pcv)){
+        object <- cbind(object$results, pcv = object$pcv)
+      } else{
+        object <- object$results
+      }
     } else if(inherits(object, "objects_rgb")){
       object <- object$objects
     } else if(inherits(object, "plm_disease")){

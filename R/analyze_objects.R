@@ -194,6 +194,9 @@
 #'  compute the Haralick features. See Details.
 #'@param har_band The band to compute the Haralick features (1 = R, 2 = G, 3 =
 #'  B). Defaults to 1.
+#' @param pcv Computes the Perimeter Complexity Value? Defaults to `FALSE`.
+#' @param niter An integer specifying the number of smoothing iterations for
+#'   computing the  Perimeter Complexity Value. Defaults to 100.
 #'@param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'  numeric value of range 0-100 (proportion of the size of the original image).
 #'@param trim Number of pixels removed from edges in the analysis. The edges of
@@ -247,8 +250,8 @@
 #'@param extension Radius of the neighborhood in pixels for the detection of
 #'  neighboring objects. Higher value smooths out small objects.
 #'@param lower_noise To prevent noise from affecting the image analysis, objects
-#'  with lesser than 25% of the mean area of all objects are removed
-#'  (`lower_noise = 0.25`). Increasing this value will remove larger noises (such
+#'  with lesser than 10% of the mean area of all objects are removed
+#'  (`lower_noise = 0.1`). Increasing this value will remove larger noises (such
 #'  as dust points), but can remove desired objects too. To define an explicit
 #'  lower or upper size, use the `lower_size` and `upper_size` arguments.
 #'@param lower_size,upper_size Lower and upper limits for size for the image
@@ -531,6 +534,8 @@ analyze_objects <- function(img,
                             har_nbins = 32,
                             har_scales = 1,
                             har_band = 1,
+                            pcv = FALSE,
+                            pcv_niter = 100,
                             resize = FALSE,
                             trim = FALSE,
                             fill_hull = FALSE,
@@ -548,7 +553,7 @@ analyze_objects <- function(img,
                             windowsize = NULL,
                             tolerance = NULL,
                             extension = NULL,
-                            lower_noise = 0.25,
+                            lower_noise = 0.10,
                             lower_size = NULL,
                             upper_size = NULL,
                             topn_lower = NULL,
@@ -605,7 +610,7 @@ analyze_objects <- function(img,
              tolerance, extension, randomize, nrows, plot, show_original,
              show_background, marker, marker_col, marker_size, save_image,
              prefix, dir_original, dir_processed, verbose, col_background,
-             col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask){
+             col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -1061,6 +1066,13 @@ analyze_objects <- function(img,
         prop_veins <- NULL
       }
 
+      # check if perimeter complexity value is computed
+      if(isTRUE(pcv)){
+        pcv <- poly_pcv(object_contour, niter = pcv_niter)
+      } else{
+        pcv <- NULL
+      }
+
       if(!is.null(object_index)){
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
@@ -1131,6 +1143,7 @@ analyze_objects <- function(img,
                       veins = prop_veins,
                       angles = angles,
                       mask = mask,
+                      pcv = pcv,
                       parms = list(index = index))
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){
@@ -1294,7 +1307,7 @@ analyze_objects <- function(img,
                tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose, col_background,
-               col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
+               col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -1330,7 +1343,7 @@ analyze_objects <- function(img,
                      tolerance , extension, randomize, nrows, plot, show_original,
                      show_background, marker, marker_col, marker_size, save_image, prefix,
                      dir_original, dir_processed, verbose, col_background,
-                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
+                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
         }
 
     } else{
@@ -1343,7 +1356,7 @@ analyze_objects <- function(img,
                    tolerance, extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image,
                    prefix, dir_original, dir_processed, verbose, col_background,
-                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask)
+                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
       }
       results <-
         lapply(seq_along(names_plant), function(i){
@@ -1484,6 +1497,19 @@ analyze_objects <- function(img,
       angles <- NULL
     }
 
+    if(isTRUE(pcv)){
+      pcv <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  data.frame(pcv = results[[i]][["pcv"]]) |>
+                  transform(img =  names(results[i]))
+                })
+        )
+
+      pcv <- pcv[, c("img", "pcv")]
+    } else{
+      pcv <- NULL
+    }
 
     results <-
       do.call(rbind,
@@ -1519,7 +1545,8 @@ analyze_objects <- function(img,
              efourier_error = efourier_error,
              efourier_minharm = efourier_minharm,
              veins = veins,
-             angles = angles),
+             angles = angles,
+             pcv = pcv),
         class = "anal_obj_ls"
       )
     )

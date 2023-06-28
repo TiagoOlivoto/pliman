@@ -718,14 +718,7 @@ poly_smooth <- function(x,
         poly_sample_prop(coords,
                          prop = prop)
     }
-    p <- nrow(coords)
-    a <- 0
-    while (a < niter) {
-      a <- a + 1
-      coo_i <- rbind(coords[-1, ], coords[1, ])
-      coo_s <- rbind(coords[p, ], coords[-p, ])
-      coords <- coords/2 + coo_i/4 + coo_s/4
-    }
+    coords <- help_smoth(coords, niter)
     if(isTRUE(plot)){
       plot_polygon(coords, aspect_ratio = 1)
     }
@@ -1268,3 +1261,78 @@ poly_apex_base_angle <- function(x,
   }
 }
 
+
+
+#' Compute Perimeter Complexity Value (PCV)
+#'
+#' This function calculates the Perimeter Complexity Value (PCV) for a given set
+#' of coordinates representing a contour. The PCV measures the variation of
+#' distances between the original coordinates and the smoothed coordinates
+#' relative to the perimeter length of the smoothed contour. See more in
+#' `details` section.
+#'
+#' @param x A matrix or a list of matrices representing the coordinates of the
+#'   contour(s).
+#' @param niter An integer specifying the number of iterations for smoothing the
+#'   contour. See [poly_smooth()] for more details. Defaults to 100.
+#' @return The PCV value(s) computed for the contour(s).
+#'
+#' @details
+#'
+#' The PCV is computed using the following formula: \deqn{PCV =
+#' \frac{sum(dists) \times sd(dists)}{perim}} where \eqn{dists}
+#' represents the distances between corresponding points in the original and
+#' smoothed coordinates, and \eqn{perim} is the perimeter length of the smoothed
+#' contour.
+#'
+#' The PCV is computed by first smoothing the input contour using a specified
+#' number of iterations. The smoothed contour is then used to compute the
+#' distances between corresponding points in the original and smoothed
+#' coordinates. These distances reflect the variations in the contour shape
+#' after smoothing. The sum of these distances represents the overall magnitude
+#' of the variations. Next, the sum of distances is multiplied by the standard
+#' deviation of the distances to capture the dispersion or spread of the
+#' variations. Finally, this value is divided by the perimeter length of the
+#' smoothed contour to provide a relative measure of complexity, taking into
+#' account both the magnitude and spread of the variations. Therefore, the PCV
+#' provides a relative measure of complexity by considering both the magnitude
+#' and spread of the variations in the contour shape after smoothing.
+#'
+#' @param x A matrix or a list of matrices representing the coordinates of the
+#'   polygon(s).
+#' @param niter An integer specifying the number of smoothing iterations. See
+#'   [poly_smooth()] for more details.
+#'
+#' @return If `x` is a matrix, returns the complexity value of the polygon's
+#'   perimeter. If `x` is a list of matrices, returns a numeric vector of
+#'   complexity values for each polygon.
+#'
+#' @examples
+#' library(pliman)
+#' set.seed(20)
+#' shp <- efourier_shape(npoints = 1000)
+#' poly_perimeter_complexity(shp)
+#'
+#' # increase the complexity of the outline
+#' shp2 <- poly_jitter(shp, noise_x = 20, noise_y = 250, plot = TRUE)
+#'
+#' smo <- poly_smooth(shp2, niter = 100, plot = FALSE)
+#' plot_contour(smo, col = "red")
+#' poly_perimeter_complexity(shp2)
+#'
+#' @export
+#'
+poly_pcv <- function(x, niter = 100){
+  complexity <- function(x, niter){
+    x_smoth <- poly_smooth(x, niter = niter, plot = FALSE)
+    dists <- sqrt((x[, 1] - x_smoth[, 1]) ^ 2 + (x[, 2] - x_smoth[, 2]) ^ 2)
+    perim <- poly_perimeter(x)
+    pcv <- (sum(dists) * sd(dists) ) / perim
+    return(pcv)
+  }
+  if (inherits(x, "list")) {
+    sapply(x, complexity, niter)
+  } else{
+    return(complexity(x, niter))
+  }
+}

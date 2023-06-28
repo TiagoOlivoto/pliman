@@ -129,3 +129,7 @@ help_poly_angles <- function(coords) {
     .Call(`_pliman_help_poly_angles`, coords)
 }
 
+help_smoth <- function(coords, niter) {
+    .Call(`_pliman_help_smoth`, coords, niter)
+}
+
