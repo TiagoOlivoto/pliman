@@ -220,7 +220,7 @@ plot_index <- function(img = NULL,
     if(!is.null(index)){
       index <- index
     } else if(!missing(object) & !is.null(object$object_index_computed)){
-      index <- object$object_index_computed
+      index <- object$object_index_computed[[1]]
     } else{
       index <- "B"
     }

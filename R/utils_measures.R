@@ -251,7 +251,7 @@ get_measures <- function(object,
       }
       # bind perimeter complexity value if it exists
       if(!is.null(object$pcv)){
-        res <- cbind(res, pvc = object[["pcv"]][, 2])
+        res <- cbind(res, pcv = object[["pcv"]][, 2])
       }
       smr <-
         do.call(cbind,
@@ -396,7 +396,7 @@ get_measures <- function(object,
       }
       # bind perimeter complexity value if it exists
       if(!is.null(object$pcv)){
-        res <- cbind(res, pvc = object$pcv)
+        res <- cbind(res, pcv = object$pcv)
       }
 
       smr <-
@@ -459,7 +459,7 @@ get_measures <- function(object,
 
     # bind perimeter complexity value if it exists
     if(!is.null(object$pcv)){
-      res <- cbind(res, pvc = object[["pcv"]])
+      res <- cbind(res, pcv = object[["pcv"]])
     }
 
     res <- round_cols(res, digits = digits)
