@@ -190,6 +190,9 @@ B). Defaults to 1.}
 
 \item{pcv}{Computes the Perimeter Complexity Value? Defaults to \code{FALSE}.}
 
+\item{pcv_niter}{An integer specifying the number of smoothing iterations for
+computing the  Perimeter Complexity Value. Defaults to 100.}
+
 \item{resize}{Resize the image before processing? Defaults to \code{FALSE}. Use a
 numeric value of range 0-100 (proportion of the size of the original image).}
 
@@ -369,9 +372,6 @@ are recognized.}
 }}
 
 \item{known_area}{The known area of the template object.}
-
-\item{niter}{An integer specifying the number of smoothing iterations for
-computing the  Perimeter Complexity Value. Defaults to 100.}
 }
 \value{
 \code{analyze_objects()} returns a list with the following objects:

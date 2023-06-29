@@ -124,7 +124,8 @@ plot(img)
 # Count the objects using the blue band to segment the image
 results <-
    analyze_objects(img,
-                 index = "B")
+                 index = "B",
+                 lower_noise = 0.1)
 plot_measures(results, measure = "id")
 
 # Get object measures by declaring the known resolution in dots per inch
@@ -142,6 +143,8 @@ get_measures(results,
              id = 1,
              area ~ 100)
 }
+
+
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

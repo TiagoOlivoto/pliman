@@ -195,7 +195,7 @@
 #'@param har_band The band to compute the Haralick features (1 = R, 2 = G, 3 =
 #'  B). Defaults to 1.
 #' @param pcv Computes the Perimeter Complexity Value? Defaults to `FALSE`.
-#' @param niter An integer specifying the number of smoothing iterations for
+#' @param pcv_niter An integer specifying the number of smoothing iterations for
 #'   computing the  Perimeter Complexity Value. Defaults to 100.
 #'@param resize Resize the image before processing? Defaults to `FALSE`. Use a
 #'  numeric value of range 0-100 (proportion of the size of the original image).

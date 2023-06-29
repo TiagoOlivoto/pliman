@@ -24,7 +24,7 @@ complexity values for each polygon.
 This function calculates the Perimeter Complexity Value (PCV) for a given set
 of coordinates representing a contour. The PCV measures the variation of
 distances between the original coordinates and the smoothed coordinates
-relative to the perimeter length of the smoothed contour. See more in
+relative to the perimeter length of the original contour. See more in
 \code{details} section.
 }
 \details{
@@ -42,22 +42,21 @@ after smoothing. The sum of these distances represents the overall magnitude
 of the variations. Next, the sum of distances is multiplied by the standard
 deviation of the distances to capture the dispersion or spread of the
 variations. Finally, this value is divided by the perimeter length of the
-smoothed contour to provide a relative measure of complexity, taking into
-account both the magnitude and spread of the variations. Therefore, the PCV
-provides a relative measure of complexity by considering both the magnitude
-and spread of the variations in the contour shape after smoothing.
+original contour to provide a relative measure of complexity. Therefore, the
+PCV provides a relative measure of complexity by considering both the
+magnitude and spread of the variations in the contour shape after smoothing.
 }
 \examples{
 library(pliman)
 set.seed(20)
 shp <- efourier_shape(npoints = 1000)
-poly_perimeter_complexity(shp)
+poly_pcv(shp)
 
 # increase the complexity of the outline
 shp2 <- poly_jitter(shp, noise_x = 20, noise_y = 250, plot = TRUE)
 
 smo <- poly_smooth(shp2, niter = 100, plot = FALSE)
 plot_contour(smo, col = "red")
-poly_perimeter_complexity(shp2)
+poly_pcv(shp2)
 
 }
