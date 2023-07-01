@@ -1118,11 +1118,12 @@ poly_width_at <- function(x,
         })
     }
     if(isTRUE(plot)){
-      plot(1:length(wd), wd,
+      plot(wd,
+           1:length(wd),
            type = "l",
            axes = FALSE,
-           xlab = "Height",
-           ylab = "Width (pixels)")
+           ylab = "Height",
+           xlab = "Width (pixels)")
       axis(1)
       axis(2)
     }
