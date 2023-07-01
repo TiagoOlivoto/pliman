@@ -249,11 +249,11 @@ landmarks_regradi <- function(x,
 #' ldm_add_smo <- landmarks_add(ldm, plot = FALSE, smooth_iter = 10)
 #' lines(ldm_add_smo, col = "blue", lwd = 3)
 landmarks_add <- function(x,
-                        n = 3,
-                        smooth_iter = 0,
-                        plot = TRUE,
-                        nrow = NULL,
-                        ncol = NULL){
+                          n = 3,
+                          smooth_iter = 0,
+                          plot = TRUE,
+                          nrow = NULL,
+                          ncol = NULL){
   if (inherits(x, "list")) {
     num_plots <- length(x)
     if (is.null(nrow) && is.null(ncol)){
@@ -382,6 +382,9 @@ calibrate <- function(img, viewer = get_pliman_viewer()){
 #'
 
 landmarks_dist <- function(x){
+  if(inherits(x, "landmarks_regradi")){
+    x <- x$coords
+  }
   n <- nrow(x)
   create_mat(dist(x), n)
 }
@@ -415,6 +418,9 @@ landmarks_angle <- function(x, unit = c("rad", "deg")){
   if(!unit %in% c("rad", "deg")){
     warning("`unit` must be 'rad' or 'deg'. Defaulting to 'rad'")
     unit <- "rad"
+  }
+  if(inherits(x, "landmarks_regradi")){
+    x <- x$coords
   }
   angles <- combn(nrow(x), 2, FUN = function(y){
     help_angle(x[y[1], 1:2], x[y[2], 1:2])
