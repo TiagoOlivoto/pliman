@@ -1,4 +1,4 @@
-# pliman (development version)
+# pliman 2.0.0
 ## New functions
 * `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.
 * `measure_disease_byl()` to measure disease severity '`by` `l`eaf' in an image with several leaves.
