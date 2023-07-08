@@ -23,7 +23,6 @@ knitr::opts_chunk$set(
 ```
 
 
-
 # Getting started
 
 The function `analyze_objects()` can be used to count objects in an image. Let us start with a simple example with the image `object_300dpi.png` available on the [GitHub page](https://github.com/TiagoOlivoto/pliman/tree/master/image_examples). To facilitate the image importation from this folder, a helper function `image_pliman()` is used.
@@ -50,7 +49,7 @@ image_binary(img)
 ```{r, fig.width=10, fig.height=5}
 img_res <- 
   analyze_objects(img,
-                  marker = "area",
+                  marker = "id",
                   index = "B") # use blue index to segment
 
 ```
@@ -67,7 +66,8 @@ Since we have known the area of the larger square (object 1), let us adjust the 
 ```{r}
 get_measures(img_res,
              id = 1,
-             area ~ 100)
+             area ~ 100) |> 
+  str()
 ```
 
 The same can be used to adjust the measures based on the perimeter or radius. Let us adjust the perimeter of objects by the perimeter of object 2 (20 cm).
@@ -75,7 +75,8 @@ The same can be used to adjust the measures based on the perimeter or radius. Le
 ```{r}
 get_measures(img_res,
              id = 2,
-             perimeter ~ 20)
+             perimeter ~ 20) |> 
+  str()
 ```
 
 ## Declaring the image resolution
@@ -91,7 +92,7 @@ pixels_to_cm(px = ls_px, dpi = 300)
 The perimeter of object 1 adjusted by the image resolution is very close to the true (40 cm). Bellow, the values of all measures are adjusted by declaring the `dpi` argument in `get_measures()`.
 
 ```{r}
-get_measures(img_res, dpi = 300)
+get_measures(img_res, dpi = 300) |> str()
 ```
 
 
@@ -129,7 +130,8 @@ count <-
 
 ```{r}
 # Get the object measures
-(measures <- get_measures(count))
+measures <- get_measures(count)
+str(measures)
 ```
 
 In the following example, we will select objects with an area above the average of all objects by using `lower_size = 2057.36`. Additionally, we will use the argument `show_original = FALSE` to show the results as colors (non-original image).
@@ -187,7 +189,7 @@ pot_meas <-
                   watershed = FALSE,
                   marker = "id",
                   show_chull = TRUE) # shows the convex hull
-print(pot_meas$results)
+str(pot_meas)
 ```
 
 Three key measures (in pixel units) are:
@@ -243,35 +245,35 @@ Then, the area of the convex hull can be obtained with `poly_area()`.
 df_cont <-
   do.call(rbind,
           lapply(seq_along(cont), function(i){
-            transform(cont[[i]], object = names(cont[i]))
+            transform(as.data.frame(cont[[i]]), object = names(cont[i]))
           }))
 
 df_conv <-  
   do.call(rbind,
           lapply(seq_along(conv), function(i){
-            transform(conv[[i]], object = names(conv[i]))
+            transform(as.data.frame(conv[[i]]), object = names(conv[i]))
           }))
 
 
 # plot the objects
 palette(c("red","blue","green"))
 with(df_cont,
-     plot(X1, X2, 
+     plot(V1, V2, 
           cex = 0.5,
           col = object,
           xlab = NA,
           ylab = NA,
           axes = F))
 with(subset(df_conv, object == 1),
-     polygon(x, y, 
+     polygon(V1, V2, 
              col = rgb(1, 0, 0, 0.2),
              border = NA))
 with(subset(df_conv, object == 2),
-     polygon(x, y, 
+     polygon(V1, V2, 
              col = rgb(0, 0, 1, 0.2),
              border = NA))
 with(subset(df_conv, object == 3),
-     polygon(x, y, 
+     polygon(V1, V2, 
              col = rgb(0, 1, 0, 0.2),
              border = NA))
 
@@ -280,10 +282,10 @@ with(subset(df_conv, object == 3),
 Or do the same with `ggplot2`
 ```{r eval=FALSE}
 library(ggplot2)
-ggplot(df_cont, aes(X1, X2, group = object)) +
+ggplot(df_cont, aes(V1, V2, group = object)) +
   geom_polygon(aes(fill = object)) +
   geom_polygon(data = df_conv,
-               aes(x, y, fill = object),
+               aes(V1, V2, fill = object),
                alpha = 0.3) +
   theme_void() +
   theme(legend.position = "bottom")

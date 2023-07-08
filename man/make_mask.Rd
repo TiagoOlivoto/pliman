@@ -4,10 +4,10 @@
 \alias{make_mask}
 \title{Makes a mask in an image}
 \usage{
-make_mask(image, brush, rel_pos_x = 0.5, rel_pos_y = 0.5, plot = TRUE)
+make_mask(img, brush, rel_pos_x = 0.5, rel_pos_y = 0.5, plot = TRUE)
 }
 \arguments{
-\item{image}{A \code{Image} object}
+\item{img}{A \code{Image} object}
 
 \item{brush}{An object created with \code{make_brush()}}
 

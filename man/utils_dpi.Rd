@@ -19,11 +19,11 @@ pixels_to_cm(px, dpi)
 
 cm_to_pixels(cm, dpi)
 
-npixels(image)
+npixels(img)
 
-dpi(image, viewer = get_pliman_viewer())
+dpi(img, viewer = get_pliman_viewer())
 
-distance(image, viewer = get_pliman_viewer())
+distance(img, viewer = get_pliman_viewer())
 }
 \arguments{
 \item{dpi}{The image resolution in dots per inch.}
@@ -32,7 +32,7 @@ distance(image, viewer = get_pliman_viewer())
 
 \item{px}{The number of pixels.}
 
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{viewer}{The viewer option. If not provided, the value is retrieved
 using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use

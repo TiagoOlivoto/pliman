@@ -4,7 +4,7 @@
 #' convolving the image with a small, separable, and integer-valued filter in
 #' the horizontal and vertical directions.
 #'
-#' @param image An image or a list of images of class `Image`.
+#' @param img An image or a list of images of class `Image`.
 #' @param sigma Gaussian kernel standard deviation used in the gaussian blur.
 #' @param threshold The theshold method to be used.  If `threshold = "Otsu"`
 #'   (default), a threshold value based on Otsu's method is used to reduce the
@@ -26,12 +26,12 @@
 #' img <- image_pliman("sev_leaf_nb.jpg", plot = TRUE)
 #' object_edge(img)
 #'
-object_edge <- function(image,
+object_edge <- function(img,
                         sigma = 1,
                         threshold = "Otsu",
                         thinning = FALSE,
                         plot = TRUE){
-  gray <- image_index(image,
+  gray <- image_index(img,
                       "GRAY",
                       plot = FALSE,
                       verbose = FALSE)[[1]]

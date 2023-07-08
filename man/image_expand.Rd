@@ -5,7 +5,7 @@
 \title{Expands an image}
 \usage{
 image_expand(
-  image,
+  img,
   left = NULL,
   top = NULL,
   right = NULL,
@@ -21,7 +21,7 @@ image_expand(
 )
 }
 \arguments{
-\item{image}{An \code{Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{left, top, right, bottom}{The number of pixels to expand in the left, top,
 right, and bottom directions, respectively.}

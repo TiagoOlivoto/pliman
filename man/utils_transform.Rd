@@ -24,7 +24,7 @@
 \title{Spatial transformations}
 \usage{
 image_autocrop(
-  image,
+  img,
   index = "NB",
   edge = 5,
   filter = 3,
@@ -35,7 +35,7 @@ image_autocrop(
 )
 
 image_crop(
-  image,
+  img,
   width = NULL,
   height = NULL,
   viewer = get_pliman_viewer(),
@@ -46,10 +46,10 @@ image_crop(
   plot = FALSE
 )
 
-image_dimension(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_dimension(img, parallel = FALSE, workers = NULL, verbose = TRUE)
 
 image_rotate(
-  image,
+  img,
   angle,
   bg_col = "white",
   parallel = FALSE,
@@ -59,7 +59,7 @@ image_rotate(
 )
 
 image_horizontal(
-  image,
+  img,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -67,7 +67,7 @@ image_horizontal(
 )
 
 image_vertical(
-  image,
+  img,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -75,7 +75,7 @@ image_vertical(
 )
 
 image_hreflect(
-  image,
+  img,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -83,7 +83,7 @@ image_hreflect(
 )
 
 image_vreflect(
-  image,
+  img,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -91,7 +91,7 @@ image_vreflect(
 )
 
 image_resize(
-  image,
+  img,
   rel_size = 100,
   width,
   height,
@@ -102,7 +102,7 @@ image_resize(
 )
 
 image_trim(
-  image,
+  img,
   edge = NULL,
   top = NULL,
   bottom = NULL,
@@ -115,7 +115,7 @@ image_trim(
 )
 
 image_dilate(
-  image,
+  img,
   kern = NULL,
   size = NULL,
   shape = "disc",
@@ -126,7 +126,7 @@ image_dilate(
 )
 
 image_erode(
-  image,
+  img,
   kern = NULL,
   size = NULL,
   shape = "disc",
@@ -137,7 +137,7 @@ image_erode(
 )
 
 image_opening(
-  image,
+  img,
   kern = NULL,
   size = NULL,
   shape = "disc",
@@ -148,7 +148,7 @@ image_opening(
 )
 
 image_closing(
-  image,
+  img,
   kern = NULL,
   size = NULL,
   shape = "disc",
@@ -159,7 +159,7 @@ image_closing(
 )
 
 image_skeleton(
-  image,
+  img,
   kern = NULL,
   parallel = FALSE,
   workers = NULL,
@@ -169,7 +169,7 @@ image_skeleton(
 )
 
 image_thinning(
-  image,
+  img,
   niter = 3,
   parallel = FALSE,
   workers = NULL,
@@ -179,7 +179,7 @@ image_thinning(
 )
 
 image_filter(
-  image,
+  img,
   size = 2,
   cache = 512,
   parallel = FALSE,
@@ -189,7 +189,7 @@ image_filter(
 )
 
 image_blur(
-  image,
+  img,
   sigma = 3,
   parallel = FALSE,
   workers = NULL,
@@ -198,7 +198,7 @@ image_blur(
 )
 
 image_contrast(
-  image,
+  img,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -206,7 +206,7 @@ image_contrast(
 )
 }
 \arguments{
-\item{image}{An image or a list of images of class \code{Image}.}
+\item{img}{An image or a list of images of class \code{Image}.}
 
 \item{index}{The index to segment the image. See \code{\link[=image_index]{image_index()}} for more
 details. Defaults to \code{"NB"} (normalized blue).}

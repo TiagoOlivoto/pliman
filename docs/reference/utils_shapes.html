@@ -34,7 +34,7 @@ draw_n_tagon() Draws polygons with n sides
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -199,17 +199,11 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">circ</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18.84952</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">############ An example of a square ############</span></span></span>
 <span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 2 0</span>
@@ -225,12 +219,7 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">############ An example of a rectangle ############</span></span></span>
 <span class="r-in"><span><span class="va">side1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
@@ -238,7 +227,6 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span><span class="op">(</span><span class="va">rect</span> <span class="op">&lt;-</span> <span class="fu">draw_rectangle</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 3 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 3 0</span>
@@ -250,17 +238,12 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># perimeter</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">rect</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
 <span class="r-in"><span><span class="co">###########  An example of an equilateral triangle #########</span></span></span>
 <span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># defaults</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">trig</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_equi</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x         y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 1.0 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.5 0.8660254</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.0 0.0000000</span>
@@ -277,23 +260,18 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### perimeter (side * 3)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">trig</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">########### An example of a rectangle triangle ##########</span></span></span>
 <span class="r-in"><span><span class="va">cat1</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="va">cat2</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">draw_trian_rect</span><span class="op">(</span><span class="va">cat1</span>, <span class="va">cat2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-5.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 3 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      x y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 3 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 0 0</span>
 <span class="r-in"><span><span class="co"># area</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">cat1</span> <span class="op">*</span> <span class="va">cat2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
@@ -305,18 +283,11 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.605551</span>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.605551</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">############ An creating shapes with n sides ############</span></span></span>
 <span class="r-in"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu">draw_square</span><span class="op">(</span>side <span class="op">=</span> <span class="va">side</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_shapes-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 2 0</span>
@@ -332,7 +303,7 @@ Defaults to <code>1</code>, and <code>2</code>, respectively.</p></dd>
 <span class="r-in"><span><span class="va">side</span> <span class="op">*</span> <span class="fl">4</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
 <span class="r-in"><span><span class="fu"><a href="utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

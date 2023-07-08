@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@
                         <h4 data-toc-skip class="author">Tiago
 Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2023-01-20</h4>
+            <h4 data-toc-skip class="date">2023-07-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/leaf_area.Rmd" class="external-link"><code>vignettes/leaf_area.Rmd</code></a></small>
       <div class="d-none name"><code>leaf_area.Rmd</code></div>
@@ -151,8 +151,16 @@ with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></co
 segment foreground (leaves) from background.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
+<span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
+<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
+<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
+<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
+<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
+<span><span class="co">#&gt; The sp package is now running under evolution status 2</span></span>
+<span><span class="co">#&gt;      (status 2 uses the sf package in place of rgdal)</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
-<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.2.0)            |</span></span>
+<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 2.0.0)            |</span></span>
 <span><span class="co">#&gt; | Author: Tiago Olivoto                                    |</span></span>
 <span><span class="co">#&gt; | Type 'citation('pliman')' to know how to cite pliman     |</span></span>
 <span><span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial     |</span></span>
@@ -165,9 +173,9 @@ segment foreground (leaves) from background.</p>
 <span>               plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf3-1.png" width="960"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/image_index.html">image_index</a></span><span class="op">(</span><span class="va">leaves</span><span class="op">)</span></span></code></pre></div>
 <p><img src="leaf_area_files/figure-html/leaf4-1.png" width="768"></p>
-<p><code>G</code> (Green) and <code>NB</code> (Normalized Blue) are two
+<p><code>B</code> (Blue) and <code>NB</code> (Normalized Blue) are two
 possible candidates to segment the leaves from the background. We will
 use the <code>NB</code> index here (default option in
 <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>). The measurement of the leaf area in
@@ -227,178 +235,16 @@ area using object 10, a square with a side of 5 cm (25 cm<span class="math inlin
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">area</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>,</span>
-<span>               id <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>               id <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>               <span class="va">area</span> <span class="op">~</span> <span class="fl">25</span><span class="op">)</span></span>
 <span><span class="co">#&gt; -----------------------------------------</span></span>
 <span><span class="co">#&gt; measures corrected with:</span></span>
-<span><span class="co">#&gt; object id: 10</span></span>
+<span><span class="co">#&gt; object id: 11</span></span>
 <span><span class="co">#&gt; area     : 25</span></span>
 <span><span class="co">#&gt; -----------------------------------------</span></span>
-<span><span class="co">#&gt; Total    : 653.542 </span></span>
-<span><span class="co">#&gt; Average  : 29.706 </span></span>
+<span><span class="co">#&gt; Total    : 801.522 </span></span>
+<span><span class="co">#&gt; Average  : 36.433 </span></span>
 <span><span class="co">#&gt; -----------------------------------------</span></span>
-<span><span class="va">area</span></span>
-<span><span class="co">#&gt;    id         x        y     area   area_ch perimeter radius_mean radius_min</span></span>
-<span><span class="co">#&gt; 1   1  276.0924 221.3585 96.73257  97.08413  40.77664     5.68003    4.04707</span></span>
-<span><span class="co">#&gt; 2   2  911.9703 191.1764 93.22938 118.40723  59.37689     5.40876    3.12394</span></span>
-<span><span class="co">#&gt; 3   3  117.3204 500.7596 77.96551  82.95558  49.29667     5.64300    2.43851</span></span>
-<span><span class="co">#&gt; 4   4  533.6229 164.1625 47.42741  49.28861  30.44753     4.03618    2.89139</span></span>
-<span><span class="co">#&gt; 5   5  690.1214 172.8539 43.01224  44.73488  28.51551     3.84708    2.80396</span></span>
-<span><span class="co">#&gt; 6   6  224.8678 751.2190 41.65977  44.17239  28.16006     3.67882    2.68811</span></span>
-<span><span class="co">#&gt; 7   7 1047.1189 424.3649 50.92026  51.67094  30.99513     4.20580    2.71596</span></span>
-<span><span class="co">#&gt; 8   8  865.0581 761.3348 32.62263  33.75796  24.79189     3.33062    2.37718</span></span>
-<span><span class="co">#&gt; 9   9  871.4651 486.6107 31.44594  33.85309  25.82924     3.25260    2.20673</span></span>
-<span><span class="co">#&gt; 11 11  606.0639 664.1501 20.51452  20.41319  18.09323     2.56885    2.17601</span></span>
-<span><span class="co">#&gt; 12 12  597.3677 378.9105 23.38283  26.41865  23.52694     2.84747    1.78762</span></span>
-<span><span class="co">#&gt; 13 13  503.6711 584.4305 21.36653  22.47291  24.74240     3.11756    1.46382</span></span>
-<span><span class="co">#&gt; 14 14  385.4281 423.9329 17.14368  18.19629  21.72432     2.71003    1.31728</span></span>
-<span><span class="co">#&gt; 15 15  423.3850 176.4127 12.86914  13.48954  17.61539     2.26096    1.08122</span></span>
-<span><span class="co">#&gt; 16 16  847.0437 626.8036  8.66490   9.03507  13.20698     1.76070    1.13456</span></span>
-<span><span class="co">#&gt; 17 17  712.4902 457.6057  7.68260   7.71776  13.94372     1.79223    0.72309</span></span>
-<span><span class="co">#&gt; 18 18  353.5446 740.3390  4.86806   5.28166  11.11322     1.42471    0.80265</span></span>
-<span><span class="co">#&gt; 19 19  641.4138 535.3791  3.81338   3.75962   7.98134     1.10104    0.74888</span></span>
-<span><span class="co">#&gt; 20 20  738.9282 711.7369  6.85541   0.01034   0.63988     0.08533    0.01484</span></span>
-<span><span class="co">#&gt; 21 21  344.6633 602.1398  4.55786   5.21342  13.61759     1.61316    0.24847</span></span>
-<span><span class="co">#&gt; 22 22  714.2806 575.9889  3.16197   3.10820   7.56237     1.03436    0.57391</span></span>
-<span><span class="co">#&gt; 23 23  473.9200 785.7101  3.64588   3.91265  26.28066     3.21439    0.12175</span></span>
-<span><span class="co">#&gt;    radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span></span>
-<span><span class="co">#&gt; 1     8.43543   1.23575  11.36006  8.09413 16.87087   15.06157    8.22795</span></span>
-<span><span class="co">#&gt; 2     7.80407   0.94065  10.81751  6.24789 15.60815   12.41160   10.39198</span></span>
-<span><span class="co">#&gt; 3     9.66370   2.12949  11.28600  4.87702 19.32741   17.22447    6.06471</span></span>
-<span><span class="co">#&gt; 4     6.10263   0.79058   8.07236  5.78278 12.20526    9.99264    6.12608</span></span>
-<span><span class="co">#&gt; 5     5.80467   0.76602   7.69415  5.60792 11.60934    9.27126    6.02411</span></span>
-<span><span class="co">#&gt; 6     5.32146   0.53095   7.35763  5.37623 10.64293    8.24069    6.75703</span></span>
-<span><span class="co">#&gt; 7     6.48186   1.07829   8.41161  5.43193 12.96372   11.49433    5.71336</span></span>
-<span><span class="co">#&gt; 8     5.00914   0.64814   6.66124  4.75435 10.01827    8.01688    5.39788</span></span>
-<span><span class="co">#&gt; 9     4.86553   0.66518   6.50520  4.41346  9.73106    7.65495    5.93623</span></span>
-<span><span class="co">#&gt; 11    3.16698   0.28024   5.13770  4.35203  6.33395    5.31339    5.14503</span></span>
-<span><span class="co">#&gt; 12    4.50735   0.69335   5.69493  3.57525  9.01470    6.84505    5.28617</span></span>
-<span><span class="co">#&gt; 13    5.40875   1.20073   6.23512  2.92765 10.81749    9.06822    3.14584</span></span>
-<span><span class="co">#&gt; 14    4.65625   1.01362   5.42006  2.63456  9.31250    7.96468    2.87204</span></span>
-<span><span class="co">#&gt; 15    3.83132   0.78693   4.52191  2.16243  7.66264    6.70204    2.52234</span></span>
-<span><span class="co">#&gt; 16    2.77394   0.46865   3.52140  2.26912  5.54788    4.57041    2.46403</span></span>
-<span><span class="co">#&gt; 17    3.10149   0.68070   3.58446  1.44618  6.20299    5.54024    1.84062</span></span>
-<span><span class="co">#&gt; 18    2.46754   0.46313   2.84941  1.60531  4.93509    3.70678    1.75421</span></span>
-<span><span class="co">#&gt; 19    1.64878   0.25965   2.20208  1.49775  3.29756    3.07344    1.58320</span></span>
-<span><span class="co">#&gt; 20    0.15722   0.04520   0.17066  0.02968  0.31444    5.63603    1.67529</span></span>
-<span><span class="co">#&gt; 21    3.01928   0.77779   3.22633  0.49693  6.03855    5.15849    1.26303</span></span>
-<span><span class="co">#&gt; 22    1.59940   0.30144   2.06872  1.14781  3.19881    3.03457    1.34187</span></span>
-<span><span class="co">#&gt; 23    6.41465   1.84320   6.42877  0.24351 12.82929   13.17236    0.40297</span></span>
-<span><span class="co">#&gt;     caliper   length    width radius_ratio    theta eccentricity form_factor</span></span>
-<span><span class="co">#&gt; 1  16.04141 16.03637  8.46275      2.08433  1.52856      0.39412     0.73107</span></span>
-<span><span class="co">#&gt; 2  14.48427 14.33914 12.05366      2.49815 -1.55598      0.83343     0.33230</span></span>
-<span><span class="co">#&gt; 3  19.17615 19.17560  6.61662      3.96296 -1.50983      0.15092     0.40316</span></span>
-<span><span class="co">#&gt; 4  11.57655 11.57530  6.33339      2.11062 -1.48723      0.38867     0.64289</span></span>
-<span><span class="co">#&gt; 5  10.65518 10.64028  6.21490      2.07017 -1.39300      0.42153     0.66472</span></span>
-<span><span class="co">#&gt; 6   9.42830  9.20539  6.90208      1.97963 -1.47403      0.62950     0.66018</span></span>
-<span><span class="co">#&gt; 7  12.65527 12.65519  5.90841      2.38658  1.40440      0.31359     0.66606</span></span>
-<span><span class="co">#&gt; 8   9.01798  8.97344  5.66115      2.10718 -1.32776      0.45560     0.66697</span></span>
-<span><span class="co">#&gt; 9   8.50241  8.40636  6.38375      2.20486 -1.47634      0.59386     0.59231</span></span>
-<span><span class="co">#&gt; 11  6.30287  4.82589  4.69392      1.45540  1.55898      0.95286     0.78748</span></span>
-<span><span class="co">#&gt; 12  7.88100  7.74461  5.76454      2.52142 -1.41819      0.54104     0.53085</span></span>
-<span><span class="co">#&gt; 13 10.61834 10.61285  3.47901      3.69494 -1.10398      0.12310     0.43859</span></span>
-<span><span class="co">#&gt; 14  9.15996  9.15994  3.16002      3.53474 -1.38299      0.14285     0.45648</span></span>
-<span><span class="co">#&gt; 15  7.64200  7.63554  2.64426      3.54353  1.55451      0.17333     0.52116</span></span>
-<span><span class="co">#&gt; 16  5.27924  5.27811  2.51609      2.44495  0.23948      0.29392     0.62426</span></span>
-<span><span class="co">#&gt; 17  6.14252  6.14065  1.91453      4.28922  1.42703      0.13952     0.49655</span></span>
-<span><span class="co">#&gt; 18  4.60402  4.59982  1.81230      3.07423 -0.51289      0.17621     0.49532</span></span>
-<span><span class="co">#&gt; 19  3.18619  3.18609  1.60567      2.20168 -1.54434      0.38159     0.75226</span></span>
-<span><span class="co">#&gt; 20  0.30506  0.30505  0.04153     10.59350  1.55370      0.02198   210.39687</span></span>
-<span><span class="co">#&gt; 21  5.91702  5.91339  1.40537     12.15168 -1.42545      0.06271     0.30887</span></span>
-<span><span class="co">#&gt; 22  3.14010  3.14009  1.36423      2.78687  1.42132      0.27034     0.69479</span></span>
-<span><span class="co">#&gt; 23 12.74678 12.74609  0.44301     52.68519 -0.03616      0.00132     0.06633</span></span>
-<span><span class="co">#&gt;    narrow_factor asp_ratio rectangularity pd_ratio plw_ratio  solidity</span></span>
-<span><span class="co">#&gt; 1        1.00031   1.89494        1.40296  2.54196   1.66441   0.99638</span></span>
-<span><span class="co">#&gt; 2        1.01012   1.18961        1.85391  4.09941   2.24974   0.78736</span></span>
-<span><span class="co">#&gt; 3        1.00003   2.89810        1.62736  2.57073   1.91130   0.93985</span></span>
-<span><span class="co">#&gt; 4        1.00011   1.82766        1.54575  2.63010   1.70015   0.96224</span></span>
-<span><span class="co">#&gt; 5        1.00140   1.71206        1.53743  2.67621   1.69179   0.96149</span></span>
-<span><span class="co">#&gt; 6        1.02421   1.33371        1.52512  2.98676   1.74826   0.94312</span></span>
-<span><span class="co">#&gt; 7        1.00001   2.14189        1.46841  2.44919   1.66967   0.98547</span></span>
-<span><span class="co">#&gt; 8        1.00496   1.58509        1.55720  2.74916   1.69406   0.96637</span></span>
-<span><span class="co">#&gt; 9        1.01143   1.31684        1.70655  3.03787   1.74639   0.92889</span></span>
-<span><span class="co">#&gt; 11       1.30605   1.02812        1.10421  2.87063   1.90059   1.00496</span></span>
-<span><span class="co">#&gt; 12       1.01761   1.34349        1.90927  2.98527   1.74156   0.88509</span></span>
-<span><span class="co">#&gt; 13       1.00052   3.05053        1.72804  2.33016   1.75579   0.95077</span></span>
-<span><span class="co">#&gt; 14       1.00000   2.89869        1.68841  2.37166   1.76334   0.94215</span></span>
-<span><span class="co">#&gt; 15       1.00085   2.88759        1.56890  2.30508   1.71359   0.95401</span></span>
-<span><span class="co">#&gt; 16       1.00021   2.09774        1.53264  2.50168   1.69446   0.95903</span></span>
-<span><span class="co">#&gt; 17       1.00030   3.20740        1.53027  2.27003   1.73102   0.99544</span></span>
-<span><span class="co">#&gt; 18       1.00091   2.53811        1.71244  2.41381   1.73316   0.92169</span></span>
-<span><span class="co">#&gt; 19       1.00003   1.98428        1.34154  2.50498   1.66564   1.01430</span></span>
-<span><span class="co">#&gt; 20       1.00001   7.34489        0.00185  2.09759   1.84624 663.00000</span></span>
-<span><span class="co">#&gt; 21       1.00061   4.20770        1.82334  2.30143   1.86064   0.87426</span></span>
-<span><span class="co">#&gt; 22       1.00000   2.30173        1.35479  2.40832   1.67891   1.01730</span></span>
-<span><span class="co">#&gt; 23       1.00005  28.77167        1.54877  2.06175   1.99261   0.93182</span></span>
-<span><span class="co">#&gt;    convexity elongation circularity circularity_haralick circularity_norm</span></span>
-<span><span class="co">#&gt; 1    0.90659    0.47228    17.18898              4.59643          1.37928</span></span>
-<span><span class="co">#&gt; 2    0.63445    0.15939    37.81656              5.75001          3.04757</span></span>
-<span><span class="co">#&gt; 3    0.82809    0.65495    31.16970              2.64993          2.51226</span></span>
-<span><span class="co">#&gt; 4    0.85419    0.45285    19.54676              5.10537          1.57711</span></span>
-<span><span class="co">#&gt; 5    0.90173    0.41591    18.90471              5.02219          1.52421</span></span>
-<span><span class="co">#&gt; 6    0.88712    0.25021    19.03489              6.92874          1.53463</span></span>
-<span><span class="co">#&gt; 7    0.88070    0.53312    18.86672              3.90045          1.51945</span></span>
-<span><span class="co">#&gt; 8    0.83370    0.36912    18.84084              5.13874          1.52242</span></span>
-<span><span class="co">#&gt; 9    0.83306    0.24060    21.21576              4.88977          1.71560</span></span>
-<span><span class="co">#&gt; 11   0.85605    0.02735    15.95772              9.16655          1.29554</span></span>
-<span><span class="co">#&gt; 12   0.82930    0.25567    23.67195              4.10685          1.92113</span></span>
-<span><span class="co">#&gt; 13   0.87695    0.67219    28.65165              2.59639          2.33228</span></span>
-<span><span class="co">#&gt; 14   0.89200    0.65502    27.52887              2.67362          2.24803</span></span>
-<span><span class="co">#&gt; 15   0.88160    0.65369    24.11212              2.87315          1.97251</span></span>
-<span><span class="co">#&gt; 16   0.91815    0.52330    20.12997              3.75698          1.65156</span></span>
-<span><span class="co">#&gt; 17   0.80393    0.68822    25.30748              2.63291          2.09102</span></span>
-<span><span class="co">#&gt; 18   0.70061    0.60601    25.37020              3.07625          2.11456</span></span>
-<span><span class="co">#&gt; 19   0.88918    0.49604    16.70480              4.24050          1.38647</span></span>
-<span><span class="co">#&gt; 20   0.53103    0.86385     0.05973              1.88758         10.50396</span></span>
-<span><span class="co">#&gt; 21   0.62058    0.76234    40.68547              2.07403          3.44557</span></span>
-<span><span class="co">#&gt; 22   0.91275    0.56554    18.08667              3.43141          1.51301</span></span>
-<span><span class="co">#&gt; 23   0.70514    0.96524   189.43955              1.74392         17.95773</span></span>
-<span><span class="co">#&gt;    coverage     asm     con     cor     var     idm      sav        sva     sen</span></span>
-<span><span class="co">#&gt; 1   0.04646 0.31992 0.31321 0.64274 1.43834 0.86645  9.38558   78.43458 0.61093</span></span>
-<span><span class="co">#&gt; 2   0.04478 0.20588 0.39564 0.69230 1.64290 0.84385  5.74363   27.28570 0.73267</span></span>
-<span><span class="co">#&gt; 3   0.03745 0.08042 0.67885 0.90480 4.56550 0.80504 16.08980  237.04471 1.14117</span></span>
-<span><span class="co">#&gt; 4   0.02278 0.21120 0.47165 0.66614 1.70635 0.83631  5.38456   23.96601 0.73566</span></span>
-<span><span class="co">#&gt; 5   0.02066 0.18794 0.50333 0.74759 1.99704 0.82826  4.93743   20.54331 0.80724</span></span>
-<span><span class="co">#&gt; 6   0.02001 0.07991 0.84887 0.79361 3.05648 0.75585 14.12732  178.99753 1.02692</span></span>
-<span><span class="co">#&gt; 7   0.02446 0.25753 0.29656 0.75908 1.61549 0.86519  8.17204   57.93871 0.70389</span></span>
-<span><span class="co">#&gt; 8   0.01567 0.13221 0.68425 0.66278 2.01455 0.77735 11.63156  119.36791 0.86151</span></span>
-<span><span class="co">#&gt; 9   0.01510 0.18175 0.73880 0.60680 1.93946 0.77932  7.60501   49.62123 0.77843</span></span>
-<span><span class="co">#&gt; 11  0.00985 0.64753 0.66436 0.38042 1.53613 0.91993 53.80581 2857.45451 0.36449</span></span>
-<span><span class="co">#&gt; 12  0.01123 0.04679 3.05453 0.52462 4.21272 0.60276 17.99663  295.20593 1.10256</span></span>
-<span><span class="co">#&gt; 13  0.01026 0.16936 0.48208 0.80529 2.23791 0.83222 10.83983  103.89081 0.86881</span></span>
-<span><span class="co">#&gt; 14  0.00823 0.13938 0.49071 0.83401 2.47813 0.82503  9.87263   85.30911 0.93466</span></span>
-<span><span class="co">#&gt; 15  0.00618 0.10916 0.50278 0.82823 2.46353 0.80686  7.47099   48.13882 0.92978</span></span>
-<span><span class="co">#&gt; 16  0.00416 0.03595 3.99106 0.70734 7.81862 0.59273 13.94771  185.15125 1.22498</span></span>
-<span><span class="co">#&gt; 17  0.00369 0.07966 1.54030 0.78829 4.63773 0.75158 10.15411   95.39066 1.07777</span></span>
-<span><span class="co">#&gt; 18  0.00234 0.05485 3.11285 0.28718 3.18348 0.55617 10.24183   91.50140 0.97466</span></span>
-<span><span class="co">#&gt; 19  0.00183 0.08578 1.38215 0.57443 2.62387 0.69392 11.86339  124.18159 0.95155</span></span>
-<span><span class="co">#&gt; 20  0.00329 0.12449 0.82365 0.81410 3.21531 0.80545  6.89737   43.42473 0.94866</span></span>
-<span><span class="co">#&gt; 21  0.00219 0.20615 0.48824 0.59893 1.60866 0.81781  9.72125   82.89629 0.72403</span></span>
-<span><span class="co">#&gt; 22  0.00152 0.12796 0.72098 0.87725 3.93683 0.78300 10.02045   93.86976 0.91862</span></span>
-<span><span class="co">#&gt; 23  0.00175 0.07204 1.27765 0.64060 2.77746 0.69238 12.37435  135.37633 0.99261</span></span>
-<span><span class="co">#&gt;        ent     dva     den     f12     f13</span></span>
-<span><span class="co">#&gt; 1  0.71606 0.31321 0.27375 0.27444 0.45136</span></span>
-<span><span class="co">#&gt; 2  0.86053 0.39564 0.30095 0.31016 0.52046</span></span>
-<span><span class="co">#&gt; 3  1.32903 0.67885 0.36048 0.48637 0.75791</span></span>
-<span><span class="co">#&gt; 4  0.87860 0.47165 0.31839 0.29008 0.50774</span></span>
-<span><span class="co">#&gt; 5  0.96012 0.50333 0.32870 0.33269 0.56425</span></span>
-<span><span class="co">#&gt; 6  1.27028 0.84887 0.40618 0.33096 0.62920</span></span>
-<span><span class="co">#&gt; 7  0.80009 0.29656 0.26681 0.36316 0.54691</span></span>
-<span><span class="co">#&gt; 8  1.07839 0.68425 0.38179 0.24682 0.51180</span></span>
-<span><span class="co">#&gt; 9  0.97772 0.73880 0.38530 0.19831 0.44014</span></span>
-<span><span class="co">#&gt; 11 0.43650 0.66436 0.22209 0.23131 0.32860</span></span>
-<span><span class="co">#&gt; 12 1.59570 3.05453 0.61325 0.14655 0.47225</span></span>
-<span><span class="co">#&gt; 13 1.00857 0.48208 0.31921 0.39769 0.62759</span></span>
-<span><span class="co">#&gt; 14 1.08625 0.49071 0.32667 0.41797 0.66085</span></span>
-<span><span class="co">#&gt; 15 1.09855 0.50278 0.33973 0.38401 0.63779</span></span>
-<span><span class="co">#&gt; 16 1.71989 3.99106 0.64892 0.21274 0.57963</span></span>
-<span><span class="co">#&gt; 17 1.36540 1.54030 0.46392 0.35550 0.66773</span></span>
-<span><span class="co">#&gt; 18 1.48771 3.11285 0.63390 0.05051 0.27238</span></span>
-<span><span class="co">#&gt; 19 1.28669 1.38215 0.48487 0.18734 0.48325</span></span>
-<span><span class="co">#&gt; 20 1.14892 0.82365 0.37808 0.38499 0.64945</span></span>
-<span><span class="co">#&gt; 21 0.87908 0.48824 0.33238 0.23235 0.45431</span></span>
-<span><span class="co">#&gt; 22 1.12244 0.72098 0.39101 0.38478 0.64359</span></span>
-<span><span class="co">#&gt; 23 1.32064 1.27765 0.47014 0.21462 0.52157</span></span>
 <span><span class="co"># plot the area to the segmented image</span></span>
 <span><span class="fu"><a href="../reference/image_segment.html">image_segment</a></span><span class="op">(</span><span class="va">leaves</span>, index <span class="op">=</span> <span class="st">"NB"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area</span>,</span>
@@ -414,16 +260,17 @@ with <code><a href="../reference/analyze_objects.html">analyze_objects()</a></co
 resolution. The function <code><a href="../reference/utils_dpi.html">dpi()</a></code> can be used to compute the
 dpi of an image, provided that the size of any object is known. See the
 <a href="#dpi">dpi</a> section for more details. In this case, the
-estimated resolution considering the calibration of object 10 was ~50.8
+estimated resolution considering the calibration of object 10 was ~50.5
 DPIs. We inform this value in the <code>dpi</code> argument of
 <code><a href="../reference/utils_measures.html">get_measures()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.8</span><span class="op">)</span></span>
-<span><span class="co"># compute the difference between the two methods</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area</span><span class="op">$</span><span class="va">area</span> <span class="op">-</span> <span class="va">area2</span><span class="op">$</span><span class="va">area</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in area$area - area2$area: longer object length is not a multiple of</span></span>
-<span><span class="co">#&gt; shorter object length</span></span>
-<span><span class="co">#&gt; [1] -70.01496</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">area2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">count</span>, dpi <span class="op">=</span> <span class="fl">50.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">leaves</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">area2</span>,</span>
+<span>              measure <span class="op">=</span> <span class="st">"area"</span>,</span>
+<span>              vjust <span class="op">=</span> <span class="op">-</span><span class="fl">60</span>,</span>
+<span>              col <span class="op">=</span> <span class="st">"gray"</span><span class="op">)</span> <span class="co"># default is "white"</span></span></code></pre></div>
+<p><img src="leaf_area_files/figure-html/leaf10-1.png" width="672"></p>
 </div>
 </div>
 <div class="section level2">

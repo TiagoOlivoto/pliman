@@ -8,7 +8,7 @@
 \title{Import and export images}
 \usage{
 image_import(
-  image,
+  img,
   ...,
   which = 1,
   pattern = NULL,
@@ -19,12 +19,12 @@ image_import(
   ncol = NULL
 )
 
-image_export(image, name, prefix = "", extension = NULL, subfolder = NULL, ...)
+image_export(img, name, prefix = "", extension = NULL, subfolder = NULL, ...)
 
-image_pliman(image, plot = FALSE)
+image_pliman(img, plot = FALSE)
 }
 \arguments{
-\item{image}{\itemize{
+\item{img}{\itemize{
 \item For \code{image_import()}, a character vector of file names or URLs.
 \item For \code{image_export()}, an Image object, an array or a list of images.
 \item For \code{image_pliman()}, a charactere value specifying the image example. See
@@ -93,8 +93,8 @@ folder <- image_pliman()
 full_path <- paste0(folder, "/sev_leaf.jpg")
 (path <- file_dir(full_path))
 (file <- basename(full_path))
-image_import(image = full_path)
-image_import(image = file, path = path)
+image_import(img = full_path)
+image_import(img = file, path = path)
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

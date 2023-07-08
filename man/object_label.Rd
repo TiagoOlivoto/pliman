@@ -24,7 +24,7 @@ object_label(
 )
 }
 \arguments{
-\item{img}{The image to be analyzed.}
+\item{img}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to binary image. See the available indexes with

@@ -6,7 +6,7 @@
 \title{Image segmentation}
 \usage{
 image_segment(
-  image,
+  img,
   index = NULL,
   threshold = c("Otsu", "adaptive"),
   k = 0.1,
@@ -27,7 +27,7 @@ image_segment(
 )
 
 image_segment_iter(
-  image,
+  img,
   nseg = 2,
   index = NULL,
   invert = NULL,
@@ -45,7 +45,7 @@ image_segment_iter(
 )
 }
 \arguments{
-\item{image}{An image object or a list of image objects.}
+\item{img}{An image object or a list of image objects.}
 
 \item{index}{\itemize{
 \item For \code{image_segment()}, a character value (or a vector of characters)

@@ -30,36 +30,78 @@ In `pliman` the following functions can be used to segment an image.
 
 Both functions segment the image based on the value of some image index, which may be one of the RGB bands or any operation with these bands. Internally, these functions call `image_index()` to compute these indexes. The following indexes are currently available.
 
+```{r echo=FALSE}
+ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+create_markdown_table <- function(data) {
+  # Get column names
+  headers <- colnames(data)
+  
+  # Create header row
+  header_row <- paste("|", paste(headers, collapse = " | "), "|")
+  
+  # Create separator row
+  separator_row <- paste("|", paste(rep("---", length(headers)), collapse = " | "), "|")
+  
+  # Create data rows
+  data_rows <- apply(data, 1, function(row) {
+    paste("|", paste(row, collapse = " | "), "|")
+  })
+  
+  # Combine all rows
+  markdown_table <- c(header_row, separator_row, data_rows)
+  
+  # Print the markdown table
+  cat(paste(markdown_table, collapse = "\n"))
+}
 
-| Index |           Equation          |
-|-------|:---------------------------:|
-| R     |              R              |
-| G     |              G              |
-| B     |              B              |
-| NR    |          R/(R+G+B)          |
-| NG    |          G/(R+G+B)          |
-| NB    |          B/(R+G+B)          |
-| GB    |             G/B             |
-| RB    |             R/B             |
-| GR    |             G/R             |
-| BI    |    sqrt((R\^2+G\^2+B\^2)/3)    |
-| BIM   |    sqrt((R\*2+G\*2+B\*2)/3)    |
-| SCI   |         (R-G)/(R+G)         |
-| GLI   |     (2\*G-R-B)/(2\*G+R+B)     |
-| HI    |       (2\*R-G-B)/(G-B)       |
-| NGRDI |         (G-R)/(G+R)         |
-| NDGBI |         (G-B)/(G+B)         |
-| NDRBI |         (R-B)/(R+B)         |
-| I     |            R+G+B            |
-| S     |    ((R+G+B)-3\*B)/(R+G+B)    |
-| VARI  |        (G-R)/(G+R-B)        |
-| HUE   |  atan(2\*(B-G-R)/30.5\*(G-R)) |
-| HUE2  |  atan(2\*(R-G-R)/30.5\*(G-B)) |
-| BGI   |             B/G             |
-| L     |           R+G+B/3           |
-| GRAY  | 0.299\*R + 0.587\*G + 0.114\*B |
+```
 
 
+| Index | Equation | Band |
+| --- | --- | --- |
+| R | R | RGB |
+| G | G | RGB |
+| B | B | RGB |
+| NR | R/(R+G+B) | RGB |
+| NG | G/(R+G+B) | RGB |
+| NB | B/(R+G+B) | RGB |
+| GB | G/B | RGB |
+| RB | R/B | RGB |
+| GR | G/R | RGB |
+| BI | sqrt((R^2+G^2+B^2)/3) | RGB |
+| BIM | sqrt((R*2+G*2+B*2)/3) | RGB |
+| SCI | (R-G)/(R+G) | RGB |
+| GLI | (2*G-R-B)/(2*G+R+B) | RGB |
+| HI | (2*R-G-B)/(G-B) | RGB |
+| NGRDI | (G-R)/(G+R) | RGB |
+| NDGBI | (G-B)/(G+B) | RGB |
+| NDRBI | (R-B)/(R+B) | RGB |
+| I | R+G+B | RGB |
+| S | ((R+G+B)-3*B)/(R+G+B) | RGB |
+| VARI | (G-R)/(G+R-B) | RGB |
+| HUE | atan(2*(B-G-R)/30.5*(G-R)) | RGB |
+| HUE2 | atan(2*(R-G-R)/30.5*(G-B)) | RGB |
+| BGI | B/G | RGB |
+| L | R+G+B/3 | RGB |
+| GRAY | 0.299*R + 0.587*G + 0.114*B | RGB |
+| GLAI | (25*(G-R)/(G+R-B)+1.25) | RGB |
+| CI | (R-B)/R | RGB |
+| SHP | 2*(R-G-B)/(G-B) | RGB |
+| RI | R**2/(B*G**3) | RGB |
+| G-B | G-B | RGB |
+| G-R | G-R | RGB |
+| R-G | R-G | RGB |
+| R-B | R-B | RGB |
+| B-R | B-R | RGB |
+| B-G | B-G | RGB |
+| DGCI | ((h - 60)/60 + (1 - s/100) + (1 - b/100)) / 3 | HSB |
+| GRAY2 | ((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2 | RGB |
+| L* | (0.2126 * R + 0.7152 * G + 0.0722 * B) | CIELab |
+| a | 0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126)) | CIELab |
+| b* | 0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722)) | CIELab |
+| L*-a | ((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))) | CIELab |
+| L*-b | ((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722))) | CIELab |
+| b*-a | (0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722))) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))) | CIELab |
 
 Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their own index by explicitly providing the formula. e.g., `index = "R-B"`.
 
@@ -71,7 +113,8 @@ soy <- image_pliman("soybean_touch.jpg")
 
 ```{r segmentation2, fig.width=10, fig.height=5}
 # Compute the indexes
-indexes <- image_index(soy, index = c("R, G, B, NR, NG, NB"))
+# Only show the first 16 to reduce the image size
+indexes <- image_index(soy, index = pliman_indexes()[1:16], plot = FALSE)
 
 # Create a raster plot with the RGB values
 plot(indexes)
@@ -88,7 +131,7 @@ The function `image_segmentation()` is used to segment images using image indexe
 
 ```{r segmentation3, fig.width=10, fig.height=5}
 segmented <- image_segment(soy, index = c("R, G, B, NR, NG, NB"))
-
+plot(segmented$NB)
 ```
 
 It seems that the `"NB"` index provided better segmentation. `"R"` and `"NR"` resulted in an inverted segmented image, i.e., the grains were considered as background and the remaining as 'selected' image. To circumvent this problem, we can use the argument `invert` in those functions.
@@ -154,7 +197,7 @@ seg_iter1 <-
   image_segment_iter(seg_iter,
                      nseg = 2, # two segmentations
                      index = c("VARI", "GLI"),
-                     threshold = c(0.3, "Otsu"),
+                     threshold = c(0, "Otsu"),
                      ncol = 3,
                      plot = FALSE)
 seg_iter2 <-

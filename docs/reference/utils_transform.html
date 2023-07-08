@@ -66,7 +66,7 @@ image_skeleton() Performs image skeletonization.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,7 +180,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_autocrop</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"NB"</span>,</span>
 <span>  edge <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  filter <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -191,19 +191,21 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_crop</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  show <span class="op">=</span> <span class="st">"rgb"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">image_dimension</span><span class="op">(</span><span class="va">image</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">image_dimension</span><span class="op">(</span><span class="va">img</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_rotate</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  <span class="va">angle</span>,</span>
 <span>  bg_col <span class="op">=</span> <span class="st">"white"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -213,7 +215,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_horizontal</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -221,7 +223,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_vertical</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -229,7 +231,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_hreflect</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -237,7 +239,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_vreflect</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -245,7 +247,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_resize</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  rel_size <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  <span class="va">width</span>,</span>
 <span>  <span class="va">height</span>,</span>
@@ -256,7 +258,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_trim</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  edge <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  top <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bottom <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -269,7 +271,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_dilate</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  kern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape <span class="op">=</span> <span class="st">"disc"</span>,</span>
@@ -280,7 +282,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_erode</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  kern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape <span class="op">=</span> <span class="st">"disc"</span>,</span>
@@ -291,7 +293,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_opening</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  kern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape <span class="op">=</span> <span class="st">"disc"</span>,</span>
@@ -302,7 +304,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_closing</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  kern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape <span class="op">=</span> <span class="st">"disc"</span>,</span>
@@ -313,7 +315,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_skeleton</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  kern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -322,8 +324,18 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">image_thinning</span><span class="op">(</span></span>
+<span>  <span class="va">img</span>,</span>
+<span>  niter <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">image_filter</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  cache <span class="op">=</span> <span class="fl">512</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -333,7 +345,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_blur</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  sigma <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -342,7 +354,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">image_contrast</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -352,7 +364,7 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><p>An image or a list of images of class <code>Image</code>.</p></dd>
 
 
@@ -406,6 +418,22 @@ respectively) that will be maintained in the cropped image, e.g., width =
 </ul></dd>
 
 
+<dt>viewer</dt>
+<dd><p>The viewer option. If not provided, the value is retrieved
+using <code><a href="get_pliman_viewer.html">get_pliman_viewer()</a></code>. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+<code><a href="set_pliman_viewer.html">set_pliman_viewer()</a></code> function. For example, you can run
+<code>set_pliman_viewer("mapview")</code> to set the viewer option to "mapview" for
+all functions.</p></dd>
+
+
+<dt>show</dt>
+<dd><p>How to plot in mapview viewer, either <code>"rgb"</code> or <code>"index"</code>.</p></dd>
+
+
 <dt>angle</dt>
 <dd><p>The rotation angle in degrees.</p></dd>
 
@@ -446,6 +474,12 @@ resolution (megapixels) times 20.</p></li>
 
 <dt>...</dt>
 <dd><p>Additional arguments passed on to <code><a href="image_binary.html">image_binary()</a></code>.</p></dd>
+
+
+<dt>niter</dt>
+<dd><p>The number of iterations to perform in the thinning procedure.
+Defaults to 3. Set to <code>NULL</code> to iterate until the binary image is no longer
+changing.</p></dd>
 
 
 <dt>cache</dt>

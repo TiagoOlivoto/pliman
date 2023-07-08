@@ -71,7 +71,7 @@ image_combine <- function(...,
 #'Import images from files and URLs and write images to files, possibly with
 #'batch processing.
 #' @name utils_image
-#' @param image
+#' @param img
 #' * For `image_import()`, a character vector of file names or URLs.
 #' * For `image_export()`, an Image object, an array or a list of images.
 #' * For `image_pliman()`, a charactere value specifying the image example. See
@@ -125,9 +125,9 @@ image_combine <- function(...,
 #' full_path <- paste0(folder, "/sev_leaf.jpg")
 #' (path <- file_dir(full_path))
 #' (file <- basename(full_path))
-#' image_import(image = full_path)
-#' image_import(image = file, path = path)
-image_import <- function(image,
+#' image_import(img = full_path)
+#' image_import(img = file, path = path)
+image_import <- function(img,
                          ...,
                          which = 1,
                          pattern = NULL,
@@ -173,15 +173,15 @@ image_import <- function(image,
     }
     return(list_img)
   } else{
-    img_dir <- ifelse(is.null(path), file_dir(image), path)
+    img_dir <- ifelse(is.null(path), file_dir(img), path)
     all_files <- sapply(list.files(img_dir), file_name)
-    img_name <- file_name(image)
+    img_name <- file_name(img)
     test <- img_name %in% file_name(list.files(img_dir))
     if(!any(grepl("http", img_dir, fixed = TRUE)) & !all(test)){
       stop(" '",img_name[which(test == FALSE)],"' not found in ", img_dir[which(test == FALSE)],  call. = FALSE)
     }
-    img_name <- paste0(img_dir, "/",img_name , ".", file_extension(image))
-    if(length(image) > 1){
+    img_name <- paste0(img_dir, "/",img_name , ".", file_extension(img))
+    if(length(img) > 1){
       ls <-
         lapply(seq_along(img_name),
                function(x){
@@ -238,48 +238,48 @@ image_import <- function(image,
 
 #' @export
 #' @name utils_image
-image_export <- function(image,
+image_export <- function(img,
                          name,
                          prefix = "",
                          extension = NULL,
                          subfolder = NULL,
                          ...){
   check_ebi()
-  if(class(image) %in% c("binary_list", "index_list",
+  if(class(img) %in% c("binary_list", "index_list",
                          "img_mat_list", "palette_list")){
-    image <- lapply(image, function(x){x[[1]]})
+    img <- lapply(img, function(x){x[[1]]})
   }
-  if(inherits(image, "segment_list")){
-    image <- lapply(image, function(x){x[[1]][[1]]})
+  if(inherits(img, "segment_list")){
+    img <- lapply(img, function(x){x[[1]][[1]]})
   }
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.list(img)){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
-    name <- file_name(names(image))
-    extens <- file_extension(names(image))
+    name <- file_name(names(img))
+    extens <- file_extension(names(img))
     if(any(sapply(extens, length)) ==  0 & is.null(extension)){
-      extens <- rep("jpg", length(image))
+      extens <- rep("jpg", length(img))
       message("Image(s) exported as *.jpg file(s).")
     }
     if(!is.null(extension)){
-      extens <- rep(extension, length(image))
+      extens <- rep(extension, length(img))
     }
-    names(image) <- paste0(name, ".", extens)
+    names(img) <- paste0(name, ".", extens)
     if(!missing(subfolder)){
       dir_out <- paste0(getwd(), "/", subfolder)
       if(dir.exists(dir_out) == FALSE){
         dir.create(dir_out, recursive = TRUE)
       }
-      names(image) <- paste0(dir_out, "/", prefix, name, ".", extens)
+      names(img) <- paste0(dir_out, "/", prefix, name, ".", extens)
       a <-
-        lapply(seq_along(image), function(i){
-          EBImage::writeImage(x = image[[i]], files = names(image[i]), ...)
+        lapply(seq_along(img), function(i){
+          EBImage::writeImage(x = img[[i]], files = names(img[i]), ...)
         })
     } else{
       a <-
-        lapply(seq_along(image), function(i){
-          EBImage::writeImage(x = image[[i]], files = paste0(prefix, names(image[i])), ...)
+        lapply(seq_along(img), function(i){
+          EBImage::writeImage(x = img[[i]], files = paste0(prefix, names(img[i])), ...)
         })
     }
 
@@ -302,19 +302,19 @@ image_export <- function(image,
       dir.create(dir_out, recursive = TRUE)
     }
     name <- paste0(dir_out, "/", filname, ".", extens)
-    EBImage::writeImage(image, name)
+    EBImage::writeImage(img, name)
   }
 }
 #' @export
 #' @name utils_image
-image_pliman <- function(image, plot = FALSE){
+image_pliman <- function(img, plot = FALSE){
   path <- system.file("tmp_images", package = "pliman")
   files <- list.files(path)
-  if(!missing(image)){
-    if(!image %in% files){
+  if(!missing(img)){
+    if(!img %in% files){
       stop("Image not available in pliman.\nAvaliable images: ", paste(files, collapse = ", "), call. = FALSE)
     }
-    im <- image_import(system.file(paste0("tmp_images/", image), package = "pliman"))
+    im <- image_import(system.file(paste0("tmp_images/", img), package = "pliman"))
     if(isTRUE(plot)){
       plot(im)
     }
@@ -357,7 +357,7 @@ image_pliman <- function(image, plot = FALSE){
 #'
 #'
 #' @name utils_transform
-#' @param image An image or a list of images of class `Image`.
+#' @param img An image or a list of images of class `Image`.
 #' @param index The index to segment the image. See [image_index()] for more
 #'   details. Defaults to `"NB"` (normalized blue).
 #' @param viewer The viewer option. If not provided, the value is retrieved
@@ -439,7 +439,7 @@ image_pliman <- function(image, plot = FALSE){
 #'img3 <- image_vreflect(img)
 #'img4 <- image_vertical(img)
 #'image_combine(img1, img2, img3, img4)
-image_autocrop <- function(image,
+image_autocrop <- function(img,
                            index = "NB",
                            edge = 5,
                            filter = 3,
@@ -448,35 +448,35 @@ image_autocrop <- function(image,
                            verbose = TRUE,
                            plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_autocrop, index, edge)
+      res <- parLapply(clust, img, image_autocrop, index, edge)
     } else{
-      res <- lapply(image, image_autocrop, index, edge)
+      res <- lapply(img, image_autocrop, index, edge)
     }
     return(structure(res, class = "autocrop_list"))
   } else{
-    conv_hull <- object_coord(image,
+    conv_hull <- object_coord(img,
                               index = index,
                               id = NULL,
                               edge = edge,
                               plot = FALSE,
                               filter = filter)
-    segmented <- image[conv_hull[1]:conv_hull[2],
+    segmented <- img[conv_hull[1]:conv_hull[2],
                        conv_hull[3]:conv_hull[4],
                        1:3]
     if(isTRUE(plot)){
@@ -488,7 +488,7 @@ image_autocrop <- function(image,
 #' @name utils_transform
 #' @export
 
-image_crop <- function(image,
+image_crop <- function(img,
                        width = NULL,
                        height = NULL,
                        viewer = get_pliman_viewer(),
@@ -499,30 +499,30 @@ image_crop <- function(image,
                        plot = FALSE){
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_crop, width, height, viewer)
+      res <- parLapply(clust, img, image_crop, width, height, viewer)
     } else{
-      res <- lapply(image, image_crop, width, height, viewer)
+      res <- lapply(img, image_crop, width, height, viewer)
     }
     return(res)
   } else{
     if (!is.null(width) | !is.null(height)) {
-      dim <- dim(image)[1:2]
+      dim <- dim(img)[1:2]
       if (!is.null(width)  & is.null(height)) {
         height <- 1:dim[2]
       }
@@ -536,12 +536,12 @@ image_crop <- function(image,
       if (!is.numeric(width) | !is.numeric(height)) {
         stop("Vectors must be numeric.")
       }
-      image@.Data <- image@.Data[width, height, ]
+      img@.Data <- img@.Data[width, height, ]
     }
     if (is.null(width) & is.null(height)) {
       if(vieweropt == "base"){
         message("Use the left mouse buttom to crop the image.")
-        plot(image)
+        plot(img)
         cord <- locator(type = "p", n = 2, col = "red", pch = 19)
         minw <- min(cord$x[[1]], cord$x[[2]])
         maxw <- max(cord$x[[1]], cord$x[[2]])
@@ -550,43 +550,43 @@ image_crop <- function(image,
         w <- round(minw, 0):round(maxw, 0)
         h <- round(minh, 0):round(maxh, 0)
       } else{
-        nc <- ncol(image)
-        mv <- mv_rectangle(image, show = show)
+        nc <- ncol(img)
+        mv <- mv_rectangle(img, show = show)
         w <- round(min(mv[,1]):max(mv[,1]))
         h <- round((min(mv[,2]))):round(max(mv[,2]))
       }
-      image@.Data <- image@.Data[w, h, ]
+      img@.Data <- img@.Data[w, h, ]
       if(isTRUE(verbose)){
         cat(paste0("width = ", w[1], ":", w[length(w)]), "\n")
         cat(paste0("height = ", h[1], ":", h[length(h)]), "\n")
       }
     }
     if (isTRUE(plot)) {
-      plot(image)
+      plot(img)
     }
-    return(image)
+    return(img)
   }
 }
 
 
 #' @name utils_transform
 #' @export
-image_dimension <- function(image,
+image_dimension <- function(img,
                             parallel = FALSE,
                             workers = NULL,
                             verbose = TRUE){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
@@ -594,13 +594,13 @@ image_dimension <- function(image,
       res <-
         as.data.frame(
           do.call(rbind,
-                  parLapply(clust, image,  image_dimension, verbose =  FALSE))
+                  parLapply(clust, img,  image_dimension, verbose =  FALSE))
         )
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
     } else{
       res <-
         do.call(rbind,
-                lapply(image, function(x){
+                lapply(img, function(x){
                   dim <- image_dimension(x, verbose = FALSE)
                   data.frame(width = dim[[1]],
                              height = dim[[2]])
@@ -617,8 +617,8 @@ image_dimension <- function(image,
     }
     invisible(res)
   } else{
-    width <- dim(image)[[1]]
-    height <- dim(image)[[2]]
+    width <- dim(img)[[1]]
+    height <- dim(img)[[2]]
     if(verbose == TRUE){
       cat("\n----------------------\n")
       cat("Image dimension\n")
@@ -632,7 +632,7 @@ image_dimension <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_rotate <- function(image,
+image_rotate <- function(img,
                          angle,
                          bg_col = "white",
                          parallel = FALSE,
@@ -640,28 +640,28 @@ image_rotate <- function(image,
                          verbose = TRUE,
                          plot = TRUE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_rotate, angle, bg_col)
+      parLapply(clust, img, image_rotate, angle, bg_col)
     } else{
-      lapply(image, image_rotate, angle, bg_col)
+      lapply(img, image_rotate, angle, bg_col)
     }
   } else{
-    img <- EBImage::rotate(image, angle, bg.col = bg_col)
+    img <- EBImage::rotate(img, angle, bg.col = bg_col)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -670,39 +670,39 @@ image_rotate <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_horizontal <- function(image,
+image_horizontal <- function(img,
                              parallel = FALSE,
                              workers = NULL,
                              verbose = TRUE,
                              plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_horizontal)
+      parLapply(clust, img, image_horizontal)
     } else{
-      lapply(image, image_horizontal)
+      lapply(img, image_horizontal)
     }
   } else{
-    width <- dim(image)[[1]]
-    height <- dim(image)[[2]]
+    width <- dim(img)[[1]]
+    height <- dim(img)[[2]]
     if(width < height){
-      img <- EBImage::rotate(image, 90)
+      img <- EBImage::rotate(img, 90)
     } else{
-      img <- image
+      img <- img
     }
     if (isTRUE(plot)) {
       plot(img)
@@ -712,39 +712,39 @@ image_horizontal <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_vertical <- function(image,
+image_vertical <- function(img,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_vertical)
+      parLapply(clust, img, image_vertical)
     } else{
-      lapply(image, image_vertical)
+      lapply(img, image_vertical)
     }
   } else{
-    width <- dim(image)[[1]]
-    height <- dim(image)[[2]]
+    width <- dim(img)[[1]]
+    height <- dim(img)[[2]]
     if(width > height){
-      img <- EBImage::rotate(image, 90)
+      img <- EBImage::rotate(img, 90)
     } else{
-      img <- image
+      img <- img
     }
     if (isTRUE(plot)) {
       plot(img)
@@ -754,34 +754,34 @@ image_vertical <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_hreflect <- function(image,
+image_hreflect <- function(img,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_hreflect)
+      parLapply(clust, img, image_hreflect)
     } else{
-      lapply(image, image_hreflect)
+      lapply(img, image_hreflect)
     }
   } else{
-    img <- EBImage::flop(image)
+    img <- EBImage::flop(img)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -790,34 +790,34 @@ image_hreflect <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_vreflect <- function(image,
+image_vreflect <- function(img,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_vreflect)
+      parLapply(clust, img, image_vreflect)
     } else{
-      lapply(image, image_vreflect)
+      lapply(img, image_vreflect)
     }
   } else{
-    img <- EBImage::flip(image)
+    img <- EBImage::flip(img)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -827,7 +827,7 @@ image_vreflect <- function(image,
 
 #' @name utils_transform
 #' @export
-image_resize <- function(image,
+image_resize <- function(img,
                          rel_size = 100,
                          width,
                          height,
@@ -836,31 +836,31 @@ image_resize <- function(image,
                          verbose = TRUE,
                          plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_resize, rel_size)
+      parLapply(clust, img, image_resize, rel_size)
     } else{
-      lapply(image, image_resize, rel_size, width, height)
+      lapply(img, image_resize, rel_size, width, height)
     }
   } else{
-    nrow <- dim(image)[[1]]
+    nrow <- dim(img)[[1]]
     new_row <- nrow * rel_size / 100
     width <- ifelse(missing(width), new_row, width)
-    img <- EBImage::resize(image, width, height)
+    img <- EBImage::resize(img, width, height)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -870,7 +870,7 @@ image_resize <- function(image,
 
 #' @name utils_transform
 #' @export
-image_trim <- function(image,
+image_trim <- function(img,
                        edge = NULL,
                        top  = NULL,
                        bottom  = NULL,
@@ -891,40 +891,40 @@ image_trim <- function(image,
   bottom <- ifelse(is.null(bottom), edge, bottom)
   left <- ifelse(is.null(left), edge, left)
   right <- ifelse(is.null(right), edge, right)
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_trim, edge, top, bottom, left, right)
+      parLapply(clust, img, image_trim, edge, top, bottom, left, right)
     } else{
-      lapply(image, image_trim, edge, top, bottom, left, right)
+      lapply(img, image_trim, edge, top, bottom, left, right)
     }
   } else{
-    image <- image[, -c(1:top) ,]
-    image <- image[, -c((dim(image)[2] - bottom + 1):dim(image)[2]) ,]
-    image <- image[-c((dim(image)[1] - right + 1):dim(image)[1]) ,  ,]
-    image <- image[-c(1:left), ,]
+    img <- img[, -c(1:top) ,]
+    img <- img[, -c((dim(img)[2] - bottom + 1):dim(img)[2]) ,]
+    img <- img[-c((dim(img)[1] - right + 1):dim(img)[1]) ,  ,]
+    img <- img[-c(1:left), ,]
     if (isTRUE(plot)) {
-      plot(image)
+      plot(img)
     }
-    return(image)
+    return(img)
   }
 }
 #' @name utils_transform
 #' @export
-image_dilate <- function(image,
+image_dilate <- function(img,
                          kern = NULL,
                          size = NULL,
                          shape = "disc",
@@ -933,36 +933,36 @@ image_dilate <- function(image,
                          verbose = TRUE,
                          plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_dilate, kern, size, shape)
+      parLapply(clust, img, image_dilate, kern, size, shape)
     } else{
-      lapply(image, image_dilate, kern, size, shape)
+      lapply(img, image_dilate, kern, size, shape)
     }
   } else{
     if(is.null(kern)){
-      dim <- dim(image)
+      dim <- dim(img)
       size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
       size <- ifelse(size == 0, 2, size)
       kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
     } else{
       kern <- kern
     }
-    img <- EBImage::dilate(image, kern)
+    img <- EBImage::dilate(img, kern)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -971,7 +971,7 @@ image_dilate <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_erode <- function(image,
+image_erode <- function(img,
                         kern = NULL,
                         size = NULL,
                         shape = "disc",
@@ -980,36 +980,36 @@ image_erode <- function(image,
                         verbose = TRUE,
                         plot = FALSE){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_erode, kern, size, shape)
+      parLapply(clust, img, image_erode, kern, size, shape)
     } else{
-      lapply(image, image_erode, size, kern, shape)
+      lapply(img, image_erode, size, kern, shape)
     }
   } else{
     if(is.null(kern)){
-      dim <- dim(image)
+      dim <- dim(img)
       size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
       size <- ifelse(size == 0, 2, size)
       kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
     } else{
       kern <- kern
     }
-    img <- EBImage::erode(image, kern)
+    img <- EBImage::erode(img, kern)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1018,7 +1018,7 @@ image_erode <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_opening <- function(image,
+image_opening <- function(img,
                           kern = NULL,
                           size = NULL,
                           shape = "disc",
@@ -1026,36 +1026,36 @@ image_opening <- function(image,
                           workers = NULL,
                           verbose = TRUE,
                           plot = FALSE){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_opening, kern, size, shape)
+      parLapply(clust, img, image_opening, kern, size, shape)
     } else{
-      lapply(image, image_opening, size, kern, shape)
+      lapply(img, image_opening, size, kern, shape)
     }
   } else{
     if(is.null(kern)){
-      dim <- dim(image)
+      dim <- dim(img)
       size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
       size <- ifelse(size == 0, 2, size)
       kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
     } else{
       kern <- kern
     }
-    img <- EBImage::opening(image, kern)
+    img <- EBImage::opening(img, kern)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1064,7 +1064,7 @@ image_opening <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_closing <- function(image,
+image_closing <- function(img,
                           kern = NULL,
                           size = NULL,
                           shape = "disc",
@@ -1072,36 +1072,36 @@ image_closing <- function(image,
                           workers = NULL,
                           verbose = TRUE,
                           plot = FALSE){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_closing, kern, size, shape)
+      parLapply(clust, img, image_closing, kern, size, shape)
     } else{
-      lapply(image, image_closing, size, kern, shape)
+      lapply(img, image_closing, size, kern, shape)
     }
   } else{
     if(is.null(kern)){
-      dim <- dim(image)
+      dim <- dim(img)
       size <- ifelse(is.null(size), round(dim[[1]]*dim[[2]] / 1e06 * 5, 0), size)
       size <- ifelse(size == 0, 2, size)
       kern <- suppressWarnings(EBImage::makeBrush(size, shape = shape))
     } else{
       kern <- kern
     }
-    img <- EBImage::closing(image, kern)
+    img <- EBImage::closing(img, kern)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1111,49 +1111,49 @@ image_closing <- function(image,
 
 #' @name utils_transform
 #' @export
-image_skeleton <- function(image,
+image_skeleton <- function(img,
                            kern = NULL,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE,
                            ...){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_skeleton)
+      parLapply(clust, img, image_skeleton)
     } else{
-      lapply(image, image_skeleton)
+      lapply(img, image_skeleton)
     }
   } else{
-    if(EBImage::colorMode(image) != 0){
-      image <- help_binary(image, ..., resize = FALSE)
+    if(EBImage::colorMode(img) != 0){
+      img <- help_binary(img, ..., resize = FALSE)
     }
-    s <- matrix(1, nrow(image), ncol(image))
-    skel <- matrix(0, nrow(image), ncol(image))
+    s <- matrix(1, nrow(img), ncol(img))
+    skel <- matrix(0, nrow(img), ncol(img))
     if(is.null(kern)){
       kern <- suppressWarnings(EBImage::makeBrush(2, shape = "diamond"))
     } else{
       kern <- kern
     }
     while (max(s) == 1) {
-      k <- EBImage::opening(image, kern)
-      s <- image - k
+      k <- EBImage::opening(img, kern)
+      s <- img - k
       skel <- skel | s
-      image <- EBImage::erode(image, kern)
+      img <- EBImage::erode(img, kern)
     }
     img <- EBImage::Image(skel)
     if (plot == TRUE) {
@@ -1165,7 +1165,7 @@ image_skeleton <- function(image,
 
 #' @name utils_transform
 #' @export
-image_thinning <- function(image,
+image_thinning <- function(img,
                            niter = 3,
                            parallel = FALSE,
                            workers = NULL,
@@ -1173,47 +1173,47 @@ image_thinning <- function(image,
                            plot = FALSE,
                            ...){
   check_ebi()
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_thinning, niter)
+      parLapply(clust, img, image_thinning, niter)
     } else{
-      lapply(image, image_thinning, niter)
+      lapply(img, image_thinning, niter)
     }
   } else{
-    if(EBImage::colorMode(image) != 0){
-      image <- help_binary(image, ..., resize = FALSE)
+    if(EBImage::colorMode(img) != 0){
+      img <- help_binary(img, ..., resize = FALSE)
     }
 
     if(is.null(niter)){
-      li <- sum(image)
+      li <- sum(img)
       lf <- 1
       while((li - lf) != 0){
-        li <- sum(image)
-        tin <- help_edge_thinning(image)
-        image <- tin
-        lf <- sum(image)
+        li <- sum(img)
+        tin <- help_edge_thinning(img)
+        img <- tin
+        lf <- sum(img)
       }
     } else{
       for(i in 1:niter){
-        tin <- help_edge_thinning(image)
-        image <- tin
+        tin <- help_edge_thinning(img)
+        img <- tin
       }
     }
-    img <- EBImage::Image(image)
+    img <- EBImage::Image(img)
     if (plot == TRUE) {
       plot(img)
     }
@@ -1227,7 +1227,7 @@ image_thinning <- function(image,
 
 #' @name utils_transform
 #' @export
-image_filter <- function(image,
+image_filter <- function(img,
                          size = 2,
                          cache = 512,
                          parallel = FALSE,
@@ -1237,28 +1237,28 @@ image_filter <- function(image,
   if(size < 2){
     stop("Using `size` < 2 will crash you R section. Please, consider using 2 or more.")
   }
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_filter, size, cache)
+      parLapply(clust, img, image_filter, size, cache)
     } else{
-      lapply(image, image_filter, size, cache)
+      lapply(img, image_filter, size, cache)
     }
   } else{
-    img <- EBImage::medianFilter(image, size, cache)
+    img <- EBImage::medianFilter(img, size, cache)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1267,34 +1267,34 @@ image_filter <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_blur <- function(image,
+image_blur <- function(img,
                        sigma = 3,
                        parallel = FALSE,
                        workers = NULL,
                        verbose = TRUE,
                        plot = FALSE){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_blur, sigma)
+      parLapply(clust, img, image_blur, sigma)
     } else{
-      lapply(image, image_blur, sigma)
+      lapply(img, image_blur, sigma)
     }
   } else{
-    img <- EBImage::gblur(image, sigma)
+    img <- EBImage::gblur(img, sigma)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1303,30 +1303,30 @@ image_blur <- function(image,
 }
 #' @name utils_transform
 #' @export
-image_contrast <- function(image,
+image_contrast <- function(img,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
-  if(is.list(image)){
-    if(class(image) %in% c("binary_list", "segment_list", "index_list",
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
                            "img_mat_list", "palette_list")){
-      image <- lapply(image, function(x){x[[1]]})
+      img <- lapply(img, function(x){x[[1]]})
     }
-    if(!all(sapply(image, class) == "Image")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, image, image_contrast)
+      parLapply(clust, img, image_contrast)
     } else{
-      lapply(image, image_contrast)
+      lapply(img, image_contrast)
     }
   } else{
     get_factors <- function(x) {
@@ -1338,8 +1338,8 @@ image_contrast <- function(image,
       }
       return(factors[!is.na(factors)])
     }
-    img_width <- dim(image)[1]
-    img_height <- dim(image)[2]
+    img_width <- dim(img)[1]
+    img_height <- dim(img)[2]
     fx <- get_factors(img_width)
     nx <- suppressWarnings(fx[max(which(fx > 1 & fx < 100))])
     fy <- get_factors(img_height)
@@ -1354,7 +1354,7 @@ image_contrast <- function(image,
           break
         }
       }
-      image <- EBImage::resize(image, w = img_width, h = img_height)
+      img <- EBImage::resize(img, w = img_width, h = img_height)
       nx <- suppressWarnings(fx[max(which(fx > 1 & fx < 100))])
     }
     testy <- any(fy > 1 & fy < 100) == FALSE
@@ -1367,10 +1367,10 @@ image_contrast <- function(image,
           break
         }
       }
-      image <- EBImage::resize(image, w = img_width, h = img_height)
+      img <- EBImage::resize(img, w = img_width, h = img_height)
       ny <- suppressWarnings(fy[max(which(fy > 1 & fy < 100))])
     }
-    img <- EBImage::clahe(image, nx = nx, ny = ny, bins = 256)
+    img <- EBImage::clahe(img, nx = nx, ny = ny, bins = 256)
     if (isTRUE(plot)) {
       plot(img)
     }
@@ -1420,7 +1420,7 @@ image_create <- function(color,
 #' Otsu's thresholding method (Otsu, 1979) is used to automatically perform
 #' clustering-based image thresholding.
 #'
-#' @param image An image object.
+#' @param img An image object.
 #' @param index A character value (or a vector of characters) specifying the
 #'   target mode for conversion to binary image. See the available indexes with
 #'   [pliman_indexes()] and [image_index()] for more details.
@@ -1490,7 +1490,7 @@ image_create <- function(color,
 #'img <- image_pliman("soybean_touch.jpg")
 #'image_binary(img, index = c("R, G"))
 #'
-image_binary <- function(image,
+image_binary <- function(img,
                          index = NULL,
                          threshold = c("Otsu", "adaptive"),
                          k = 0.1,
@@ -1509,20 +1509,20 @@ image_binary <- function(image,
                          workers = NULL,
                          verbose = TRUE){
   threshold <- threshold[[1]]
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.list(img)){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
       res <- parLapply(clust,
-                       image,
+                       img,
                        image_binary,
                        index,
                        threshold,
@@ -1539,7 +1539,7 @@ image_binary <- function(image,
                        nrow,
                        ncol)
     } else{
-      res <- lapply(image,
+      res <- lapply(img,
                     image_binary,
                     index,
                     threshold,
@@ -1579,7 +1579,7 @@ image_binary <- function(image,
           windowsize <- as.integer(windowsize + 1)
         }
         if (windowsize >= dim(imgs)[[1]] || windowsize >= dim(imgs)[[2]]){
-          warning("windowsize is too large. Setting to `min(dim(image)) / 3`", call. = FALSE)
+          warning("windowsize is too large. Setting to `min(dim(img)) / 3`", call. = FALSE)
           windowsize <- min(dim(imgs)) / 3
         }
         if (k > 1){
@@ -1621,7 +1621,7 @@ image_binary <- function(image,
       return(imgs)
     }
 
-    imgs <- lapply(image_index(image, index, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
+    imgs <- lapply(image_index(img, index, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
                    bin_img,
                    invert,
                    fill_hull,
@@ -1701,7 +1701,7 @@ image_binary <- function(image,
 #' - `a*`: `0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))`
 #'
 #' @name image_index
-#' @param image An image object.
+#' @param img An image object.
 #' @param index A character value (or a vector of characters) specifying the
 #'   target mode for conversion to binary image. Use [pliman_indexes()] or the
 #'   `details` section to see the available indexes.  Defaults to `NULL`
@@ -1743,7 +1743,7 @@ image_binary <- function(image,
 #' library(pliman)
 #'img <- image_pliman("soybean_touch.jpg")
 #'image_index(img, index = c("R, NR"))
-image_index <- function(image,
+image_index <- function(img,
                         index = NULL,
                         resize = FALSE,
                         re = NULL,
@@ -1756,26 +1756,26 @@ image_index <- function(image,
                         workers = NULL,
                         verbose = TRUE,
                         ...){
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.list(img)){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
+      res <- parLapply(clust, img, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
     } else{
-      res <- lapply(image, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
+      res <- lapply(img, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
     }
     return(structure(res, class = "index_list"))
   } else{
     if(resize != FALSE){
-      image <- image_resize(image, resize)
+      img <- image_resize(img, resize)
     }
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
 
@@ -1798,16 +1798,16 @@ image_index <- function(image,
     nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
     hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
 
-    R <- try(image@.Data[,,1], TRUE)
-    G <- try(image@.Data[,,2], TRUE)
-    B <- try(image@.Data[,,3], TRUE)
+    R <- try(img@.Data[,,1], TRUE)
+    G <- try(img@.Data[,,2], TRUE)
+    B <- try(img@.Data[,,3], TRUE)
     test_band <- any(sapply(list(R, G, B), class) == "try-error")
 
     if(any(index %in% hsb_ind)){
       hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
-      h <- matrix(hsb$h, nrow = nrow(image), ncol = ncol(image))
-      s <- matrix(hsb$s, nrow = nrow(image), ncol = ncol(image))
-      b <- matrix(hsb$b, nrow = nrow(image), ncol = ncol(image))
+      h <- matrix(hsb$h, nrow = nrow(img), ncol = ncol(img))
+      s <- matrix(hsb$s, nrow = nrow(img), ncol = ncol(img))
+      b <- matrix(hsb$b, nrow = nrow(img), ncol = ncol(img))
     }
     if(isTRUE(test_band)){
       stop("At least 3 bands (RGB) are necessary to calculate indices available in pliman.", call. = FALSE)
@@ -1824,7 +1824,7 @@ image_index <- function(image,
                   B = "blue",
                   GR = "gray"
           )
-        imgs[[i]] <- EBImage::channel(image, indx)
+        imgs[[i]] <- EBImage::channel(img, indx)
       } else{
         if(!indx %in% ind$Index){
           if(isTRUE(verbose)){
@@ -1836,10 +1836,10 @@ image_index <- function(image,
             stop(paste("Index ", indx, " need NIR/RedEdge band to be calculated."), call. = FALSE)
           }
           if(!is.null(re)){
-            RE <-  try(image@.Data[,,re], TRUE)
+            RE <-  try(img@.Data[,,re], TRUE)
           }
           if(!is.null(nir)){
-            NIR <- try(image@.Data[,,nir], TRUE)
+            NIR <- try(img@.Data[,,nir], TRUE)
           }
           test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
           if(isTRUE(test_nir_ne)){
@@ -1966,7 +1966,7 @@ plot.image_index <- function(x,
 #' the proportions of segmented pixels.
 #'
 #' @inheritParams image_binary
-#' @param image An image object or a list of image objects.
+#' @param img An image object or a list of image objects.
 #' @param index
 #'  * For `image_segment()`, a character value (or a vector of characters)
 #'  specifying the target mode for conversion to binary image. See the available
@@ -2027,7 +2027,7 @@ plot.image_index <- function(x,
 #'
 #'# adaptive thresholding
 #'
-image_segment <- function(image,
+image_segment <- function(img,
                           index = NULL,
                           threshold = c("Otsu", "adaptive"),
                           k = 0.1,
@@ -2046,24 +2046,24 @@ image_segment <- function(image,
                           workers = NULL,
                           verbose = TRUE){
   threshold <- threshold[[1]]
-  if(inherits(image, "img_segment")){
-    image <- image[[1]]
+  if(inherits(img, "img_segment")){
+    img <- img[[1]]
   }
-  if(is.list(image)){
-    if(!all(sapply(image, class)  %in% c("Image", "img_segment"))){
+  if(is.list(img)){
+    if(!all(sapply(img, class)  %in% c("Image", "img_segment"))){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
+      res <- parLapply(clust, img, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
     } else{
-      res <- lapply(image, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
+      res <- lapply(img, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
@@ -2090,8 +2090,9 @@ image_segment <- function(image,
              col_background <- col_background / 255)
     }
     for(i in 1:length(index)){
+      imgmask <- img
       indx <- index[[i]]
-      img2 <- help_binary(image,
+      img2 <- help_binary(img,
                           index = indx,
                           threshold = threshold,
                           k = k,
@@ -2101,13 +2102,13 @@ image_segment <- function(image,
                           fill_hull = fill_hull,
                           filter = filter,
                           re = re,
-                          nir = nir)
+                          nir = nir,
+                          invert = invert)
       ID <- which(img2@.Data == FALSE)
-      img <- image
-      img@.Data[,,1][ID] <- col_background[1]
-      img@.Data[,,2][ID] <- col_background[2]
-      img@.Data[,,3][ID] <- col_background[3]
-      imgs[[i]] <- img
+      imgmask@.Data[,,1][ID] <- col_background[1]
+      imgmask@.Data[,,2][ID] <- col_background[2]
+      imgmask@.Data[,,3][ID] <- col_background[3]
+      imgs[[i]] <- imgmask
     }
     names(imgs) <- index
     num_plots <- length(imgs)
@@ -2145,7 +2146,7 @@ image_segment <- function(image,
 
 #' @export
 #' @name image_segment
-image_segment_iter <- function(image,
+image_segment_iter <- function(img,
                                nseg = 2,
                                index = NULL,
                                invert = NULL,
@@ -2161,8 +2162,8 @@ image_segment_iter <- function(image,
                                workers = NULL,
                                ...){
   check_ebi()
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.list(img)){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
@@ -2173,9 +2174,9 @@ image_segment_iter <- function(image,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol,  ...)
+      a <- parLapply(clust, img, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol,  ...)
     } else{
-      a <- lapply(image, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol, ...)
+      a <- lapply(img, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol, ...)
     }
     results <-
       do.call(rbind, lapply(a, function(x){
@@ -2201,7 +2202,7 @@ image_segment_iter <- function(image,
         threshold <- threshold
       }
       if(is.null(index)){
-        image_segment(image,
+        image_segment(img,
                       invert = invert[1],
                       index = "all",
                       has_white_bg = has_white_bg,
@@ -2218,20 +2219,20 @@ image_segment_iter <- function(image,
                           as.character(threshold[1]),
                           as.numeric(threshold[1]))
       segmented <-
-        image_segment(image,
+        image_segment(img,
                       index = index,
                       threshold = my_thresh,
                       invert = invert[1],
                       plot = FALSE,
                       has_white_bg = has_white_bg,
                       ...)
-      total <- length(image)
+      total <- length(img)
       segm <- length(which(segmented != 1))
       prop <- segm / total * 100
       results <- data.frame(total = total,
                             segmented = segm,
                             prop = prop)
-      imgs <- list(image, segmented)
+      imgs <- list(img, segmented)
       if(verbose){
         print(results)
       }
@@ -2242,7 +2243,7 @@ image_segment_iter <- function(image,
                      images = imgs))
     } else{
       if(is.null(index)){
-        image_segment(image,
+        image_segment(img,
                       index = "all",
                       ...)
         indx <-
@@ -2262,7 +2263,7 @@ image_segment_iter <- function(image,
         invert <- invert
       }
       segmented <- list()
-      total <- length(image)
+      total <- length(img)
       if(is.null(threshold)){
         threshold <- rep("Otsu", nseg)
       } else{
@@ -2272,7 +2273,7 @@ image_segment_iter <- function(image,
                           as.character(threshold[1]),
                           as.numeric(threshold[1]))
       first <-
-        image_segment(image,
+        image_segment(img,
                       index = indx,
                       invert = invert[1],
                       threshold = my_thresh[1],
@@ -2333,7 +2334,7 @@ image_segment_iter <- function(image,
       imgs <- lapply(segmented, function(x){
         x[[1]]
       })
-      imgs <- c(list(image), segmented)
+      imgs <- c(list(img), segmented)
       names <- paste("seg", 1:length(segmented), sep = "")
       names(imgs) <- c("original", names)
       pixels <- transform(pixels, image = c("original",names))
@@ -2356,7 +2357,7 @@ image_segment_iter <- function(image,
 #'
 #' Segments image objects using clustering by the k-means clustering algorithm
 #'
-#' @param image An `Image` object.
+#' @param img An `Image` object.
 #' @param bands A numeric integer/vector indicating the RGB band used in the
 #'   segmentation. Defaults to `1:3`, i.e., all the RGB bands are used.
 #' @param nclasses The number of desired classes after image segmentation.
@@ -2382,14 +2383,14 @@ image_segment_iter <- function(image,
 #' seg <- image_segment_kmeans(img)
 #' seg <- image_segment_kmeans(img, fill_hull = TRUE, invert = TRUE, filter = 10)
 
-image_segment_kmeans <-   function (image,
+image_segment_kmeans <-   function (img,
                                     bands = 1:3,
                                     nclasses = 2,
                                     invert = FALSE,
                                     filter = FALSE,
                                     fill_hull = FALSE,
                                     plot = TRUE){
-  imm <- image@.Data[, , bands]
+  imm <- img@.Data[, , bands]
   if(length(dim(imm)) < 3){
     imb <- data.frame(B1 = image_to_mat(imm)[,3])
   } else{
@@ -2401,7 +2402,7 @@ image_segment_kmeans <-   function (image,
   for (i in 1:length(nm)) {
     x3[x2 == nm[i]] <- i
   }
-  m <- matrix(x3, nrow = dim(image)[1])
+  m <- matrix(x3, nrow = dim(img)[1])
   LIST <- list()
   for (i in 1:length(nm)) {
     list <- list(m == i)
@@ -2419,7 +2420,7 @@ image_segment_kmeans <-   function (image,
   } else{
     id <- which(mask != 1)
   }
-  im2 <- image
+  im2 <- img
   im2@.Data[, , 1][id] <- 1
   im2@.Data[, , 2][id] <- 1
   im2@.Data[, , 3][id] <- 1
@@ -2430,7 +2431,7 @@ image_segment_kmeans <-   function (image,
       suppressWarnings(image(m, useRaster = TRUE))
     }
   }
-  return(list(image = im2,
+  return(list(img = im2,
               clusters = m,
               masks = LIST))
 }
@@ -2446,7 +2447,7 @@ image_segment_kmeans <-   function (image,
 #'   the shape is "rectangle", it allows the user to select two points to define
 #'   the area.
 #'
-#' @param image An `Image` object.
+#' @param img An `Image` object.
 #' @param shape The type of shape to use. Defaults to "free". Other possible
 #'   values are "circle" and "rectangle". Partial matching is allowed.
 #' @param type The type of segmentation. By default (`type = "select"`) objects
@@ -2478,7 +2479,7 @@ image_segment_kmeans <-   function (image,
 #' plot(seg$mask)
 #'
 #' }
-image_segment_manual <-  function(image,
+image_segment_manual <-  function(img,
                                   shape = c("free", "circle", "rectangle"),
                                   type = c("select", "remove"),
                                   viewer = get_pliman_viewer(),
@@ -2492,7 +2493,7 @@ image_segment_manual <-  function(image,
   if (isTRUE(interactive())) {
     if(shape == "free"){
       if(vieweropt == "base"){
-        plot(image)
+        plot(img)
         message("Please, draw a perimeter to select/remove objects. Click 'Esc' to finish.")
         stop <- FALSE
         n <- 1e+06
@@ -2517,15 +2518,15 @@ image_segment_manual <-  function(image,
         }
         coor <- rbind(coor, coor[1, ])
       } else{
-        coor <- mv_polygon(image)
-        plot(image)
+        coor <- mv_polygon(img)
+        plot(img)
 
       }
     }
 
     if(shape == "circle"){
       if(vieweropt == "base"){
-        plot(image)
+        plot(img)
         message("Click on the center of the circle")
         cent = unlist(locator(type = "p", n = 1, col = "red", pch = 19))
         message("Click on the edge of the circle")
@@ -2538,7 +2539,7 @@ image_segment_manual <-  function(image,
         x = c(x1, x2) * radius + cent[1]
         y = c(y1, y2) * radius + cent[2]
       } else{
-        mv <- mv_two_points(image)
+        mv <- mv_two_points(img)
         radius = sqrt(sum((c(mv$x1, mv$y1) - c(mv$x2, mv$y2))^2))
         x1 = seq(-1, 1, l = 2000)
         x2 = x1
@@ -2548,12 +2549,12 @@ image_segment_manual <-  function(image,
         y = c(y1, y2) * radius + mv$y1
       }
       coor = cbind(x, y)
-      plot(image)
+      plot(img)
     }
 
     if(shape == "rectangle"){
       if(vieweropt == "base"){
-        plot(image)
+        plot(img)
         message("Select 2 points drawing the diagonal that includes the area of interest.")
         cord <- unlist(locator(type = "p", n = 2, col = "red", pch = 19))
         coor <-
@@ -2562,8 +2563,8 @@ image_segment_manual <-  function(image,
                 c(cord[2], cord[4]),
                 c(cord[1], cord[4]))
       } else{
-        coor <- mv_rectangle(image)
-        plot(image)
+        coor <- mv_rectangle(img)
+        plot(img)
       }
     }
     mat <- NULL
@@ -2577,7 +2578,7 @@ image_segment_manual <-  function(image,
       mat <- rbind(mat, cbind(Xs + round(c1[1], 0), Ys))
       lines(Xs + round(c1[1], 0), Ys, col = "red")
     }
-    n = dim(image)
+    n = dim(img)
     imF = matrix(0, n[1], n[2])
     id = unique(mat[, 1])
     for (i in id) {
@@ -2591,9 +2592,9 @@ image_segment_manual <-  function(image,
     } else{
       id <- mask == 1
     }
-    image@.Data[, , 1][id] = 1
-    image@.Data[, , 2][id] = 1
-    image@.Data[, , 3][id] = 1
+    img@.Data[, , 1][id] = 1
+    img@.Data[, , 2][id] = 1
+    img@.Data[, , 3][id] = 1
 
     if(isTRUE(resize)){
       nrows <- nrow(mask)
@@ -2612,12 +2613,12 @@ image_segment_manual <-  function(image,
       row_min <- ifelse(row_min < 1, 1, row_min) - edge
       row_max <- max(which(b == TRUE))
       row_max <- ifelse(row_max > nrows, nrows, row_max) + edge
-      image <- image[row_min:row_max, col_min:col_max, 1:3]
+      img <- img[row_min:row_max, col_min:col_max, 1:3]
     }
     if(isTRUE(plot)){
-      plot(image)
+      plot(img)
     }
-    return(list(image = image, mask = EBImage::Image(mask)))
+    return(list(img = image, mask = EBImage::Image(mask)))
   }
 }
 
@@ -2626,7 +2627,7 @@ image_segment_manual <-  function(image,
 #' Convert an image to a data.frame
 #'
 #' Given an object image, converts it into a data frame where each row corresponds to the intensity values of each pixel in the image.
-#' @param image An image object.
+#' @param img An image object.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time when `image` is a list. The number of sections is set
@@ -2645,36 +2646,36 @@ image_segment_manual <-  function(image,
 #'dim(img)
 #'mat <- image_to_mat(img)
 #'dim(mat[[1]])
-image_to_mat <- function(image,
+image_to_mat <- function(img,
                          parallel = FALSE,
                          workers = NULL,
                          verbose = TRUE){
-  if(is.list(image)){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.list(img)){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, image, image_to_mat)
+      res <- parLapply(clust, img, image_to_mat)
     } else{
-      res <- lapply(image, image_to_mat)
+      res <- lapply(img, image_to_mat)
     }
     return(structure(res, class = "img_mat_list"))
   } else{
-    mat <- cbind(expand.grid(Row = 1:dim(image)[1], Col = 1:dim(image)[2]))
-    if(length(dim(image)) == 3){
-      for (i in 1:dim(image)[3]) {
-        mat <- cbind(mat, c(image[, , i]))
+    mat <- cbind(expand.grid(Row = 1:dim(img)[1], Col = 1:dim(img)[2]))
+    if(length(dim(img)) == 3){
+      for (i in 1:dim(img)[3]) {
+        mat <- cbind(mat, c(img[, , i]))
       }
-      colnames(mat) = c("row", "col", paste0("B", 1:dim(image)[3]))
+      colnames(mat) = c("row", "col", paste0("B", 1:dim(img)[3]))
     } else{
-      mat <- cbind(mat, c(image))
+      mat <- cbind(mat, c(img))
       colnames(mat) = c("row", "col", "B1")
     }
     return(mat)
@@ -2686,7 +2687,7 @@ image_to_mat <- function(image,
 #'
 #' `image_palette()`  creates image palettes by applying the k-means algorithm
 #' to the RGB values.
-#' @param image An image object.
+#' @param img An image object.
 #' @param npal The number of color palettes.
 #' @param proportional Creates a joint palette with proportional size equal to
 #'   the number of pixels in the image? Defaults to `TRUE`.
@@ -2708,14 +2709,14 @@ image_to_mat <- function(image,
 #'image_combine(pal$palette_list)
 #'
 #'}
-image_palette <- function (image,
+image_palette <- function (img,
                            npal = 5,
                            proportional = TRUE,
                            plot = TRUE) {
   id <- matrix(TRUE,
-               nrow = nrow(image@.Data[, , 1]),
-               ncol = ncol(image@.Data[, , 1]))
-  ck <- image_segment_kmeans(image, nclasses = npal, plot = FALSE)[["masks"]]
+               nrow = nrow(img@.Data[, , 1]),
+               ncol = ncol(img@.Data[, , 1]))
+  ck <- image_segment_kmeans(img, nclasses = npal, plot = FALSE)[["masks"]]
   layers = length(ck)
   ck2 <- 1 * ck[[1]]
   for (i in 2:layers) {
@@ -2724,9 +2725,9 @@ image_palette <- function (image,
   ck <- ck2
   MAT <- NULL
   for (i in unique(na.omit(c(ck)))) {
-    r = mean(image@.Data[, , 1][ck == i], na.rm = T)
-    g = mean(image@.Data[, , 2][ck == i], na.rm = T)
-    b = mean(image@.Data[, , 3][ck == i], na.rm = T)
+    r = mean(img@.Data[, , 1][ck == i], na.rm = T)
+    g = mean(img@.Data[, , 2][ck == i], na.rm = T)
+    b = mean(img@.Data[, , 3][ck == i], na.rm = T)
     MAT = cbind(MAT, c(r = r, g = g, b = b))
   }
   pal_list <- list()
@@ -2740,7 +2741,7 @@ image_palette <- function (image,
   }
   MATn <- NULL
   for (i in unique(na.omit(c(ck)))) {
-    r <- length(na.omit(image@.Data[, , 1][ck == i]))
+    r <- length(na.omit(img@.Data[, , 1][ck == i]))
     MATn <- cbind(MATn, r = r)
   }
   props <- data.frame(class = paste0("c", 1:length(MATn)),
@@ -2802,7 +2803,7 @@ image_palette <- function (image,
 #' from the image edge. Users can choose how many pixels (rows or columns) are
 #' sampled and how many pixels the expansion will have.
 #'
-#' @param image An `Image` object.
+#' @param img An `Image` object.
 #' @param left,top,right,bottom The number of pixels to expand in the left, top,
 #'   right, and bottom directions, respectively.
 #' @param edge The number of pixels to expand in all directions. This can be
@@ -2823,7 +2824,7 @@ image_palette <- function (image,
 #' image_expand(img, left = 200)
 #' image_expand(img, right = 150, bottom = 250, filter = 5)
 #'
-image_expand <- function(image,
+image_expand <- function(img,
                          left = NULL,
                          top = NULL,
                          right = NULL,
@@ -2859,8 +2860,8 @@ image_expand <- function(image,
     sample_bottom <- 2
   }
   if(!is.null(left)){
-    left_img <- image@.Data[1:sample_left,,] |> EBImage::Image(colormode = "Color")
-    left_img <- EBImage::resize(left_img, w = left, h = dim(image)[2])
+    left_img <- img@.Data[1:sample_left,,] |> EBImage::Image(colormode = "Color")
+    left_img <- EBImage::resize(left_img, w = left, h = dim(img)[2])
     if(isTRUE(random)){
       nc <- dim(left_img)
       for (i in 1:nc[1]) {
@@ -2870,11 +2871,11 @@ image_expand <- function(image,
     if(!is.null(filter)){
       left_img <- EBImage::medianFilter(left_img, size = filter)
     }
-    image <- EBImage::abind(left_img, image, along = 1)
+    img <- EBImage::abind(left_img, img, along = 1)
   }
   if(!is.null(top)){
-    top_img <- image@.Data[,1:sample_top,] |> EBImage::Image(colormode = "Color")
-    top_img <- EBImage::resize(top_img, w = dim(image)[1], h = top)
+    top_img <- img@.Data[,1:sample_top,] |> EBImage::Image(colormode = "Color")
+    top_img <- EBImage::resize(top_img, w = dim(img)[1], h = top)
     if(isTRUE(random)){
       nc <- dim(top_img)
       for (i in 1:nc[2]) {
@@ -2884,12 +2885,12 @@ image_expand <- function(image,
     if(!is.null(filter)){
       top_img <- EBImage::medianFilter(top_img, size = filter)
     }
-    image <- EBImage::abind(top_img, image, along = 2)
+    img <- EBImage::abind(top_img, img, along = 2)
   }
   if(!is.null(right)){
-    dimx <- dim(image)[1]
-    right_img <- image@.Data[(dimx-sample_right):dimx,,] |> EBImage::Image(colormode = "Color")
-    right_img <- EBImage::resize(right_img, w = right, h = dim(image)[2])
+    dimx <- dim(img)[1]
+    right_img <- img@.Data[(dimx-sample_right):dimx,,] |> EBImage::Image(colormode = "Color")
+    right_img <- EBImage::resize(right_img, w = right, h = dim(img)[2])
     if(isTRUE(random)){
       nc <- dim(right_img)
       for (i in 1:nc[1]) {
@@ -2899,12 +2900,12 @@ image_expand <- function(image,
     if(!is.null(filter)){
       right_img <- EBImage::medianFilter(right_img, size = filter)
     }
-    image <- EBImage::abind(image, right_img, along = 1)
+    img <- EBImage::abind(img, right_img, along = 1)
   }
   if(!is.null(bottom)){
-    dimy <- dim(image)[2]
-    bot_img <- image@.Data[,(dimy-sample_bottom):dimy,] |> EBImage::Image(colormode = "Color")
-    bot_img <- EBImage::resize(bot_img, w = dim(image)[1], h = bottom)
+    dimy <- dim(img)[2]
+    bot_img <- img@.Data[,(dimy-sample_bottom):dimy,] |> EBImage::Image(colormode = "Color")
+    bot_img <- EBImage::resize(bot_img, w = dim(img)[1], h = bottom)
     if(isTRUE(random)){
       nc <- dim(bot_img)
       for (i in 1:nc[2]) {
@@ -2914,12 +2915,12 @@ image_expand <- function(image,
     if(!is.null(filter)){
       bot_img <- EBImage::medianFilter(bot_img, size = filter)
     }
-    image <- EBImage::abind(image, bot_img, along = 2)
+    img <- EBImage::abind(img, bot_img, along = 2)
   }
   if(isTRUE(plot)){
-    plot(image)
+    plot(img)
   }
-  invisible(image)
+  invisible(img)
 }
 
 
@@ -2940,8 +2941,8 @@ image_expand <- function(image,
 #' dim(img)
 #' square <- image_square(img)
 #' dim(square)
-image_square <- function(image, plot = TRUE, ...){
-  len <- dim(image)
+image_square <- function(img, plot = TRUE, ...){
+  len <- dim(img)
   n <- max(len[1], len[2])
   if (len[1] > len[2]) {
     ni1 <- ceiling((n - len[2])/2)
@@ -2950,7 +2951,7 @@ image_square <- function(image, plot = TRUE, ...){
     } else{
       ni2 <- ni1
     }
-    image <- image_expand(image, bottom = ni1, top = ni2, plot = FALSE, ...)
+    img <- image_expand(img, bottom = ni1, top = ni2, plot = FALSE, ...)
   }
   if (len[2] > len[1]) {
     ni1 <- ceiling((n - len[1])/2)
@@ -2959,12 +2960,12 @@ image_square <- function(image, plot = TRUE, ...){
     } else{
       ni2 <- ni1
     }
-    image <- image_expand(image, left = ni1, right = ni2, plot = FALSE, ...)
+    img <- image_expand(img, left = ni1, right = ni2, plot = FALSE, ...)
   }
   if(isTRUE(plot)){
-    plot(image)
+    plot(img)
   }
-  invisible(image)
+  invisible(img)
 }
 
 
@@ -2992,7 +2993,7 @@ image_square <- function(image, plot = TRUE, ...){
 #'   known distance in the image (e.g., `la_leaves.jpg`).
 #'
 #' @name utils_dpi
-#' @param image An image object.
+#' @param img An image object.
 #' @param dpi The image resolution in dots per inch.
 #' @param viewer The viewer option. If not provided, the value is retrieved
 #'   using [get_pliman_viewer()]. This option controls the type of viewer to use
@@ -3065,19 +3066,19 @@ cm_to_pixels <- function(cm, dpi){
 }
 #' @name utils_dpi
 #' @export
-npixels <- function(image){
-  if(!inherits(image, "Image")){
+npixels <- function(img){
+  if(!inherits(img, "Image")){
     stop("Image must be of class 'Image'.")
   }
-  dim <- dim(image)
+  dim <- dim(img)
   dim[[1]] * dim[[2]]
 }
 #' @name utils_dpi
 #' @export
-dpi <- function(image,
+dpi <- function(img,
                 viewer = get_pliman_viewer()){
   if(isTRUE(interactive())){
-    pix <- distance(image, viewer = viewer)
+    pix <- distance(img, viewer = viewer)
     known <- as.numeric(readline("known distance (cm): "))
     pix / (known / 2.54)
   }
@@ -3085,13 +3086,13 @@ dpi <- function(image,
 
 #' @name utils_dpi
 #' @export
-distance <- function(image,
+distance <- function(img,
                      viewer = get_pliman_viewer()){
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(isTRUE(interactive())){
     if(vieweropt == "base"){
-      plot(image)
+      plot(img)
       message("Use the first mouse button to create a line in the plot.")
       coords <- locator(type = "l",
                         n = 2,
@@ -3099,7 +3100,7 @@ distance <- function(image,
                         col = "red")
       pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
     } else{
-      coords2 <- mv_two_points(image)
+      coords2 <- mv_two_points(img)
       pix <- sqrt((coords2$x1 - coords2$x2)^2 + (coords2$y1 - coords2$y2)^2)
     }
     return(pix)
@@ -3223,7 +3224,7 @@ rgb_to_lab <- function(object){
 
 
 # Faster alternatives (makes only the needed)
-help_segment <- function(image,
+help_segment <- function(img,
                          index = NULL,
                          threshold = c("Otsu", "adaptive"),
                          k = 0.1,
@@ -3235,7 +3236,7 @@ help_segment <- function(image,
                          re = NULL,
                          nir = NULL,
                          invert = FALSE){
-  img2 <- help_binary(image,
+  img2 <- help_binary(img,
                       index = index,
                       threshold = threshold,
                       k = k,
@@ -3248,15 +3249,15 @@ help_segment <- function(image,
                       nir = nir,
                       invert = invert)
   ID <- which(img2@.Data == FALSE)
-  image@.Data[,,1][ID] <- 1
-  image@.Data[,,2][ID] <- 1
-  image@.Data[,,3][ID] <- 1
-  invisible(image)
+  img@.Data[,,1][ID] <- 1
+  img@.Data[,,2][ID] <- 1
+  img@.Data[,,3][ID] <- 1
+  invisible(img)
 }
 
 
 
-help_binary <- function(image,
+help_binary <- function(img,
                         index = NULL,
                         threshold = c("Otsu", "adaptive"),
                         k = 0.1,
@@ -3291,7 +3292,7 @@ help_binary <- function(image,
         windowsize <- as.integer(windowsize + 1)
       }
       if (windowsize >= dim(imgs)[[1]] || windowsize >= dim(imgs)[[2]]){
-        warning("windowsize is too large. Setting to `min(dim(image)) / 3`", call. = FALSE)
+        warning("windowsize is too large. Setting to `min(dim(img)) / 3`", call. = FALSE)
         windowsize <- min(dim(imgs)) / 3
       }
       if (k > 1){
@@ -3332,7 +3333,7 @@ help_binary <- function(image,
     return(imgs)
   }
 
-  gray_img <- help_imageindex(image, index, resize, re, nir, has_white_bg)
+  gray_img <- help_imageindex(img, index, resize, re, nir, has_white_bg)
   bin_img <- bin_img(gray_img,
                      invert,
                      fill_hull,
@@ -3343,29 +3344,29 @@ help_binary <- function(image,
 
 
 
-help_imageindex <- function(image,
+help_imageindex <- function(img,
                             index = NULL,
                             resize = FALSE,
                             re = NULL,
                             nir = NULL,
                             has_white_bg = FALSE){
   if(resize != FALSE){
-    image <- image_resize(image, resize)
+    img <- image_resize(img, resize)
   }
   ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
 
   nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
   hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
 
-  R <- try(image@.Data[,,1], TRUE)
-  G <- try(image@.Data[,,2], TRUE)
-  B <- try(image@.Data[,,3], TRUE)
+  R <- try(img@.Data[,,1], TRUE)
+  G <- try(img@.Data[,,2], TRUE)
+  B <- try(img@.Data[,,3], TRUE)
 
   if(any(index %in% hsb_ind)){
     hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
-    h <- matrix(hsb$h, nrow = nrow(image), ncol = ncol(image))
-    s <- matrix(hsb$s, nrow = nrow(image), ncol = ncol(image))
-    b <- matrix(hsb$b, nrow = nrow(image), ncol = ncol(image))
+    h <- matrix(hsb$h, nrow = nrow(img), ncol = ncol(img))
+    s <- matrix(hsb$s, nrow = nrow(img), ncol = ncol(img))
+    b <- matrix(hsb$b, nrow = nrow(img), ncol = ncol(img))
   }
 
   if(!is.null(re)|!is.null(nir)){
@@ -3373,10 +3374,10 @@ help_imageindex <- function(image,
       stop(paste("Index ", index, " need NIR/RedEdge band to be calculated."), call. = FALSE)
     }
     if(!is.null(re)){
-      RE <-  try(image@.Data[,,re], TRUE)
+      RE <-  try(img@.Data[,,re], TRUE)
     }
     if(!is.null(nir)){
-      NIR <- try(image@.Data[,,nir], TRUE)
+      NIR <- try(img@.Data[,,nir], TRUE)
     }
     test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
     if(isTRUE(test_nir_ne)){

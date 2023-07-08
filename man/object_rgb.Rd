@@ -4,10 +4,10 @@
 \alias{object_rgb}
 \title{Extract red, green and blue values from objects}
 \usage{
-object_rgb(image, labels)
+object_rgb(img, labels)
 }
 \arguments{
-\item{image}{An \code{Image} object}
+\item{img}{An \code{Image} object}
 
 \item{labels}{A mask containing the labels for each object. This can be
 obtained with \code{\link[EBImage:bwlabel]{EBImage::bwlabel()}} or \code{\link[EBImage:watershed]{EBImage::watershed()}}}

@@ -4,10 +4,10 @@
 \alias{image_to_mat}
 \title{Convert an image to a data.frame}
 \usage{
-image_to_mat(image, parallel = FALSE, workers = NULL, verbose = TRUE)
+image_to_mat(img, parallel = FALSE, workers = NULL, verbose = TRUE)
 }
 \arguments{
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,26 +130,9 @@
 </div>
 <!-- badges: start -->
 
-<p><code>pliman</code> (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell <code>pliman</code> what each one represents, and it takes care of the details. Image indexes can also be used to segment images. The package will help you to:</p>
-<ul>
-<li>Measure leaf area;</li>
-<li>Measure disease severity;</li>
-<li>Count the number of lesions;</li>
-<li>Obtain the shape of lesions;</li>
-<li>Produce Standard Area Diagrams;</li>
-<li>Count objects in an image;</li>
-<li>Get object features (area, perimeter, radius, circularity, eccentricity, solidity);</li>
-<li>Get the RGB values for each object in an image;</li>
-<li>Get the object coordinates;</li>
-<li>Get the object contours;</li>
-<li>Get convex hulls;</li>
-<li>Isolate objects;</li>
-<li>Plot object measures;</li>
-<li>Perform Elliptical Fourier Analysis;</li>
-<li>
-</li>
-</ul>
-<p><code>pliman</code> also provides useful functions for image <a href="https://tiagoolivoto.github.io/pliman/reference/utils_transform.html">transformation</a>, <a href="https://tiagoolivoto.github.io/pliman/reference/image_binary.html">binarization</a>, <a href="https://tiagoolivoto.github.io/pliman/reference/image_segment.html">segmentation</a>, and <a href="https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html">resolution</a>. Please, visit the <a href="https://tiagoolivoto.github.io/pliman/index.html">Examples</a> page in <code>pliman</code> website for a detailed documentation of each function.</p>
+<!-- badges: end -->
+<p>The pliman (<strong>pl</strong>ant <strong>im</strong>age <strong>an</strong>alysis) package is designed to analyze plant images, particularly for leaf and seed analysis. It offers a range of functionalities to assist with various tasks such as measuring disease severity, counting lesions, obtaining lesion shapes, counting objects in an image, extracting object characteristics, performing Fourier Analysis, obtaining RGB values, extracting object coordinates and outlines, isolating objects, and plotting object measurements.</p>
+<p><code>pliman</code> also provides useful functions for image transformation, binarization, segmentation, and resolution. Please visit the <a href="https://tiagoolivoto.github.io/pliman/reference/index.html">Examples</a> page on the <code>pliman</code> website for detailed documentation of each function.</p>
 </div>
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -166,139 +149,135 @@
 <p><em>Note</em>: If you are a Windows user, you should also first download and install the latest version of <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a>.</p>
 </div>
 <div class="section level1">
-<h1 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+<h1 id="analyze-objects">Analyze objects<a class="anchor" aria-label="anchor" href="#analyze-objects"></a>
 </h1>
-<p>The two main functions of pliman are <code>analyze objects()</code> and <code>measure disease()</code>, which can be used to compute object features and measure disease severity, respectively.</p>
-<div class="section level2">
-<h2 id="analyze-objects">Analyze objects<a class="anchor" aria-label="anchor" href="#analyze-objects"></a>
-</h2>
-<p>The function <code><a href="reference/analyze_objects.html">analyze_objects()</a></code> can be used to analyze objects such as leaves, grains, pods, and pollen in an image. The following example counts and computes several features of soybean grains of an image with 30 grains.</p>
+<p>The function <code><a href="reference/analyze_objects.html">analyze_objects()</a></code> can be used to analyze objects such as leaves, grains, pods, and pollen in an image. By default, all measures are returned in pixel units. Users can <a href="https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html#adjusting-object-measures">adjust the object measures</a> with <code><a href="reference/utils_measures.html">get_measures()</a></code> provided that the image resolution (Dots Per Inch) is known. Another option is to use a reference object in the image. In this last case, the argument <code>reference</code> must be set to <code>TRUE</code>. There are two options to identify the reference object:</p>
+<ol style="list-style-type: decimal">
+<li>By its color, using the arguments <code>back_fore_index</code> and <code>fore_ref_index</code><br>
+</li>
+<li>By its size, using the arguments <code>reference_larger</code> or <code>reference_smaller</code>
+</li>
+</ol>
+<p>In both cases, the <code>reference_area</code> must be declared. Let’s see how to analyze an image with flax grains containing a reference object (rectangle with 2x3 cm). Here, we’ll identify the reference object by its size; so, the final results in this case will be in metric units (cm).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
-<span><span class="co"># |==========================================================|</span></span>
-<span><span class="co"># | Tools for Plant Image Analysis (pliman 1.2.0)            |</span></span>
-<span><span class="co"># | Author: Tiago Olivoto                                    |</span></span>
-<span><span class="co"># | Type 'citation('pliman')' to know how to cite pliman     |</span></span>
-<span><span class="co"># | Type 'vignette('pliman_start')' for a short tutorial     |</span></span>
-<span><span class="co"># | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |</span></span>
-<span><span class="co"># |==========================================================|</span></span>
-<span><span class="va">img</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">soy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>, marker <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
+<span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"flax_grains.jpg"</span><span class="op">)</span></span>
+<span><span class="va">flax</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="reference/analyze_objects.html">analyze_objects</a></span><span class="op">(</span><span class="va">img</span>,</span>
+<span>                  index <span class="op">=</span> <span class="st">"GRAY"</span>,</span>
+<span>                  reference <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                  reference_larger <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                  reference_area <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>                  marker <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">soy</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="co"># 'data.frame': 30 obs. of  47 variables:</span></span>
-<span><span class="co">#  $ id                  : num  1 2 3 4 5 6 7 8 9 10 ...</span></span>
-<span><span class="co">#  $ x                   : num  246 538 238 345 278 ...</span></span>
-<span><span class="co">#  $ y                   : num  510 402 340 106 261 ...</span></span>
-<span><span class="co">#  $ area                : num  2275 2299 2311 2443 2161 ...</span></span>
-<span><span class="co">#  $ area_ch             : num  2302 2270 2289 2413 2123 ...</span></span>
-<span><span class="co">#  $ perimeter           : num  184 178 181 186 172 ...</span></span>
-<span><span class="co">#  $ radius_mean         : num  26.5 26.6 26.7 27.5 25.8 ...</span></span>
-<span><span class="co">#  $ radius_min          : num  22.9 25 24 24.3 24.2 ...</span></span>
-<span><span class="co">#  $ radius_max          : num  29.4 28.7 29.4 30.5 28 ...</span></span>
-<span><span class="co">#  $ radius_sd           : num  1.369 0.945 1.24 1.757 0.803 ...</span></span>
-<span><span class="co">#  $ diam_mean           : num  52.9 53.2 53.4 55 51.5 ...</span></span>
-<span><span class="co">#  $ diam_min            : num  45.9 49.9 48 48.7 48.5 ...</span></span>
-<span><span class="co">#  $ diam_max            : num  58.9 57.4 58.9 61.1 56.1 ...</span></span>
-<span><span class="co">#  $ major_axis          : num  56.1 56.5 57.5 60.9 54.1 ...</span></span>
-<span><span class="co">#  $ minor_axis          : num  51.9 51.9 51.3 51.1 50.9 ...</span></span>
-<span><span class="co">#  $ caliper             : num  57.3 56.9 57.7 61 54.4 ...</span></span>
-<span><span class="co">#  $ length              : num  56.6 56.5 57.2 61 54 ...</span></span>
-<span><span class="co">#  $ width               : num  51.6 52.4 52 51 50.6 ...</span></span>
-<span><span class="co">#  $ radius_ratio        : num  1.28 1.15 1.23 1.25 1.16 ...</span></span>
-<span><span class="co">#  $ theta               : num  -0.889 -0.841 -0.565 -0.993 -0.218 ...</span></span>
-<span><span class="co">#  $ eccentricity        : num  0.893 0.853 0.816 0.754 0.896 ...</span></span>
-<span><span class="co">#  $ form_factor         : num  0.849 0.91 0.886 0.891 0.921 ...</span></span>
-<span><span class="co">#  $ narrow_factor       : num  1.01 1.01 1.01 1 1.01 ...</span></span>
-<span><span class="co">#  $ asp_ratio           : num  1.1 1.08 1.1 1.2 1.07 ...</span></span>
-<span><span class="co">#  $ rectangularity      : num  1.28 1.29 1.29 1.27 1.26 ...</span></span>
-<span><span class="co">#  $ pd_ratio            : num  3.2 3.13 3.14 3.04 3.16 ...</span></span>
-<span><span class="co">#  $ plw_ratio           : num  1.7 1.64 1.66 1.66 1.64 ...</span></span>
-<span><span class="co">#  $ solidity            : num  0.988 1.013 1.01 1.012 1.018 ...</span></span>
-<span><span class="co">#  $ convexity           : num  0.886 0.881 0.911 0.915 0.898 ...</span></span>
-<span><span class="co">#  $ elongation          : num  0.0884 0.0728 0.0911 0.1638 0.0642 ...</span></span>
-<span><span class="co">#  $ circularity         : num  14.8 13.8 14.2 14.1 13.6 ...</span></span>
-<span><span class="co">#  $ circularity_haralick: num  19.3 28.1 21.5 15.7 32.1 ...</span></span>
-<span><span class="co">#  $ circularity_norm    : num  1.22 1.14 1.17 1.16 1.13 ...</span></span>
-<span><span class="co">#  $ coverage            : num  0.00426 0.0043 0.00432 0.00457 0.00404 ...</span></span>
-<span><span class="co">#  $ asm                 : num  0.0679 0.0886 0.0848 0.0869 0.0865 ...</span></span>
-<span><span class="co">#  $ con                 : num  0.527 0.603 0.702 0.73 0.834 ...</span></span>
-<span><span class="co">#  $ cor                 : num  0.961 0.959 0.95 0.945 0.944 ...</span></span>
-<span><span class="co">#  $ var                 : num  7.68 8.37 7.98 7.58 8.46 ...</span></span>
-<span><span class="co">#  $ idm                 : num  0.81 0.807 0.794 0.801 0.795 ...</span></span>
-<span><span class="co">#  $ sav                 : num  40.5 40.7 40.7 40.6 40.9 ...</span></span>
-<span><span class="co">#  $ sva                 : num  1566 1591 1590 1583 1606 ...</span></span>
-<span><span class="co">#  $ sen                 : num  1.24 1.18 1.17 1.17 1.2 ...</span></span>
-<span><span class="co">#  $ ent                 : num  1.4 1.36 1.36 1.36 1.4 ...</span></span>
-<span><span class="co">#  $ dva                 : num  0.527 0.603 0.702 0.73 0.834 ...</span></span>
-<span><span class="co">#  $ den                 : num  0.347 0.364 0.386 0.385 0.392 ...</span></span>
-<span><span class="co">#  $ f12                 : num  0.569 0.56 0.535 0.544 0.542 ...</span></span>
-<span><span class="co">#  $ f13                 : num  0.82 0.807 0.793 0.798 0.804 ...</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># summary statistics</span></span>
+<span><span class="va">flax</span><span class="op">$</span><span class="va">statistics</span></span>
+<span><span class="co">#        stat        value</span></span>
+<span><span class="co"># 1         n 271.00000000</span></span>
+<span><span class="co"># 2  min_area   0.01868645</span></span>
+<span><span class="co"># 3 mean_area   0.06165272</span></span>
+<span><span class="co"># 4  max_area   0.07969222</span></span>
+<span><span class="co"># 5   sd_area   0.00654426</span></span>
+<span><span class="co"># 6  sum_area  16.70788678</span></span>
+<span><span class="co"># 7  coverage   0.05391447</span></span>
+<span></span>
+<span><span class="co"># plot the density of the grain's length (in cm)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">flax</span>, measure <span class="op">=</span> <span class="st">"length"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-4-2.png" width="100%"></p>
+</div>
+<div class="section level1">
+<h1 id="analyzing-shapefiles">Analyzing shapefiles<a class="anchor" aria-label="anchor" href="#analyzing-shapefiles"></a>
+</h1>
+<p>The <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> function performs object analysis based on shapefiles (rows and columns). Possible applications include computing canopy coverage and vegetation indexes useful for high-throughput phenotyping. By default <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> calls <code><a href="reference/image_prepare_mv.html">image_prepare_mv()</a></code> internally, allowing alignment and crop the image before processing. In the following example, we compute the canopy coverage and the Normalized Green Red Difference Index (NGRDI) for each one of the 12 soybean plots.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">shp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"field_mosaic.jpg"</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="reference/analyze_objects_shp.html">analyze_objects_shp</a></span><span class="op">(</span><span class="va">shp</span>, </span>
+<span>                      prepare <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># it is already aligned and cropped</span></span>
+<span>                      ncol <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>                      nrow <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                      index <span class="op">=</span> <span class="st">"HUE"</span>, <span class="co"># used to segment the soil</span></span>
+<span>                      object_index <span class="op">=</span> <span class="st">"NGRDI"</span><span class="op">)</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">final_image_masked</span><span class="op">)</span></span>
+<span><span class="co"># plot the shapefiles</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">shapefiles</span><span class="op">)</span></span>
+<span><span class="co"># plot the canopy coverage</span></span>
+<span><span class="fu"><a href="reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">res</span>, measure <span class="op">=</span> <span class="st">"coverage"</span>, col <span class="op">=</span> <span class="st">"black"</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">160</span><span class="op">)</span></span>
+<span><span class="co"># plot the NGRDI index</span></span>
+<span><span class="fu"><a href="reference/utils_measures.html">plot_measures</a></span><span class="op">(</span><span class="va">res</span>, measure <span class="op">=</span> <span class="st">"NGRDI"</span>, col <span class="op">=</span> <span class="st">"red"</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">190</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
+</div>
+<div class="section level1">
+<h1 id="disease-severity">Disease severity<a class="anchor" aria-label="anchor" href="#disease-severity"></a>
+</h1>
+<div class="section level2">
+<h2 id="using-image-indexes">Using image indexes<a class="anchor" aria-label="anchor" href="#using-image-indexes"></a>
+</h2>
+<p>To compute the percentage of symptomatic leaf area you can use the <code><a href="reference/measure_disease.html">measure_disease()</a></code> function you can use an image index to segment the entire leaf from the background and then separate the diseased tissue from the healthy tissue. Alternatively, you can provide color palette samples to the <code><a href="reference/measure_disease.html">measure_disease()</a></code> function. In this approach, the function fits a general linear model (binomial family) to the RGB values of the image. It then uses the color palette samples to segment the lesions from the healthy leaf.</p>
+<p>In the following example, we compute the symptomatic area of a soybean leaf. The proportion of healthy and symptomatic areas is given as a proportion of the total leaf area after segmenting the leaf from the background (blue).</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span></span>
+<span><span class="co"># Computes the symptomatic area</span></span>
+<span><span class="va">sev</span> <span class="op">&lt;-</span> </span>
+<span><span class="fu"><a href="reference/measure_disease.html">measure_disease</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,</span>
+<span>                index_lb <span class="op">=</span> <span class="st">"B"</span>, <span class="co"># to remove the background</span></span>
+<span>                index_dh <span class="op">=</span> <span class="st">"NGRDI"</span>, <span class="co"># to isolate the diseased area</span></span>
+<span>                threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Otsu"</span>, <span class="fl">0</span><span class="op">)</span>, <span class="co"># You can also use the Otsu algorithm in both indexes (default)</span></span>
+<span>                plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sev</span><span class="op">$</span><span class="va">severity</span></span>
+<span><span class="co">#    healthy symptomatic</span></span>
+<span><span class="co"># 1 92.62721    7.372791</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="disease-severity">Disease severity<a class="anchor" aria-label="anchor" href="#disease-severity"></a>
+<h2 id="interactive-disease-measurements">Interactive disease measurements<a class="anchor" aria-label="anchor" href="#interactive-disease-measurements"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span><span class="op">)</span></span>
-<span><span class="va">healthy</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_healthy.jpg"</span><span class="op">)</span></span>
-<span><span class="va">symptoms</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_sympt.jpg"</span><span class="op">)</span></span>
-<span><span class="va">background</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_back.jpg"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/image_combine.html">image_combine</a></span><span class="op">(</span><span class="va">img</span>, <span class="va">healthy</span>, <span class="va">symptoms</span>, <span class="va">background</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sev</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="reference/measure_disease.html">measure_disease</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,</span>
-<span>                  img_healthy <span class="op">=</span> <span class="va">healthy</span>,</span>
-<span>                  img_symptoms <span class="op">=</span> <span class="va">symptoms</span>,</span>
-<span>                  img_background <span class="op">=</span> <span class="va">background</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png"><!-- --></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">sev</span><span class="op">$</span><span class="va">severity</span></span>
-<span><span class="co">#    healthy symptomatic</span></span>
-<span><span class="co"># 1 89.20609    10.79391</span></span></code></pre></div>
-<p><code>pliman</code> takes the advantage of several powerful functions from <a href="https://bioconductor.org/packages/release/bioc/html/EBImage.html" class="external-link">EBImage package</a>. Thanks to Andrzej Oleś and collaborators for the impressive job done with EBImage!</p>
+<p>An alternative approach to measuring disease percentage is available through the <code><a href="reference/measure_disease.html">measure_disease_iter()</a></code> function. This function offers an interactive interface that empowers users to manually select sample colors directly from the image. By doing so, it provides a highly customizable analysis method.</p>
+<p>One advantage of using <code><a href="reference/measure_disease.html">measure_disease_iter()</a></code> is the ability to utilize the “mapview” viewer, which enhances the analysis process by offering zoom-in options. This feature allows users to closely examine specific areas of the image, enabling detailed inspection and accurate disease measurement.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/measure_disease.html">measure_disease_iter</a></span><span class="op">(</span><span class="va">img</span>, viewer <span class="op">=</span> <span class="st">"mapview"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level1">
 <h1 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">"pliman"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>Please, support this project by citing it <span class="cf">in</span> your publications<span class="sc">!</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  Olivoto, <span class="fu">T.</span>(<span class="dv">2022</span>). Lights, camera, pliman<span class="sc">!</span> An R package <span class="cf">for</span> plant</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  image analysis. Methods Ecol Evol. <span class="dv">13</span><span class="sc">:</span><span class="dv">789-798</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  doi<span class="sc">:</span><span class="fl">10.1111</span><span class="sc">/</span><span class="dv">2041</span><span class="sc">-</span>210X<span class="fl">.13803</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>A BibTeX entry <span class="cf">for</span> LaTeX users is</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="sc">@</span>Article{Olivoto2022,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    author <span class="ot">=</span> {Tiago Olivoto},</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    title <span class="ot">=</span> {Lights, camera, pliman<span class="sc">!</span> An R package <span class="cf">for</span> plant image analysis},</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    journal <span class="ot">=</span> {Methods <span class="cf">in</span> Ecology and Evolution},</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    volume <span class="ot">=</span> {<span class="dv">13</span>},</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    number <span class="ot">=</span> {<span class="dv">4</span>},</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    pages <span class="ot">=</span> {<span class="dv">789-798</span>},</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    year <span class="ot">=</span> {<span class="dv">2022</span>},</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    doi <span class="ot">=</span> {<span class="fl">10.1111</span><span class="sc">/</span><span class="dv">2041</span><span class="sc">-</span>210X<span class="fl">.13803</span>},</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">"pliman"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>Please, support this project by citing it <span class="cf">in</span> your publications<span class="sc">!</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  Olivoto <span class="fu">T</span> (<span class="dv">2022</span>). <span class="st">"Lights, camera, pliman! An R package for plant</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="st">  image analysis."</span> _Methods <span class="cf">in</span> Ecology and Evolution_, <span class="sc">*</span><span class="dv">13</span><span class="sc">*</span>(<span class="dv">4</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="dv">789</span><span class="fl">-798.</span> doi<span class="sc">:</span><span class="fl">10.1111</span><span class="sc">/</span><span class="dv">2041</span><span class="sc">-</span>210X<span class="fl">.13803</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="sc">&lt;</span>https<span class="sc">:</span><span class="er">//</span>doi.org<span class="sc">/</span><span class="fl">10.1111</span><span class="sc">/</span><span class="dv">2041</span><span class="sc">-</span>210X<span class="fl">.13803</span><span class="sc">&gt;</span>.</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>A BibTeX entry <span class="cf">for</span> LaTeX users is</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="sc">@</span>Article{,</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    title <span class="ot">=</span> {Lights, camera, pliman<span class="sc">!</span> An R package <span class="cf">for</span> plant image analysis},</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>    author <span class="ot">=</span> {Tiago Olivoto},</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>    year <span class="ot">=</span> {<span class="dv">2022</span>},</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>    journal <span class="ot">=</span> {Methods <span class="cf">in</span> Ecology and Evolution},</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>    volume <span class="ot">=</span> {<span class="dv">13</span>},</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>    number <span class="ot">=</span> {<span class="dv">4</span>},</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>    pages <span class="ot">=</span> {<span class="dv">789-798</span>},</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>    doi <span class="ot">=</span> {<span class="fl">10.1111</span><span class="sc">/</span><span class="dv">2041</span><span class="sc">-</span>210X<span class="fl">.13803</span>},</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  }</span></code></pre></div>
 </div>
 <div class="section level1">
 <h1 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h1>
-<ul>
-<li><p>If you encounter a clear bug, please file a minimal reproducible example on <a href="https://github.com/TiagoOlivoto/pliman/issues" class="external-link">github</a>. The package <a href="https://reprex.tidyverse.org/" class="external-link">reprex</a> may help you with that.</p></li>
-<li><p>Suggestions and criticisms to improve the quality and usability of the package are welcome!</p></li>
-</ul>
+<p>If you come across any clear bugs while using the package, please consider filing a minimal reproducible example on <a href="https://github.com/TiagoOlivoto/pliman/issues" class="external-link">github</a>. This will help the developers address the issue promptly.</p>
+<p>Suggestions and criticisms aimed at improving the quality and usability of the package are highly encouraged. Your feedback is valuable in making {pliman} even better!</p>
 </div>
 <div class="section level1">
 <h1 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
 </h1>
 <p>Please note that the pliman project is released with a <a href="https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 <div align="center">
-<p><a href="https://www.free-website-hit-counter.com" class="external-link"><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" border="0" alt="Free Website Hit Counter"></a><br><small><a href="https://www.free-website-hit-counter.com" title="Free Website Hit Counter" class="external-link">Free website hit counter</a></small></p>
+<p><a href="https://www.free-website-hit-counter.com" class="external-link"><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" alt="Free Website Hit Counter" border="0"></a><br><small><a href="https://www.free-website-hit-counter.com" title="Free Website Hit Counter" class="external-link">Free website hit counter</a></small></p>
 </div>
 </div>
 
@@ -347,7 +326,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=pliman" class="external-link"><img src="https://www.r-pkg.org/badges/version-ago/pliman" alt="CRAN status"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental-1" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg" alt="Lifecycle: stable"></a></li>
 <li><a href="https://r-pkg.org/pkg/pliman" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange" alt="CRAN RStudio mirror downloads"></a></li>
 <li><a href="https://r-pkg.org/pkg/pliman" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange" alt="CRAN RStudio mirror downloads"></a></li>
 <li><a href="https://r-pkg.org/pkg/pliman" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange" alt="CRAN RStudio mirror downloads"></a></li>

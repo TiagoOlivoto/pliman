@@ -5,7 +5,7 @@
 \title{Segment an \code{Image} object using a brush mask}
 \usage{
 image_segment_mask(
-  image,
+  img,
   size,
   shape = "disc",
   rel_pos_x = 0.5,
@@ -16,7 +16,7 @@ image_segment_mask(
 )
 }
 \arguments{
-\item{image}{A \code{Image} object}
+\item{img}{A \code{Image} object}
 
 \item{size}{A numeric containing the size of the brush in pixels. This should
 be an odd number; even numbers are rounded to the next odd one.}

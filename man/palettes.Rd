@@ -5,10 +5,10 @@
 \alias{image_palette}
 \title{Create image palettes}
 \usage{
-image_palette(image, npal = 5, proportional = TRUE, plot = TRUE)
+image_palette(img, npal = 5, proportional = TRUE, plot = TRUE)
 }
 \arguments{
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{npal}{The number of color palettes.}
 

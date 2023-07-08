@@ -37,10 +37,10 @@ leaves <-
 ```
 
 ```{r leaf4, fig.width=8, fig.height=8}
-image_segment(leaves, index = "all")
+image_index(leaves)
 ```
 
-`G` (Green) and `NB` (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the `NB` index here (default option in `analyze_objects()`). The measurement of the leaf area in this approach can be done in two main ways: 1) using an object of known area, and 2) knowing the image resolution in dpi (dots per inch).
+`B` (Blue) and `NB` (Normalized Blue) are two possible candidates to segment the leaves from the background. We will use the `NB` index here (default option in `analyze_objects()`). The measurement of the leaf area in this approach can be done in two main ways: 1) using an object of known area, and 2) knowing the image resolution in dpi (dots per inch).
 
 
 ### Using an object of known area
@@ -92,9 +92,8 @@ The function `get_measures()` is used to adjust the leaf area using object 10, a
 ```{r leaf9, fig.width=10, fig.height=8}
 area <-
   get_measures(count,
-               id = 10,
+               id = 11,
                area ~ 25)
-area
 # plot the area to the segmented image
 image_segment(leaves, index = "NB", verbose = FALSE)
 plot_measures(area,
@@ -106,12 +105,15 @@ plot_measures(area,
 
 
 ### knowing the image resolution in dpi (dots per inch)
-When the image resolution is known, the measures in pixels obtained with `analyze_objects()` are corrected by the image resolution. The function `dpi()` can be used to compute the dpi of an image, provided that the size of any object is known. See the [dpi](#dpi) section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.8 DPIs. We inform this value in the `dpi` argument of `get_measures()`.
+When the image resolution is known, the measures in pixels obtained with `analyze_objects()` are corrected by the image resolution. The function `dpi()` can be used to compute the dpi of an image, provided that the size of any object is known. See the [dpi](#dpi) section for more details. In this case, the estimated resolution considering the calibration of object 10 was ~50.5 DPIs. We inform this value in the `dpi` argument of `get_measures()`.
 
 ```{r leaf10}
-area2 <- get_measures(count, dpi = 50.8)
-# compute the difference between the two methods
-sum(area$area - area2$area)
+area2 <- get_measures(count, dpi = 50.5)
+plot(leaves)
+plot_measures(area2,
+              measure = "area",
+              vjust = -60,
+              col = "gray") # default is "white"
 ```
 
 # <i class="fas fa-scroll"></i> A little bit more!

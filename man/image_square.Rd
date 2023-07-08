@@ -4,10 +4,10 @@
 \alias{image_square}
 \title{Squares an image}
 \usage{
-image_square(image, plot = TRUE, ...)
+image_square(img, plot = TRUE, ...)
 }
 \arguments{
-\item{image}{An \code{Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{plot}{Plots the extended image? defaults to \code{FALSE}.}
 

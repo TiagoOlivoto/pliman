@@ -110,26 +110,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // bounding_box
-IntegerVector bounding_box(LogicalMatrix image, int edge);
-RcppExport SEXP _pliman_bounding_box(SEXP imageSEXP, SEXP edgeSEXP) {
+IntegerVector bounding_box(LogicalMatrix img, int edge);
+RcppExport SEXP _pliman_bounding_box(SEXP imgSEXP, SEXP edgeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< LogicalMatrix >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type img(imgSEXP);
     Rcpp::traits::input_parameter< int >::type edge(edgeSEXP);
-    rcpp_result_gen = Rcpp::wrap(bounding_box(image, edge));
+    rcpp_result_gen = Rcpp::wrap(bounding_box(img, edge));
     return rcpp_result_gen;
 END_RCPP
 }
 // isolate_objects5
-List isolate_objects5(NumericMatrix image, IntegerMatrix labels);
-RcppExport SEXP _pliman_isolate_objects5(SEXP imageSEXP, SEXP labelsSEXP) {
+List isolate_objects5(NumericMatrix img, IntegerMatrix labels);
+RcppExport SEXP _pliman_isolate_objects5(SEXP imgSEXP, SEXP labelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type img(imgSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type labels(labelsSEXP);
-    rcpp_result_gen = Rcpp::wrap(isolate_objects5(image, labels));
+    rcpp_result_gen = Rcpp::wrap(isolate_objects5(img, labels));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -163,13 +163,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // help_otsu
-double help_otsu(const NumericVector& image);
-RcppExport SEXP _pliman_help_otsu(SEXP imageSEXP) {
+double help_otsu(const NumericVector& img);
+RcppExport SEXP _pliman_help_otsu(SEXP imgSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type image(imageSEXP);
-    rcpp_result_gen = Rcpp::wrap(help_otsu(image));
+    Rcpp::traits::input_parameter< const NumericVector& >::type img(imgSEXP);
+    rcpp_result_gen = Rcpp::wrap(help_otsu(img));
     return rcpp_result_gen;
 END_RCPP
 }

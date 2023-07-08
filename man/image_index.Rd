@@ -6,7 +6,7 @@
 \title{Image indexes}
 \usage{
 image_index(
-  image,
+  img,
   index = NULL,
   resize = FALSE,
   re = NULL,
@@ -24,7 +24,7 @@ image_index(
 \method{plot}{image_index}(x, type = c("raster", "density"), nrow = NULL, ncol = NULL, ...)
 }
 \arguments{
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to binary image. Use \code{\link[=pliman_indexes]{pliman_indexes()}} or the

@@ -20,7 +20,7 @@ images is returned."><meta property="og:image" content="https://tiagoolivoto.git
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,9 +125,9 @@ images is returned.</p>
 <span>  extension <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object_size <span class="op">=</span> <span class="st">"medium"</span>,</span>
-<span>  keep_location <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  col_background <span class="op">=</span> <span class="st">"white"</span>,</span>
-<span>  show_image <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  edge <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  remove_bg <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -165,10 +165,10 @@ objects.</p></dd>
 images with a black background. Defaults to <code>FALSE</code>. If <code>reference = TRUE</code>
 is use, <code>invert</code> can be declared as a logical vector of length 2 (eg.,
 <code>invert = c(FALSE, TRUE</code>). In this case, the segmentation of objects and
-reference from the foreground using <code>back_fore_index</code> is performed using
-the default (not inverted), and the segmentation of objects from the
-reference is performed by inverting the selection (selecting pixels higher
-than the threshold).</p></dd>
+reference from the foreground using <code>back_fore_index</code> is performed using the
+default (not inverted), and the segmentation of objects from the reference
+is performed by inverting the selection (selecting pixels higher than the
+threshold).</p></dd>
 
 
 <dt>fill_hull</dt>
@@ -182,16 +182,20 @@ image.</p></dd>
 <dt>filter</dt>
 <dd><p>Performs median filtering in the binary image? See more at
 <code><a href="utils_transform.html">image_filter()</a></code>. Defaults to <code>FALSE</code>. Use a positive integer to define the
-size of the median filtering. Larger values are effective at removing
-noise, but adversely affect edges.</p></dd>
+size of the median filtering. Larger values are effective at removing noise,
+but adversely affect edges.</p></dd>
 
 
 <dt>threshold</dt>
-<dd><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.</p></dd>
+<dd><p>The theshold method to be used.</p><ul><li><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.</p></li>
+<li><p>If <code>threshold = "adaptive"</code>, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the <code>k</code> and <code>windowsize</code> arguments.</p></li>
+<li><p>If any non-numeric value different than <code>"Otsu"</code> and <code>"adaptive"</code> is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.</p></li>
+</ul></dd>
 
 
 <dt>extension</dt>
@@ -210,24 +214,21 @@ which is the highest.</p></dd>
 <dt>object_size</dt>
 <dd><p>The size of the object. Used to automatically set up
 <code>tolerance</code> and <code>extension</code> parameters. One of the following. <code>"small"</code>
-(e.g, wheat grains), <code>"medium"</code> (e.g, soybean grains), <code>"large"</code>(e.g,
-peanut grains), and <code>"elarge"</code> (e.g, soybean pods)`.</p></dd>
+(e.g, wheat grains), <code>"medium"</code> (e.g, soybean grains), <code>"large"</code>(e.g, peanut
+grains), and <code>"elarge"</code> (e.g, soybean pods)`.</p></dd>
 
 
-<dt>keep_location</dt>
-<dd><p>A logical argument (defaults to <code>TRUE</code>). If <code>FALSE</code>, the
-new image is created with the object in the exactly position of the
-original image.</p></dd>
+<dt>edge</dt>
+<dd><p>The number of pixels to be added in the edge of the segmented
+object. Defaults to 5.</p></dd>
 
 
-<dt>col_background</dt>
-<dd><p>The background color in the new image. Defaults to
-<code>white</code>. Use the built-in color names which <code>R</code> knows about (see
-?<code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">grDevices::colors()</a></code>) or a numeric vector with R, G, and B intensities
-(see ?<code><a href="https://rdrr.io/r/grDevices/rgb.html" class="external-link">grDevices::rgb()</a></code>).</p></dd>
+<dt>remove_bg</dt>
+<dd><p>If <code>TRUE</code>, the pixels that are not part of objects are
+converted to white.</p></dd>
 
 
-<dt>show_image</dt>
+<dt>plot</dt>
 <dd><p>Show image after processing?</p></dd>
 
 
@@ -260,9 +261,9 @@ original image.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of the procedure</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ==============================</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of objects: 6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Average area     : 26679 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Minimum area     : 4323 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum area     : 44701 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Average area     : 26654.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Minimum area     : 4303 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum area     : 44658 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Objects created  : 6 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ==============================</span>
 <span class="r-plt img"><img src="object_split-2.png" alt="" width="700" height="433"></span>

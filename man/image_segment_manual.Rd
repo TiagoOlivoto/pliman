@@ -5,7 +5,7 @@
 \title{Image segmentation by hand}
 \usage{
 image_segment_manual(
-  image,
+  img,
   shape = c("free", "circle", "rectangle"),
   type = c("select", "remove"),
   viewer = get_pliman_viewer(),
@@ -15,7 +15,7 @@ image_segment_manual(
 )
 }
 \arguments{
-\item{image}{An \code{Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{shape}{The type of shape to use. Defaults to "free". Other possible
 values are "circle" and "rectangle". Partial matching is allowed.}

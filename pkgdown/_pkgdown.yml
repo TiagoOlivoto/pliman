@@ -76,6 +76,7 @@ reference:
   - title: "Image operations"
     desc: "Import, show and export images"
     contents:
+      - as_image
       - utils_image
       - image_combine
       - image_create
@@ -99,8 +100,12 @@ reference:
     desc: "Provides utilities for creating and analyzing image shape files"
     contents:
       - analyze_objects_shp
+      - measure_disease_shp
+      - prepare_to_shp
       - image_shp
       - image_align
+      - object_mark
+      - object_map
       - plot.image_shp
 
 
@@ -116,6 +121,10 @@ reference:
       - utils_polygon
       - utils_polygon_plot
       - utils_shapes
+      - plot_lw
+      - poly_apex_base_angle
+      - poly_width_at
+      - poly_pcv
 
   - title: "Utilities for image points"
     desc: "Opens an iterative section to count objects, extract pixel intensity and create image palettes manually. "
@@ -129,6 +138,8 @@ reference:
       - image_binary
       - image_index
       - palettes
+      - dist_transform
+      - dist_transform
       - image_segment
       - image_segment_kmeans
       - image_segment_manual
@@ -136,6 +147,10 @@ reference:
       - image_to_mat
       - make_brush
       - make_mask
+      - otsu
+      - plot_index
+      - pixel_index
+      - watershed2
       - plot.image_index
 
 
@@ -169,11 +184,14 @@ reference:
       - utils_objects
       - object_split_shp
       - object_to_color
-      - tune_tolerance
       - plot.anal_obj
       - summary_index
       - utils_polygon
       - object_split
+      - object_edge
+      - object_label
+      - object_rgb
+      - pixel_index
 
 
   - title: "Symptomatic area"
@@ -189,12 +207,22 @@ reference:
     desc: "Miscellaneous Functions"
     contents:
       - separate_col
+      - custom_palette
       - utils_pca
       - utils_rows_cols
       - utils_stats
       - utils_wd
       - random_color
       - ggplot_color
+      - get_pliman_viewer
+      - set_pliman_viewer
+
+  - title: "Iterative visualization"
+    desc: "Tools to plot images and create polygons, points, and lines using mapview and mapedit packages."
+    contents:
+      - image_prepare_mv
+      - image_view
+      - pliman_viewer
 
 
 

@@ -39,7 +39,7 @@ make_brush <- function(size,
 #' arguments.  The size of the brush must be smaller or equal to the smaller
 #' dimension of `image`.
 #'
-#' @param image A `Image` object
+#' @param img A `Image` object
 #' @param brush An object created with `make_brush()`
 #' @param rel_pos_x,rel_pos_y A relative position to include the brush in the
 #'   image. Defaults to 0.5. This means that the brush will be centered in the
@@ -57,17 +57,17 @@ make_brush <- function(size,
 #'           brush = make_brush(size = 401, shape = "diamond"),
 #'           rel_pos_x = 0.1,
 #'           rel_pos_y = 0.8)
-make_mask <- function(image,
+make_mask <- function(img,
                       brush,
                       rel_pos_x = 0.5,
                       rel_pos_y = 0.5,
                       plot = TRUE){
-  min_dim <- min(dim(image)[1:2])
+  min_dim <- min(dim(img)[1:2])
   if(nrow(brush) > min_dim){
     stop("The size of the brush cannot be greater than the smaller dimension of `image` (", min_dim, ")", call. = FALSE)
   }
-  nrim <- nrow(image)
-  ncim <- ncol(image)
+  nrim <- nrow(img)
+  ncim <- ncol(img)
   nrbrush <- nrow(brush)
   # difference in number of rows
   difr <- nrim - nrbrush
@@ -115,7 +115,7 @@ make_mask <- function(image,
 #'                    rel_pos_x = 0,
 #'                    rel_pos_y = 0,
 #'                    type = "shadow")
-image_segment_mask <- function(image,
+image_segment_mask <- function(img,
                                size,
                                shape = "disc",
                                rel_pos_x = 0.5,
@@ -123,22 +123,22 @@ image_segment_mask <- function(image,
                                type = c("binary", "shadow"),
                                plot = TRUE,
                                ...){
-  mask <- make_mask(image,
+  mask <- make_mask(img,
                     brush = make_brush(size = size, shape = shape, ...),
                     rel_pos_x = rel_pos_x,
                     rel_pos_y = rel_pos_y,
                     plot = FALSE)
   ID <- which(mask == 0)
   if(type[[1]] == "binary"){
-    image@.Data[, , 1][ID] <- 1
-    image@.Data[, , 2][ID] <- 1
-    image@.Data[, , 3][ID] <- 1
+    img@.Data[, , 1][ID] <- 1
+    img@.Data[, , 2][ID] <- 1
+    img@.Data[, , 3][ID] <- 1
   } else{
-    image@.Data[, , 1][ID] <- 1
+    img@.Data[, , 1][ID] <- 1
   }
   if(isTRUE(plot)){
-    plot(image)
+    plot(img)
   }
-  return(image)
+  return(img)
 }
 

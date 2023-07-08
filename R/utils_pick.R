@@ -10,7 +10,7 @@
 #' from the image.
 #' * `pick_rgb()` Picks up the RGB values from selected point(s) in the image.
 #'
-#' @param image An `Image` object.
+#' @param img An `Image` object.
 #' @param n The number of points of the `pick_*` function. Defaults to `Inf`.
 #'   This means that picking will run until the user press Esc.
 #' @param r The radius of neighborhood pixels. Defaults to `1`.
@@ -37,7 +37,7 @@
 #' @param width,height The width and height of the generated palette. Defaults
 #'   to `100` for both, i.e., a square image of 100 x 100.
 #' @param verbose If `TRUE` (default) shows a counter in the console.
-#' @param plot Call a new `plot(image)` before processing? Defaults to `TRUE`.
+#' @param plot Call a new `plot(img)` before processing? Defaults to `TRUE`.
 #' @param palette Plot the generated palette? Defaults to `TRUE`.
 #' @return
 #' * `pick_count()` returns `data.frame` with the `x` and `y` coordinates of the
@@ -63,7 +63,7 @@
 #' # create a palette from point(s)
 #' pick_palette(img)
 #' }
-pick_count <- function(image,
+pick_count <- function(img,
                        n = Inf,
                        col = "red",
                        viewer = get_pliman_viewer(),
@@ -75,7 +75,7 @@ pick_count <- function(image,
   if (isTRUE(interactive())) {
     if(vieweropt == "base"){
       if (isTRUE(plot)) {
-        plot(image)
+        plot(img)
       }
       on.exit(return(length(x)))
       if(isTRUE(verbose)){
@@ -99,7 +99,7 @@ pick_count <- function(image,
         warning("Maximum number of count achieved. Please, increase the argument `n`.", call. = FALSE)
       }
     } else {
-      points <- mv_points(image, title = "Use the 'Draw Marker' tool to pick up points in the plot")
+      points <- mv_points(img, title = "Use the 'Draw Marker' tool to pick up points in the plot")
       return(nrow(points))
     }
   }
@@ -107,7 +107,7 @@ pick_count <- function(image,
 
 #' @name utils_pick
 #' @export
-pick_coords <- function(image,
+pick_coords <- function(img,
                         n = Inf,
                         col = "red",
                         viewer = get_pliman_viewer(),
@@ -118,7 +118,7 @@ pick_coords <- function(image,
   if (isTRUE(interactive())) {
     pixels <- NULL
     if(vieweropt == "base"){
-      plot(image)
+      plot(img)
       on.exit(return(data.frame(x = x, y = y)))
       if(isTRUE(verbose)){
         message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
@@ -140,7 +140,7 @@ pick_coords <- function(image,
         warning("Maximum number of count achieved. Please, increase the argument `n`.", call. = FALSE)
       }
     } else{
-      points <- mv_points(image, title = "Use the 'Draw Marker' tool to pick up points in the plot")
+      points <- mv_points(img, title = "Use the 'Draw Marker' tool to pick up points in the plot")
       return(points)
     }
   }
@@ -148,7 +148,7 @@ pick_coords <- function(image,
 
 #' @name utils_pick
 #' @export
-pick_rgb <- function(image,
+pick_rgb <- function(img,
                      n = Inf,
                      col = "red",
                      viewer = get_pliman_viewer(),
@@ -161,7 +161,7 @@ pick_rgb <- function(image,
     pixels <- NULL
     if(vieweropt == "base"){
       if (isTRUE(plot)) {
-        plot(image)
+        plot(img)
       }
       on.exit(return(pixels))
       if(isTRUE(verbose)){
@@ -177,7 +177,7 @@ pick_rgb <- function(image,
         }
         x <- d$x
         y <- d$y
-        pixels <- rbind(pixels, image@.Data[x, y, ])
+        pixels <- rbind(pixels, img@.Data[x, y, ])
         points(x, y, type = "p", col = col, cex = size, pch = 19)
         if(isTRUE(verbose)){
           cat("Number of objects:", i, "\r")
@@ -190,11 +190,11 @@ pick_rgb <- function(image,
         warning("Maximum number of count achieved. Please, increase the argument `n`.", call. = FALSE)
       }
     } else{
-      points <- mv_points(image, title = "Use the 'Draw Marker' tool to pick up points in the plot")
+      points <- mv_points(img, title = "Use the 'Draw Marker' tool to pick up points in the plot")
       pixels <-
         do.call(rbind,
                 lapply(1:nrow(points), function(i){
-                  image@.Data[points[i, 1], points[i, 2], ]
+                  img@.Data[points[i, 1], points[i, 2], ]
                 })) |>
         as.data.frame()
     }
@@ -207,7 +207,7 @@ pick_rgb <- function(image,
 
 #' @name utils_pick
 #' @export
-pick_palette <- function(image,
+pick_palette <- function(img,
                          n = Inf,
                          r = 1,
                          shape = "box",
@@ -229,7 +229,7 @@ pick_palette <- function(image,
     if(vieweropt == "base"){
 
       if (isTRUE(plot)) {
-        plot(image)
+        plot(img)
       }
       if(isTRUE(verbose)){
         message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
@@ -247,9 +247,9 @@ pick_palette <- function(image,
         yrmax <- trunc(d$y) + r
         sqr <- xrmax - xrmin + 1
         kern <- as.logical(EBImage::makeBrush(sqr, shape = shape))
-        R <- image@.Data[xrmin:xrmax, yrmin:yrmax, 1][kern]
-        G <- image@.Data[xrmin:xrmax, yrmin:yrmax, 2][kern]
-        B <- image@.Data[xrmin:xrmax, yrmin:yrmax, 3][kern]
+        R <- img@.Data[xrmin:xrmax, yrmin:yrmax, 1][kern]
+        G <- img@.Data[xrmin:xrmax, yrmin:yrmax, 2][kern]
+        B <- img@.Data[xrmin:xrmax, yrmin:yrmax, 3][kern]
         rect(xrmin, yrmin, xrmax, yrmax, border = col, lwd = size)
         bind <- rbind(bind, cbind(R, G, B))
         if(isTRUE(verbose)){
@@ -261,7 +261,7 @@ pick_palette <- function(image,
         stop("Process interrupted", call. = FALSE)
       }
     } else{
-      mvpoin <- mv_points(image, show = show, title = title, index = index)
+      mvpoin <- mv_points(img, show = show, title = title, index = index)
       bind <- NULL
       for (i in 1:nrow(mvpoin)) {
         xrmin <- trunc(mvpoin[, 1][i]) - r
@@ -270,9 +270,9 @@ pick_palette <- function(image,
         yrmax <- trunc(mvpoin[, 2][i]) + r
         sqr <- xrmax - xrmin + 1
         kern <- as.logical(EBImage::makeBrush(sqr, shape = shape))
-        R <- image@.Data[xrmin:xrmax, yrmin:yrmax, 1][kern]
-        G <- image@.Data[xrmin:xrmax, yrmin:yrmax, 2][kern]
-        B <- image@.Data[xrmin:xrmax, yrmin:yrmax, 3][kern]
+        R <- img@.Data[xrmin:xrmax, yrmin:yrmax, 1][kern]
+        G <- img@.Data[xrmin:xrmax, yrmin:yrmax, 2][kern]
+        B <- img@.Data[xrmin:xrmax, yrmin:yrmax, 3][kern]
         bind <- rbind(bind, cbind(R, G, B))
       }
     }

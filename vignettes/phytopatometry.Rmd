@@ -21,7 +21,6 @@ knitr::opts_chunk$set(
 
 # Getting started
 
-
 # Single images
 
 ```{r disease1, fig.width=12, fig.height=3}
@@ -39,11 +38,12 @@ image_combine(img, healthy, symptoms, background, ncol = 4)
 ```
 
 # Image palettes
-Sample palettes can be made by simply manually sampling small areas of representative images and producing a composite image that will represent each of the desired classes (background, healthy, and symptomatic tissues). Another way is to use the `image_palette()` function to create sample color palettes
+
+Sample palettes can be created by manually sampling small areas of representative images and producing a composite image that represents each of the desired classes (background, healthy, and symptomatic tissues). Another approach is to use the `image_palette()` function to generate sample color palettes.
 
 ```{r}
 pals <- image_palette(img, npal = 8)
-
+image_combine(pals$palette_list)
 # to extract the color palettes, use the object
 plot(pals$palette_list[[1]])
 ```
@@ -58,7 +58,7 @@ res <-
 res$severity
 ```
 
-Alternatively, users can create a mask instead of showing the original image.
+Alternatively, users can create a mask instead of displaying the original image.
 
 ```{r disease3, fig.width=10, fig.height=7}
 
@@ -78,9 +78,9 @@ res2 <-
 res2$severity
 ```
 
-
 # Variations in image palettes
-The results may vary depending on how palettes are chosen and are subjective due to the researcher’s experience. In the following example, I show a second example with a variation in the color palettes, where only the necrotic area is assumed to be the diseased tissue. Therefore, the symptomatic area will be smaller than the previous one.
+
+The results may vary depending on how the palettes are chosen and are subjective due to the researcher's experience. In the following example, I present a second variation in the color palettes, where only the necrotic area is assumed to be the diseased tissue. Therefore, the symptomatic area will be smaller than in the previous example.
 
 ```{r disease4, fig.width=10, fig.height=7}
 
@@ -98,7 +98,6 @@ res3 <-
 res3$severity
 ```
 
-
 # Lesion features
 
 ```{r fig.width=10, fig.height=7}
@@ -113,11 +112,24 @@ res4$shape
 res4$statistics
 ```
 
+# Interactive disease measurements
 
+An alternative approach to measuring disease percentage is available through the `measure_disease_iter()` function. This function offers an interactive interface that empowers users to manually select sample colors directly from the image. By doing so, it provides a highly customizable analysis method.
+
+One advantage of using `measure_disease_iter()` is the ability to utilize the "mapview" viewer, which enhances the analysis process by offering zoom-in options. This feature allows users to closely examine specific areas of the image, enabling detailed inspection and accurate disease measurement.
+
+```{r eval=FALSE}
+img <- image_pliman("sev_leaf.jpg", plot = TRUE)
+measure_disease_iter(img, viewer = "mapview")
+```
+
+![](gif_severity.gif)
 
 # <i class="fas fa-scroll"></i> A little bit more!
 
 <!-- inicio font awesome -->
-<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
 
+```{=html}
+<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
+```
 > At [this link](https://tiagoolivoto.github.io/paper_pliman/code.html) you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded [here](https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip). You can also find a talk (Portuguese language) about {pliman} [here](https://www.youtube.com/watch?v=ElvUVlPocgA). <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!

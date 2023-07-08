@@ -5,18 +5,20 @@ pick_count() opens an interactive section where the user will be able to
 click in the image to count objects (points) manually. In each mouse click, a
 point is drawn and an upward counter is shown in the console. After n
 counts or after the user press Esc, the interactive process is terminated and
-a data.frame with the x and y coordinates for each point is returned.
+the number of counts is returned.
+pick_coord() Picks coordinates from the image
 pick_palette()  creates an image palette by picking up color point(s)
 from the image.
 pick_rgb() Picks up the RGB values from selected point(s) in the image.
 
-"><title>Picking up points in an image — utils_pick • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Picking up points in an image — utils_pick"><meta property="og:description" content="
+"><title>Utilities for picking up points in an image — utils_pick • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utilities for picking up points in an image — utils_pick"><meta property="og:description" content="
 
 pick_count() opens an interactive section where the user will be able to
 click in the image to count objects (points) manually. In each mouse click, a
 point is drawn and an upward counter is shown in the console. After n
 counts or after the user press Esc, the interactive process is terminated and
-a data.frame with the x and y coordinates for each point is returned.
+the number of counts is returned.
+pick_coord() Picks coordinates from the image
 pick_palette()  creates an image palette by picking up color point(s)
 from the image.
 pick_rgb() Picks up the RGB values from selected point(s) in the image.
@@ -38,7 +40,7 @@ pick_rgb() Picks up the RGB values from selected point(s) in the image.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +120,7 @@ pick_rgb() Picks up the RGB values from selected point(s) in the image.
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.svg" class="logo" alt=""><h1>Picking up points in an image</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Utilities for picking up points in an image</h1>
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/R/utils_pick.R" class="external-link"><code>R/utils_pick.R</code></a></small>
       <div class="d-none name"><code>utils_pick.Rd</code></div>
     </div>
@@ -129,7 +131,8 @@ pick_rgb() Picks up the RGB values from selected point(s) in the image.
 click in the image to count objects (points) manually. In each mouse click, a
 point is drawn and an upward counter is shown in the console. After <code>n</code>
 counts or after the user press Esc, the interactive process is terminated and
-a data.frame with the <code>x</code> and <code>y</code> coordinates for each point is returned.</p></li>
+the number of counts is returned.</p></li>
+<li><p><code>pick_coord()</code> Picks coordinates from the image</p></li>
 <li><p><code>pick_palette()</code>  creates an image palette by picking up color point(s)
 from the image.</p></li>
 <li><p><code>pick_rgb()</code> Picks up the RGB values from selected point(s) in the image.</p></li>
@@ -138,21 +141,43 @@ from the image.</p></li>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">pick_count</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  n <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  size <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">pick_rgb</span><span class="op">(</span><span class="va">image</span>, n <span class="op">=</span> <span class="cn">Inf</span>, col <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">0.8</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">pick_coords</span><span class="op">(</span></span>
+<span>  <span class="va">img</span>,</span>
+<span>  n <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">pick_rgb</span><span class="op">(</span></span>
+<span>  <span class="va">img</span>,</span>
+<span>  n <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">pick_palette</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  n <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>  r <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  r <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  shape <span class="op">=</span> <span class="st">"box"</span>,</span>
+<span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  show <span class="op">=</span> <span class="st">"rgb"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Pick colors in the image"</span>,</span>
+<span>  index <span class="op">=</span> <span class="st">"B"</span>,</span>
 <span>  random <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -166,7 +191,7 @@ from the image.</p></li>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><p>An <code>Image</code> object.</p></dd>
 
 
@@ -179,8 +204,20 @@ This means that picking will run until the user press Esc.</p></dd>
 <dd><p>The color and size for the marker point.</p></dd>
 
 
+<dt>viewer</dt>
+<dd><p>The viewer option. If not provided, the value is retrieved
+using <code><a href="get_pliman_viewer.html">get_pliman_viewer()</a></code>. This option controls the type of viewer to use
+for interactive plotting. The available options are "base" and "mapview".
+If set to "base", the base R graphics system is used for interactive
+plotting. If set to "mapview", the mapview package is used. To set this
+argument globally for all functions in the package, you can use the
+<code><a href="set_pliman_viewer.html">set_pliman_viewer()</a></code> function. For example, you can run
+<code>set_pliman_viewer("mapview")</code> to set the viewer option to "mapview" for
+all functions.</p></dd>
+
+
 <dt>plot</dt>
-<dd><p>Call a new <code>plot(image)</code> before processing? Defaults to <code>TRUE</code>.</p></dd>
+<dd><p>Call a new <code>plot(img)</code> before processing? Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt>verbose</dt>
@@ -188,7 +225,7 @@ This means that picking will run until the user press Esc.</p></dd>
 
 
 <dt>r</dt>
-<dd><p>The radius of neighborhood pixels. Defaults to <code>3</code>.</p></dd>
+<dd><p>The radius of neighborhood pixels. Defaults to <code>1</code>.</p></dd>
 
 
 <dt>shape</dt>
@@ -198,6 +235,18 @@ selected pixel. It  can be <code>"box"</code>, <code>"disc"</code>, <code>"diamo
 surrounding pixels are sampled. Setting to <code>"disc"</code> and increasing the
 radius (<code>r</code>) will select surrounding pixels towards the format of a sphere
 around the selected pixel.</p></dd>
+
+
+<dt>show</dt>
+<dd><p>How to plot in mapview viewer, either <code>'rgb</code> or <code>'index'</code>.</p></dd>
+
+
+<dt>title</dt>
+<dd><p>The title of the map view when <code>viewer</code>is used.</p></dd>
+
+
+<dt>index</dt>
+<dd><p>The index to use for the index view. Defaults to 'B'.</p></dd>
 
 
 <dt>random</dt>

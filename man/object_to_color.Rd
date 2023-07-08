@@ -4,10 +4,10 @@
 \alias{object_to_color}
 \title{Apply color to image objects}
 \usage{
-object_to_color(image, index = "NB", color = "blue", plot = TRUE, ...)
+object_to_color(img, index = "NB", color = "blue", plot = TRUE, ...)
 }
 \arguments{
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to binary image. See the available indexes with

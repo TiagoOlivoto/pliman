@@ -18,7 +18,7 @@ batch processing."><meta property="og:image" content="https://tiagoolivoto.githu
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,24 +111,25 @@ batch processing.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_import</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  which <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  resize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">image_export</span><span class="op">(</span><span class="va">image</span>, <span class="va">name</span>, prefix <span class="op">=</span> <span class="st">""</span>, extension <span class="op">=</span> <span class="cn">NULL</span>, subfolder <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">image_export</span><span class="op">(</span><span class="va">img</span>, <span class="va">name</span>, prefix <span class="op">=</span> <span class="st">""</span>, extension <span class="op">=</span> <span class="cn">NULL</span>, subfolder <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">image_pliman</span><span class="op">(</span><span class="va">image</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">image_pliman</span><span class="op">(</span><span class="va">img</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><ul><li><p>For <code>image_import()</code>, a character vector of file names or URLs.</p></li>
 <li><p>For <code>image_export()</code>, an Image object, an array or a list of images.</p></li>
 <li><p>For <code>image_pliman()</code>, a charactere value specifying the image example. See
@@ -160,6 +161,12 @@ will be returned if the pattern matches any file that is not supported
 <dd><p>A character vector of full path names; the default corresponds to
 the working directory, <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>. It will overwrite (if given) the path
 informed in <code>image</code> argument.</p></dd>
+
+
+<dt>resize</dt>
+<dd><p>Resize the image after importation? Defaults to <code>FALSE</code>. Use a
+numeric value of range 0-100 (proportion of the size of the original
+image).</p></dd>
 
 
 <dt>plot</dt>
@@ -219,7 +226,7 @@ installed with the package is returned.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "C:/Users/tiago/AppData/Local/R/win-library/4.2/pliman/tmp_images"</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">full_path</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "sev_leaf.jpg"</span>
-<span class="r-in"><span><span class="fu">image_import</span><span class="op">(</span>image <span class="op">=</span> <span class="va">full_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">image_import</span><span class="op">(</span>img <span class="op">=</span> <span class="va">full_path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Image </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   colorMode    : Color </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   storage.mode : double </span>
@@ -234,7 +241,7 @@ installed with the package is returned.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.007843137 0.007843137 0.007843137 0.007843137 0.007843137 0.003921569</span>
-<span class="r-in"><span><span class="fu">image_import</span><span class="op">(</span>image <span class="op">=</span> <span class="va">file</span>, path <span class="op">=</span> <span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">image_import</span><span class="op">(</span>img <span class="op">=</span> <span class="va">file</span>, path <span class="op">=</span> <span class="va">path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Image </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   colorMode    : Color </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   storage.mode : double </span>

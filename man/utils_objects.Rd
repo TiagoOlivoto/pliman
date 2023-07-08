@@ -9,7 +9,7 @@
 \title{Utilities for working with image objects}
 \usage{
 object_coord(
-  image,
+  img,
   id = NULL,
   index = "NB",
   watershed = TRUE,
@@ -27,7 +27,7 @@ object_coord(
 )
 
 object_contour(
-  image,
+  img,
   pattern = NULL,
   dir_original = NULL,
   center = FALSE,
@@ -46,12 +46,12 @@ object_contour(
   verbose = TRUE
 )
 
-object_isolate(image, id = NULL, parallel = FALSE, workers = NULL, ...)
+object_isolate(img, id = NULL, parallel = FALSE, workers = NULL, ...)
 
-object_id(image, parallel = FALSE, workers = NULL, ...)
+object_id(img, parallel = FALSE, workers = NULL, ...)
 }
 \arguments{
-\item{image}{An image of class \code{Image} or a list of \code{Image} objects.}
+\item{img}{An image of class \code{Image} or a list of \code{Image} objects.}
 
 \item{id}{\itemize{
 \item For \code{object_coord()}, a vector (or scalar) of object \code{id} to compute the

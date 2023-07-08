@@ -3,20 +3,20 @@
 
 analyze_objects() provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
-more at Details section.
+more at the Details section.
 analyze_objects_iter() provides an iterative section to measure object
 features using an object with a known area.
-plot.anal_obj() Produces an histogram for the R, G, and B values when
+plot.anal_obj() produces a histogram for the R, G, and B values when
 argument object_index is used in the function analyze_objects().
 
 "><title>Analyzes objects in an image — analyze_objects • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Analyzes objects in an image — analyze_objects"><meta property="og:description" content="
 
 analyze_objects() provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
-more at Details section.
+more at the Details section.
 analyze_objects_iter() provides an iterative section to measure object
 features using an object with a known area.
-plot.anal_obj() Produces an histogram for the R, G, and B values when
+plot.anal_obj() produces a histogram for the R, G, and B values when
 argument object_index is used in the function analyze_objects().
 
 "><meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.svg"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -36,7 +36,7 @@ argument object_index is used in the function analyze_objects().
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,10 +125,10 @@ argument object_index is used in the function analyze_objects().
     
 <ul><li><p><code>analyze_objects()</code> provides tools for counting and extracting object
 features (e.g., area, perimeter, radius, pixel intensity) in an image. See
-more at <strong>Details</strong> section.</p></li>
+more at the <strong>Details</strong> section.</p></li>
 <li><p><code>analyze_objects_iter()</code> provides an iterative section to measure object
 features using an object with a known area.</p></li>
-<li><p><code>plot.anal_obj()</code> Produces an histogram for the R, G, and B values when
+<li><p><code>plot.anal_obj()</code> produces a histogram for the R, G, and B values when
 argument <code>object_index</code> is used in the function <code>analyze_objects()</code>.</p></li>
 </ul></div>
 
@@ -138,6 +138,7 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  <span class="va">img</span>,</span>
 <span>  foreground <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pick_palettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  reference <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  reference_area <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  back_fore_index <span class="op">=</span> <span class="st">"R/(G/B)"</span>,</span>
@@ -148,9 +149,16 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  watershed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  veins <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sigma_veins <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ab_angles <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ab_angles_percentiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
+<span>  haralick <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  har_nbins <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  har_scales <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  har_band <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  pcv <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  pcv_niter <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  resize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  trim <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  fill_hull <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -159,11 +167,16 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  object_size <span class="op">=</span> <span class="st">"medium"</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"NB"</span>,</span>
 <span>  object_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pixel_level_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  return_mask <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  efourier <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  nharm <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  threshold <span class="op">=</span> <span class="st">"Otsu"</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  windowsize <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extension <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lower_noise <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  lower_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  upper_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  topn_lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -174,12 +187,13 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  upper_circ <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  randomize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  nrows <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  show_image <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_original <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_chull <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_contour <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  contour_col <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>  contour_size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  show_lw <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_background <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_segmentation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  col_foreground <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -199,8 +213,7 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  <span class="va">x</span>,</span>
 <span>  which <span class="op">=</span> <span class="st">"measure"</span>,</span>
 <span>  measure <span class="op">=</span> <span class="st">"area"</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"density"</span>,</span>
-<span>  facet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"density"</span>, <span class="st">"histogram"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -214,10 +227,16 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 
 
 <dt>foreground, background</dt>
-<dd><p>A color palette for the foregrond and
-background, respectively (optional). If a chacarceter is used (eg.,
-<code>foreground = "fore"</code>), the function will search in the current working
-directory a valid image that contains "fore" in the name.</p></dd>
+<dd><p>A color palette for the foregrond and background,
+respectively (optional). If a chacarceter is used (eg., <code>foreground = "fore"</code>), the function will search in the current working directory a valid
+image named "fore".</p></dd>
+
+
+<dt>pick_palettes</dt>
+<dd><p>Logical argument indicating wheater the user needs to
+pick up the color palettes for foreground and background for the image. If
+<code>TRUE</code> <code><a href="utils_pick.html">pick_palette()</a></code> will be called internally so that the user can sample
+color points representing foreground and background.</p></dd>
 
 
 <dt>reference</dt>
@@ -227,55 +246,55 @@ standard resolution (e.g., field images). See more in the details section.</p></
 
 
 <dt>reference_area</dt>
-<dd><p>The known area of the reference objects. The measures
-of all the objects in the image will be corrected using the same unit of
-the area informed here.</p></dd>
+<dd><p>The known area of the reference objects. The measures of
+all the objects in the image will be corrected using the same unit of the
+area informed here.</p></dd>
 
 
 <dt>back_fore_index</dt>
 <dd><p>A character value to indicate the index to segment the
 foreground (objects and reference) from the background. Defaults to
-<code>"R/(G/B)"</code>. This index is optimized to segment white backgrounds from
-green leaves and a blue reference object.</p></dd>
+<code>"R/(G/B)"</code>. This index is optimized to segment white backgrounds from green
+leaves and a blue reference object.</p></dd>
 
 
 <dt>fore_ref_index</dt>
 <dd><p>A character value to indicate the index to segment
 objects and the reference object. It can be either an available index in
-<code>pliman</code> (see <code><a href="utils_file.html">pliman_indexes()</a></code> or an own index computed with the R, G,
-and B bands. Defaults to <code>"B-R"</code>. This index is optimized to segment green
+<code>pliman</code> (see <code><a href="utils_file.html">pliman_indexes()</a></code> or an own index computed with the R, G, and
+B bands. Defaults to <code>"B-R"</code>. This index is optimized to segment green
 leaves from a blue reference object after a white background has been
 removed.</p></dd>
 
 
 <dt>reference_larger, reference_smaller</dt>
-<dd><p>Logical argument indicating when
-the larger/smaller object in the image must be used as the reference
-object. This only is valid when <code>reference</code> is set to <code>TRUE</code> and
-<code>reference_area</code> indicates the area of the reference object. IMPORTANT.
-When <code>reference_smaller</code> is used, objects with an area smaller than 1% of
-the mean of all the objects are ignored. This is used to remove possible
-noise in the image such as dust. So, be sure the reference object has an
-area that will be not removed by that cutpoint.</p></dd>
+<dd><p>Logical argument indicating when the
+larger/smaller object in the image must be used as the reference object.
+This only is valid when <code>reference</code> is set to <code>TRUE</code> and <code>reference_area</code>
+indicates the area of the reference object. IMPORTANT. When
+<code>reference_smaller</code> is used, objects with an area smaller than 1% of the
+mean of all the objects are ignored. This is used to remove possible noise
+in the image such as dust. So, be sure the reference object has an area that
+will be not removed by that cutpoint.</p></dd>
 
 
 <dt>pattern</dt>
 <dd><p>A pattern of file name used to identify images to be imported.
-For example, if <code>pattern = "im"</code> all images in the current working
-directory that the name matches the pattern (e.g., img1.-, image1.-, im2.-)
-will be imported as a list. Providing any number as pattern (e.g., <code>pattern = "1"</code>) will select images that are named as 1.-, 2.-, and so on. An error
-will be returned if the pattern matches any file that is not supported
-(e.g., img1.pdf).</p></dd>
+For example, if <code>pattern = "im"</code> all images in the current working directory
+that the name matches the pattern (e.g., img1.-, image1.-, im2.-) will be
+imported as a list. Providing any number as pattern (e.g., <code>pattern = "1"</code>)
+will select images that are named as 1.-, 2.-, and so on. An error will be
+returned if the pattern matches any file that is not supported (e.g.,
+img1.pdf).</p></dd>
 
 
 <dt>parallel</dt>
-<dd><p>If <code>TRUE</code> processes the images asynchronously (in parallel)
-in separate R sessions running in the background on the same machine. It
-may speed up the processing time, especially when <code>pattern</code> is used is
-informed. When <code>object_index</code> is informed, multiple sections will be used
-to extract the RGB values for each object in the image. This may
-significantly speed up processing time when an image has lots of objects
-(say &gt;1000).</p></dd>
+<dd><p>If <code>TRUE</code> processes the images asynchronously (in parallel) in
+separate R sessions running in the background on the same machine. It may
+speed up the processing time, especially when <code>pattern</code> is used is informed.
+When <code>object_index</code> is informed, multiple sections will be used to extract
+the RGB values for each object in the image. This may significantly speed up
+processing time when an image has lots of objects (say &gt;1000).</p></dd>
 
 
 <dt>workers</dt>
@@ -292,9 +311,42 @@ to a unique object. This is faster but is not able to segment touching
 objects.</p></dd>
 
 
+<dt>veins</dt>
+<dd><p>Logical argument indicating whether vein features are computed.
+This will call <code><a href="object_edge.html">object_edge()</a></code> and applies the Sobel-Feldman Operator to
+detect edges. The result is the proportion of edges in relation to the
+entire area of the object(s) in the image. Note that <strong>THIS WILL BE AN
+OPERATION ON AN IMAGE LEVEL, NOT OBJECT!</strong>.</p></dd>
+
+
+<dt>sigma_veins</dt>
+<dd><p>Gaussian kernel standard deviation used in the gaussian
+blur in the edge detection algorithm</p></dd>
+
+
+<dt>ab_angles</dt>
+<dd><p>Logical argument indicating whether apex and base angles
+should be computed. Defaults to <code>FALSE</code>. If <code>TRUE</code>, <code><a href="poly_apex_base_angle.html">poly_apex_base_angle()</a></code>
+are called and the base and apex angles are computed considering the 25th
+and 75th percentiles of the object height. These percentiles can be changed
+with the argument <code>ab_angles_percentiles</code>.</p></dd>
+
+
+<dt>ab_angles_percentiles</dt>
+<dd><p>The percentiles indicating the heights of the
+object for which the angle should be computed (from the apex and the
+bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
+75th percentiles of the object height.</p></dd>
+
+
+<dt>haralick</dt>
+<dd><p>Logical value indicating whether Haralick features are
+computed. Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt>har_nbins</dt>
-<dd><p>An integer indicating the number of bins using to compute
-the Haralick matrix. Defaults to 32. See Details</p></dd>
+<dd><p>An integer indicating the number of bins using to compute the
+Haralick matrix. Defaults to 32. See Details</p></dd>
 
 
 <dt>har_scales</dt>
@@ -307,10 +359,18 @@ compute the Haralick features. See Details.</p></dd>
 B). Defaults to 1.</p></dd>
 
 
+<dt>pcv</dt>
+<dd><p>Computes the Perimeter Complexity Value? Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt>pcv_niter</dt>
+<dd><p>An integer specifying the number of smoothing iterations for
+computing the  Perimeter Complexity Value. Defaults to 100.</p></dd>
+
+
 <dt>resize</dt>
 <dd><p>Resize the image before processing? Defaults to <code>FALSE</code>. Use a
-numeric value of range 0-100 (proportion of the size of the original
-image).</p></dd>
+numeric value of range 0-100 (proportion of the size of the original image).</p></dd>
 
 
 <dt>trim</dt>
@@ -331,8 +391,8 @@ image.</p></dd>
 <dt>filter</dt>
 <dd><p>Performs median filtering in the binary image? See more at
 <code><a href="utils_transform.html">image_filter()</a></code>. Defaults to <code>FALSE</code>. Use a positive integer to define the
-size of the median filtering. Larger values are effective at removing
-noise, but adversely affect edges.</p></dd>
+size of the median filtering. Larger values are effective at removing noise,
+but adversely affect edges.</p></dd>
 
 
 <dt>invert</dt>
@@ -340,17 +400,17 @@ noise, but adversely affect edges.</p></dd>
 images with a black background. Defaults to <code>FALSE</code>. If <code>reference = TRUE</code>
 is use, <code>invert</code> can be declared as a logical vector of length 2 (eg.,
 <code>invert = c(FALSE, TRUE</code>). In this case, the segmentation of objects and
-reference from the foreground using <code>back_fore_index</code> is performed using
-the default (not inverted), and the segmentation of objects from the
-reference is performed by inverting the selection (selecting pixels higher
-than the threshold).</p></dd>
+reference from the foreground using <code>back_fore_index</code> is performed using the
+default (not inverted), and the segmentation of objects from the reference
+is performed by inverting the selection (selecting pixels higher than the
+threshold).</p></dd>
 
 
 <dt>object_size</dt>
 <dd><p>The size of the object. Used to automatically set up
 <code>tolerance</code> and <code>extension</code> parameters. One of the following. <code>"small"</code>
-(e.g, wheat grains), <code>"medium"</code> (e.g, soybean grains), <code>"large"</code>(e.g,
-peanut grains), and <code>"elarge"</code> (e.g, soybean pods)`.</p></dd>
+(e.g, wheat grains), <code>"medium"</code> (e.g, soybean grains), <code>"large"</code>(e.g, peanut
+grains), and <code>"elarge"</code> (e.g, soybean pods)`.</p></dd>
 
 
 <dt>index</dt>
@@ -368,24 +428,49 @@ will return for each object in the image, the average value of the R/B
 ratio. Use <code><a href="utils_file.html">pliman_indexes_eq()</a></code> to see the equations of available indexes.</p></dd>
 
 
+<dt>pixel_level_index</dt>
+<dd><p>Return the indexes computed in <code>object_index</code> in the
+pixel level? Defaults to <code>FALSE</code> to avoid returning large data.frames.</p></dd>
+
+
+<dt>return_mask</dt>
+<dd><p>Returns the mask for the analyzed image? Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt>efourier</dt>
 <dd><p>Logical argument indicating if Elliptical Fourier should be
 computed for each object. This will call <code><a href="efourier.html">efourier()</a></code> internally. It
-<code>efourier = TRUE</code> is used, both standard and normalized Fourier
-coefficients are returned.</p></dd>
+<code>efourier = TRUE</code> is used, both standard and normalized Fourier coefficients
+are returned.</p></dd>
 
 
 <dt>nharm</dt>
-<dd><p>An integer indicating the number of harmonics to use. Defaults
-to 10. For more details see <code><a href="efourier.html">efourier()</a></code>.</p></dd>
+<dd><p>An integer indicating the number of harmonics to use. Defaults to
+10. For more details see <code><a href="efourier.html">efourier()</a></code>.</p></dd>
 
 
 <dt>threshold</dt>
-<dd><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.</p></dd>
+<dd><p>The theshold method to be used.</p><ul><li><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.</p></li>
+<li><p>If <code>threshold = "adaptive"</code>, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the <code>k</code> and <code>windowsize</code> arguments.</p></li>
+<li><p>If any non-numeric value different than <code>"Otsu"</code> and <code>"adaptive"</code> is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.</p></li>
+</ul></dd>
+
+
+<dt>k</dt>
+<dd><p>a numeric in the range 0-1. when <code>k</code> is high, local threshold
+values tend to be lower. when <code>k</code> is low, local threshold value tend to be
+higher.</p></dd>
+
+
+<dt>windowsize</dt>
+<dd><p>windowsize controls the number of local neighborhood in
+adaptive thresholding. By default it is set to <code>1/3 * minxy</code>, where
+<code>minxy</code> is the minimum dimension of the image (in pixels).</p></dd>
 
 
 <dt>tolerance</dt>
@@ -401,16 +486,23 @@ which is the highest.</p></dd>
 neighboring objects. Higher value smooths out small objects.</p></dd>
 
 
+<dt>lower_noise</dt>
+<dd><p>To prevent noise from affecting the image analysis, objects
+with lesser than 10% of the mean area of all objects are removed
+(<code>lower_noise = 0.1</code>). Increasing this value will remove larger noises (such
+as dust points), but can remove desired objects too. To define an explicit
+lower or upper size, use the <code>lower_size</code> and <code>upper_size</code> arguments.</p></dd>
+
+
 <dt>lower_size, upper_size</dt>
 <dd><p>Lower and upper limits for size for the image
-analysis. Plant images often contain dirt and dust. To prevent dust from
-affecting the image analysis, objects with lesser than 10% of the mean of
-all objects are removed. Upper limit is set to <code>NULL</code>, i.e., no upper
-limit used. One can set a known area or use <code>lower_limit = 0</code> to select all
-objects (not advised). Objects that matches the size of a given range of
-sizes can be selected by setting up the two arguments. For example, if
-<code>lower_size = 120</code> and <code>upper_size = 140</code>, objects with size greater than
-or equal 120 and less than or equal 140 will be considered.</p></dd>
+analysis. Plant images often contain dirt and dust.  Upper limit is set to
+<code>NULL</code>, i.e., no upper limit used. One can set a known area or use
+<code>lower_limit = 0</code> to select all objects (not advised). Objects that matches
+the size of a given range of sizes can be selected by setting up the two
+arguments. For example, if <code>lower_size = 120</code> and <code>upper_size = 140</code>,
+objects with size greater than or equal 120 and less than or equal 140 will
+be considered.</p></dd>
 
 
 <dt>topn_lower, topn_upper</dt>
@@ -436,7 +528,7 @@ to <code>NULL</code> (i.e., no lower and upper limits).</p></dd>
 2000.</p></dd>
 
 
-<dt>show_image</dt>
+<dt>plot</dt>
 <dd><p>Show image after processing?</p></dd>
 
 
@@ -450,13 +542,18 @@ to <code>NULL</code> (i.e., no lower and upper limits).</p></dd>
 
 
 <dt>show_contour</dt>
-<dd><p>Show a contour line around the objects? Defaults
-to <code>TRUE</code>.</p></dd>
+<dd><p>Show a contour line around the objects? Defaults to
+<code>TRUE</code>.</p></dd>
 
 
 <dt>contour_col, contour_size</dt>
-<dd><p>The color and size for the contour line
-around objects. Defaults to <code>contour_col = "red"</code> and <code>contour_size = 1</code>.</p></dd>
+<dd><p>The color and size for the contour line around
+objects. Defaults to <code>contour_col = "red"</code> and <code>contour_size = 1</code>.</p></dd>
+
+
+<dt>show_lw</dt>
+<dd><p>If <code>TRUE</code>, plots the length and width lines on each object
+calling <code><a href="plot_lw.html">plot_lw()</a></code>.</p></dd>
 
 
 <dt>show_background</dt>
@@ -494,12 +591,11 @@ given in <code>img</code>.</p></dd>
 
 <dt>dir_original, dir_processed</dt>
 <dd><p>The directory containing the original and
-processed images. Defaults to <code>NULL</code>. In this case, the function will
-search for the image <code>img</code> in the current working directory. After
-processing, when <code>save_image = TRUE</code>, the processed image will be also
-saved in such a directory. It can be either a full path, e.g.,
-<code>"C:/Desktop/imgs"</code>, or a subfolder within the current working directory,
-e.g., <code>"/imgs"</code>.</p></dd>
+processed images. Defaults to <code>NULL</code>. In this case, the function will search
+for the image <code>img</code> in the current working directory. After processing, when
+<code>save_image = TRUE</code>, the processed image will be also saved in such a
+directory. It can be either a full path, e.g., <code>"C:/Desktop/imgs"</code>, or a
+subfolder within the current working directory, e.g., <code>"/imgs"</code>.</p></dd>
 
 
 <dt>verbose</dt>
@@ -524,16 +620,9 @@ e.g., <code>"/imgs"</code>.</p></dd>
 are recognized.</p></dd>
 
 
-<dt>facet</dt>
-<dd><p>Create a facet plot for each object when <code>which = "index"</code> is
-used?. Defaults to <code>FALSE</code>.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Depends on the function:</p><ul><li><p>For <code>analyze_objects_iter()</code>, further arguments passed on to
 <code>analyze_objects()</code>.</p></li>
-<li><p>For <code>plot.anal_obj()</code>, further argument passed on to <code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::histogram()</a></code>
-or <code><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">lattice::densityplot()</a></code></p></li>
 </ul></dd>
 
 
@@ -558,8 +647,8 @@ maximum radius (in pixels), respectively.</p></li>
 maximum diameter (in pixels), respectively.</p></li>
 <li><p><code>major_axis</code>, <code>minor_axis</code>: elliptical fit for major and minor axes (in
 pixels).</p></li>
-<li><p><code>calliper</code>: The longest distance between any two points on the margin
-of the object. See <code>poly_calliper()</code> for more details</p></li>
+<li><p><code>caliper</code>: The longest distance between any two points on the margin
+of the object. See <code><a href="utils_polygon.html">poly_caliper()</a></code> for more details</p></li>
 <li><p><code>length</code>, <code>width</code> The length and width of objects (in pixels). These
 measures are obtained as the range of x and y coordinates after aligning
 each object with <code><a href="utils_polygon.html">poly_align()</a></code>.</p></li>
@@ -570,12 +659,12 @@ ratio of the eigen values (inertia axes of coordinates).</p></li>
 <li><p><code>form_factor</code> (Wu et al., 2007):  the difference between a leaf and a
 circle. It is defined as <code>4*pi*A/P</code>, where A is the area and P is the
 perimeter of the object.</p></li>
-<li><p><code>narrow_factor</code> (Wu et al., 2007): Narrow factor (<code>calliper / length</code>).</p></li>
+<li><p><code>narrow_factor</code> (Wu et al., 2007): Narrow factor (<code>caliper / length</code>).</p></li>
 <li><p><code>asp_ratio</code> (Wu et al., 2007): Aspect ratio (<code>length / width</code>).</p></li>
 <li><p><code>rectangularity</code> (Wu et al., 2007): The similarity between a leaf and
 a rectangle (<code>length * width/ area</code>).</p></li>
 <li><p><code>pd_ratio</code> (Wu et al., 2007): Ratio of perimeter to diameter
-(<code>perimeter / calliper</code>)</p></li>
+(<code>perimeter / caliper</code>)</p></li>
 <li><p><code>plw_ratio</code> (Wu et al., 2007): Perimeter ratio of length and width
 (<code>perimeter / (length + width)</code>)</p></li>
 <li><p><code>solidity</code>: object solidity given by <code>area / area_ch</code>.</p></li>
@@ -587,7 +676,7 @@ between the perimeter of the convex hull and the perimeter of the polygon.</p></
 <code>CH =  m/sd</code>, where <code>m</code> and <code>sd</code> are the mean and standard deviations
 from each pixels of the perimeter to the centroid of the object.</p></li>
 <li><p><code>circularity_norm</code>: The normalized circularity (Cn), to be unity for a
-circle. This measure is computed as `Cn = perimeter ^ 2 / 4<em>pi</em>area`` and
+circle. This measure is computed as <code>Cn = perimeter ^ 2 / 4*pi*area</code> and
 is invariant under translation, rotation, scaling transformations, and
 dimensionless.</p></li>
 <li><p><code>asm</code>: The angular second-moment feature.</p></li>
@@ -608,7 +697,7 @@ homogeneity.</p></li>
 <li><p><code>statistics</code>: A data frame with the summary statistics for the area of the
 objects.</p></li>
 <li><p><code>count</code>: If <code>pattern</code> is used, shows the number of objects in each image.</p></li>
-<li><p><code>object_rgb</code>: If <code>object_index</code> is used, returns the R, G, and B values
+<li><p><code>obj_rgb</code>: If <code>object_index</code> is used, returns the R, G, and B values
 for each pixel of each object.</p></li>
 <li><p><code>object_index</code>: If <code>object_index</code> is used, returns the index computed for
 each object.</p></li>
@@ -622,6 +711,8 @@ outline. For more details see <code><a href="efourier_error.html">efourier_error
 <li><p><code>efourier_power</code>: The spectrum of harmonic Fourier power.
 For more details see <code><a href="efourier_power.html">efourier_power()</a></code>.</p></li>
 </ul></li>
+<li><p><code>veins</code>: If <code>veins = TRUE</code> is used, returns, for each image, the
+proportion of veins (in fact the object edges) related to the total object(s)' area.</p></li>
 <li><p><code>analyze_objects_iter()</code> returns a data.frame containing the features
 described in the <code>results</code> object of <code>analyze_objects()</code>.</p></li>
 <li><p><code>plot.anal_obj()</code> returns a <code>trellis</code> object containing the distribution
@@ -629,57 +720,97 @@ of the pixels, optionally  for each object when <code>facet = TRUE</code> is use
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>A binary image is first generated to segment the foreground and background.
-The argument <code>index</code> is useful to choose a proper index to segment the image
-(see <code><a href="image_binary.html">image_binary()</a></code> for more details). Then, the number of objects in the
-foreground is counted. By setting up arguments such as <code>lower_size</code>,
-<code>upper_size</code> it is possible to set a threshold for lower and upper sizes of
-the objects, respectively. The argument <code>object_size</code> can be used to set up
-pre-defined values of <code>tolerance</code> and <code>extension</code> depending on the image
-resolution. This will influence the watershed-based object segmentation. Users
-can also tune-up <code>tolerance</code> and <code>extension</code> explicitly to a better precision
-of watershed segmentation.</p>
+    <p>A binary image is first generated to segment the foreground and
+background. The argument <code>index</code> is useful to choose a proper index to
+segment the image (see <code><a href="image_binary.html">image_binary()</a></code> for more details). It is also
+possible to provide color palettes for background and foreground (arguments
+<code>background</code> and <code>foreground</code>, respectively). When this is used, a general
+linear model (binomial family) fitted to the RGB values to segment fore- and
+background.</p>
+<p>Then, the number of objects in the  foreground is counted. By setting up
+arguments such as <code>lower_size</code> and <code>upper_size</code>, it is possible to set a
+threshold for lower and upper sizes of the objects, respectively. The
+argument <code>object_size</code> can be used to set up pre-defined values of
+<code>tolerance</code> and <code>extension</code> depending on the image resolution. This will
+influence the watershed-based object segmentation. Users can also tune up
+<code>tolerance</code> and <code>extension</code> explicitly for a better precision of watershed
+segmentation.</p>
 <p>If <code>watershed = FALSE</code> is used, all pixels for each connected set of
-foreground pixels in <code>img</code> are set to a unique object. This is faster
-(specially for a large number of objects) but is not able to segment touching
-objects.</p>
-<p>If color palettes are provided, a general linear model (binomial family)
-fitted to the RGB values is used to segment fore- and background. If a color
-palette for a <code>reference</code> object with a known area (<code>reference_area</code>) is
-informed. The measures of the objects in the image will be corrected
-considering the unit of measure informed in <code>reference_area</code>. Sample palettes
-can be produced with <code><a href="palettes.html">image_palette()</a></code>.</p>
-<p>By using <code>pattern</code> it is possible to process several images with common
+foreground pixels in <code>img</code> are set to a unique object. This is faster,
+especially for a large number of objects, but it is not able to segment
+touching objects.</p>
+<p>There are some ways to correct the measures based on a reference object. If
+a reference object with a known area (<code>reference_area</code>) is used in the image
+and <code>reference = TRUE</code> is used, the measures of the objects will be
+corrected, considering the unit of measure informed in <code>reference_area</code>.
+There are two main ways to work with reference objects.</p><ul><li><p>The first, is to provide a reference object that has a contrasting color with
+both the background and object of interest. In this case, the arguments
+<code>back_fore_index</code> and <code>fore_ref_index</code> can be used to define an index to
+first segment the reference object and objects to be measured from the
+background, then the reference object from objects to be measured.</p></li>
+<li><p>The second one is to use a reference object that has a similar color to the
+objects to be measured, but has a contrasting size. For example, if we are
+counting small brown grains, we can use a brown reference template that has
+an area larger (says 3 times the area of the grains) and then uses
+<code>reference_larger = TRUE</code>. With this, the larger object in the image will be
+used as the reference object. This is particularly useful when images are
+captured with background light, such as the example  2. Some types: (i) It
+is suggested that the reference object is not too much larger than the
+objects of interest (mainly when the <code>watershed = TRUE</code>). In some cases, the
+reference object can be broken into several pieces due to the watershed
+algorithm. (ii) Since the reference object will increase the mean area of
+the object, the argument <code>lower_noise</code> can be increased. By default
+(<code>lower_noise = 0.1</code>) objects with lesser than 10% of the mean area of all
+objects are removed. Since the mean area will be increased, increasing
+<code>lower_noise</code> will remove dust and noises more reliably. The argument
+<code>reference_smaller</code> can be used in the same way</p></li>
+</ul><p>By using <code>pattern</code>, it is possible to process several images with common
 pattern names that are stored in the current working directory or in the
-subdirectory informed in <code>dir_original</code>'. To speed up the computation time,
+subdirectory informed in <code>dir_original</code>. To speed up the computation time,
 one can set <code>parallel = TRUE</code>.</p>
 <p><code>analyze_objects_iter()</code> can be used to process several images using an
 object with a known area as a template. In this case, all the images in the
-current working directory that matches the <code>pattern</code> will be processed. For
+current working directory that match the <code>pattern</code> will be processed. For
 each image, the function will compute the features for the objects and show
 the identification (id) of each object. The user only needs to inform which
-is the id of the known object. Then, given the <code>known_area</code>, all the measures
-will be adjusted. In the end, a data.frame with the adjusted measures will be
-returned. This is useful when the images are taken at different heights. In
-such cases, the image resolution cannot be conserved. Consequently, the
-measures cannot be adjusted using the argument <code>dpi</code> from <code><a href="utils_measures.html">get_measures()</a></code>,
-since each image will have a different resolution. NOTE: This will only work
-in an interactive section.</p>
-<p>The function computes 13 Haralick texture features for each object based on a
-gray-level co-occurrence matrix (Haralick et al. 1979). Haralick features
-depend on the configuration of the parameters  <code>har_nbins</code> and <code>har_scales</code>.
-<code>har_nbins</code> controls the number of bins used to compute the Haralick matrix.
-A smaller <code>har_nbins</code> can give more accurate estimates of the correlation
-because the number of events per bin is higher. While a higher value will
-give more sensitivity. <code>har_scales</code> controls the number of scales used to
-compute the Haralick features. Since Haralick features compute the
-correlation of intensities of neighboring pixels it is possible to identify
-textures with different scales, e.g., a texture that is repeated every two
-pixels or 10 pixels. By default, the Haralick features are computed with the
-R band. To chance this default, use the argument <code>har_band</code>. For example,
-<code>har_band = 2</code> will compute the features with the green band.</p>
-<p>If <code>efourier = TRUE</code> is used, an Elliptical Fourier Analysis (Kuhl and Giardina, 1982) is computed for each object contour. should be</p>
-    </div>
+is the id of the known object. Then, given the <code>known_area</code>, all the
+measures will be adjusted. In the end, a data.frame with the adjusted
+measures will be returned. This is useful when the images are taken at
+different heights. In such cases, the image resolution cannot be conserved.
+Consequently, the measures cannot be adjusted using the argument <code>dpi</code> from
+<code><a href="utils_measures.html">get_measures()</a></code>, since each image will have a different resolution. NOTE:
+This will only work in an interactive section.</p><ul><li><p>Additional measures: By default, some measures are not computed, mainly due to
+computational efficiency when the user only needs simple measures such as
+area, length, and width.</p><ul><li><p>If <code>haralick = TRUE</code>, The function computes 13 Haralick texture features for
+each object based on a gray-level co-occurrence matrix (Haralick et al.
+1979). Haralick features depend on the configuration of the parameters
+<code>har_nbins</code> and <code>har_scales</code>. <code>har_nbins</code> controls the number of bins used
+to compute the Haralick matrix. A smaller <code>har_nbins</code> can give more accurate
+estimates of the correlation because the number of events per bin is higher.
+While a higher value will give more sensitivity. <code>har_scales</code> controls the
+number of scales used to compute the Haralick features. Since Haralick
+features compute the correlation of intensities of neighboring pixels it is
+possible to identify textures with different scales, e.g., a texture that is
+repeated every two pixels or 10 pixels. By default, the Haralick features
+are computed with the R band. To chance this default, use the argument
+<code>har_band</code>. For example, <code>har_band = 2</code> will compute the features with the
+green band.</p></li>
+<li><p>If <code>efourier = TRUE</code> is used, an Elliptical Fourier Analysis (Kuhl and
+Giardina, 1982) is computed for each object contour using <code><a href="efourier.html">efourier()</a></code>.</p></li>
+<li><p>If <code>veins = TRUE</code> (experimental), vein features are computed. This will call
+<code><a href="object_edge.html">object_edge()</a></code> and applies the Sobel-Feldman Operator to detect edges. The
+result is the proportion of edges in relation to the entire area of the
+object(s) in the image. Note that THIS WILL BE AN OPERATION ON AN IMAGE
+LEVEL, NOT an OBJECT LEVEL! So, If vein features need to be computed for
+leaves, it is strongly suggested to use one leaf per image.</p></li>
+<li><p>If <code>ab_angles = TRUE</code> the apex and base angles of each object are
+computed with <code><a href="poly_apex_base_angle.html">poly_apex_base_angle()</a></code>. By default, the function computes
+the angle from the first pixel of the apex of the object to the two pixels
+that slice the object at the 25th percentile of the object height (apex
+angle). The base angle is computed in the same way but from the first base
+pixel.</p></li>
+</ul></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Claude, J. (2008) <em>Morphometrics with R</em>, Use R! series,
@@ -721,75 +852,70 @@ Processing and Information Technology, 11–16.
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu">analyze_objects</span><span class="op">(</span><span class="va">img</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="analyze_objects-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">obj</span><span class="op">$</span><span class="va">statistics</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        stat      value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         n    30.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  min_area  1368.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 mean_area  2056.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  max_area  2443.0000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   sd_area   230.0232</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  sum_area 61680.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        stat        value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         n 3.000000e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  min_area 1.366000e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 mean_area 2.051300e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  max_area 2.436000e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   sd_area 2.300703e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  sum_area 6.153900e+04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  coverage 1.151122e-01</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">########################### Example 1 #########################</span></span></span>
 <span class="r-in"><span><span class="co"># Enumerate the objects in the original image</span></span></span>
 <span class="r-in"><span><span class="co"># Return the top-5 grains with the largest area</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">top</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span> <span class="fu">analyze_objects</span><span class="op">(</span><span class="va">img</span>,</span></span>
 <span class="r-in"><span>                 marker <span class="op">=</span> <span class="st">"id"</span>,</span></span>
 <span class="r-in"><span>                 topn_upper <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="analyze_objects-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">top</span><span class="op">$</span><span class="va">results</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id        x         y area area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4 345.3348 105.75686 2443    2413  185.6102    27.49088   24.33975</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 10 469.0151  56.45596 2316    2283  181.6102    26.80966   23.15986</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3 237.6504 339.80874 2311    2289  181.0244    26.69892   23.99281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   6 406.9631  77.42188 2304    2268  178.7817    26.62267   24.07772</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 538.0387 401.85037 2299    2270  178.1960    26.60974   24.95488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    30.53159 1.7565552  54.98177 48.67950 61.06318   60.93242   51.06310</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   31.18773 2.3381509  53.61931 46.31972 62.37547   61.18631   48.21792</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    29.43448 1.2403149  53.39784 47.98561 58.86897   57.49117   51.25223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    30.03551 1.6644721  53.24535 48.15544 60.07101   58.94378   49.79657</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    28.70321 0.9453011  53.21949 49.90975 57.40641   56.45901   51.87605</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     caliper   length    width radius_ratio      theta eccentricity form_factor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  61.03278 61.02071 51.02434     1.254392 -0.9926965    0.7539797   0.8911068</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 61.18823 61.03697 48.69446     1.346629  1.2961522    0.6824269   0.8824052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  57.69749 57.20133 51.98953     1.226805 -0.5648957    0.8162596   0.8862079</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  59.50630 59.50243 50.79021     1.247440  1.1344362    0.8034516   0.9058285</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  56.85948 56.54173 52.42395     1.150204 -0.8413811    0.8525173   0.9098151</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    narrow_factor asp_ratio rectangularity pd_ratio plw_ratio solidity convexity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       1.000198  1.195914       1.274475 3.041156  1.656567 1.012433 0.9145237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10      1.002478  1.253468       1.283317 2.968057  1.655043 1.014455 0.8647999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       1.008674  1.100247       1.286833 3.137474  1.657871 1.009611 0.9112384</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       1.000065  1.171534       1.311693 3.004417  1.620976 1.015873 0.8767728</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1.005620  1.078548       1.289317 3.133971  1.635340 1.012775 0.8810137</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    elongation circularity circularity_haralick circularity_norm    coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.16381943    14.10198             15.65045         1.161421 0.004569772</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.20221369    14.24104             11.46618         1.174075 0.004332211</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.09111329    14.17993             21.52592         1.168866 0.004322858</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.14641800    13.87279             15.99466         1.143415 0.004309764</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.07282731    13.81201             28.14949         1.138237 0.004300412</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           asm       con       cor      var       idm      sav      sva      sen</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.08691588 0.7298578 0.9445076 7.576197 0.8011890 40.63760 1582.907 1.174546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.08317829 0.8342044 0.9426903 8.278044 0.7901221 42.45991 1731.949 1.184363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.08484019 0.7020281 0.9497252 7.981903 0.7941562 40.70983 1590.260 1.174603</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.08564560 0.7496927 0.9508846 8.631946 0.7848458 42.70254 1753.433 1.185619</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.08863301 0.6025756 0.9591354 8.372833 0.8067203 40.70896 1591.123 1.183855</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         ent       dva       den       f12       f13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.358955 0.7298578 0.3847632 0.5436600 0.7984089</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.381620 0.8342044 0.3970503 0.5197025 0.7880111</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.357803 0.7020281 0.3861546 0.5354312 0.7933860</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.378303 0.7496927 0.3950257 0.5277220 0.7922799</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.355013 0.6025756 0.3644611 0.5598796 0.8070404</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id        x         y area area_ch perimeter radius_mean radius_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 344.3132 104.74372 2436  2408.0  185.6102    27.45204   24.31796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  9 468.0383  55.44180 2311  2278.0  181.0244    26.77622   23.16169</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 236.6572 338.80546 2310  2288.5  181.0244    26.69273   23.99117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  6 405.9755  76.41826 2297  2264.5  178.7817    26.58139   24.07681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 537.0532 400.81350 2289  2261.5  178.1960    26.55606   24.84882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   30.53131 1.7403323  54.90407 48.63592 61.06262   20.76326   18.04194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   31.04441 2.3392198  53.55243 46.32339 62.08881   20.69928   17.14476</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   29.44025 1.2381808  53.38545 47.98234 58.88049   19.82571   17.91553</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   30.02968 1.6596304  53.16279 48.15362 60.05937   19.82630   17.78272</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   28.70321 0.9660995  53.11211 49.69764 57.40641   19.53438   18.01553</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    caliper   length    width radius_ratio      theta eccentricity form_factor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 61.03278 61.02182 51.02160     1.255504 -0.9790241    0.4949248   0.8885535</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9 61.18823 61.07428 48.72944     1.340334  1.2628961    0.5603174   0.8862079</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 57.69749 57.20139 51.99249     1.227128 -0.6370637    0.4282680   0.8858245</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 59.48109 59.42578 50.82265     1.247245  1.1427598    0.4421814   0.9030764</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 56.85948 56.53366 52.36854     1.155113 -0.8035065    0.3866007   0.9058576</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   narrow_factor asp_ratio rectangularity pd_ratio plw_ratio solidity convexity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      1.000180  1.196000       1.278091 3.041156  1.656592 1.011628 0.9187379</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      1.001866  1.253334       1.287804 2.958484  1.648618 1.014486 0.8658923</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      1.008673  1.100186       1.287464 3.137474  1.657825 1.009395 0.9111738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      1.000931  1.169277       1.314835 3.005691  1.621626 1.014352 0.8761289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      1.005763  1.079535       1.293397 3.133971  1.636293 1.012160 0.8794599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   elongation circularity circularity_haralick circularity_norm    coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.16387934    14.14250             15.77402        0.8584609 0.004556678</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9 0.20212827    14.17993             11.44664        0.8555300 0.004322858</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.09106255    14.18607             21.55802        0.8551466 0.004320988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.14477098    13.91507             16.01645        0.8718206 0.004296670</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.07367508    13.87235             27.48791        0.8745939 0.004281706</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#' ########################### Example 1 #########################</span></span></span>
 <span class="r-in"><span><span class="co"># Correct the measures based on the area of the largest object</span></span></span>
+<span class="r-in"><span><span class="co"># note that since the reference object</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="utils_transform.html">image_resize</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"flax_grains.jpg"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span></span></span>
-<span class="r-in"><span> <span class="fu">analyze_objects</span><span class="op">(</span><span class="va">img</span>,</span></span>
-<span class="r-in"><span>                 reference <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                 reference_area <span class="op">=</span> <span class="fl">100</span>,</span></span>
-<span class="r-in"><span>                 reference_larger <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                 marker <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">analyze_objects</span><span class="op">(</span><span class="va">img</span>,</span></span>
+<span class="r-in"><span>                  index <span class="op">=</span> <span class="st">"GRAY"</span>,</span></span>
+<span class="r-in"><span>                  marker <span class="op">=</span> <span class="st">"point"</span>,</span></span>
+<span class="r-in"><span>                  show_contour <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                  reference <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                  reference_area <span class="op">=</span> <span class="fl">6</span>,</span></span>
+<span class="r-in"><span>                  reference_larger <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                  lower_noise <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="analyze_objects-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
@@ -803,7 +929,8 @@ Processing and Information Technology, 11–16.
 <span class="r-in"><span><span class="va">rgb</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>   <span class="fu">analyze_objects</span><span class="op">(</span><span class="va">img</span>,</span></span>
 <span class="r-in"><span>                   marker <span class="op">=</span> <span class="st">"id"</span>,</span></span>
-<span class="r-in"><span>                   object_index <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                   object_index <span class="op">=</span> <span class="st">"B"</span>,</span></span>
+<span class="r-in"><span>                   pixel_level_index <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="analyze_objects-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># density of area</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rgb</span><span class="op">)</span></span></span>

@@ -34,7 +34,7 @@ object_isolate() isolates an object from an image.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@ of each object in the image.</p></li>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">object_coord</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"NB"</span>,</span>
 <span>  watershed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -146,11 +146,14 @@ of each object in the image.</p></li>
 <span>  object_size <span class="op">=</span> <span class="st">"medium"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_image <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">object_contour</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dir_original <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"NB"</span>,</span>
 <span>  invert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  filter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -162,17 +165,18 @@ of each object in the image.</p></li>
 <span>  object_size <span class="op">=</span> <span class="st">"medium"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_image <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">object_isolate</span><span class="op">(</span><span class="va">image</span>, id <span class="op">=</span> <span class="cn">NULL</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">object_isolate</span><span class="op">(</span><span class="va">img</span>, id <span class="op">=</span> <span class="cn">NULL</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">object_id</span><span class="op">(</span><span class="va">image</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">object_id</span><span class="op">(</span><span class="va">img</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, workers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><p>An image of class <code>Image</code> or a list of <code>Image</code> objects.</p></dd>
 
 
@@ -241,9 +245,33 @@ up to 50% of available cores.</p></dd>
 number of parallel processes that can be active at the same time.</p></dd>
 
 
-<dt>show_image</dt>
+<dt>plot</dt>
 <dd><p>Shows the image with bounding rectangles? Defaults to
 <code>TRUE</code>.</p></dd>
+
+
+<dt>pattern</dt>
+<dd><p>A pattern of file name used to identify images to be imported.
+For example, if <code>pattern = "im"</code> all images in the current working directory
+that the name matches the pattern (e.g., img1.-, image1.-, im2.-) will be
+imported as a list. Providing any number as pattern (e.g., <code>pattern = "1"</code>)
+will select images that are named as 1.-, 2.-, and so on. An error will be
+returned if the pattern matches any file that is not supported (e.g.,
+img1.pdf).</p></dd>
+
+
+<dt>dir_original</dt>
+<dd><p>The directory containing the original images. Defaults
+to <code>NULL</code>, which means that the current working directory will be
+considered.</p></dd>
+
+
+<dt>center</dt>
+<dd><p>If <code>TRUE</code> returns the object contours centered on the origin.</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p>If <code>TRUE</code> (default) a summary is shown in the console.</p></dd>
 
 
 <dt>...</dt>
@@ -277,18 +305,9 @@ object.</p></li>
 <span class="r-in"><span><span class="co"># Get the coordinates and draw a bounding rectangle around leaves 1 and 3</span></span></span>
 <span class="r-in"><span><span class="fu">object_coord</span><span class="op">(</span><span class="va">img</span>, id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="utils_objects-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $col_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 320 304</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $col_max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 641 607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $row_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 435  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $row_max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 641 202</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      xleft xright ybottom ytop</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   434    640     319  640</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    19    201     303  606</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Isolate leaf 3</span></span></span>
 <span class="r-in"><span><span class="va">isolated</span> <span class="op">&lt;-</span> <span class="fu">object_isolate</span><span class="op">(</span><span class="va">img</span>, id <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>

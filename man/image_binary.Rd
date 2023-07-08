@@ -5,7 +5,7 @@
 \title{Creates a binary image}
 \usage{
 image_binary(
-  image,
+  img,
   index = NULL,
   threshold = c("Otsu", "adaptive"),
   k = 0.1,
@@ -26,7 +26,7 @@ image_binary(
 )
 }
 \arguments{
-\item{image}{An image object.}
+\item{img}{An image object.}
 
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to binary image. See the available indexes with

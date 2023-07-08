@@ -9,7 +9,8 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#",
-  fig.path = "man/figures/README-"
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 
 ```
@@ -18,13 +19,20 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental-1) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
+[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
+[![Lifecycle: stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
+![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
 
 <!-- badges: end -->
 
 The pliman (**pl**ant **im**age **an**alysis) package is designed to analyze plant images, particularly for leaf and seed analysis. It offers a range of functionalities to assist with various tasks such as measuring disease severity, counting lesions, obtaining lesion shapes, counting objects in an image, extracting object characteristics, performing Fourier Analysis, obtaining RGB values, extracting object coordinates and outlines, isolating objects, and plotting object measurements.
 
-`pliman` also provides useful functions for image [transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html), [binarization](https://tiagoolivoto.github.io/pliman/reference/image_binary.html), [segmentation](https://tiagoolivoto.github.io/pliman/reference/image_segment.html), and [resolution](https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html). Please, visit the [Examples](https://tiagoolivoto.github.io/pliman/index.html) page in `pliman` website for a detailed documentation of each function.
+`pliman` also provides useful functions for image transformation, binarization, segmentation, and resolution. Please visit the [Examples](https://tiagoolivoto.github.io/pliman/reference/index.html) page on the `pliman` website for detailed documentation of each function.
+
+
 
 # Installation
 
@@ -47,18 +55,53 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 *Note*: If you are a Windows user, you should also first download and install the latest version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-# Basic usage
+# Analyze objects
 
-## Analyze objects
+The function `analyze_objects()` can be used to analyze objects such as leaves, grains, pods, and pollen in an image. By default, all measures are returned in pixel units. Users can [adjust the object measures](https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html#adjusting-object-measures) with `get_measures()` provided that the image resolution (Dots Per Inch) is known. Another option is to use a reference object in the image. In this last case, the argument `reference` must be set to `TRUE`. There are two options to identify the reference object:   
 
-The function `analyze_objects()` can be used to analyze objects such as leaves, grains, pods, and pollen in an image. The following example counts and computes several features of soybean grains of an image with 30 grains.
+  1. By its color, using the arguments `back_fore_index` and `fore_ref_index`  
+  2. By its size, using the arguments `reference_larger` or `reference_smaller` 
+
+In both cases, the `reference_area` must be declared. Let's see how to analyze an image with flax grains containing a reference object (rectangle with 2x3 cm). Here, we'll identify the reference object by its size; so, the final results in this case will be in metric units (cm).
+
+```{r warning=FALSE, message=FALSE}
+library(pliman)
+img <- image_pliman("flax_grains.jpg")
+flax <- 
+  analyze_objects(img,
+                  index = "GRAY",
+                  reference = TRUE,
+                  reference_larger = TRUE,
+                  reference_area = 6,
+                  marker = "point")
+# summary statistics
+flax$statistics
+
+# plot the density of the grain's length (in cm)
+plot(flax, measure = "length")
+```
+
+# Analyzing shapefiles
+The `analyze_objects_shp()` function performs object analysis based on shapefiles (rows and columns). Possible applications include computing canopy coverage and vegetation indexes useful for high-throughput phenotyping. By default `analyze_objects_shp()` calls `image_prepare_mv()` internally, allowing alignment and crop the image before processing. In the following example, we compute the canopy coverage and the Normalized Green Red Difference Index (NGRDI) for each one of the 12 soybean plots.
 
 ```{r}
-library(pliman)
-img <-image_pliman("soybean_touch.jpg", plot = TRUE)
-soy <- analyze_objects(img, marker = "id")
-str(soy$results)
+shp <- image_pliman("field_mosaic.jpg")
+res <- 
+  analyze_objects_shp(shp, 
+                      prepare = FALSE, # it is already aligned and cropped
+                      ncol = 12,
+                      nrow = 1,
+                      index = "HUE", # used to segment the soil
+                      object_index = "NGRDI") 
+plot(res$final_image_masked)
+# plot the shapefiles
+plot(res$shapefiles)
+# plot the canopy coverage
+plot_measures(res, measure = "coverage", col = "black", vjust = -160)
+# plot the NGRDI index
+plot_measures(res, measure = "NGRDI", col = "red", vjust = -190)
 ```
+
 
 # Disease severity
 
@@ -71,11 +114,13 @@ In the following example, we compute the symptomatic area of a soybean leaf. The
 ```{r}
 img <- image_pliman("sev_leaf.jpg")
 # Computes the symptomatic area
+sev <- 
 measure_disease(img = img,
                 index_lb = "B", # to remove the background
                 index_dh = "NGRDI", # to isolate the diseased area
                 threshold = c("Otsu", 0), # You can also use the Otsu algorithm in both indexes (default)
                 plot = TRUE)
+sev$severity
 ```
 
 ## Interactive disease measurements

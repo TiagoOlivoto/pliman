@@ -33,12 +33,12 @@ help_get_rgb <- function(R, G, B, labels) {
     .Call(`_pliman_help_get_rgb`, R, G, B, labels)
 }
 
-bounding_box <- function(image, edge) {
-    .Call(`_pliman_bounding_box`, image, edge)
+bounding_box <- function(img, edge) {
+    .Call(`_pliman_bounding_box`, img, edge)
 }
 
-isolate_objects5 <- function(image, labels) {
-    .Call(`_pliman_isolate_objects5`, image, labels)
+isolate_objects5 <- function(img, labels) {
+    .Call(`_pliman_isolate_objects5`, img, labels)
 }
 
 help_isolate_object <- function(R, G, B, labels, remove_bg, edge) {
@@ -49,8 +49,8 @@ help_shp <- function(rows, cols, dims) {
     .Call(`_pliman_help_shp`, rows, cols, dims)
 }
 
-help_otsu <- function(image) {
-    .Call(`_pliman_help_otsu`, image)
+help_otsu <- function(img) {
+    .Call(`_pliman_help_otsu`, img)
 }
 
 help_area <- function(coord) {

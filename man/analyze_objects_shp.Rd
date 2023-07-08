@@ -16,6 +16,8 @@ analyze_objects_shp(
   plot = FALSE,
   parallel = FALSE,
   workers = NULL,
+  watershed = TRUE,
+  filter = FALSE,
   object_size = "medium",
   efourier = FALSE,
   object_index = NULL,
@@ -69,6 +71,17 @@ processing time when an image has lots of objects (say >1000).}
 \item{workers}{A positive numeric scalar or a function specifying the number
 of parallel processes that can be active at the same time. By default, the
 number of sections is set up to 50\% of available cores.}
+
+\item{watershed}{If \code{TRUE} (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If \code{FALSE}, all pixels for each connected set of foreground pixels are set
+to a unique object. This is faster but is not able to segment touching
+objects.}
+
+\item{filter}{Performs median filtering in the binary image? See more at
+\code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
+size of the median filtering. Larger values are effective at removing noise,
+but adversely affect edges.}
 
 \item{object_size}{Argument to control control the watershed segmentation.
 See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}

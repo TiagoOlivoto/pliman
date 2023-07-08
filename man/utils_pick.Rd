@@ -9,7 +9,7 @@
 \title{Utilities for picking up points in an image}
 \usage{
 pick_count(
-  image,
+  img,
   n = Inf,
   col = "red",
   viewer = get_pliman_viewer(),
@@ -19,7 +19,7 @@ pick_count(
 )
 
 pick_coords(
-  image,
+  img,
   n = Inf,
   col = "red",
   viewer = get_pliman_viewer(),
@@ -28,7 +28,7 @@ pick_coords(
 )
 
 pick_rgb(
-  image,
+  img,
   n = Inf,
   col = "red",
   viewer = get_pliman_viewer(),
@@ -38,7 +38,7 @@ pick_rgb(
 )
 
 pick_palette(
-  image,
+  img,
   n = Inf,
   r = 1,
   shape = "box",
@@ -57,7 +57,7 @@ pick_palette(
 )
 }
 \arguments{
-\item{image}{An \code{Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{n}{The number of points of the \verb{pick_*} function. Defaults to \code{Inf}.
 This means that picking will run until the user press Esc.}
@@ -74,7 +74,7 @@ argument globally for all functions in the package, you can use the
 \code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
 all functions.}
 
-\item{plot}{Call a new \code{plot(image)} before processing? Defaults to \code{TRUE}.}
+\item{plot}{Call a new \code{plot(img)} before processing? Defaults to \code{TRUE}.}
 
 \item{verbose}{If \code{TRUE} (default) shows a counter in the console.}
 

@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,6 +112,11 @@
 
       <dl><dt>
           
+          <code><a href="as_image.html">as_image()</a></code> 
+        </dt>
+        <dd>Create an <code>Image</code> object</dd>
+      </dl><dl><dt>
+          
           <code><a href="utils_image.html">image_import()</a></code> <code><a href="utils_image.html">image_export()</a></code> <code><a href="utils_image.html">image_pliman()</a></code> 
         </dt>
         <dd>Import and export images</dd>
@@ -148,7 +153,7 @@
 
       <dl><dt>
           
-          <code><a href="utils_transform.html">image_autocrop()</a></code> <code><a href="utils_transform.html">image_crop()</a></code> <code><a href="utils_transform.html">image_dimension()</a></code> <code><a href="utils_transform.html">image_rotate()</a></code> <code><a href="utils_transform.html">image_horizontal()</a></code> <code><a href="utils_transform.html">image_vertical()</a></code> <code><a href="utils_transform.html">image_hreflect()</a></code> <code><a href="utils_transform.html">image_vreflect()</a></code> <code><a href="utils_transform.html">image_resize()</a></code> <code><a href="utils_transform.html">image_trim()</a></code> <code><a href="utils_transform.html">image_dilate()</a></code> <code><a href="utils_transform.html">image_erode()</a></code> <code><a href="utils_transform.html">image_opening()</a></code> <code><a href="utils_transform.html">image_closing()</a></code> <code><a href="utils_transform.html">image_skeleton()</a></code> <code><a href="utils_transform.html">image_filter()</a></code> <code><a href="utils_transform.html">image_blur()</a></code> <code><a href="utils_transform.html">image_contrast()</a></code> 
+          <code><a href="utils_transform.html">image_autocrop()</a></code> <code><a href="utils_transform.html">image_crop()</a></code> <code><a href="utils_transform.html">image_dimension()</a></code> <code><a href="utils_transform.html">image_rotate()</a></code> <code><a href="utils_transform.html">image_horizontal()</a></code> <code><a href="utils_transform.html">image_vertical()</a></code> <code><a href="utils_transform.html">image_hreflect()</a></code> <code><a href="utils_transform.html">image_vreflect()</a></code> <code><a href="utils_transform.html">image_resize()</a></code> <code><a href="utils_transform.html">image_trim()</a></code> <code><a href="utils_transform.html">image_dilate()</a></code> <code><a href="utils_transform.html">image_erode()</a></code> <code><a href="utils_transform.html">image_opening()</a></code> <code><a href="utils_transform.html">image_closing()</a></code> <code><a href="utils_transform.html">image_skeleton()</a></code> <code><a href="utils_transform.html">image_thinning()</a></code> <code><a href="utils_transform.html">image_filter()</a></code> <code><a href="utils_transform.html">image_blur()</a></code> <code><a href="utils_transform.html">image_contrast()</a></code> 
         </dt>
         <dd>Spatial transformations</dd>
       </dl><dl><dt>
@@ -200,6 +205,16 @@
         <dd>Analyzes objects using shapefiles</dd>
       </dl><dl><dt>
           
+          <code><a href="measure_disease_shp.html">measure_disease_shp()</a></code> 
+        </dt>
+        <dd>Measure disease using shapefiles</dd>
+      </dl><dl><dt>
+          
+          <code><a href="prepare_to_shp.html">prepare_to_shp()</a></code> 
+        </dt>
+        <dd>Prepare images to analyze_objects_shp()</dd>
+      </dl><dl><dt>
+          
           <code><a href="image_shp.html">image_shp()</a></code> 
         </dt>
         <dd>Construct a shape file from an image</dd>
@@ -208,6 +223,16 @@
           <code><a href="image_align.html">image_align()</a></code> 
         </dt>
         <dd>Aligns an <code>Image</code> object by hand</dd>
+      </dl><dl><dt>
+          
+          <code><a href="object_mark.html">object_mark()</a></code> 
+        </dt>
+        <dd>Mark Object Points</dd>
+      </dl><dl><dt>
+          
+          <code><a href="object_map.html">object_map()</a></code> 
+        </dt>
+        <dd>Map Object Distances</dd>
       </dl><dl><dt>
           
           <code><a href="plot.image_shp.html">plot(<i>&lt;image_shp&gt;</i>)</a></code> 
@@ -231,7 +256,7 @@
         <dd>Utilities for image resolution</dd>
       </dl><dl><dt>
           
-          <code><a href="utils_colorspace.html">rgb_to_hsb()</a></code> <code><a href="utils_colorspace.html">rgb_to_lab()</a></code> 
+          <code><a href="utils_colorspace.html">rgb_to_hsb()</a></code> <code><a href="utils_colorspace.html">rgb_to_srgb()</a></code> <code><a href="utils_colorspace.html">rgb_to_lab()</a></code> 
         </dt>
         <dd>Convert between colour spaces</dd>
       </dl></div><div class="section level2">
@@ -247,7 +272,7 @@
 
       <dl><dt>
           
-          <code><a href="utils_polygon.html">poly_check()</a></code> <code><a href="utils_polygon.html">poly_is_closed()</a></code> <code><a href="utils_polygon.html">poly_close()</a></code> <code><a href="utils_polygon.html">poly_unclose()</a></code> <code><a href="utils_polygon.html">poly_limits()</a></code> <code><a href="utils_polygon.html">conv_hull()</a></code> <code><a href="utils_polygon.html">poly_area()</a></code> <code><a href="utils_polygon.html">poly_slide()</a></code> <code><a href="utils_polygon.html">poly_distpts()</a></code> <code><a href="utils_polygon.html">poly_centdist()</a></code> <code><a href="utils_polygon.html">poly_perimeter()</a></code> <code><a href="utils_polygon.html">poly_rotate()</a></code> <code><a href="utils_polygon.html">poly_align()</a></code> <code><a href="utils_polygon.html">poly_lw()</a></code> <code><a href="utils_polygon.html">poly_eccentricity()</a></code> <code><a href="utils_polygon.html">poly_convexity()</a></code> <code><a href="utils_polygon.html">poly_caliper()</a></code> <code><a href="utils_polygon.html">poly_elongation()</a></code> <code><a href="utils_polygon.html">poly_solidity()</a></code> <code><a href="utils_polygon.html">poly_flip_y()</a></code> <code><a href="utils_polygon.html">poly_flip_x()</a></code> <code><a href="utils_polygon.html">poly_sample()</a></code> <code><a href="utils_polygon.html">poly_sample_prop()</a></code> <code><a href="utils_polygon.html">poly_jitter()</a></code> <code><a href="utils_polygon.html">poly_circularity()</a></code> <code><a href="utils_polygon.html">poly_circularity_haralick()</a></code> <code><a href="utils_polygon.html">poly_circularity_norm()</a></code> <code><a href="utils_polygon.html">poly_measures()</a></code> <code><a href="utils_polygon.html">poly_mass()</a></code> <code><a href="utils_polygon.html">poly_spline()</a></code> <code><a href="utils_polygon.html">poly_smooth()</a></code> 
+          <code><a href="utils_polygon.html">poly_check()</a></code> <code><a href="utils_polygon.html">poly_is_closed()</a></code> <code><a href="utils_polygon.html">poly_close()</a></code> <code><a href="utils_polygon.html">poly_unclose()</a></code> <code><a href="utils_polygon.html">poly_angles()</a></code> <code><a href="utils_polygon.html">poly_limits()</a></code> <code><a href="utils_polygon.html">conv_hull()</a></code> <code><a href="utils_polygon.html">conv_hull_unified()</a></code> <code><a href="utils_polygon.html">poly_area()</a></code> <code><a href="utils_polygon.html">poly_slide()</a></code> <code><a href="utils_polygon.html">poly_distpts()</a></code> <code><a href="utils_polygon.html">poly_centdist()</a></code> <code><a href="utils_polygon.html">poly_perimeter()</a></code> <code><a href="utils_polygon.html">poly_rotate()</a></code> <code><a href="utils_polygon.html">poly_align()</a></code> <code><a href="utils_polygon.html">poly_center()</a></code> <code><a href="utils_polygon.html">poly_lw()</a></code> <code><a href="utils_polygon.html">poly_eccentricity()</a></code> <code><a href="utils_polygon.html">poly_convexity()</a></code> <code><a href="utils_polygon.html">poly_caliper()</a></code> <code><a href="utils_polygon.html">poly_elongation()</a></code> <code><a href="utils_polygon.html">poly_solidity()</a></code> <code><a href="utils_polygon.html">poly_flip_y()</a></code> <code><a href="utils_polygon.html">poly_flip_x()</a></code> <code><a href="utils_polygon.html">poly_sample()</a></code> <code><a href="utils_polygon.html">poly_sample_prop()</a></code> <code><a href="utils_polygon.html">poly_jitter()</a></code> <code><a href="utils_polygon.html">poly_circularity()</a></code> <code><a href="utils_polygon.html">poly_circularity_norm()</a></code> <code><a href="utils_polygon.html">poly_circularity_haralick()</a></code> <code><a href="utils_polygon.html">poly_mass()</a></code> <code><a href="utils_polygon.html">poly_spline()</a></code> <code><a href="utils_polygon.html">poly_smooth()</a></code> <code><a href="utils_polygon.html">poly_measures()</a></code> 
         </dt>
         <dd>Utilities for Polygons</dd>
       </dl><dl><dt>
@@ -260,6 +285,26 @@
           <code><a href="utils_shapes.html">draw_circle()</a></code> <code><a href="utils_shapes.html">draw_square()</a></code> <code><a href="utils_shapes.html">draw_rectangle()</a></code> <code><a href="utils_shapes.html">draw_trian_equi()</a></code> <code><a href="utils_shapes.html">draw_trian_rect()</a></code> <code><a href="utils_shapes.html">draw_n_tagon()</a></code> 
         </dt>
         <dd>Utilities for drawing coordinates of known shapes</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_lw.html">plot_lw()</a></code> 
+        </dt>
+        <dd>Plot length and width lines on objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="poly_apex_base_angle.html">poly_apex_base_angle()</a></code> 
+        </dt>
+        <dd>Calculate the apex and base angles of an object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="poly_width_at.html">poly_width_at()</a></code> 
+        </dt>
+        <dd>Width at a given height</dd>
+      </dl><dl><dt>
+          
+          <code><a href="poly_pcv.html">poly_pcv()</a></code> 
+        </dt>
+        <dd>Compute Perimeter Complexity Value (PCV)</dd>
       </dl></div><div class="section level2">
       <h2 id="utilities-for-image-points">Utilities for image points<a class="anchor" aria-label="anchor" href="#utilities-for-image-points"></a></h2>
       
@@ -273,9 +318,9 @@
 
       <dl><dt>
           
-          <code><a href="utils_pick.html">pick_count()</a></code> <code><a href="utils_pick.html">pick_rgb()</a></code> <code><a href="utils_pick.html">pick_palette()</a></code> 
+          <code><a href="utils_pick.html">pick_count()</a></code> <code><a href="utils_pick.html">pick_coords()</a></code> <code><a href="utils_pick.html">pick_rgb()</a></code> <code><a href="utils_pick.html">pick_palette()</a></code> 
         </dt>
-        <dd>Picking up points in an image</dd>
+        <dd>Utilities for picking up points in an image</dd>
       </dl></div><div class="section level2">
       <h2 id="image-segmentation">Image segmentation<a class="anchor" aria-label="anchor" href="#image-segmentation"></a></h2>
       
@@ -302,6 +347,11 @@
           <code><a href="palettes.html">image_palette()</a></code> 
         </dt>
         <dd>Create image palettes</dd>
+      </dl><dl><dt>
+          
+          <code><a href="dist_transform.html">dist_transform()</a></code> 
+        </dt>
+        <dd>Distance map transform</dd>
       </dl><dl><dt>
           
           <code><a href="image_segment.html">image_segment()</a></code> <code><a href="image_segment.html">image_segment_iter()</a></code> 
@@ -337,6 +387,26 @@
           <code><a href="make_mask.html">make_mask()</a></code> 
         </dt>
         <dd>Makes a mask in an image</dd>
+      </dl><dl><dt>
+          
+          <code><a href="otsu.html">otsu()</a></code> 
+        </dt>
+        <dd>Calculate Otsu's threshold</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_index.html">plot_index()</a></code> 
+        </dt>
+        <dd>Plot an image index</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pixel_index.html">pixel_index()</a></code> 
+        </dt>
+        <dd>Get the pixel indices for a given row of a binary image</dd>
+      </dl><dl><dt>
+          
+          <code><a href="watershed2.html">watershed2()</a></code> 
+        </dt>
+        <dd>Alternative watershed algorithm</dd>
       </dl></div><div class="section level2">
       <h2 id="elliptical-fourier-analysis">Elliptical Fourier Analysis<a class="anchor" aria-label="anchor" href="#elliptical-fourier-analysis"></a></h2>
       
@@ -466,17 +536,12 @@
         <dd>Apply color to image objects</dd>
       </dl><dl><dt>
           
-          <code><a href="tune_tolerance.html">tune_tolerance()</a></code> 
-        </dt>
-        <dd>Tune tolerance parameter</dd>
-      </dl><dl><dt>
-          
           <code><a href="summary_index.html">summary_index()</a></code> 
         </dt>
         <dd>Summary an object index</dd>
       </dl><dl><dt>
           
-          <code><a href="utils_polygon.html">poly_check()</a></code> <code><a href="utils_polygon.html">poly_is_closed()</a></code> <code><a href="utils_polygon.html">poly_close()</a></code> <code><a href="utils_polygon.html">poly_unclose()</a></code> <code><a href="utils_polygon.html">poly_limits()</a></code> <code><a href="utils_polygon.html">conv_hull()</a></code> <code><a href="utils_polygon.html">poly_area()</a></code> <code><a href="utils_polygon.html">poly_slide()</a></code> <code><a href="utils_polygon.html">poly_distpts()</a></code> <code><a href="utils_polygon.html">poly_centdist()</a></code> <code><a href="utils_polygon.html">poly_perimeter()</a></code> <code><a href="utils_polygon.html">poly_rotate()</a></code> <code><a href="utils_polygon.html">poly_align()</a></code> <code><a href="utils_polygon.html">poly_lw()</a></code> <code><a href="utils_polygon.html">poly_eccentricity()</a></code> <code><a href="utils_polygon.html">poly_convexity()</a></code> <code><a href="utils_polygon.html">poly_caliper()</a></code> <code><a href="utils_polygon.html">poly_elongation()</a></code> <code><a href="utils_polygon.html">poly_solidity()</a></code> <code><a href="utils_polygon.html">poly_flip_y()</a></code> <code><a href="utils_polygon.html">poly_flip_x()</a></code> <code><a href="utils_polygon.html">poly_sample()</a></code> <code><a href="utils_polygon.html">poly_sample_prop()</a></code> <code><a href="utils_polygon.html">poly_jitter()</a></code> <code><a href="utils_polygon.html">poly_circularity()</a></code> <code><a href="utils_polygon.html">poly_circularity_haralick()</a></code> <code><a href="utils_polygon.html">poly_circularity_norm()</a></code> <code><a href="utils_polygon.html">poly_measures()</a></code> <code><a href="utils_polygon.html">poly_mass()</a></code> <code><a href="utils_polygon.html">poly_spline()</a></code> <code><a href="utils_polygon.html">poly_smooth()</a></code> 
+          <code><a href="utils_polygon.html">poly_check()</a></code> <code><a href="utils_polygon.html">poly_is_closed()</a></code> <code><a href="utils_polygon.html">poly_close()</a></code> <code><a href="utils_polygon.html">poly_unclose()</a></code> <code><a href="utils_polygon.html">poly_angles()</a></code> <code><a href="utils_polygon.html">poly_limits()</a></code> <code><a href="utils_polygon.html">conv_hull()</a></code> <code><a href="utils_polygon.html">conv_hull_unified()</a></code> <code><a href="utils_polygon.html">poly_area()</a></code> <code><a href="utils_polygon.html">poly_slide()</a></code> <code><a href="utils_polygon.html">poly_distpts()</a></code> <code><a href="utils_polygon.html">poly_centdist()</a></code> <code><a href="utils_polygon.html">poly_perimeter()</a></code> <code><a href="utils_polygon.html">poly_rotate()</a></code> <code><a href="utils_polygon.html">poly_align()</a></code> <code><a href="utils_polygon.html">poly_center()</a></code> <code><a href="utils_polygon.html">poly_lw()</a></code> <code><a href="utils_polygon.html">poly_eccentricity()</a></code> <code><a href="utils_polygon.html">poly_convexity()</a></code> <code><a href="utils_polygon.html">poly_caliper()</a></code> <code><a href="utils_polygon.html">poly_elongation()</a></code> <code><a href="utils_polygon.html">poly_solidity()</a></code> <code><a href="utils_polygon.html">poly_flip_y()</a></code> <code><a href="utils_polygon.html">poly_flip_x()</a></code> <code><a href="utils_polygon.html">poly_sample()</a></code> <code><a href="utils_polygon.html">poly_sample_prop()</a></code> <code><a href="utils_polygon.html">poly_jitter()</a></code> <code><a href="utils_polygon.html">poly_circularity()</a></code> <code><a href="utils_polygon.html">poly_circularity_norm()</a></code> <code><a href="utils_polygon.html">poly_circularity_haralick()</a></code> <code><a href="utils_polygon.html">poly_mass()</a></code> <code><a href="utils_polygon.html">poly_spline()</a></code> <code><a href="utils_polygon.html">poly_smooth()</a></code> <code><a href="utils_polygon.html">poly_measures()</a></code> 
         </dt>
         <dd>Utilities for Polygons</dd>
       </dl><dl><dt>
@@ -484,6 +549,26 @@
           <code><a href="object_split.html">object_split()</a></code> 
         </dt>
         <dd>Splits objects from an image into multiple images</dd>
+      </dl><dl><dt>
+          
+          <code><a href="object_edge.html">object_edge()</a></code> 
+        </dt>
+        <dd>Object edges</dd>
+      </dl><dl><dt>
+          
+          <code><a href="object_label.html">object_label()</a></code> 
+        </dt>
+        <dd>Labels objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="object_rgb.html">object_rgb()</a></code> 
+        </dt>
+        <dd>Extract red, green and blue values from objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pixel_index.html">pixel_index()</a></code> 
+        </dt>
+        <dd>Get the pixel indices for a given row of a binary image</dd>
       </dl></div><div class="section level2">
       <h2 id="symptomatic-area">Symptomatic area<a class="anchor" aria-label="anchor" href="#symptomatic-area"></a></h2>
       
@@ -528,6 +613,11 @@
         <dd>Turns a single character column into multiple columns.</dd>
       </dl><dl><dt>
           
+          <code><a href="custom_palette.html">custom_palette()</a></code> 
+        </dt>
+        <dd>Generate Custom Color Palette</dd>
+      </dl><dl><dt>
+          
           <code><a href="utils_pca.html">pca()</a></code> <code><a href="utils_pca.html">get_biplot()</a></code> <code><a href="utils_pca.html">plot(<i>&lt;pca&gt;</i>)</a></code> 
         </dt>
         <dd>Utilities for Principal Component Axis analysis</dd>
@@ -557,6 +647,42 @@ numeric vector.</dd>
           <code><a href="ggplot_color.html">ggplot_color()</a></code> 
         </dt>
         <dd>ggplot2-like colors generation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_pliman_viewer.html">get_pliman_viewer()</a></code> 
+        </dt>
+        <dd>Get the value of the pliman_viewer option</dd>
+      </dl><dl><dt>
+          
+          <code><a href="set_pliman_viewer.html">set_pliman_viewer()</a></code> 
+        </dt>
+        <dd>Set the value of the pliman_viewer option</dd>
+      </dl></div><div class="section level2">
+      <h2 id="iterative-visualization">Iterative visualization<a class="anchor" aria-label="anchor" href="#iterative-visualization"></a></h2>
+      
+      <p class="section-desc"></p><p>Tools to plot images and create polygons, points, and lines using mapview and mapedit packages.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="image_prepare_mv.html">image_prepare_mv()</a></code> 
+        </dt>
+        <dd>Prepare an image (align and crop)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="image_view.html">image_view()</a></code> 
+        </dt>
+        <dd>Create an interactive map view of an image</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pliman_viewer.html">pliman_viewer</a></code> 
+        </dt>
+        <dd>Global option for controlling the viewer in pliman package</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

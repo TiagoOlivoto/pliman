@@ -4,16 +4,10 @@
 \alias{object_edge}
 \title{Object edges}
 \usage{
-object_edge(
-  image,
-  sigma = 1,
-  threshold = "Otsu",
-  thinning = FALSE,
-  plot = TRUE
-)
+object_edge(img, sigma = 1, threshold = "Otsu", thinning = FALSE, plot = TRUE)
 }
 \arguments{
-\item{image}{An image or a list of images of class \code{Image}.}
+\item{img}{An image or a list of images of class \code{Image}.}
 
 \item{sigma}{Gaussian kernel standard deviation used in the gaussian blur.}
 

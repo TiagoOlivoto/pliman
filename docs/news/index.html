@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,9 +101,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="pliman-development-version">pliman (development version)<a class="anchor" aria-label="anchor" href="#pliman-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="pliman-200">pliman 2.0.0<a class="anchor" aria-label="anchor" href="#pliman-200"></a></h2>
 <div class="section level3">
-<h3 id="new-functions-development-version">New functions<a class="anchor" aria-label="anchor" href="#new-functions-development-version"></a></h3>
+<h3 id="new-functions-2-0-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-2-0-0"></a></h3>
 <ul><li><p><code><a href="../reference/analyze_objects.html">analyze_objects_iter()</a></code> to execute an interactive section of <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</p></li>
 <li><p><code><a href="../reference/measure_disease_byl.html">measure_disease_byl()</a></code> to measure disease severity ‘<code>by</code> <code>l</code>eaf’ in an image with several leaves.</p></li>
 <li><p><code><a href="../reference/object_split.html">object_split()</a></code> to split multiples objects of an image into a list of images.</p></li>
@@ -144,18 +144,39 @@
 <li>
 <code><a href="../reference/landmarks_regradi.html">landmarks_regradi()</a></code>: Pseudolandmarks with equally spaced angles</li>
 </ul></li>
+<li><p><code><a href="../reference/object_edge.html">object_edge()</a></code> to detect edges in images using Sobel-Feldman Operator.</p></li>
+<li>
+<p>A new family of <code>*_shp()</code> functions to analyze shape files.</p>
+<ul><li>
+<code><a href="../reference/image_shp.html">image_shp()</a></code> to construct a shape file from an image.</li>
+<li>
+<code><a href="../reference/object_split_shp.html">object_split_shp()</a></code> to splits image objects based on a shapefile.</li>
+<li>
+<code><a href="../reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> to analyze objects using shapefiles.</li>
+<li>
+<code><a href="../reference/measure_disease_shp.html">measure_disease_shp()</a></code> to measure disease using shapefiles.</li>
+</ul></li>
+<li><p>New <code><a href="../reference/plot_index.html">plot_index()</a></code> function to plot an image index using raster package, and optionaly using the mapview package to show the image index.</p></li>
+<li><p>New <code><a href="../reference/image_view.html">image_view()</a></code> function to create an interactive map view of an image. This function allows users to interactively edit and analyze an image using <a href="https://r-spatial.github.io/mapview/" class="external-link">mapview</a> and <a href="https://github.com/r-spatial/mapedit" class="external-link">mapedit</a> packages.</p></li>
+<li><p>New <code><a href="../reference/image_prepare_mv.html">image_prepare_mv()</a></code> function to prepare an image to be analyzed for <code><a href="../reference/analyze_objects_shp.html">analyze_objects_shp()</a></code>. This function aligns and crops the image using either base or mapview visualization.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><a href="https://ieeexplore.ieee.org/document/4309314" class="external-link">Haralick’s features</a> that quantify pixel texture for image objects were included.</p></li>
+<h3 id="new-features-2-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-0-0"></a></h3>
+<ul><li><p>New <code>viewer</code> option added. Now, iterative functions such as <code><a href="../reference/utils_pick.html">pick_palette()</a></code> and <code><a href="../reference/measure_disease.html">measure_disease_iter()</a></code> have an argument <code>viewer</code>. If not provided, the value is retrieved using <code><a href="../reference/get_pliman_viewer.html">get_pliman_viewer()</a></code>. This option controls the type of viewer to use for interactive plotting. The available options are “base” and “mapview”. If set to “base”, the base R graphics system is used for interactive plotting. If set to “mapview”, the <a href="https://r-spatial.github.io/mapview/" class="external-link">mapview</a> package is used, allowing the users to draw shapes like points and polygons with <a href="https://github.com/r-spatial/mapedit" class="external-link">mapedit</a> package. To set this argument globally for all functions in the package, you can use the <code><a href="../reference/set_pliman_viewer.html">set_pliman_viewer()</a></code> function. For example, you can run <code>set_pliman_viewer("mapview")</code> to set the viewer option to “mapview” for all functions.</p></li>
+<li><p><a href="https://ieeexplore.ieee.org/document/4309314" class="external-link">Haralick’s features</a> that quantify pixel texture for image objects were included.</p></li>
 <li><p>Several measures were added in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. The function now wraps some <code>poly_*()</code> functions to compute shape measures such as width, length, elongation, circularity. Haralick’s features are now computed by default. . This improvement was at cost of a slight increase in computation time.</p></li>
 <li><p><code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, <code><a href="../reference/measure_disease.html">measure_disease()</a></code>, and <code><a href="../reference/measure_disease_byl.html">measure_disease_byl()</a></code> have now a <code>filter</code> argument that applies a median filtering in the binary mask. This is useful to reduce the noise in the segmentation of objects.</p></li>
 <li><p>Arguments <code>reference_larger</code> and <code>reference_smaller</code> were included in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> indicating when the larger/smaller object in the image must be used as the reference object.</p></li>
 <li><p>Arguments <code>efourier</code> and <code>nharm</code> included in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. If <code>efourier = TRUE</code>, Elliptical Fourier analysis is computed for each object depending on the number of harmonics (<code>nharm</code>).</p></li>
 <li><p>Logical arguments <code>reference_larger</code> and <code>reference_smaller</code> included in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>. Those indicates when the larger/smaller object in the image must be used as the reference object. This only is valid when <code>reference = TRUE</code> and <code>reference_area</code> indicates the area of the reference object. <strong>IMPORTANT</strong>. When <code>reference_smaller</code> is used, objects with an area smaller than 1% of the mean of all the objects are ignored. This is used to remove possible noise in the image such as dust. So, be sure the reference object has an area that will be not removed by that cutpoint.</p></li>
+<li>
+<p><code>Rcpp</code> and <code>RcppArmadillo</code> dependencies were included, allowing the implementation of <code>C++</code> code. This will dramatically reduce the time computing of some functions/procesures. As an example, we wave.</p>
+<ul><li>Reduction in time processing from more than 5 minutes to less than 1 second using the new <code><a href="../reference/object_rgb.html">object_rgb()</a></code> function to extract the RGB values from an image (1445 x 1084) with ~1400 objects.</li>
+<li>Reduction in time processing of the set of <code>*_poly()</code> functions.</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-changes-development-version">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-development-version"></a></h3>
+<h3 id="minor-changes-2-0-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-2-0-0"></a></h3>
 <ul><li>
 <code><a href="../reference/utils_measures.html">get_measures()</a></code> now remove known objects from the results when using the <code>id</code> argument.</li>
 <li>The right-hand of argument <code>measure</code> in <code><a href="../reference/utils_measures.html">get_measures()</a></code> now accepts a numeric object stored in the global environment.</li>
@@ -165,6 +186,11 @@
 <li>Argument <code>object_index</code> in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code> now recognizes the names of built-in indexes (see ?<code><a href="../reference/utils_file.html">pliman_indexes()</a></code>).</li>
 <li>
 <code><a href="../reference/image_index.html">plot.image_index()</a></code> not limits the number of pixels to reduce plotting time.</li>
+<li>
+<code>show_image</code> argument changed with <code>plot</code> to standardize the argument across functions.</li>
+<li>
+<code><a href="../reference/utils_colorspace.html">rgb_to_hsb()</a></code> optimized using <code>C++</code>.</li>
+<li>Change <code>rows</code> and <code>cols</code> with <code>nrow</code> and <code>ncol</code>, respectively, in functions <code><a href="../reference/analyze_objects_shp.html">analyze_objects_shp()</a></code>, <code><a href="../reference/image_shp.html">image_shp()</a></code>, <code><a href="../reference/measure_disease_shp.html">measure_disease_shp()</a></code>, and <code><a href="../reference/object_split_shp.html">object_split_shp()</a></code>, to standardize the arguments across functions.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -205,7 +231,7 @@
 <li>
 <code><a href="../reference/utils_dpi.html">dpi()</a></code> to compute the resolution (dots per inch) of an image.</li>
 <li>
-<code><a href="../reference/tune_tolerance.html">tune_tolerance()</a></code> for tunning the <code>tolerance</code> parameter.</li>
+<code>tune_tolerance()</code> for tunning the <code>tolerance</code> parameter.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-functions-1-0-0">Deprecated functions.<a class="anchor" aria-label="anchor" href="#deprecated-functions-1-0-0"></a></h3>

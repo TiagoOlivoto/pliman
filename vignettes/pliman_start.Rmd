@@ -16,21 +16,19 @@ knitr::opts_chunk$set(comment = "#", collapse = TRUE, fig.width = 5)
 ```
 
 # Getting started
-`pliman` (**pl**ant **im**age **an**alysis) is designed to analyze plant images, especially related to leaf analysis. You provide color palettes, tell `pliman` what each one represents, and it takes care of the details. The package will help you to:
 
-* Get object statistics (number, area, perimeter, etc.) with `analyze_objects()`.
-* Measure disease severity with `symptomatic_area()`.
-* Get the RGB values for each object in an image with `objects_rgb()`.
-* Get object measures with `get_measures()`.
-* Plot objec measures with `plot_measures()`.
+The pliman (**pl**ant **im**age **an**alysis) package is designed to analyze plant images, particularly for leaf and seed analysis. It offers a range of functionalities to assist with various tasks such as measuring disease severity, counting lesions, obtaining lesion shapes, counting objects in an image, extracting object characteristics, performing Fourier Analysis, obtaining RGB values, extracting object coordinates and outlines, isolating objects, and plotting object measurements.
 
+# Leaf area measurement
 
-# Leaf area
-The function `analyze_objects()` can be used to measure the leaf area in an image. The pixel area can be adjusted to metric units (cm) in two ways: (i) Using an object of known area to correct the measures or (ii) knowing the image resolution in dpi (dots per inch).
+To measure the leaf area in an image, you can use the analyze_objects() function. There are two ways to adjust the pixel area to metric units (cm):
 
-To show the first approach, first we count the number of objects and plot an object id using the argument `marker = "text"` of the function `analyze_objects()`. This allows for the further adjustment of the leaf area using the known object, that in this case is the leaf square, with 4 cm$^2$.
+-   Using an object of known area to correct the measurements
+-   Knowing the image resolution in dots per inch (dpi)
 
+## Adjusting leaf area using a known object
 
+To demonstrate the first approach, let's count the number of objects and plot their IDs using the marker = "id" argument in the `analyze_objects()` function. This allows us to adjust the leaf area using a known object, in this case, a leaf square with an area of 4 cm².
 
 ```{r}
 library(pliman)
@@ -39,34 +37,37 @@ plot(leaves)
 count <- analyze_objects(leaves, marker = "id")
 ```
 
+To adjust the leaf area using the known object (id = 6), we can utilize the `get_measures()` function.
 
-- Adjust the leaf area by the area of the known object
-
-The function `get_measures()` is used to adjust the leaf area using object 6.
 
 ```{r leaf6}
 area <- 
   get_measures(count,
                id = 6,
                area ~ 4)
-area
+str(area)
 # plot the area to the segmented image
 image_segment(leaves, index = "NB", verbose = FALSE)
+plot(leaves)
 plot_measures(area, measure = "area")
 
 ```
 
+## Adjusting leaf area using image resolution
 
-When the image resolution is known, we can the image dpi (dots per inch) to correct the pixel units given by `analyze_objects()` to metric units. The function `dpi()` can be used to compute the dpi of an image, provided that the size of any object is known. See a brief tutorial [here](https://www.youtube.com/watch?v=Rh10_pLgeng).
+When the image resolution is known, we can use the `dpi()` function to compute the dots per inch (dpi) of an image. This allows us to convert pixel units to metric units. To apply this method, you need to know the size of any object in the image. You can refer to a tutorial [here](https://www.youtube.com/watch?v=Rh10_pLgeng) for more details.
+
 ```{r}
-get_measures(count, dpi = 84)
+area_dpi <- get_measures(count, dpi = 83.5)
+plot(leaves)
+plot_measures(area_dpi,
+              measure = "area",
+              vjust = -25)
 ```
 
+# Counting crop grains
 
-
-# Counting crop grains 
-
-Here, we will count the grains in the image `soybean_touch.jpg`. This image has a cyan background and contains 30 soybean grains that touch with each other.
+Here, we will count the grains in the image `soybean_touch.jpg`. This image has a cyan background and contains 30 soybean grains that touch each other.
 
 ```{r}
 soy <- image_pliman("soybean_touch.jpg")
@@ -79,31 +80,40 @@ grains <- analyze_objects(soy)
 plot_measures(grains)
 ```
 
-
-
 # Disease severity
-The function `measure_disease()` is used to compute the percentage of symptomatic leaf area in a sample or entire leaf based on provided color palettes samples. A general linear model (binomial family) fitted to the RGB values is used to segment the lesions from the healthy leaf. If a pallet of background is provided, the function takes care of the details to isolate it before computing the number and area of lesions.
 
-The next example computes the symptomatic area of a soybean leaf. The proportion of the healthy and symptomatic areas is given as the proportion of the total leaf area, after segmenting the leaf from the background (blue).
+## Using image indexes
+
+To compute the percentage of symptomatic leaf area you can use the `measure_disease()` function you can use an image index to segment the entire leaf from the background and then separate the diseased tissue from the healthy tissue. Alternatively, you can provide color palette samples to the `measure_disease()` function. In this approach, the function fits a general linear model (binomial family) to the RGB values of the image. It then uses the color palette samples to segment the lesions from the healthy leaf.
+
+In the following example, we compute the symptomatic area of a soybean leaf. The proportion of healthy and symptomatic areas is given as a proportion of the total leaf area after segmenting the leaf from the background (blue).
 
 ```{r}
 img <- image_pliman("sev_leaf.jpg")
-healthy <- image_pliman("sev_healthy.jpg")
-symptoms <- image_pliman("sev_sympt.jpg")
-background <- image_pliman("sev_back.jpg")
-image_combine(img, healthy, symptoms,background)
-
 # Computes the symptomatic area
 measure_disease(img = img,
-                img_healthy = healthy,
-                img_symptoms = symptoms,
-                img_background = background,
+                index_lb = "B", # to remove the background
+                index_dh = "NGRDI", # to isolate the diseased area
+                threshold = c("Otsu", 0), # You can also use the Otsu algorithm in both indexes (default)
                 plot = TRUE)
 ```
 
 
+## Interactive disease measurements
+
+An alternative approach to measuring disease percentage is available through the `measure_disease_iter()` function. This function offers an interactive interface that empowers users to manually select sample colors directly from the image. By doing so, it provides a highly customizable analysis method.
+
+One advantage of using `measure_disease_iter()` is the ability to utilize the "mapview" viewer, which enhances the analysis process by offering zoom-in options. This feature allows users to closely examine specific areas of the image, enabling detailed inspection and accurate disease measurement.
+
+
+```{r eval=FALSE}
+img <- image_pliman("sev_leaf.jpg", plot = TRUE)
+measure_disease_iter(img, viewer = "mapview")
+```
+
 # RGB values for objects
-The function `objects_rgb()` can be used to get the Red Green and Blue (RGB) for objects in an image. Here, the RGB for 
+
+The function `analyze_objects()` can also be used to get the Red Green and Blue (RGB) -or any other image index- for objects in an image. To do that, use the argument `object_index`.
 
 ```{r}
 img <- image_pliman("soy_green.jpg")
@@ -113,22 +123,19 @@ img <- image_pliman("soy_green.jpg")
 rgb <- 
   analyze_objects(img,
                   object_index = "B",
-                  marker = "id")
-# plot the distribution of RGB values of each object
-plot(rgb)
+                  pixel_level_index = TRUE)
+# Plots the B index for each grain
+plot_measures(rgb, measure = "B")
 ```
-
-
 
 # Getting help
 
--   If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues)
+If you come across any clear bugs while using the package, please consider filing a minimal reproducible example on [github](https://github.com/TiagoOlivoto/pliman/issues). This will help the developers address the issue promptly.
 
--   Suggestions and criticisms to improve the quality and usability of the package are welcome!
+Suggestions and criticisms aimed at improving the quality and usability of the package are highly encouraged. Your feedback is valuable in making {pliman} even better!
 
 # <i class="fas fa-scroll"></i> A little bit more!
 
-<!-- inicio font awesome -->
-<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
+For more examples on how to utilize {pliman} for analyzing plant images, you can visit this [this link](https://tiagoolivoto.github.io/paper_pliman/code.html). On that page, you will find downloadable source code and images that can be used for your analysis. Additionally, you can watch a talk about {pliman} (in Portuguese) [here](https://www.youtube.com/watch?v=ElvUVlPocgA) to gain more insights and tips on using the package effectively.
 
-> At [this link](https://tiagoolivoto.github.io/paper_pliman/code.html) you will find more examples on how to use {pliman} to analyze plant images. Source code and images can be downloaded [here](https://github.com/TiagoOlivoto/paper_pliman/archive/refs/heads/master.zip). You can also find a talk (Portuguese language) about {pliman} [here](https://www.youtube.com/watch?v=ElvUVlPocgA). <i class="far fa-lightbulb"></i>Lights, <i class="fas fa-camera"></i>camera, {pliman}!
+<i class="far fa-lightbulb"></i> Get ready with your project and let {pliman} shine with its <i class="fas fa-camera"></i> image analysis capabilities!

@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@
                         <h4 data-toc-skip class="author">Tiago
 Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2023-01-20</h4>
+            <h4 data-toc-skip class="date">2023-07-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/polygons.Rmd" class="external-link"><code>vignettes/polygons.Rmd</code></a></small>
       <div class="d-none name"><code>polygons.Rmd</code></div>
@@ -159,8 +159,16 @@ polygons. Let’s start with a simple example, related to the area and
 perimeter of a square.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
+<span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
+<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
+<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
+<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
+<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
+<span><span class="co">#&gt; The sp package is now running under evolution status 2</span></span>
+<span><span class="co">#&gt;      (status 2 uses the sf package in place of rgdal)</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
-<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 1.2.0)            |</span></span>
+<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 2.0.0)            |</span></span>
 <span><span class="co">#&gt; | Author: Tiago Olivoto                                    |</span></span>
 <span><span class="co">#&gt; | Type 'citation('pliman')' to know how to cite pliman     |</span></span>
 <span><span class="co">#&gt; | Type 'vignette('pliman_start')' for a short tutorial     |</span></span>
@@ -172,7 +180,7 @@ perimeter of a square.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">square</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
 <p>Now, Let’s see what happens when we start with a hexagon and increase
 the number of sides up to 1000.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -189,7 +197,7 @@ the number of sides up to 1000.</p>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">shapes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2.598076 3.000000 3.105829 3.139526 3.141510 3.141572</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">shapes</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6.000000 6.211657 6.265257 6.282152 6.283144 6.283175</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 5.000000 5.694019 6.004205 6.219330 6.270578 6.276892</span></span></code></pre></div>
 <p>Note that when <span class="math inline">\(n \to \infty\)</span>, the
 sum of sides becomes the circumference of the circle, given by <span class="math inline">\(2\pi r\)</span>, and the area becomes <span class="math inline">\(\pi r^2\)</span>. This is cool, but
 <code>pliman</code> is mainly designed to analyze plant image analysis.
@@ -213,7 +221,7 @@ to obtain useful information.</p>
 information related to its shape. To reduce the amount of output, I will
 only use five samples: 2, 4, 13, 24, and 35.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cont</span> <span class="op">&lt;-</span> <span class="va">cont</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2"</span>, <span class="st">"4"</span>, <span class="st">"13"</span>, <span class="st">"24"</span>, <span class="st">"36"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">cont</span> <span class="op">&lt;-</span> <span class="va">cont</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2"</span>, <span class="st">"4"</span>, <span class="st">"13"</span>, <span class="st">"24"</span>, <span class="st">"41"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 <p>In the current version of <code>pliman</code>, you will be able to
@@ -237,8 +245,7 @@ y_{i+1}-x_{i+1}y_{i}\right)\right|
 \]</span></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       2       4      13      24      36 </span></span>
-<span><span class="co">#&gt; 45075.0 20793.5 15183.5 12095.5  2316.0</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 45075.0 20793.5 15183.5  4144.0  1688.0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="perimeter">Perimeter<a class="anchor" aria-label="anchor" href="#perimeter"></a>
@@ -248,8 +255,8 @@ between every point of a shape. The distances can be obtained with
 <code><a href="../reference/utils_polygon.html">poly_distpts()</a></code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 1290.1413  630.7128  565.7422  466.4874  237.4508</span></span>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt; 1290.1413  630.7128  565.7422  291.5929  603.1543</span></span>
 <span></span>
 <span><span class="co"># perimeter of a circle with radius equals to 2</span></span>
 <span><span class="va">circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_shapes.html">draw_circle</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -272,17 +279,17 @@ average, maximum and minimum radius can be obtained.</p>
 <span></span>
 <span><span class="co"># statistics for the radius</span></span>
 <span><span class="fu"><a href="../reference/utils_stats.html">mean_list</a></span><span class="op">(</span><span class="va">dists</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 119.55450  85.22870  72.13064  64.39723  30.99134</span></span>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt; 119.55450  85.22870  72.13064  39.10193  73.70601</span></span>
 <span><span class="fu"><a href="../reference/utils_stats.html">min_list</a></span><span class="op">(</span><span class="va">dists</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        2        4       13       24       36 </span></span>
-<span><span class="co">#&gt; 68.93836 62.14629 48.67098 48.21310 17.25115</span></span>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt; 68.938361 62.146291 48.670983 25.480450  2.638939</span></span>
 <span><span class="fu"><a href="../reference/utils_stats.html">max_list</a></span><span class="op">(</span><span class="va">dists</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 171.20105 129.75938 108.46217  95.62495  52.42721</span></span>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt; 171.20105 129.75938 108.46217  61.56336 147.04645</span></span>
 <span><span class="fu"><a href="../reference/utils_stats.html">sd_list</a></span><span class="op">(</span><span class="va">dists</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        2        4       13       24       36 </span></span>
-<span><span class="co">#&gt; 20.94407 16.84946 14.62283 13.64961 10.33370</span></span>
+<span><span class="co">#&gt;        2        4       13       24       41 </span></span>
+<span><span class="co">#&gt; 20.94407 16.84946 14.62283 10.26425 42.27660</span></span>
 <span></span>
 <span><span class="co"># average radius of the circle above</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_centdist</a></span><span class="op">(</span><span class="va">circle</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_stats.html">mean_list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -302,12 +309,12 @@ been aligned with <code><a href="../reference/utils_polygon.html">poly_align()</
 <code class="sourceCode R"><span></span>
 <span><span class="co"># compute length and width</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_lw</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       length     width</span></span>
-<span><span class="co">#&gt; 2  314.37766 265.87632</span></span>
-<span><span class="co">#&gt; 4  235.44533 138.61494</span></span>
-<span><span class="co">#&gt; 13 186.39012 140.53457</span></span>
-<span><span class="co">#&gt; 24 184.07642 100.13720</span></span>
-<span><span class="co">#&gt; 36  98.25528  40.66916</span></span></code></pre></div>
+<span><span class="co">#&gt;        length     width</span></span>
+<span><span class="co">#&gt; [1,] 314.3777 265.87632</span></span>
+<span><span class="co">#&gt; [2,] 235.4453 138.61494</span></span>
+<span><span class="co">#&gt; [3,] 186.3901 140.53457</span></span>
+<span><span class="co">#&gt; [4,] 116.0408  56.15904</span></span>
+<span><span class="co">#&gt; [5,] 292.2781  10.17229</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="circularity-eccentricity-caliper-and-elongation">Circularity, eccentricity, caliper, and elongation<a class="anchor" aria-label="anchor" href="#circularity-eccentricity-caliper-and-elongation"></a>
@@ -318,22 +325,22 @@ Measures. International Mathematical Forum 4(27): 1305–1335&lt;/p&gt;"><sup>6<
 compactness, or roundness measure of an object. It is given by <span class="math inline">\(C = P^2 / A\)</span>, where <span class="math inline">\(P\)</span> is the perimeter and <span class="math inline">\(A\)</span> is the area of the object.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_circularity</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        2        4       13       24       36 </span></span>
-<span><span class="co">#&gt; 36.92656 19.13091 21.07974 17.99103 24.34494</span></span></code></pre></div>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt;  36.92656  19.13091  21.07974  20.51796 215.51845</span></span></code></pre></div>
 <p>Since the above measure is dependent on the scale, the normalized
 circularity can be used. In this case, it is assumed to be unity for a
 circle. This measure is invariant under translation, rotation, scaling
 transformations, and dimensionless. It is given by: <span class="math inline">\(Cn = P^2 / 4 \pi A\)</span></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_circularity_norm</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        2        4       13       24       36 </span></span>
-<span><span class="co">#&gt; 2.938522 1.522390 1.677472 1.431680 1.937309</span></span>
+<span><span class="co">#&gt;          2          4         13         24         41 </span></span>
+<span><span class="co">#&gt; 0.34030714 0.65686211 0.59613497 0.61245704 0.05830763</span></span>
 <span></span>
 <span><span class="co"># normalized circularity for different shapes</span></span>
 <span><span class="fu"><a href="../reference/utils_shapes.html">draw_square</a></span><span class="op">(</span>plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_polygon.html">poly_circularity_norm</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.27324</span></span>
+<span><span class="co">#&gt; [1] 1.396263</span></span>
 <span><span class="fu"><a href="../reference/utils_shapes.html">draw_circle</a></span><span class="op">(</span>plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_polygon.html">poly_circularity_norm</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.000003</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.9999967</span></span></code></pre></div>
 <p><code><a href="../reference/utils_polygon.html">poly_circularity_haralick()</a></code> computes the Haralick’s
 circularity (CH). The method is based on the computation of all the
 Euclidean distances from the object centroid to each boundary pixel.
@@ -342,61 +349,69 @@ parameters are used on a ratio that calculates the circularity, CH, of a
 shape, as <span class="math inline">\(CH = m/sd\)</span></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_circularity_haralick</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        2        4       13       24       36 </span></span>
-<span><span class="co">#&gt; 5.708275 5.058245 4.932743 4.717880 2.999055</span></span></code></pre></div>
+<span><span class="co">#&gt;        2        4       13       24       41 </span></span>
+<span><span class="co">#&gt; 5.708275 5.058245 4.932743 3.809527 1.743423</span></span></code></pre></div>
 <p><code><a href="../reference/utils_polygon.html">poly_convexity()</a></code> Computes the convexity of a shape using
 a ratio between the perimeter of the convex hull and the perimeter of
 the polygon.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_convexity</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 0.6435196 0.8850799 0.7579630 0.9188307 0.7093135</span></span></code></pre></div>
+<span><span class="co">#&gt;         2         4        13        24        41 </span></span>
+<span><span class="co">#&gt; 0.6435196 0.8850799 0.7579630 0.9099463 0.7222449</span></span></code></pre></div>
 <p><code><a href="../reference/utils_polygon.html">poly_eccentricity()</a></code> Computes the eccentricity of a shape
 using the ratio of the eigenvalues (inertia axes of coordinates).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_eccentricity</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 0.8333972 0.4217709 0.5991804 0.3995773 0.1949398</span></span></code></pre></div>
+<span><span class="co">#&gt;             [,1]</span></span>
+<span><span class="co">#&gt; [1,] 0.833397171</span></span>
+<span><span class="co">#&gt; [2,] 0.421770889</span></span>
+<span><span class="co">#&gt; [3,] 0.599180391</span></span>
+<span><span class="co">#&gt; [4,] 0.297943286</span></span>
+<span><span class="co">#&gt; [5,] 0.001438398</span></span></code></pre></div>
 <p><code><a href="../reference/utils_polygon.html">poly_elongation()</a></code> Computes the elongation of a shape as
 <code>1 - width / length</code></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_elongation</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 0.1542773 0.4112648 0.2460192 0.4560020 0.5860868</span></span></code></pre></div>
+<span><span class="co">#&gt;           [,1]</span></span>
+<span><span class="co">#&gt; [1,] 0.1542773</span></span>
+<span><span class="co">#&gt; [2,] 0.4112648</span></span>
+<span><span class="co">#&gt; [3,] 0.2460192</span></span>
+<span><span class="co">#&gt; [4,] 0.5160407</span></span>
+<span><span class="co">#&gt; [5,] 0.9651965</span></span></code></pre></div>
 <p><code><a href="../reference/utils_polygon.html">poly_caliper()</a></code> Computes the caliper (Also called the
 Feret’s diameter).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_caliper</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         2         4        13        24        36 </span></span>
-<span><span class="co">#&gt; 318.56710 235.58650 188.21530 184.27154  98.27004</span></span></code></pre></div>
+<span><span class="co">#&gt;        2        4       13       24       41 </span></span>
+<span><span class="co">#&gt; 317.5106 229.5125 187.4807 115.1347 253.3338</span></span></code></pre></div>
 <p>Users can use the function <code><a href="../reference/utils_polygon.html">poly_measures()</a></code> to compute
 most of the object measures in a single call.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_polygon.html">poly_measures</a></span><span class="op">(</span><span class="va">cont</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    id        x        y    area area_ch perimeter radius_mean radius_min</span></span>
-<span><span class="co">#&gt; 2   1 910.8859 190.0833 45075.0 57540.0 1290.1413   119.55450   68.93836</span></span>
-<span><span class="co">#&gt; 4   2 688.6980 171.6494 20793.5 21924.0  630.7128    85.22870   62.14629</span></span>
-<span><span class="co">#&gt; 13  3 866.7525 482.7571 15183.5 16554.0  565.7422    72.13064   48.67098</span></span>
-<span><span class="co">#&gt; 24  4 959.6320 622.0042 12095.5 12463.5  466.4874    64.39723   48.21310</span></span>
-<span><span class="co">#&gt; 36  5 341.3717 703.9947  2316.0  2602.5  237.4508    30.99134   17.25115</span></span>
-<span><span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean  diam_min diam_max   caliper</span></span>
-<span><span class="co">#&gt; 2   171.20105  20.94407     2.483393 239.10899 137.87672 342.4021 318.56710</span></span>
-<span><span class="co">#&gt; 4   129.75938  16.84946     2.087967 170.45741 124.29258 259.5188 235.58650</span></span>
-<span><span class="co">#&gt; 13  108.46217  14.62283     2.228477 144.26129  97.34197 216.9243 188.21530</span></span>
-<span><span class="co">#&gt; 24   95.62495  13.64961     1.983381 128.79447  96.42620 191.2499 184.27154</span></span>
-<span><span class="co">#&gt; 36   52.42721  10.33370     3.039056  61.98267  34.50230 104.8544  98.27004</span></span>
-<span><span class="co">#&gt;       length     width  solidity convexity elongation circularity</span></span>
-<span><span class="co">#&gt; 2  314.37766 265.87632 0.7833681 0.6435196  0.1542773    36.92656</span></span>
-<span><span class="co">#&gt; 4  235.44533 138.61494 0.9484355 0.8850799  0.4112648    19.13091</span></span>
-<span><span class="co">#&gt; 13 186.39012 140.53457 0.9172103 0.7579630  0.2460192    21.07974</span></span>
-<span><span class="co">#&gt; 24 184.07642 100.13720 0.9704738 0.9188307  0.4560020    17.99103</span></span>
-<span><span class="co">#&gt; 36  98.25528  40.66916 0.8899135 0.7093135  0.5860868    24.34494</span></span>
-<span><span class="co">#&gt;    circularity_haralick circularity_norm eccentricity</span></span>
-<span><span class="co">#&gt; 2              3.291546         2.938522    0.8333972</span></span>
-<span><span class="co">#&gt; 4              3.688325         1.522390    0.4217709</span></span>
-<span><span class="co">#&gt; 13             3.328425         1.677472    0.5991804</span></span>
-<span><span class="co">#&gt; 24             3.532195         1.431680    0.3995773</span></span>
-<span><span class="co">#&gt; 36             1.669406         1.937309    0.1949398</span></span></code></pre></div>
+<span><span class="co">#&gt; 2   1 911.0558 190.1729 45075.0   57540 1290.1413   119.55450  68.938361</span></span>
+<span><span class="co">#&gt; 4   2 689.1227 171.8705 20793.5   21924  630.7128    85.22870  62.146291</span></span>
+<span><span class="co">#&gt; 13  3 870.4033 485.5803 15183.5   16554  565.7422    72.13064  48.670983</span></span>
+<span><span class="co">#&gt; 24  4 846.2110 625.7005  4144.0    4433  291.5929    39.10193  25.480450</span></span>
+<span><span class="co">#&gt; 41  5 472.9797 784.6601  1688.0    2167  603.1543    73.70601   2.638939</span></span>
+<span><span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean   diam_min diam_max  caliper</span></span>
+<span><span class="co">#&gt; 2   171.20105  20.94407     2.483393 239.10899 137.876721 342.4021 314.3777</span></span>
+<span><span class="co">#&gt; 4   129.75938  16.84946     2.087967 170.45741 124.292582 259.5188 235.4453</span></span>
+<span><span class="co">#&gt; 13  108.46217  14.62283     2.228477 144.26129  97.341966 216.9243 186.3901</span></span>
+<span><span class="co">#&gt; 24   61.56336  10.26425     2.416102  78.20386  50.960900 123.1267 116.0408</span></span>
+<span><span class="co">#&gt; 41  147.04645  42.27660    55.721805 147.41202   5.277878 294.0929 292.2781</span></span>
+<span><span class="co">#&gt;      length     width  solidity convexity elongation circularity</span></span>
+<span><span class="co">#&gt; 2  314.3777 265.87632 0.7833681 0.6435196  0.1542773    36.92656</span></span>
+<span><span class="co">#&gt; 4  235.4453 138.61494 0.9484355 0.8850799  0.4112648    19.13091</span></span>
+<span><span class="co">#&gt; 13 186.3901 140.53457 0.9172103 0.7579630  0.2460192    21.07974</span></span>
+<span><span class="co">#&gt; 24 116.0408  56.15904 0.9348071 0.9099463  0.5160407    20.51796</span></span>
+<span><span class="co">#&gt; 41 292.2781  10.17229 0.7789571 0.7222449  0.9651965   215.51845</span></span>
+<span><span class="co">#&gt;    circularity_haralick circularity_norm eccentricity       pcv</span></span>
+<span><span class="co">#&gt; 2              5.708275       0.34030714  0.833397171 2.6693543</span></span>
+<span><span class="co">#&gt; 4              5.058245       0.65686211  0.421770889 0.8422071</span></span>
+<span><span class="co">#&gt; 13             4.932743       0.59613497  0.599180391 1.1910148</span></span>
+<span><span class="co">#&gt; 24             3.809527       0.61245704  0.297943286 1.7042851</span></span>
+<span><span class="co">#&gt; 41             1.743423       0.05830763  0.001438398 0.6421213</span></span></code></pre></div>
 <p>If the image resolution is known, then, the measures can be corrected
 with <code><a href="../reference/utils_measures.html">get_measures()</a></code>. The image resolution can be obtained
 using a known distance in the image. In the example, the white square
@@ -405,29 +420,29 @@ obtained. In this case, the dpi is ~50.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">measures_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_measures.html">get_measures</a></span><span class="op">(</span><span class="va">measures</span>, dpi <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    id        x        y      area   area_ch perimeter radius_mean radius_min</span></span>
-<span><span class="co">#&gt; 2   1 910.8859 190.0833 116.32235 148.49003  65.53918     6.07337    3.50207</span></span>
-<span><span class="co">#&gt; 4   2 688.6980 171.6494  53.66054  56.57795  32.04021     4.32962    3.15703</span></span>
-<span><span class="co">#&gt; 13  3 866.7526 482.7571  39.18315  42.71991  28.73970     3.66424    2.47249</span></span>
-<span><span class="co">#&gt; 24  4 959.6320 622.0042  31.21413  32.16381  23.69756     3.27138    2.44923</span></span>
-<span><span class="co">#&gt; 36  5 341.3717 703.9947   5.97676   6.71612  12.06250     1.57436    0.87636</span></span>
+<span><span class="co">#&gt; 2   1 911.0558 190.1729 116.32235 148.49003  65.53918     6.07337    3.50207</span></span>
+<span><span class="co">#&gt; 4   2 689.1227 171.8705  53.66054  56.57795  32.04021     4.32962    3.15703</span></span>
+<span><span class="co">#&gt; 13  3 870.4033 485.5803  39.18315  42.71991  28.73970     3.66424    2.47249</span></span>
+<span><span class="co">#&gt; 24  4 846.2110 625.7005  10.69417  11.43998  14.81292     1.98638    1.29441</span></span>
+<span><span class="co">#&gt; 41  5 472.9797 784.6600   4.35612   5.59225  30.64024     3.74427    0.13406</span></span>
 <span><span class="co">#&gt;    radius_max radius_sd radius_ratio diam_mean diam_min diam_max  caliper</span></span>
-<span><span class="co">#&gt; 2     8.69701   1.06396      0.12616  12.14674  7.00414 17.39403 16.18321</span></span>
-<span><span class="co">#&gt; 4     6.59178   0.85595      0.10607   8.65924  6.31406 13.18355 11.96779</span></span>
-<span><span class="co">#&gt; 13    5.50988   0.74284      0.11321   7.32847  4.94497 11.01976  9.56134</span></span>
-<span><span class="co">#&gt; 24    4.85775   0.69340      0.10076   6.54276  4.89845  9.71549  9.36099</span></span>
-<span><span class="co">#&gt; 36    2.66330   0.52495      0.15438   3.14872  1.75272  5.32660  4.99212</span></span>
+<span><span class="co">#&gt; 2     8.69701   1.06396      0.12616  12.14674  7.00414 17.39403 15.97039</span></span>
+<span><span class="co">#&gt; 4     6.59178   0.85595      0.10607   8.65924  6.31406 13.18355 11.96062</span></span>
+<span><span class="co">#&gt; 13    5.50988   0.74284      0.11321   7.32847  4.94497 11.01976  9.46862</span></span>
+<span><span class="co">#&gt; 24    3.12742   0.52142      0.12274   3.97276  2.58881  6.25484  5.89487</span></span>
+<span><span class="co">#&gt; 41    7.46996   2.14765      2.83067   7.48853  0.26812 14.93992 14.84773</span></span>
 <span><span class="co">#&gt;      length    width solidity convexity elongation circularity</span></span>
 <span><span class="co">#&gt; 2  15.97039 13.50652  0.03980   0.64352    0.15428    36.92656</span></span>
 <span><span class="co">#&gt; 4  11.96062  7.04164  0.04818   0.88508    0.41126    19.13091</span></span>
 <span><span class="co">#&gt; 13  9.46862  7.13916  0.04659   0.75796    0.24602    21.07974</span></span>
-<span><span class="co">#&gt; 24  9.35108  5.08697  0.04930   0.91883    0.45600    17.99103</span></span>
-<span><span class="co">#&gt; 36  4.99137  2.06599  0.04521   0.70931    0.58609    24.34494</span></span>
-<span><span class="co">#&gt;    circularity_haralick circularity_norm eccentricity</span></span>
-<span><span class="co">#&gt; 2               3.29155          2.93852      0.83340</span></span>
-<span><span class="co">#&gt; 4               3.68833          1.52239      0.42177</span></span>
-<span><span class="co">#&gt; 13              3.32842          1.67747      0.59918</span></span>
-<span><span class="co">#&gt; 24              3.53220          1.43168      0.39958</span></span>
-<span><span class="co">#&gt; 36              1.66941          1.93731      0.19494</span></span></code></pre></div>
+<span><span class="co">#&gt; 24  5.89487  2.85288  0.04749   0.90995    0.51604    20.51796</span></span>
+<span><span class="co">#&gt; 41 14.84773  0.51675  0.03957   0.72224    0.96520   215.51845</span></span>
+<span><span class="co">#&gt;    circularity_haralick circularity_norm eccentricity     pcv     pcv</span></span>
+<span><span class="co">#&gt; 2               5.70828          0.34031      0.83340 2.66935 2.66935</span></span>
+<span><span class="co">#&gt; 4               5.05825          0.65686      0.42177 0.84221 0.84221</span></span>
+<span><span class="co">#&gt; 13              4.93274          0.59613      0.59918 1.19101 1.19101</span></span>
+<span><span class="co">#&gt; 24              3.80953          0.61246      0.29794 1.70429 1.70429</span></span>
+<span><span class="co">#&gt; 41              1.74342          0.05831      0.00144 0.64212 0.64212</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

@@ -22,7 +22,7 @@ clustering-based image thresholding."><meta property="og:image" content="https:/
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,9 +117,11 @@ clustering-based image thresholding.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_binary</span><span class="op">(</span></span>
-<span>  <span class="va">image</span>,</span>
+<span>  <span class="va">img</span>,</span>
 <span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="st">"Otsu"</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Otsu"</span>, <span class="st">"adaptive"</span><span class="op">)</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  windowsize <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  has_white_bg <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  resize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  fill_hull <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -127,7 +129,7 @@ clustering-based image thresholding.</p>
 <span>  re <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  invert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show_image <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -138,7 +140,7 @@ clustering-based image thresholding.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><p>An image object.</p></dd>
 
 
@@ -149,11 +151,27 @@ target mode for conversion to binary image. See the available indexes with
 
 
 <dt>threshold</dt>
-<dd><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
-on Otsu's method is used to reduce the grayscale image to a binary image.
-If a numeric value is informed, this value will be used as a threshold.
-Inform any non-numeric value different than "Otsu" to iteratively chosen
-the threshold based on a raster plot showing pixel intensity of the index.</p></dd>
+<dd><p>The theshold method to be used.</p><ul><li><p>By default (<code>threshold = "Otsu"</code>), a threshold value based
+on Otsu's method is used to reduce the grayscale image to a binary image. If
+a numeric value is informed, this value will be used as a threshold.</p></li>
+<li><p>If <code>threshold = "adaptive"</code>, adaptive thresholding (Shafait et al. 2008)
+is used, and will depend on the <code>k</code> and <code>windowsize</code> arguments.</p></li>
+<li><p>If any non-numeric value different than <code>"Otsu"</code> and <code>"adaptive"</code> is used,
+an iterative section will allow you to choose the threshold based on a
+raster plot showing pixel intensity of the index.</p></li>
+</ul></dd>
+
+
+<dt>k</dt>
+<dd><p>a numeric in the range 0-1. when <code>k</code> is high, local threshold
+values tend to be lower. when <code>k</code> is low, local threshold value tend to be
+higher.</p></dd>
+
+
+<dt>windowsize</dt>
+<dd><p>windowsize controls the number of local neighborhood in
+adaptive thresholding. By default it is set to <code>1/3 * minxy</code>, where
+<code>minxy</code> is the minimum dimension of the image (in pixels).</p></dd>
 
 
 <dt>has_white_bg</dt>
@@ -197,7 +215,7 @@ image file.</p></dd>
 <dd><p>Inverts the binary image, if desired.</p></dd>
 
 
-<dt>show_image</dt>
+<dt>plot</dt>
 <dd><p>Show image after processing?</p></dd>
 
 
@@ -231,9 +249,11 @@ of indexes used.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Nobuyuki Otsu, "A threshold selection method from gray-level
-histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
-<a href="https://doi.org/10.1109/TSMC.1979.4310076" class="external-link">doi:10.1109/TSMC.1979.4310076</a></p>
+    <p>Otsu, N. 1979. Threshold selection method from gray-level histograms. IEEE
+Trans Syst Man Cybern SMC-9(1): 62–66. <a href="https://doi.org/10.1109/tsmc.1979.4310076" class="external-link">doi:10.1109/tsmc.1979.4310076</a></p>
+<p>Shafait, F., D. Keysers, and T.M. Breuel. 2008. Efficient implementation of
+local adaptive thresholding techniques using integral images. Document
+Recognition and Retrieval XV. SPIE. p. 317–322 <a href="https://doi.org/10.1117/12.767755" class="external-link">doi:10.1117/12.767755</a></p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -246,6 +266,7 @@ histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
 <span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">image_binary</span><span class="op">(</span><span class="va">img</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R, G"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="image_binary-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

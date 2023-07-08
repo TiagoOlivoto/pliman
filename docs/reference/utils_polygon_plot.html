@@ -34,7 +34,7 @@ each object.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,11 +131,10 @@ each object.</p></li>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_contour</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, id <span class="op">=</span> <span class="cn">NULL</span>, col <span class="op">=</span> <span class="st">"black"</span>, lwd <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_contour</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="cn">NULL</span>, col <span class="op">=</span> <span class="st">"black"</span>, lwd <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plot_polygon</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fill <span class="op">=</span> <span class="st">"gray"</span>,</span>
 <span>  random_fill <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -152,26 +151,15 @@ each object.</p></li>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">plot_mass</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  col <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  cex <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  lwd <span class="op">=</span> <span class="fl">1</span></span>
-<span><span class="op">)</span></span>
+<span><span class="fu">plot_mass</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="cn">NULL</span>, col <span class="op">=</span> <span class="st">"black"</span>, cex <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plot_ellipse</span><span class="op">(</span><span class="va">object</span>, id <span class="op">=</span> <span class="cn">NULL</span>, col <span class="op">=</span> <span class="st">"black"</span>, lwd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>x, y</dt>
-<dd><p>Coordinate vectors of points. This can be specified as two vectors
-(<code>x</code> and <code>y</code>), or a 2-column matrix <code>x</code>. If <code>x</code> is a list of vector
-coordinates the function will be applied to each element using
-<code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">base::lapply()</a></code>.</p></dd>
+    <dl><dt>x</dt>
+<dd><p>A 2-column matrix with the <code>x</code> and <code>y</code> coordinates.</p></dd>
 
 
 <dt>id</dt>
@@ -236,11 +224,6 @@ window size.</p></dd>
 <dt>xlim, ylim</dt>
 <dd><p>A numeric vector of length 2 (min; max) indicating the range
 of <code>x</code> and <code>y</code>-axes.</p></dd>
-
-
-<dt>arrow</dt>
-<dd><p>If <code>TRUE</code> (default) plots two arrows connecting the center of
-mass to the minimum and maximum radius.</p></dd>
 
 
 <dt>object</dt>

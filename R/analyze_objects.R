@@ -583,6 +583,7 @@ analyze_objects <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
+  lower_noise <- ifelse(isTRUE(reference_larger), lower_noise * 3, lower_noise)
   if(!object_size %in% c("small", "medium", "large", "elarge")){
     stop("'object_size' must be one of 'small', 'medium', 'large', or 'elarge'")
   }
@@ -1124,13 +1125,14 @@ analyze_objects <- function(img,
         mask <- NULL
       }
       stats <- data.frame(stat = c("n", "min_area", "mean_area", "max_area",
-                                   "sd_area", "sum_area"),
+                                   "sd_area", "sum_area", "coverage"),
                           value = c(length(shape$area),
                                     min(shape$area),
                                     mean(shape$area),
                                     max(shape$area),
                                     sd(shape$area),
-                                    sum(shape$area)))
+                                    sum(shape$area),
+                                    sum(shape$coverage)))
       results <- list(results = shape,
                       statistics = stats,
                       object_rgb = obj_rgb,
@@ -1147,12 +1149,7 @@ analyze_objects <- function(img,
                       parms = list(index = index))
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){
-        if(!interactive()){
-          pdf(NULL)
-        }
-
         backg <- !is.null(col_background)
-
         # color for background
         if (is.null(col_background)){
           col_background <- col2rgb("white") / 255
@@ -1254,6 +1251,7 @@ analyze_objects <- function(img,
             }
           }
         }
+
         if(save_image == TRUE){
           if(dir.exists(diretorio_processada) == FALSE){
             dir.create(diretorio_processada, recursive = TRUE)
@@ -1562,7 +1560,6 @@ analyze_objects <- function(img,
 #' @param type The type of plot. Either `"hist"` or `"density"`. Partial matches
 #'   are recognized.
 #' @method plot anal_obj
-#' @importFrom grDevices pdf
 #' @export
 #'
 #' @examples
@@ -1606,10 +1603,10 @@ plot.anal_obj <- function(x,
     matches <- grepl(type[1], types)
     type <- types[matches]
     if(type == "histogram"){
-      hist(temp,  xlab = paste(measure, "(pixels)"), main = NA, col = "cyan")
+      hist(temp,  xlab = paste(measure), main = NA, col = "cyan")
     } else{
       density_data <- density(temp)  # Calculate the density for the column
-      plot(density_data, col = "red", main = NA, lwd = 2, xlab = paste(measure, "(pixels)"), ylab = "Density")  # Create the density plot
+      plot(density_data, col = "red", main = NA, lwd = 2, xlab = paste(measure), ylab = "Density")  # Create the density plot
       points(x = temp, y = rep(0, length(temp)), col = "red")
     }
   } else{

@@ -64,7 +64,7 @@ plot_polygon(cont)
 # Object measures
 Nice! We can use the contour of any object to obtain useful information related to its shape. To reduce the amount of output, I will only use five samples: 2, 4, 13, 24, and 35.
 ```{r fig.height=6}
-cont <- cont[c("2", "4", "13", "24", "36")]
+cont <- cont[c("2", "4", "13", "24", "41")]
 plot_polygon(cont)
 ```
 

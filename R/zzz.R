@@ -21,6 +21,7 @@
 #' * `soybean_grain.jpg` A sample palette of the grains in `soy_green`.
 #' * `soybean_touch.jpg` Soybean grains with a cyan background touching one each
 #' other.
+#' * `field_mosaic.jpg` An UVA image from a soybean field.
 #' @md
 #' @source Personal data, Gupta et al. (2020).
 #' @references Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S.
@@ -34,7 +35,7 @@
 NULL
 
 .onAttach <- function(libname, pkgname) {
-  vers <-  "1.2.0.9000"
+  vers <-  "2.0.0"
   packageStartupMessage("|==========================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")            |")
   packageStartupMessage("| Author: Tiago Olivoto                                    |")

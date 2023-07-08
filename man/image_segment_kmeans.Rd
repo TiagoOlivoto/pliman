@@ -5,7 +5,7 @@
 \title{Image segmentation using k-means clustering}
 \usage{
 image_segment_kmeans(
-  image,
+  img,
   bands = 1:3,
   nclasses = 2,
   invert = FALSE,
@@ -15,7 +15,7 @@ image_segment_kmeans(
 )
 }
 \arguments{
-\item{image}{An \code{Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{bands}{A numeric integer/vector indicating the RGB band used in the
 segmentation. Defaults to \code{1:3}, i.e., all the RGB bands are used.}

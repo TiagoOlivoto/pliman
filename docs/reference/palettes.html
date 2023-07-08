@@ -18,7 +18,7 @@ to the RGB values."><meta property="og:image" content="https://tiagoolivoto.gith
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,12 +110,12 @@ to the RGB values.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_palette</span><span class="op">(</span><span class="va">image</span>, npal <span class="op">=</span> <span class="fl">2</span>, proportional <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_palette</span><span class="op">(</span><span class="va">img</span>, npal <span class="op">=</span> <span class="fl">5</span>, proportional <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>image</dt>
+    <dl><dt>img</dt>
 <dd><p>An image object.</p></dd>
 
 
@@ -138,6 +138,8 @@ the number of pixels in the image? Defaults to <code>TRUE</code>.</p></dd>
 
 <p><code>image_palette()</code> returns a list with two elements:</p><ul><li><p><code>palette_list</code> A list with <code>npal</code> color palettes of class <code>Image</code>.</p></li>
 <li><p><code>joint</code> An object of class <code>Image</code> with the color palettes</p></li>
+<li><p><code>proportions</code> The proportion of the entire image corresponding to each color in the palette</p></li>
+<li><p><code>rgbs</code> The average RGB value for each palette</p></li>
 </ul></div>
 
     <div class="section level2">

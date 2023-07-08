@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental-1)
+stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
@@ -29,15 +29,11 @@ performing Fourier Analysis, obtaining RGB values, extracting object
 coordinates and outlines, isolating objects, and plotting object
 measurements.
 
-`pliman` also provides useful functions for image
-[transformation](https://tiagoolivoto.github.io/pliman/reference/utils_transform.html),
-[binarization](https://tiagoolivoto.github.io/pliman/reference/image_binary.html),
-[segmentation](https://tiagoolivoto.github.io/pliman/reference/image_segment.html),
-and
-[resolution](https://tiagoolivoto.github.io/pliman/reference/utils_dpi.html).
-Please, visit the
-[Examples](https://tiagoolivoto.github.io/pliman/index.html) page in
-`pliman` website for a detailed documentation of each function.
+`pliman` also provides useful functions for image transformation,
+binarization, segmentation, and resolution. Please visit the
+[Examples](https://tiagoolivoto.github.io/pliman/reference/index.html)
+page on the `pliman` website for detailed documentation of each
+function.
 
 # Installation
 
@@ -62,68 +58,90 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 install the latest version of
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-# Basic usage
-
-## Analyze objects
+# Analyze objects
 
 The function `analyze_objects()` can be used to analyze objects such as
-leaves, grains, pods, and pollen in an image. The following example
-counts and computes several features of soybean grains of an image with
-30 grains.
+leaves, grains, pods, and pollen in an image. By default, all measures
+are returned in pixel units. Users can [adjust the object
+measures](https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html#adjusting-object-measures)
+with `get_measures()` provided that the image resolution (Dots Per Inch)
+is known. Another option is to use a reference object in the image. In
+this last case, the argument `reference` must be set to `TRUE`. There
+are two options to identify the reference object:
+
+1.  By its color, using the arguments `back_fore_index` and
+    `fore_ref_index`  
+2.  By its size, using the arguments `reference_larger` or
+    `reference_smaller`
+
+In both cases, the `reference_area` must be declared. Let’s see how to
+analyze an image with flax grains containing a reference object
+(rectangle with 2x3 cm). Here, we’ll identify the reference object by
+its size; so, the final results in this case will be in metric units
+(cm).
 
 ``` r
 library(pliman)
-# |==========================================================|
-# | Tools for Plant Image Analysis (pliman 1.2.0.9000)            |
-# | Author: Tiago Olivoto                                    |
-# | Type 'citation('pliman')' to know how to cite pliman     |
-# | Type 'vignette('pliman_start')' for a short tutorial     |
-# | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |
-# |==========================================================|
-img <-image_pliman("soybean_touch.jpg", plot = TRUE)
+img <- image_pliman("flax_grains.jpg")
+flax <- 
+  analyze_objects(img,
+                  index = "GRAY",
+                  reference = TRUE,
+                  reference_larger = TRUE,
+                  reference_area = 6,
+                  marker = "point")
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ``` r
-soy <- analyze_objects(img, marker = "id")
-str(soy$results)
-# 'data.frame': 30 obs. of  34 variables:
-#  $ id                  : num  1 2 3 4 5 6 7 8 9 10 ...
-#  $ x                   : num  245 537 237 344 277 ...
-#  $ y                   : num  509 401 339 105 260 ...
-#  $ area                : num  2279 2289 2310 2436 2159 ...
-#  $ area_ch             : num  2304 2262 2288 2408 2122 ...
-#  $ perimeter           : num  184 178 181 186 172 ...
-#  $ radius_mean         : num  26.5 26.6 26.7 27.5 25.8 ...
-#  $ radius_min          : num  23 24.8 24 24.3 24.2 ...
-#  $ radius_max          : num  29.4 28.7 29.4 30.5 28 ...
-#  $ radius_sd           : num  1.375 0.966 1.238 1.74 0.801 ...
-#  $ diam_mean           : num  53 53.1 53.4 54.9 51.5 ...
-#  $ diam_min            : num  45.9 49.7 48 48.6 48.5 ...
-#  $ diam_max            : num  58.8 57.4 58.9 61.1 56.1 ...
-#  $ major_axis          : num  19.3 19.5 19.8 20.8 18.7 ...
-#  $ minor_axis          : num  18.2 18 17.9 18 17.7 ...
-#  $ caliper             : num  57.3 56.9 57.7 61 54.4 ...
-#  $ length              : num  56.6 56.5 57.2 61 54 ...
-#  $ width               : num  51.5 52.4 52 51 50.5 ...
-#  $ radius_ratio        : num  1.28 1.16 1.23 1.26 1.16 ...
-#  $ theta               : num  -0.828 -0.804 -0.637 -0.979 -0.217 ...
-#  $ eccentricity        : num  0.328 0.387 0.428 0.495 0.325 ...
-#  $ form_factor         : num  0.85 0.906 0.886 0.889 0.92 ...
-#  $ narrow_factor       : num  1.01 1.01 1.01 1 1.01 ...
-#  $ asp_ratio           : num  1.1 1.08 1.1 1.2 1.07 ...
-#  $ rectangularity      : num  1.28 1.29 1.29 1.28 1.26 ...
-#  $ pd_ratio            : num  3.2 3.13 3.14 3.04 3.16 ...
-#  $ plw_ratio           : num  1.7 1.64 1.66 1.66 1.64 ...
-#  $ solidity            : num  0.989 1.012 1.009 1.012 1.017 ...
-#  $ convexity           : num  0.887 0.879 0.911 0.919 0.898 ...
-#  $ elongation          : num  0.089 0.0737 0.0911 0.1639 0.0643 ...
-#  $ circularity         : num  14.8 13.9 14.2 14.1 13.7 ...
-#  $ circularity_haralick: num  19.3 27.5 21.6 15.8 32.2 ...
-#  $ circularity_norm    : num  0.821 0.875 0.855 0.858 0.887 ...
-#  $ coverage            : num  0.00426 0.00428 0.00432 0.00456 0.00404 ...
+# summary statistics
+flax$statistics
+#        stat        value
+# 1         n 271.00000000
+# 2  min_area   0.01868645
+# 3 mean_area   0.06165272
+# 4  max_area   0.07969222
+# 5   sd_area   0.00654426
+# 6  sum_area  16.70788678
+# 7  coverage   0.05391447
+
+# plot the density of the grain's length (in cm)
+plot(flax, measure = "length")
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
+
+# Analyzing shapefiles
+
+The `analyze_objects_shp()` function performs object analysis based on
+shapefiles (rows and columns). Possible applications include computing
+canopy coverage and vegetation indexes useful for high-throughput
+phenotyping. By default `analyze_objects_shp()` calls
+`image_prepare_mv()` internally, allowing alignment and crop the image
+before processing. In the following example, we compute the canopy
+coverage and the Normalized Green Red Difference Index (NGRDI) for each
+one of the 12 soybean plots.
+
+``` r
+shp <- image_pliman("field_mosaic.jpg")
+res <- 
+  analyze_objects_shp(shp, 
+                      prepare = FALSE, # it is already aligned and cropped
+                      ncol = 12,
+                      nrow = 1,
+                      index = "HUE", # used to segment the soil
+                      object_index = "NGRDI") 
+plot(res$final_image_masked)
+# plot the shapefiles
+plot(res$shapefiles)
+# plot the canopy coverage
+plot_measures(res, measure = "coverage", col = "black", vjust = -160)
+# plot the NGRDI index
+plot_measures(res, measure = "NGRDI", col = "red", vjust = -190)
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 # Disease severity
 
@@ -146,6 +164,7 @@ background (blue).
 ``` r
 img <- image_pliman("sev_leaf.jpg")
 # Computes the symptomatic area
+sev <- 
 measure_disease(img = img,
                 index_lb = "B", # to remove the background
                 index_dh = "NGRDI", # to isolate the diseased area
@@ -153,20 +172,13 @@ measure_disease(img = img,
                 plot = TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-    # $severity
-    #    healthy symptomatic
-    # 1 92.62721    7.372791
-    # 
-    # $shape
-    # NULL
-    # 
-    # $statistics
-    # NULL
-    # 
-    # attr(,"class")
-    # [1] "plm_disease"
+``` r
+sev$severity
+#    healthy symptomatic
+# 1 92.62721    7.372791
+```
 
 ## Interactive disease measurements
 

@@ -18,7 +18,7 @@ given a list with Fourier coefficients computed with efourier()."><meta property
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,7 @@ given a list with Fourier coefficients computed with <code><a href="efourier.htm
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">efourier_inv</span><span class="op">(</span><span class="va">x</span>, nharm <span class="op">=</span> <span class="cn">NULL</span>, npoints <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">efourier_inv</span><span class="op">(</span><span class="va">x</span>, nharm <span class="op">=</span> <span class="cn">NULL</span>, a0 <span class="op">=</span> <span class="cn">NULL</span>, c0 <span class="op">=</span> <span class="cn">NULL</span>, npoints <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -123,6 +123,12 @@ given a list with Fourier coefficients computed with <code><a href="efourier.htm
 <dt>nharm</dt>
 <dd><p>An integer indicating the number of harmonics to use. If not
 specified the number of harmonics used in <code>x</code> is used.</p></dd>
+
+
+<dt>a0, c0</dt>
+<dd><p>the estimates of the coordinates of the centroid of the
+configuration. If <code>NULL</code> (default), the generated coordinates will be
+centered on the position of the original shape given by <code><a href="efourier.html">efourier()</a></code>.</p></dd>
 
 
 <dt>npoints</dt>

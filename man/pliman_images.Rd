@@ -27,6 +27,7 @@ al. (2020).
 \item \code{soybean_grain.jpg} A sample palette of the grains in \code{soy_green}.
 \item \code{soybean_touch.jpg} Soybean grains with a cyan background touching one each
 other.
+\item \code{field_mosaic.jpg} An UVA image from a soybean field.
 }
 }
 \source{

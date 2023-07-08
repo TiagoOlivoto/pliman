@@ -446,9 +446,9 @@ std::vector<std::vector<double>> help_get_rgb(const NumericMatrix &R, const Nume
 
 // GET THE COORDINATES OF A BOUNDING BOX OF A BINARY IMAGE
 // [[Rcpp::export]]
-IntegerVector bounding_box(LogicalMatrix image, int edge) {
-  int nrow = image.nrow();
-  int ncol = image.ncol();
+IntegerVector bounding_box(LogicalMatrix img, int edge) {
+  int nrow = img.nrow();
+  int ncol = img.ncol();
 
   int min_row = nrow;
   int max_row = 0;
@@ -457,7 +457,7 @@ IntegerVector bounding_box(LogicalMatrix image, int edge) {
 
   for (int i = 0; i < nrow; i++) {
     for (int j = 0; j < ncol; j++) {
-      if (image(i, j)) {
+      if (img(i, j)) {
         min_row = std::min(min_row, i);
         max_row = std::max(max_row, i);
         min_col = std::min(min_col, j);
@@ -473,7 +473,7 @@ IntegerVector bounding_box(LogicalMatrix image, int edge) {
 }
 
 // [[Rcpp::export]]
-List isolate_objects5(NumericMatrix image, IntegerMatrix labels) {
+List isolate_objects5(NumericMatrix img, IntegerMatrix labels) {
 
   int nrows = labels.nrow(), ncols = labels.ncol();
 
@@ -509,7 +509,7 @@ List isolate_objects5(NumericMatrix image, IntegerMatrix labels) {
     NumericMatrix cropped(crop_nrows, crop_ncols);
     for (int j = 0; j < crop_nrows; j++) {
       for (int k = 0; k < crop_ncols; k++) {
-        cropped(j,k) = image(top + j, left + k);
+        cropped(j,k) = img(top + j, left + k);
       }
     }
 
@@ -643,16 +643,16 @@ NumericMatrix help_shp(int rows, int cols, NumericVector dims) {
 
 // Function to compute Otsu's threshold
 // [[Rcpp::export]]
-double help_otsu(const NumericVector& image) {
-  int n = image.size();
+double help_otsu(const NumericVector& img) {
+  int n = img.size();
 
-  double x_max = max(image);
-  double x_min = min(image);
+  double x_max = max(img);
+  double x_min = min(img);
 
   // Compute histogram
   std::vector<int> histogram(256, 0);
   for (int i = 0; i < n; i++) {
-    int intensity = (int)(((1 - 0) / (x_max - x_min) * (image[i] - x_max) + 1) * 255);
+    int intensity = (int)(((1 - 0) / (x_max - x_min) * (img[i] - x_max) + 1) * 255);
     histogram[intensity]++;
   }
 

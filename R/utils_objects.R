@@ -9,7 +9,7 @@
 #' @name utils_objects
 #'
 #' @inheritParams analyze_objects
-#' @param image An image of class `Image` or a list of `Image` objects.
+#' @param img An image of class `Image` or a list of `Image` objects.
 #' @param center If `TRUE` returns the object contours centered on the origin.
 #' @param id
 #' * For `object_coord()`, a vector (or scalar) of object `id` to compute the
@@ -78,7 +78,7 @@
 #' plot(isolated)
 #'
 #' }
-object_coord <- function(image,
+object_coord <- function(img,
                          id =  NULL,
                          index = "NB",
                          watershed = TRUE,
@@ -93,25 +93,25 @@ object_coord <- function(image,
                          parallel = FALSE,
                          workers = NULL,
                          plot = TRUE){
-  if(inherits(image, "list")){
-    if(!all(sapply(image, class) == "Image")){
+  if(inherits(img, "list")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_coord, id, index, invert,
+      parLapply(clust, img, object_coord, id, index, invert,
                 fill_hull, threshold, edge, extension, tolerance,
                 object_size, plot)
     } else{
-      lapply(image, object_coord, id, index, invert, fill_hull, threshold,
+      lapply(img, object_coord, id, index, invert, fill_hull, threshold,
              edge, extension, tolerance, object_size, plot)
     }
   } else{
-    img2 <- help_binary(image,
+    img2 <- help_binary(img,
                         index = index,
                         invert = invert,
                         filter = filter,
@@ -122,7 +122,7 @@ object_coord <- function(image,
       coord <- t(as.matrix(bounding_box(data_mask, edge)))
       colnames(coord) <- c("xleft", "xright", "ybottom", "ytop")
       if(plot == TRUE){
-        plot(image)
+        plot(img)
         rect(xleft = coord[1],
              xright = coord[2],
              ybottom = coord[3],
@@ -158,7 +158,7 @@ object_coord <- function(image,
       coord <- t(sapply(list_mask, bounding_box, edge))
       colnames(coord) <- c("xleft", "xright", "ybottom", "ytop")
       if(plot == TRUE){
-        plot(image)
+        plot(img)
         rect(xleft = coord[,1],
              xright = coord[,2],
              ybottom = coord[,3],
@@ -173,7 +173,7 @@ object_coord <- function(image,
 #' @export
 #'
 
-object_contour <- function(image,
+object_contour <- function(img,
                            pattern = NULL,
                            dir_original = NULL,
                            center =  FALSE,
@@ -199,25 +199,25 @@ object_contour <- function(image,
              paste0("./", dir_original))
   }
 
-  if(is.null(pattern) && inherits(image, "list")){
-    if(!all(sapply(image, class) == "Image")){
+  if(is.null(pattern) && inherits(img, "list")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
+      parLapply(clust, img, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
                 watershed, extension, tolerance, object_size, plot = plot)
     } else{
-      lapply(image, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
+      lapply(img, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
              watershed, extension, tolerance, object_size, plot = plot)
     }
   } else{
     if(is.null(pattern)){
-      img2 <- help_binary(image,
+      img2 <- help_binary(img,
                           index = index,
                           invert = invert,
                           filter = filter,
@@ -253,7 +253,7 @@ object_contour <- function(image,
         if(isTRUE(center)){
           plot_polygon(contour)
         } else{
-          plot(image)
+          plot(img)
           plot_contour(contour, col = "red")
         }
       }
@@ -276,8 +276,8 @@ object_contour <- function(image,
 
 
       help_contour <- function(img){
-        image <- image_import(img)
-        img2 <- help_binary(image,
+        img <- image_import(img)
+        img2 <- help_binary(img,
                             index = index,
                             invert = invert,
                             filter = filter,
@@ -354,31 +354,31 @@ object_contour <- function(image,
 
 #' @name utils_objects
 #' @export
-object_isolate <- function(image,
+object_isolate <- function(img,
                            id = NULL,
                            parallel = FALSE,
                            workers = NULL,
                            ...){
-  if(inherits(image, "list")){
-    if(!all(sapply(image, class) == "Image")){
+  if(inherits(img, "list")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_isolate, id, ...)
+      parLapply(clust, img, object_isolate, id, ...)
     } else{
-      lapply(image, object_isolate, id, ...)
+      lapply(img, object_isolate, id, ...)
     }
   } else{
-    coord <- object_coord(image,
+    coord <- object_coord(img,
                           id = id,
                           plot = FALSE,
                           ...)
-    segmented <- image[coord[1]:coord[2],
+    segmented <- img[coord[1]:coord[2],
                        coord[3]:coord[4],
                        1:3]
     return(segmented)
@@ -386,26 +386,26 @@ object_isolate <- function(image,
 }
 #' @name utils_objects
 #' @export
-object_id <- function(image,
+object_id <- function(img,
                       parallel = FALSE,
                       workers = NULL,
                       ...){
-  if(inherits(image, "list")){
-    if(!all(sapply(image, class) == "Image")){
+  if(inherits(img, "list")){
+    if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
       clust <- makeCluster(nworkers)
-      clusterExport(clust, "image")
+      clusterExport(clust, "img")
       on.exit(stopCluster(clust))
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, image, object_id, ...)
+      parLapply(clust, img, object_id, ...)
     } else{
-      lapply(image, object_id, ...)
+      lapply(img, object_id, ...)
     }
   } else{
-    analyze_objects(image, verbose = FALSE, marker = "id", ...)
+    analyze_objects(img, verbose = FALSE, marker = "id", ...)
   }
 }
 
@@ -516,7 +516,7 @@ object_split <- function(img,
 #' Given an image and a matrix of labels that identify each object, the function
 #' extracts the red, green, and blue values from each object.
 #'
-#' @param image An `Image` object
+#' @param img An `Image` object
 #' @param labels A mask containing the labels for each object. This can be
 #'   obtained with [EBImage::bwlabel()] or [EBImage::watershed()]
 #'
@@ -536,8 +536,8 @@ object_split <- function(img,
 #' labs <- object_label(img, watershed = TRUE)
 #' rgb <- object_rgb(img, labs[[1]])
 #' head(rgb)
-object_rgb <- function(image, labels){
-  dd <- help_get_rgb(image[,,1], image[,,2], image[,,3], labels)
+object_rgb <- function(img, labels){
+  dd <- help_get_rgb(img[,,1], img[,,2], img[,,3], labels)
   df2 <- data.frame(do.call(rbind,  lapply(dd, function(x){
     matrix(x, ncol = 4, byrow = TRUE)
   })))
@@ -567,21 +567,21 @@ object_rgb <- function(image, labels){
 #' img2 <- object_to_color(img, index = "G-R")
 #' image_combine(img, img2)
 #'
-object_to_color <- function(image,
+object_to_color <- function(img,
                             index = "NB",
                             color = "blue",
                             plot = TRUE,
                             ...){
-  bin <- help_binary(image,
+  bin <- help_binary(img,
                      index = index,
                      ...)
   pix_ref <- which(bin == 1)
   colto <- col2rgb(color) / 255
-  image@.Data[,,1][pix_ref] <- colto[1]
-  image@.Data[,,2][pix_ref] <- colto[2]
-  image@.Data[,,3][pix_ref] <- colto[3]
+  img@.Data[,,1][pix_ref] <- colto[1]
+  img@.Data[,,2][pix_ref] <- colto[2]
+  img@.Data[,,3][pix_ref] <- colto[3]
   if(isTRUE(plot)){
-    plot(image)
+    plot(img)
   }
-  invisible(image)
+  invisible(img)
 }
