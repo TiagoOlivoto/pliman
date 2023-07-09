@@ -1600,7 +1600,7 @@ image_binary <- function(img,
             threshold <- threshold
           } else{
             pixels <- raster::raster(t(imgs@.Data))
-            plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+            raster::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
             threshold <- readline("Selected threshold: ")
           }
         }
@@ -3312,7 +3312,7 @@ help_binary <- function(img,
           threshold <- threshold
         } else{
           pixels <- raster::raster(t(imgs@.Data))
-          plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+          raster::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
           threshold <- readline("Selected threshold: ")
         }
       }
@@ -3398,6 +3398,7 @@ help_imageindex <- function(img,
   invisible(img_gray)
 }
 
+img
 
 #' Create an `Image` object
 #'

@@ -48,7 +48,7 @@ object_edge <- function(img,
     }
     else {
       pixels <- raster::raster(t(edata@.Data))
-      plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+      raster::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
       threshold <- readline("Selected threshold: ")
     }
   }
