@@ -3398,7 +3398,6 @@ help_imageindex <- function(img,
   invisible(img_gray)
 }
 
-img
 
 #' Create an `Image` object
 #'
