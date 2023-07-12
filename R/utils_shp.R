@@ -318,8 +318,8 @@ image_align <- function(img,
 #' @param nrow,ncol The number of rows and columns to generate the shapefile
 #'   when `shapefile` is not declared. Defaults to `1`.
 #' @param prepare Logical value indicating whether to prepare the image for
-#'   analysis using [image_prepare_mv()] function. This allows to align and crop
-#'   the image before processing.
+#'   analysis using [image_prepare_mv()] function. Defaults to `FALSE`. Set to
+#'   `TRUE` to interactively align and crop the image before processing.
 #' @param viewer The viewer option. If not provided, the value is retrieved
 #'   using [get_pliman_viewer()]. This option controls the type of viewer to use
 #'   for interactive plotting. The available options are "base" and "mapview".
@@ -363,7 +363,7 @@ image_align <- function(img,
 analyze_objects_shp <- function(img,
                                 nrow = 1,
                                 ncol = 1,
-                                prepare = TRUE,
+                                prepare = FALSE,
                                 viewer = get_pliman_viewer(),
                                 index = "R",
                                 shapefile = NULL,
@@ -629,7 +629,6 @@ analyze_objects_shp <- function(img,
 #' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 #' res <-
 #'    analyze_objects_shp(flax,
-#'                        prepare = FALSE,
 #'                        nrow = 3,
 #'                        ncol = 1,
 #'                        watershed = FALSE,

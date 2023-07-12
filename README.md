@@ -89,7 +89,10 @@ flax <-
                   reference = TRUE,
                   reference_larger = TRUE,
                   reference_area = 6,
-                  marker = "point")
+                  marker = "point",
+                  marker_size = 0.5,
+                  marker_col = "red", # default is white
+                  show_contour = FALSE) # default is TRUE
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -127,7 +130,6 @@ one of the 12 soybean plots.
 shp <- image_pliman("field_mosaic.jpg")
 res <- 
   analyze_objects_shp(shp, 
-                      prepare = FALSE, # it is already aligned and cropped
                       ncol = 12,
                       nrow = 1,
                       index = "HUE", # used to segment the soil
@@ -196,6 +198,8 @@ disease measurement.
 
 ``` r
 img <- image_pliman("sev_leaf.jpg", plot = TRUE)
+
+# works only in an interactive section
 measure_disease_iter(img, viewer = "mapview")
 ```
 

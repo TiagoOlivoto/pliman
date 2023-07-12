@@ -8,7 +8,7 @@ analyze_objects_shp(
   img,
   nrow = 1,
   ncol = 1,
-  prepare = TRUE,
+  prepare = FALSE,
   viewer = get_pliman_viewer(),
   index = "R",
   shapefile = NULL,
@@ -34,8 +34,8 @@ analyze_objects_shp(
 when \code{shapefile} is not declared. Defaults to \code{1}.}
 
 \item{prepare}{Logical value indicating whether to prepare the image for
-analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. This allows to align and crop
-the image before processing.}
+analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. Defaults to \code{FALSE}. Set to
+\code{TRUE} to interactively align and crop the image before processing.}
 
 \item{viewer}{The viewer option. If not provided, the value is retrieved
 using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use

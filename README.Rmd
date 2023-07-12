@@ -73,7 +73,10 @@ flax <-
                   reference = TRUE,
                   reference_larger = TRUE,
                   reference_area = 6,
-                  marker = "point")
+                  marker = "point",
+                  marker_size = 0.5,
+                  marker_col = "red", # default is white
+                  show_contour = FALSE) # default is TRUE
 # summary statistics
 flax$statistics
 
@@ -88,7 +91,6 @@ The `analyze_objects_shp()` function performs object analysis based on shapefile
 shp <- image_pliman("field_mosaic.jpg")
 res <- 
   analyze_objects_shp(shp, 
-                      prepare = FALSE, # it is already aligned and cropped
                       ncol = 12,
                       nrow = 1,
                       index = "HUE", # used to segment the soil
@@ -131,6 +133,8 @@ One advantage of using `measure_disease_iter()` is the ability to utilize the "m
 
 ```{r eval=FALSE}
 img <- image_pliman("sev_leaf.jpg", plot = TRUE)
+
+# works only in an interactive section
 measure_disease_iter(img, viewer = "mapview")
 ```
 
