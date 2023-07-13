@@ -948,6 +948,8 @@ analyze_objects <- function(img,
                           filter = filter,
                           invert = invert,
                           fill_hull = fill_hull)
+            ID <-  which(mask == 1) # IDs for foreground
+            ID2 <- which(mask == 0) # IDs for background
             if(isTRUE(watershed)){
               parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
               res <- length(mask)
@@ -1000,6 +1002,9 @@ analyze_objects <- function(img,
           })
         }
       }
+
+
+
       if(!is.null(lower_size) & !is.null(topn_lower) | !is.null(upper_size) & !is.null(topn_upper)){
         stop("Only one of 'lower_*' or 'topn_*' can be used.")
       }
