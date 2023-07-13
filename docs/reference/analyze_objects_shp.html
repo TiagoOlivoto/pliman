@@ -111,7 +111,7 @@
 <span>  <span class="va">img</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  prepare <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  prepare <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"R"</span>,</span>
 <span>  shapefile <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -144,8 +144,8 @@ when <code>shapefile</code> is not declared. Defaults to <code>1</code>.</p></dd
 
 <dt>prepare</dt>
 <dd><p>Logical value indicating whether to prepare the image for
-analysis using <code><a href="image_prepare_mv.html">image_prepare_mv()</a></code> function. This allows to align and crop
-the image before processing.</p></dd>
+analysis using <code><a href="image_prepare_mv.html">image_prepare_mv()</a></code> function. Defaults to <code>FALSE</code>. Set to
+<code>TRUE</code> to interactively align and crop the image before processing.</p></dd>
 
 
 <dt>viewer</dt>

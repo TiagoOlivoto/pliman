@@ -168,7 +168,10 @@
 <span>                  reference <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                  reference_larger <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                  reference_area <span class="op">=</span> <span class="fl">6</span>,</span>
-<span>                  marker <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></span></code></pre></div>
+<span>                  marker <span class="op">=</span> <span class="st">"point"</span>,</span>
+<span>                  marker_size <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>                  marker_col <span class="op">=</span> <span class="st">"red"</span>, <span class="co"># default is white</span></span>
+<span>                  show_contour <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># default is TRUE</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># summary statistics</span></span>
@@ -194,7 +197,6 @@
 <code class="sourceCode R"><span><span class="va">shp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"field_mosaic.jpg"</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="reference/analyze_objects_shp.html">analyze_objects_shp</a></span><span class="op">(</span><span class="va">shp</span>, </span>
-<span>                      prepare <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># it is already aligned and cropped</span></span>
 <span>                      ncol <span class="op">=</span> <span class="fl">12</span>,</span>
 <span>                      nrow <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                      index <span class="op">=</span> <span class="st">"HUE"</span>, <span class="co"># used to segment the soil</span></span>
@@ -238,6 +240,8 @@
 <p>One advantage of using <code><a href="reference/measure_disease.html">measure_disease_iter()</a></code> is the ability to utilize the “mapview” viewer, which enhances the analysis process by offering zoom-in options. This feature allows users to closely examine specific areas of the image, enabling detailed inspection and accurate disease measurement.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"sev_leaf.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># works only in an interactive section</span></span>
 <span><span class="fu"><a href="reference/measure_disease.html">measure_disease_iter</a></span><span class="op">(</span><span class="va">img</span>, viewer <span class="op">=</span> <span class="st">"mapview"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
