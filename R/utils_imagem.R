@@ -3128,6 +3128,7 @@ distance <- function(img,
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return A data frame with the columns of the converted color space
 #' @examples
+#' if(interactive()){
 #' library(pliman)
 #' img <- image_pliman("sev_leaf.jpg")
 #' rgb_to_lab(img)
@@ -3135,6 +3136,7 @@ distance <- function(img,
 #' # analyze the object and convert the pixels
 #' anal <- analyze_objects(img, object_index = "B", pixel_level_index = TRUE)
 #' rgb_to_lab(anal)
+#' }
 rgb_to_hsb <- function(object){
   if (any(class(object) %in%  c("data.frame", "matrix"))){
     hsb <-
