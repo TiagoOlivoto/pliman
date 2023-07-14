@@ -1,17 +1,15 @@
-## Release summary
-This is a minor release (1.1.0) that includes new features, bug corrections, and minor improvements. Please,  see `NEWS.md` for additional information.
-
-
-## Test environments
-* local R installation, R 4.2.0
-* ubuntu-16.04: devel, release, oldrel, 3.5, 3.4, 3.3
-* windows: release, oldrel
-* macOS: release
-* win-builder: devel
-
-## R CMD check results (run with --run-donttest --as-cran)
+* **Package**: pliman
+* **Version**: 2.0.0
+* **Date**: 2023/07/14
+* **Dependencies**
+   - Pliman depends on {EBImage} that is not on CRAN. I check this internally and provide a guide to install it. 
+* **Reverse dependencies**: None
+* **Release summary**
+   - This is a major release (2.0.0) that includes several new features and breaking changes. Please, see `NEWS.md` for additional information.
+   
+* **R CMD check results (run with --run-donttest --as-cran)**
 0 errors | 0 warnings | 1 notes
+checking CRAN incoming feasibility ... [13s] NOTE (I think the following note doesn't matter)
 
-* checking CRAN incoming feasibility ... Note_to_CRAN_maintainers Maintainer: 'Tiago Olivoto <tiagoolivoto@gmail.com>'
-
-   - I think the following note doesn't matter.
+* **devtools::check()**
+0 errors | 0 warnings | 0 notes
