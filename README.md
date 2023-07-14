@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# pliman <img src="man/figures/logo_pliman.svg" align="right" height="140/"/>
+# pliman <img src="man/figures/logo.svg" align="right" height="140/"/>
 
 <!-- badges: start -->
 
