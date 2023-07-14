@@ -1353,7 +1353,9 @@ analyze_objects <- function(img,
       init_time <- Sys.time()
       pb <- progress(max = length(plants), style = 4)
       foo <- function(plants, ...){
-        run_progress(pb, ...)
+        if(verbose == TRUE){
+          run_progress(pb, ...)
+        }
         help_count(img  = plants,
                    foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
                    tolerance, extension, randomize, nrows, plot, show_original,
@@ -1505,7 +1507,7 @@ analyze_objects <- function(img,
         do.call(rbind,
                 lapply(seq_along(results), function(i){
                   data.frame(pcv = results[[i]][["pcv"]]) |>
-                  transform(img =  names(results[i]))
+                    transform(img =  names(results[i]))
                 })
         )
 

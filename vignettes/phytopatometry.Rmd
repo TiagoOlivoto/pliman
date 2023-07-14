@@ -123,7 +123,7 @@ img <- image_pliman("sev_leaf.jpg", plot = TRUE)
 measure_disease_iter(img, viewer = "mapview")
 ```
 
-![](gif_severity.gif)
+![](https://tiagoolivoto.github.io/pliman_tut/imgs/gif_severity.gif)
 
 # <i class="fas fa-scroll"></i> A little bit more!
 
