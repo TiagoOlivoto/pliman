@@ -2,23 +2,27 @@ Package: pliman
 Title: Tools for Plant Image Analysis
 Version: 2.0.0
 Authors@R: 
-    person(given = "Tiago",
-           family = "Olivoto",
-           role = c("aut", "cre"),
-           email = "tiagoolivoto@gmail.com",
+    person("Tiago", "Olivoto", , "tiagoolivoto@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0241-9636"))
-Description: The pliman package provides a comprehensive set of tools for single
-    or batch image manipulation. It offers functionalities to accurately quantify
-    plant leaf area, assess disease severity, count objects, obtain shape measures, 
-    object landmarks, and compute Fourier analysis of the object outline.
-    Additionally, the package includes tools for analyzing grids, which enables
-    high throughput field phenotyping using RGB imagery captured by unmanned
+Description: Tools for single or batch image manipulation and analysis as
+    described by Olivoto (2022) <doi:10.1111/2041-210X.13803> that can be
+    used to quantify plant leaf area, assess disease severity, count
+    objects, obtain shape measures, object landmarks, and compute
+    Elliptical Fourier Analysis of the object outline, as described by
+    Claude (2008) <doi:10.1007/978-0-387-77789-4>. Additionally, the
+    package includes tools for analyzing grids, which enables high
+    throughput field phenotyping using RGB imagery captured by unmanned
     aerial vehicles.
 License: GPL (>= 3)
 URL: https://github.com/TiagoOlivoto/pliman
 BugReports: https://github.com/TiagoOlivoto/pliman/issues
 Depends: 
     R (>= 4.1)
+Imports: 
+    doParallel,
+    foreach,
+    raster,
+    Rcpp
 Suggests: 
     BiocManager,
     EBImage,
@@ -29,19 +33,14 @@ Suggests:
     mapview (>= 2.11.0),
     rmarkdown,
     rstudioapi
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
 VignetteBuilder: 
     knitr
 biocViews:
 Encoding: UTF-8
 Language: en-US
+LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Imports: 
-    doParallel,
-    foreach,
-    raster,
-    Rcpp
-LazyData: true
-LinkingTo: 
-    Rcpp,
-    RcppArmadillo
