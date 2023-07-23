@@ -725,6 +725,119 @@ plot_shp <- function(coords,
   })
 }
 
+
+#' Plot rectangles colored by a quantitative attribute and overlay on an RGB
+#' image
+#'
+#' This function plots rectangles on top of an RGB image, where each rectangle
+#' is colored based on a quantitative variable. The quantitative variable is
+#' specified in the `attribute` argument and should be present in the
+#' `object_index` of the `object` computed using [analyze_objects_shp()]. The
+#' rectangles are colored using a color scale.
+#'
+#' @param object An object computed with [analyze_objects_shp()].
+#' @param attribute The name of the quantitative variable in the
+#'   \code{object_index} to be used for coloring the rectangles.
+#' @param color A vector of two colors to be used for the color scale.
+#' @param alpha The transparency level of the rectangles' color (between 0 and 1).
+#' @param legend.position The position of the color legend, either
+#'   \code{"bottom"} or \code{"right"}.
+#' @param na.color The color to be used for rectangles with missing values in
+#'   the quantitative variable.
+#' @param classes The number of classes in the color scale.
+#' @param round The number of decimal places to round the legend values.
+#' @param horiz Logical, whether the legend should be horizontal (\code{TRUE})
+#'   or vertical (\code{FALSE}).
+#' @return The function plots rectangles colored by the specified quantitative
+#'   variable on top of the RGB image and shows the continuous color legend
+#'   outside the plot.
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#'
+#' # Computes the DGCI index for each flax leaf
+#' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
+#' res <-
+#'    analyze_objects_shp(flax,
+#'                        nrow = 3,
+#'                        ncol = 5,
+#'                        plot = FALSE,
+#'                        object_index = "DGCI")
+#' plot(res$final_image)
+#' plot_index_shp(res)
+#' }
+#'
+plot_index_shp <- function(object,
+                           attribute = "coverage",
+                           color = c("red","green"),
+                           alpha = 0.5,
+                           legend.position = "bottom",
+                           na.color = "gray",
+                           classes = 6,
+                           round = 3,
+                           horiz = TRUE) {
+  if(!is.null(object$object_index)){
+    quant_var <- aggregate(. ~ img, data = object[["object_index"]], FUN = mean)
+    quant_var <- cbind(quant_var, coverage =  aggregate(coverage ~ img, data = object$results, FUN = sum)$coverage)
+  } else{
+    quant_var <- aggregate(coverage ~ img, data = object$results, FUN = sum)
+  }
+  get_numeric_from_img <- function(x) {
+    as.numeric(gsub("shp", "", x))
+  }
+  quant_var <- quant_var[order(get_numeric_from_img(quant_var$img)), ]
+  if(!attribute %in% names(quant_var)){
+    stop("Attribute not found. Have you included it in the `object_index` argument from `analyze_objects_shp()`?", call. = FALSE)
+  }
+  quant_variable <- quant_var[, attribute]
+  coords_list <- object$shapefiles$shapefiles
+
+  # Combine all rectangles into one data frame for plotting
+  all_rectangles <- do.call(rbind, coords_list)
+
+  # Define the xmax, xmin, ymax, ymin of the image
+  xmax <- max(all_rectangles$x)
+  xmin <- min(all_rectangles$x)
+  ymax <- max(all_rectangles$y)
+  ymin <- min(all_rectangles$y)
+
+  # Normalize the quantitative variable for color scaling
+  rr <- range(quant_variable, na.rm = TRUE)
+  svals <- (quant_variable - rr[1]) / diff(rr)
+  svals[is.na(svals)] <- 0
+
+  # Create the color ramp function
+  f <- colorRamp(color)
+
+  # Calculate colors based on the normalized values and alpha
+  valcol <- rgb(f(svals)/255, alpha = alpha)
+  valcol[is.na(svals)] <- rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha)
+
+  # Add RGB image (raster) on the plot
+  plot(object$final_image)
+
+  for (i in 1:length(coords_list)) {
+    rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = valcol[i], border = NA)
+    rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = NA, border = "black")
+  }
+
+  # Generate the legend
+  pos <- round(seq(min(quant_variable, na.rm = TRUE),
+                   max(quant_variable, na.rm = TRUE),
+                   length.out = classes), round)
+  if (any(is.na(quant_variable))) {
+    pos <- c(pos, "NA")
+  }
+  col <- rgb(f(seq(0, 1, length.out = classes))/255, alpha = alpha)
+  if (any(is.na(quant_variable))) {
+    col <- c(col, rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha))
+  }
+  legend(legend.position, title = attribute, legend = pos, fill = col, bty = "n", horiz = horiz)
+}
+
+
 #' Measure disease using shapefiles
 #'
 #' This function calls [measure_disease()] in each image polygon of a shapefile
