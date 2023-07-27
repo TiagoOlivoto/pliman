@@ -11,6 +11,7 @@ analyze_objects(
   foreground = NULL,
   background = NULL,
   pick_palettes = FALSE,
+  viewer = get_pliman_viewer(),
   reference = FALSE,
   reference_area = NULL,
   back_fore_index = "R/(G/B)",
@@ -101,6 +102,10 @@ image named "fore".}
 pick up the color palettes for foreground and background for the image. If
 \code{TRUE} \code{\link[=pick_palette]{pick_palette()}} will be called internally so that the user can sample
 color points representing foreground and background.}
+
+\item{viewer}{The viewer option. This option controls the type of viewer to
+use for interactive plotting (eg., when \code{pick_palettes = TRUE}).  If not
+provided, the value is retrieved using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}.}
 
 \item{reference}{Logical to indicate if a reference object is present in the
 image. This is useful to adjust measures when images are not obtained with

@@ -125,6 +125,9 @@
 #'   pick up the color palettes for foreground and background for the image. If
 #'   `TRUE` [pick_palette()] will be called internally so that the user can sample
 #'   color points representing foreground and background.
+#' @param viewer The viewer option. This option controls the type of viewer to
+#'   use for interactive plotting (eg., when `pick_palettes = TRUE`).  If not
+#'   provided, the value is retrieved using [get_pliman_viewer()].
 #'@param reference Logical to indicate if a reference object is present in the
 #'  image. This is useful to adjust measures when images are not obtained with
 #'  standard resolution (e.g., field images). See more in the details section.
@@ -516,6 +519,7 @@ analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
                             pick_palettes = FALSE,
+                            viewer = get_pliman_viewer(),
                             reference = FALSE,
                             reference_area = NULL,
                             back_fore_index = "R/(G/B)",
@@ -638,22 +642,38 @@ analyze_objects <- function(img,
       # when reference is not used
       if(isFALSE(reference)){
         if(isTRUE(pick_palettes)){
+          viewopt <- c("base", "mapview")
+          viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
+
           if(interactive()){
-            plot(img)
-            message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
+            if(viewopt == "base"){
+              plot(img)
+            }
+            if(viewopt == "base"){
+              message("Use the first mouse button to pick up BACKGROUND colors. Press Est to exit")
+            }
             background <- pick_palette(img,
                                        r = 5,
                                        verbose = FALSE,
                                        palette  = FALSE,
                                        plot = FALSE,
-                                       col = "blue")
-            message("Use the first mouse button to pick up FOREGROUND colors. Press Est to exit")
+                                       col = "blue",
+                                       title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
+                                       viewer = viewer)
+            if(viewopt != "base"){
+              image_view(img |> reduce_dimensions(2000))
+            }
+            if(viewopt == "base"){
+              message("Use the first mouse button to pick up FOREGROUND colors. Press Est to exit")
+            }
             foreground <- pick_palette(img,
                                        r = 5,
                                        verbose = FALSE,
                                        palette  = FALSE,
                                        plot = FALSE,
-                                       col = "salmon")
+                                       col = "salmon",
+                                       title = "Use the first mouse button to pick up FOREGROUND colors. Click 'Done' to finish",
+                                       viewer = viewer)
           }
         }
         if(!is.null(foreground) && !is.null(background)){
@@ -1358,9 +1378,9 @@ analyze_objects <- function(img,
         }
         help_count(img  = plants,
                    foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
-                   tolerance, extension, randomize, nrows, plot, show_original,
-                   show_background, marker, marker_col, marker_size, save_image,
-                   prefix, dir_original, dir_processed, verbose, col_background,
+                   tolerance , extension, randomize, nrows, plot, show_original,
+                   show_background, marker, marker_col, marker_size, save_image, prefix,
+                   dir_original, dir_processed, verbose, col_background,
                    col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
       }
       results <-
