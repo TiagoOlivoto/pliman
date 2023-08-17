@@ -53,6 +53,10 @@ help_otsu <- function(img) {
     .Call(`_pliman_help_otsu`, img)
 }
 
+helper_guo_hall <- function(image) {
+    .Call(`_pliman_helper_guo_hall`, image)
+}
+
 help_area <- function(coord) {
     .Call(`_pliman_help_area`, coord)
 }

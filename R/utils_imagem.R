@@ -246,7 +246,7 @@ image_export <- function(img,
                          ...){
   check_ebi()
   if(class(img) %in% c("binary_list", "index_list",
-                         "img_mat_list", "palette_list")){
+                       "img_mat_list", "palette_list")){
     img <- lapply(img, function(x){x[[1]]})
   }
   if(inherits(img, "segment_list")){
@@ -450,7 +450,7 @@ image_autocrop <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -477,8 +477,8 @@ image_autocrop <- function(img,
                               plot = FALSE,
                               filter = filter)
     segmented <- img[conv_hull[1]:conv_hull[2],
-                       conv_hull[3]:conv_hull[4],
-                       1:3]
+                     conv_hull[3]:conv_hull[4],
+                     1:3]
     if(isTRUE(plot)){
       plot(segmented)
     }
@@ -501,7 +501,7 @@ image_crop <- function(img,
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -577,7 +577,7 @@ image_dimension <- function(img,
                             verbose = TRUE){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -642,7 +642,7 @@ image_rotate <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -678,7 +678,7 @@ image_horizontal <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -720,7 +720,7 @@ image_vertical <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -762,7 +762,7 @@ image_hreflect <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -798,7 +798,7 @@ image_vreflect <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -838,7 +838,7 @@ image_resize <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -893,7 +893,7 @@ image_trim <- function(img,
   right <- ifelse(is.null(right), edge, right)
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -935,7 +935,7 @@ image_dilate <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -982,7 +982,7 @@ image_erode <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1028,7 +1028,7 @@ image_opening <- function(img,
                           plot = FALSE){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1074,7 +1074,7 @@ image_closing <- function(img,
                           plot = FALSE){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1120,7 +1120,7 @@ image_skeleton <- function(img,
                            ...){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1175,7 +1175,7 @@ image_thinning <- function(img,
   check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1222,6 +1222,79 @@ image_thinning <- function(img,
 }
 
 
+#' Perform Guo-Hall thinning on a binary image or list of binary images
+#'
+#' This function performs the Guo-Hall thinning algorithm (Guo and Hall, 1989)
+#' on a binary image or a list of binary images.
+#'
+#' @param img The binary image or a list of binary images to be thinned. It can
+#'   be either a single binary image of class 'Image' or a list of binary
+#'   images.
+#' @param parallel Logical, whether to perform thinning using multiple cores
+#'   (parallel processing). If TRUE, the function will use multiple cores for
+#'   processing if available. Default is FALSE.
+#' @param workers Integer, the number of workers (cores) to use for parallel
+#'   processing. If NULL (default), it will use 40% of available cores.
+#' @param verbose Logical, whether to display progress messages during parallel
+#'   processing. Default is TRUE.
+#' @param plot Logical, whether to plot the thinned images. Default is FALSE.
+#' @param ... Additional arguments to be passed to [image_binary()] if
+#'   \code{img} is not a binary image.
+#'
+#' @references Guo, Z., and R.W. Hall. 1989. Parallel thinning with
+#'    two-subiteration algorithms. Commun. ACM 32(3): 359–373.
+#'    \doi{10.1145/62065.62074}
+#' @return If \code{img} is a single binary image, the function returns the
+#'   thinned binary image. If \code{img} is a list of binary images, the
+#'   function returns a list containing the thinned binary images.
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' img <- image_pliman("potato_leaves.jpg", plot = TRUE)
+#' image_thinning_guo_hall(img, index = "R", plot = TRUE)
+#'
+#'
+image_thinning_guo_hall <- function(img,
+                                    parallel = FALSE,
+                                    workers = NULL,
+                                    verbose = TRUE,
+                                    plot = FALSE,
+                                    ...){
+  check_ebi()
+  if(is.list(img)){
+    if(class(img) %in% c("binary_list", "segment_list", "index_list",
+                         "img_mat_list", "palette_list")){
+      img <- lapply(img, function(x){x[[1]]})
+    }
+    if(!all(sapply(img, class) == "Image")){
+      stop("All images must be of class 'Image'")
+    }
+    if(parallel == TRUE){
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.4), workers)
+      clust <- makeCluster(nworkers)
+      clusterExport(clust, "img")
+      on.exit(stopCluster(clust))
+      if(verbose == TRUE){
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+      }
+      parLapply(clust, img, image_thinning_guo_hall)
+    } else{
+      lapply(img, image_thinning_guo_hall)
+    }
+  } else{
+    if(EBImage::colorMode(img) != 0){
+      img <- help_binary(img, ..., resize = FALSE)
+    }
+    thin <- helper_guo_hall(img)
+    if(isTRUE(plot)){
+      plot(thin)
+    }
+    return(thin)
+  }
+}
+
+
 
 
 
@@ -1239,7 +1312,7 @@ image_filter <- function(img,
   }
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1275,7 +1348,7 @@ image_blur <- function(img,
                        plot = FALSE){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){
@@ -1310,7 +1383,7 @@ image_contrast <- function(img,
                            plot = FALSE){
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
-                           "img_mat_list", "palette_list")){
+                         "img_mat_list", "palette_list")){
       img <- lapply(img, function(x){x[[1]]})
     }
     if(!all(sapply(img, class) == "Image")){

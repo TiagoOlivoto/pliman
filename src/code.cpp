@@ -704,3 +704,73 @@ double help_otsu(const NumericVector& img) {
 }
 
 
+
+
+
+// Function to apply Guo-Hall thinning algorithm to a binary image
+// Adapted from https://observablehq.com/@esperanc/thinning#guoHall
+// [[Rcpp::export]]
+IntegerMatrix helper_guo_hall(IntegerMatrix image) {
+  int wid = image.ncol();
+  int hgt = image.nrow();
+  IntegerMatrix data2 = Rcpp::clone(image);
+
+  auto get = [&](int col, int row) { return image(row, col) != 0; };
+  auto set = [&](int col, int row) { data2(row, col) = 255; };
+  auto clear = [&](int col, int row) { data2(row, col) = 0; };
+
+  IntegerMatrix stepCounter(wid, hgt);
+
+  // Performs the conditional removal of one pixel. Even is true
+  // if this is an even iteration.
+  // Returns 1 if pixel was removed and 0 if not
+  auto removePixel = [&](int col, int row, bool even) {
+    if (!get(col, row)) return 0; // Not a 1-pixel
+    int p2 = get(col - 1, row);
+    int p3 = get(col - 1, row + 1);
+    int p4 = get(col, row + 1);
+    int p5 = get(col + 1, row + 1);
+    int p6 = get(col + 1, row);
+    int p7 = get(col + 1, row - 1);
+    int p8 = get(col, row - 1);
+    int p9 = get(col - 1, row - 1);
+    int C = ((!p2) & (p3 | p4)) + ((!p4) & (p5 | p6)) + ((!p6) & (p7 | p8)) + ((!p8) & (p9 | p2));
+    if (C != 1) return 0;
+    int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+    int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+    int N = (N1 < N2) ? N1 : N2;
+    if (N < 2 || N > 3) return 0;
+    int m = even ? ((p6 | p7 | (!p9)) & p8) : ((p2 | p3 | (!p5)) & p4);
+    if (m == 0) {
+      clear(col, row);
+      stepCounter(row, col) = 1;
+      return 1;
+    }
+    return 0;
+  };
+
+  bool even = true;
+
+  // Performs one thinning step.
+  // Returns the number of removed pixels
+  auto thinStep = [&]() {
+    int result = 0;
+    for (int row = 1; row < hgt - 1; row++) {
+      for (int col = 1; col < wid - 1; col++) {
+        result += removePixel(col, row, even);
+      }
+    }
+    even = !even;
+    image = clone(data2); // Copy data2 back to image
+    return result;
+  };
+
+  // Performs the thinning algorithm
+  int n = 0;
+  do {
+    stepCounter.fill(0);
+    n = thinStep();
+  } while (n > 0);
+
+  return image;
+}
