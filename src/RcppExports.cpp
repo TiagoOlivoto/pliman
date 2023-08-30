@@ -150,15 +150,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // help_shp
-NumericMatrix help_shp(int rows, int cols, NumericVector dims);
-RcppExport SEXP _pliman_help_shp(SEXP rowsSEXP, SEXP colsSEXP, SEXP dimsSEXP) {
+NumericMatrix help_shp(int rows, int cols, NumericVector dims, double buffer_x, double buffer_y);
+RcppExport SEXP _pliman_help_shp(SEXP rowsSEXP, SEXP colsSEXP, SEXP dimsSEXP, SEXP buffer_xSEXP, SEXP buffer_ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type rows(rowsSEXP);
     Rcpp::traits::input_parameter< int >::type cols(colsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dims(dimsSEXP);
-    rcpp_result_gen = Rcpp::wrap(help_shp(rows, cols, dims));
+    Rcpp::traits::input_parameter< double >::type buffer_x(buffer_xSEXP);
+    Rcpp::traits::input_parameter< double >::type buffer_y(buffer_ySEXP);
+    rcpp_result_gen = Rcpp::wrap(help_shp(rows, cols, dims, buffer_x, buffer_y));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -420,7 +422,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_bounding_box", (DL_FUNC) &_pliman_bounding_box, 2},
     {"_pliman_isolate_objects5", (DL_FUNC) &_pliman_isolate_objects5, 2},
     {"_pliman_help_isolate_object", (DL_FUNC) &_pliman_help_isolate_object, 6},
-    {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 3},
+    {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 5},
     {"_pliman_help_otsu", (DL_FUNC) &_pliman_help_otsu, 1},
     {"_pliman_helper_guo_hall", (DL_FUNC) &_pliman_helper_guo_hall, 1},
     {"_pliman_help_area", (DL_FUNC) &_pliman_help_area, 1},

@@ -596,47 +596,50 @@ List help_isolate_object(NumericMatrix R, NumericMatrix G, NumericMatrix B, Inte
   return isolated_objects;
 }
 
-
-// COORDINATES OF A SHAPEFILE
 // [[Rcpp::export]]
-NumericMatrix help_shp(int rows, int cols, NumericVector dims) {
+NumericMatrix help_shp(int rows, int cols, NumericVector dims, double buffer_x, double buffer_y) {
   double xmin = dims[0];
   double xmax = dims[1];
   double ymin = dims[2];
   double ymax = dims[3];
   double xr = xmax - xmin;
   double yr = ymax - ymin;
+
   double intx = xr / cols;
-  NumericVector xvec(cols + 1);
-  xvec[0] = xmin;
-  for (int i = 1; i <= cols; i++) {
-    xvec[i] = xvec[i - 1] + intx;
-  }
   double inty = yr / rows;
-  NumericVector yvec(rows + 1);
-  yvec[0] = ymin;
-  for (int i = 1; i <= rows; i++) {
-    yvec[i] = yvec[i - 1] + inty;
-  }
+
   NumericMatrix coords(rows * cols * 5, 2);
   int con = 0;
+
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       con++;
-      coords((con - 1) * 5, 0) = xvec[j];
-      coords((con - 1) * 5, 1) = yvec[i];
-      coords((con - 1) * 5 + 1, 0) = xvec[j + 1];
-      coords((con - 1) * 5 + 1, 1) = yvec[i];
-      coords((con - 1) * 5 + 2, 0) = xvec[j + 1];
-      coords((con - 1) * 5 + 2, 1) = yvec[i + 1];
-      coords((con - 1) * 5 + 3, 0) = xvec[j];
-      coords((con - 1) * 5 + 3, 1) = yvec[i + 1];
-      coords((con - 1) * 5 + 4, 0) = xvec[j];
-      coords((con - 1) * 5 + 4, 1) = yvec[i];
+
+      double x_start = xmin + j * intx;
+      double x_end = x_start + intx;
+      double y_start = ymin + i * inty;
+      double y_end = y_start + inty;
+
+      double buffered_x_start = x_start + buffer_x * intx;
+      double buffered_x_end = x_end - buffer_x * intx;
+      double buffered_y_start = y_start + buffer_y * inty;
+      double buffered_y_end = y_end - buffer_y * inty;
+
+      coords((con - 1) * 5, 0) = buffered_x_start;
+      coords((con - 1) * 5, 1) = buffered_y_start;
+      coords((con - 1) * 5 + 1, 0) = buffered_x_end;
+      coords((con - 1) * 5 + 1, 1) = buffered_y_start;
+      coords((con - 1) * 5 + 2, 0) = buffered_x_end;
+      coords((con - 1) * 5 + 2, 1) = buffered_y_end;
+      coords((con - 1) * 5 + 3, 0) = buffered_x_start;
+      coords((con - 1) * 5 + 3, 1) = buffered_y_end;
+      coords((con - 1) * 5 + 4, 0) = buffered_x_start;
+      coords((con - 1) * 5 + 4, 1) = buffered_y_start;
     }
   }
   return coords;
 }
+
 
 
 

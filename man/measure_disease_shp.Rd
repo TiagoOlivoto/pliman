@@ -8,6 +8,8 @@ measure_disease_shp(
   img,
   nrow = 1,
   ncol = 1,
+  buffer_x = 0,
+  buffer_y = 0,
   prepare = FALSE,
   viewer = "mapview",
   index_lb = "HUE2",
@@ -33,6 +35,11 @@ that contains the images to be processed.}
 
 \item{nrow, ncol}{The number of rows and columns to generate the shapefile.
 Defaults to \code{1}.}
+
+\item{buffer_x, buffer_y}{Buffering factor for the width and height,
+respectively, of each individual shape's side. A value between 0 and 0.5 where 0
+means no buffering and 0.5 means complete buffering (default: 0). A value of
+0.25 will buffer the shape by 25\% on each side.}
 
 \item{prepare}{Logical value indicating whether to prepare the image for
 analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. This allows to align and crop

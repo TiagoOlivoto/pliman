@@ -8,6 +8,8 @@ object_split_shp(
   img,
   nrow = 1,
   ncol = 1,
+  buffer_x = 0,
+  buffer_y = 0,
   interactive = FALSE,
   viewer = get_pliman_viewer(),
   only_shp = FALSE,
@@ -20,6 +22,11 @@ object_split_shp(
 \item{nrow}{The number of desired rows in the grid. Defaults to \code{1}.}
 
 \item{ncol}{The number of desired columns in the grid. Defaults to \code{1}.}
+
+\item{buffer_x, buffer_y}{Buffering factor for the width and height,
+respectively, of each individual shape's side. A value between 0 and 0.5 where 0
+means no buffering and 0.5 means complete buffering (default: 0). A value of
+0.25 will buffer the shape by 25\% on each side.}
 
 \item{interactive}{If \code{FALSE} (default) the grid is created automatically
 based on the image dimension and number of rows/columns. If \code{interactive = TRUE}, users must draw points at the diagonal of the desired bounding box
