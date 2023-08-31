@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# pliman <img src="man/figures/logo.svg" align="right" height="140/"/>
+# pliman <img src="man/figures/logo.png" align="right" height="140/"/>
 
 <!-- badges: start -->
 
@@ -132,15 +132,10 @@ res <-
   analyze_objects_shp(shp, 
                       ncol = 12,
                       nrow = 1,
+                      buffer_x = 0.1, # defaults is 0
                       index = "HUE", # used to segment the soil
                       object_index = "NGRDI") 
-plot(res$final_image_masked)
-# plot the shapefiles
-plot(res$shapefiles)
-# plot the canopy coverage
-plot_measures(res, measure = "coverage", col = "black", vjust = -160)
-# plot the NGRDI index
-plot_measures(res, measure = "NGRDI", col = "red", vjust = -190)
+plot_index_shp(res, attribute = "coverage")
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -207,7 +202,6 @@ measure_disease_iter(img, viewer = "mapview")
 
 ``` r
 citation("pliman")
-
 Please, support this project by citing it in your publications!
 
   Olivoto T (2022). "Lights, camera, pliman! An R package for plant
@@ -215,7 +209,7 @@ Please, support this project by citing it in your publications!
   789-798. doi:10.1111/2041-210X.13803
   <https://doi.org/10.1111/2041-210X.13803>.
 
-A BibTeX entry for LaTeX users is
+Uma entrada BibTeX para usuários(as) de LaTeX é
 
   @Article{,
     title = {Lights, camera, pliman! An R package for plant image analysis},

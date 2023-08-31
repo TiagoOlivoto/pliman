@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 ```
 
-# pliman <img src="man/figures/logo.svg" align="right" height="140/"/>
+# pliman <img src="man/figures/logo.png" align="right" height="140/"/>
 
 <!-- badges: start -->
 
@@ -93,15 +93,10 @@ res <-
   analyze_objects_shp(shp, 
                       ncol = 12,
                       nrow = 1,
+                      buffer_x = 0.1, # defaults is 0
                       index = "HUE", # used to segment the soil
                       object_index = "NGRDI") 
-plot(res$final_image_masked)
-# plot the shapefiles
-plot(res$shapefiles)
-# plot the canopy coverage
-plot_measures(res, measure = "coverage", col = "black", vjust = -160)
-# plot the NGRDI index
-plot_measures(res, measure = "NGRDI", col = "red", vjust = -190)
+plot_index_shp(res, attribute = "coverage")
 ```
 
 
