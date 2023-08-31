@@ -60,6 +60,8 @@ library(pliman)
 flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 res <-
    analyze_objects_shp(flax,
+                       buffer_x = 0.2,
+                       buffer_y = 0.2,
                        nrow = 3,
                        ncol = 5,
                        plot = FALSE,
