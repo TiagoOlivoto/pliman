@@ -65,9 +65,9 @@ ef2 <- efourier(contours, align = TRUE, center = TRUE)
 efourier_coefs(ef2)
 
 # reconstruct the perimeter of the object
-plot_polygon(contours)
-efourier_inv(ef2) |>
-plot_contour(col = "red", lwd = 4)
+# Use only the first one for simplicity
+plot_polygon(contours[[1]] |> poly_align() |> poly_center())
+efourier_inv(ef2[[1]]) |> plot_contour(col = "red", lwd = 4)
 }
 \references{
 Claude, J. (2008) \emph{Morphometrics with R}, Use R! series,
