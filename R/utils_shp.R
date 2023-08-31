@@ -8,6 +8,10 @@
 #' @param img An object of class `Image`
 #' @param nrow The number of desired rows in the grid. Defaults to `1`.
 #' @param ncol The number of desired columns in the grid. Defaults to `1`.
+#' @param buffer_x,buffer_y Buffering factor for the width and height,
+#'   respectively, of each individual shape's side. A value between 0 and 0.5 where 0
+#'   means no buffering and 0.5 means complete buffering (default: 0). A value of
+#'   0.25 will buffer the shape by 25% on each side.
 #' @param interactive If `FALSE` (default) the grid is created automatically
 #'   based on the image dimension and number of rows/columns. If `interactive =
 #'   TRUE`, users must draw points at the diagonal of the desired bounding box
@@ -37,6 +41,8 @@
 image_shp <- function(img,
                       nrow = 1,
                       ncol = 1,
+                      buffer_x = 0,
+                      buffer_y = 0,
                       interactive = FALSE,
                       viewer = get_pliman_viewer(),
                       col_line = "red",
@@ -64,7 +70,7 @@ image_shp <- function(img,
   bbox <-
     data.frame(x = c(c1[1], c1[2], c1[2], c1[1], c1[1]),
                y = c(c1[3], c1[3], c1[4], c1[4], c1[3]))
-  shps <- help_shp(nrow, ncol, c1)
+  shps <- help_shp(nrow, ncol, c1, buffer_x = buffer_x, buffer_y = buffer_y)
   shps <- data.frame(plot = paste0(rep(1:(ncol * nrow), each = 5)), shps)
   colnames(shps) <- c("plot", "x", "y")
   coords <- split(shps, shps$plot)
@@ -166,13 +172,20 @@ plot.image_shp <- function(x,
 object_split_shp <- function(img,
                              nrow = 1,
                              ncol = 1,
+                             buffer_x = 0,
+                             buffer_y = 0,
                              interactive = FALSE,
                              viewer = get_pliman_viewer(),
                              only_shp = FALSE,
                              ...){
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
-  shps <- image_shp(img, nrow, ncol, interactive = interactive, plot = FALSE, viewer = vieweropt, ...)
+  shps <- image_shp(img, nrow, ncol,
+                    buffer_x = buffer_x,
+                    buffer_y = buffer_y,
+                    interactive = interactive,
+                    plot = FALSE,
+                    viewer = vieweropt, ...)
   shapefile <- shps$shapefiles
   if(!isTRUE(only_shp)){
     imgs <- list()
@@ -313,6 +326,7 @@ image_align <- function(img,
 #'
 #'
 #' @inheritParams analyze_objects
+#' @inheritParams  image_shp
 #'
 #' @param img An `Image` object
 #' @param nrow,ncol The number of rows and columns to generate the shapefile
@@ -363,6 +377,8 @@ image_align <- function(img,
 analyze_objects_shp <- function(img,
                                 nrow = 1,
                                 ncol = 1,
+                                buffer_x = 0,
+                                buffer_y = 0,
                                 prepare = FALSE,
                                 viewer = get_pliman_viewer(),
                                 index = "R",
@@ -396,13 +412,20 @@ analyze_objects_shp <- function(img,
                           object_index = object_index)$mask
   object_index_used <- object_index
   if(is.null(shapefile)){
-    tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
+    tmp <- object_split_shp(img, nrow, ncol,
+                            buffer_x = buffer_x,
+                            buffer_y = buffer_y,
+                            interactive = interactive,
+                            only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
   } else{
     nrow <- shapefile$nrow
     ncol <- shapefile$ncol
-    tmp <- object_split_shp(img, nrow, ncol, interactive = FALSE, only_shp = FALSE)
+    tmp <- object_split_shp(img, nrow, ncol,
+                            buffer_x = buffer_x,
+                            buffer_y = buffer_y,
+                            interactive = FALSE, only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
   }
@@ -751,6 +774,7 @@ plot_shp <- function(coords,
 #' @return The function plots rectangles colored by the specified quantitative
 #'   variable on top of the RGB image and shows the continuous color legend
 #'   outside the plot.
+#' @importFrom grDevices colorRamp
 #' @export
 #'
 #' @examples
@@ -761,6 +785,8 @@ plot_shp <- function(coords,
 #' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 #' res <-
 #'    analyze_objects_shp(flax,
+#'                        buffer_x = 0.2,
+#'                        buffer_y = 0.2,
 #'                        nrow = 3,
 #'                        ncol = 5,
 #'                        plot = FALSE,
@@ -845,6 +871,7 @@ plot_index_shp <- function(object,
 #' frames.
 #'
 #' @inheritParams measure_disease
+#' @inheritParams image_shp
 #'
 #' @param img The image to be analyzed. Either an image of class `Image` or a
 #'   character string containing the image name. In the last, the image will be
@@ -884,6 +911,8 @@ plot_index_shp <- function(object,
 measure_disease_shp <- function(img,
                                 nrow = 1,
                                 ncol = 1,
+                                buffer_x = 0,
+                                buffer_y = 0,
                                 prepare = FALSE,
                                 viewer = "mapview",
                                 index_lb = "HUE2",
@@ -916,6 +945,8 @@ measure_disease_shp <- function(img,
   help_meas_shp <- function(img,
                             nrow,
                             ncol,
+                            buffer_x,
+                            buffer_y,
                             index_lb,
                             index_dh,
                             threshold,
@@ -933,7 +964,11 @@ measure_disease_shp <- function(img,
       name_ori <- match.call()[[2]]
       extens_ori <- "jpg"
     }
-    tmp <- object_split_shp(img, nrow, ncol, interactive = interactive, only_shp = FALSE)
+    tmp <- object_split_shp(img, nrow, ncol,
+                            buffer_x = buffer_x,
+                            buffer_y = buffer_y,
+                            interactive = interactive,
+                            only_shp = FALSE)
     imgs <- tmp$imgs
     shapes <- tmp$shapefile$shapefiles
 
@@ -1016,6 +1051,8 @@ measure_disease_shp <- function(img,
     results <- help_meas_shp(img,
                              nrow,
                              ncol,
+                             buffer_x,
+                             buffer_y,
                              index_lb,
                              index_dh,
                              threshold,
@@ -1051,6 +1088,8 @@ measure_disease_shp <- function(img,
           help_meas_shp(names_plant[[i]],
                         nrow,
                         ncol,
+                        buffer_x,
+                        buffer_y,
                         index_lb,
                         index_dh,
                         threshold,
@@ -1069,6 +1108,8 @@ measure_disease_shp <- function(img,
         results[[i]] <- help_meas_shp(img  = names_plant[i],
                                       nrow,
                                       ncol,
+                                      buffer_x,
+                                      buffer_y,
                                       index_lb,
                                       index_dh,
                                       threshold,
