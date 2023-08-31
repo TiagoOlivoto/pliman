@@ -451,9 +451,8 @@ poly_center <- function(x, plot = TRUE) {
     return(centered)
   } else{
     centered <-
-      transform(x,
-                X1 = X1 - mean(X1),
-                X2 = X2 - mean(X2))
+      data.frame(X1 = x[,1] - mean(x[,1]),
+                 X2 = x[,2] - mean(x[,2]))
     if(isTRUE(plot)){
       plot_polygon(centered, merge = FALSE, aspect_ratio = 1)
     }
