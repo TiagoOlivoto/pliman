@@ -1,3 +1,13 @@
+# pliman 2.0.1
+## New functions
+
+* `object_export_shp()` and `object_export()` to export objects from an image to multiple images in the current working directory.
+* `plot_index_shp()` to plot rectangles on top of an RGB image, where each rectangle is colored based on a quantitative variable.
+
+## Bug fixes
+* Fix bug in `poly_center()` by calling the column position instead column name (`X1`)
+
+
 # pliman 2.0.0
 ## New functions
 * `analyze_objects_iter()` to execute an interactive section of `analyze_objects()`.

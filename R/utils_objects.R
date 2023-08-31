@@ -379,8 +379,8 @@ object_isolate <- function(img,
                           plot = FALSE,
                           ...)
     segmented <- img[coord[1]:coord[2],
-                       coord[3]:coord[4],
-                       1:3]
+                     coord[3]:coord[4],
+                     1:3]
     return(segmented)
   }
 }
@@ -508,6 +508,84 @@ object_split <- function(img,
   }
   return(list_objects)
 }
+
+#' Export multiple objects from an image to multiple images
+#'
+#' Givin an image with multiple objects, `object_export()` will split the
+#' objects into a list of objects using [object_split()] and then export them to
+#' multiple images into the current working directory (or a subfolder).
+#'
+#' @inheritParams object_split
+#' @inheritParams image_export
+#' @param format The format of image to be exported.
+#' @param subfolder Optional character string indicating a subfolder within the
+#'   current working directory to save the image(s). If the folder doesn't
+#'   exist, it will be created.
+#' @param squarize Squarizes the image before the exportation? If `TRUE`,
+#'   [image_square()] will be called internally.
+#' @return A `NULL` object.
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' img <- image_pliman("la_leaves.jpg")
+#' object_export(img)
+#'
+#' }
+object_export <- function(img,
+                          format = ".jpg",
+                          subfolder = NULL,
+                          squarize = FALSE,
+                          index = "NB",
+                          lower_size = NULL,
+                          watershed = TRUE,
+                          invert = FALSE,
+                          fill_hull = FALSE,
+                          filter = 2,
+                          threshold = "Otsu",
+                          extension = NULL,
+                          tolerance = NULL,
+                          object_size = "medium",
+                          edge = 20,
+                          remove_bg = FALSE){
+
+  list_objects <- object_split(img = img,
+                               index = index,
+                               lower_size = lower_size,
+                               watershed = watershed,
+                               invert = invert,
+                               fill_hull = fill_hull,
+                               filter = filter,
+                               threshold = threshold,
+                               extension = extension,
+                               tolerance = tolerance,
+                               object_size = object_size,
+                               edge = edge,
+                               remove_bg = remove_bg,
+                               verbose = FALSE,
+                               plot = FALSE)
+
+  a <- lapply(seq_along(list_objects), function(i){
+    tmp <- list_objects[[i]]
+    if(isTRUE(squarize)){
+      tmp <- image_square(tmp,
+                          plot = FALSE,
+                          sample_left = 10,
+                          sample_top = 10,
+                          sample_right = 10,
+                          sample_bottom = 10)
+    }
+    image_export(tmp,
+                 name = paste0("obj_",
+                               leading_zeros(as.numeric(names(list_objects[i])),
+                                             n = 4), format),
+                 subfolder = subfolder)
+  })
+  rm(a)
+}
+
+
 
 
 

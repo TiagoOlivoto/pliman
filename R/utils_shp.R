@@ -212,6 +212,67 @@ object_split_shp <- function(img,
 }
 
 
+#' Export multiple objects from an image to multiple images
+#'
+#' Givin an image with multiple objects, `object_export_shp()` will split the
+#' objects into a list of objects using [object_split_shp()] and then export
+#' them to multiple images into the current working directory (or a subfolder).
+#'
+#' @inheritParams object_split_shp
+#' @inheritParams image_export
+#' @param format The format of image to be exported.
+#' @param subfolder Optional character string indicating a subfolder within the
+#'   current working directory to save the image(s). If the folder doesn't
+#'   exist, it will be created.
+#' @param squarize Squarizes the image before the exportation? If `TRUE`,
+#'   [image_square()] will be called internally.
+#' @return A `NULL` object.
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' flax <- image_pliman("flax_leaves.jpg", plot = TRUE)
+#' object_export_shp(flax)
+#'
+#' }
+object_export_shp <- function(img,
+                              format = ".jpg",
+                              subfolder = NULL,
+                              squarize = FALSE,
+                              nrow = 1,
+                              ncol = 1,
+                              buffer_x = 0,
+                              buffer_y = 0,
+                              interactive = FALSE,
+                              viewer = get_pliman_viewer()){
+
+  list_objects <- object_split_shp(img,
+                                   nrow = nrow,
+                                   ncol = ncol,
+                                   buffer_x = buffer_x,
+                                   buffer_y = buffer_y,
+                                   interactive = interactive,
+                                   viewer = viewer)[["imgs"]]
+
+  a <- lapply(seq_along(list_objects), function(i){
+    tmp <- list_objects[[i]]
+    if(isTRUE(squarize)){
+      tmp <- image_square(tmp,
+                          plot = FALSE,
+                          sample_left = 10,
+                          sample_top = 10,
+                          sample_right = 10,
+                          sample_bottom = 10)
+    }
+    image_export(tmp,
+                 name = paste0(names(list_objects[i]), format),
+                 subfolder = subfolder)
+  })
+  rm(a)
+}
+
+
 #' Aligns an `Image` object by hand
 #'
 #' [image_rotate()] rotate an image given a line of desired aligment along the y
