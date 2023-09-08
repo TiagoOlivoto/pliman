@@ -217,13 +217,27 @@ object_split_shp <- function(img,
 #' Givin an image with multiple objects, `object_export_shp()` will split the
 #' objects into a list of objects using [object_split_shp()] and then export
 #' them to multiple images into the current working directory (or a subfolder).
+#' Batch processing is performed by declaring a file name pattern that matches
+#' the images within the working directory.
 #'
 #' @inheritParams object_split_shp
-#' @inheritParams image_export
-#' @param format The format of image to be exported.
-#' @param subfolder Optional character string indicating a subfolder within the
+#' @inheritParams utils_image
+#' @inheritParams analyze_objects
+#'
+#' @param pattern A pattern of file name used to identify images to be
+#'   processed. For example, if `pattern = "im"` all images in the current
+#'   working directory that the name matches the pattern (e.g., img1.-,
+#'   image1.-, im2.-) will be imported and processed. Providing any number as
+#'   pattern (e.g., `pattern = "1"`) will select images that are named as 1.-,
+#'   2.-, and so on. An error will be returned if the pattern matches any file
+#'   that is not supported (e.g., img1.pdf).
+#'@param dir_original The directory containing the original images. Defaults to
+#'  `NULL`. It can be either a full path, e.g., `"C:/Desktop/imgs"`, or a
+#'  subfolder within the current working directory, e.g., `"/imgs"`.
+#' @param dir_processed Optional character string indicating a subfolder within the
 #'   current working directory to save the image(s). If the folder doesn't
 #'   exist, it will be created.
+#' @param format The format of image to be exported.
 #' @param squarize Squarizes the image before the exportation? If `TRUE`,
 #'   [image_square()] will be called internally.
 #' @return A `NULL` object.
@@ -237,6 +251,9 @@ object_split_shp <- function(img,
 #'
 #' }
 object_export_shp <- function(img,
+                              pattern = NULL,
+                              dir_original = NULL,
+                              dir_processed = NULL,
                               format = ".jpg",
                               subfolder = NULL,
                               squarize = FALSE,
@@ -245,31 +262,146 @@ object_export_shp <- function(img,
                               buffer_x = 0,
                               buffer_y = 0,
                               interactive = FALSE,
+                              parallel = FALSE,
+                              verbose = TRUE,
                               viewer = get_pliman_viewer()){
+  if(is.null(pattern)){
+    list_objects <- object_split_shp(img,
+                                     nrow = nrow,
+                                     ncol = ncol,
+                                     buffer_x = buffer_x,
+                                     buffer_y = buffer_y,
+                                     interactive = interactive,
+                                     viewer = viewer)[["imgs"]]
 
-  list_objects <- object_split_shp(img,
-                                   nrow = nrow,
-                                   ncol = ncol,
-                                   buffer_x = buffer_x,
-                                   buffer_y = buffer_y,
-                                   interactive = interactive,
-                                   viewer = viewer)[["imgs"]]
-
-  a <- lapply(seq_along(list_objects), function(i){
-    tmp <- list_objects[[i]]
-    if(isTRUE(squarize)){
-      tmp <- image_square(tmp,
-                          plot = FALSE,
-                          sample_left = 10,
-                          sample_top = 10,
-                          sample_right = 10,
-                          sample_bottom = 10)
+    a <- lapply(seq_along(list_objects), function(i){
+      tmp <- list_objects[[i]]
+      if(isTRUE(squarize)){
+        tmp <- image_square(tmp,
+                            plot = FALSE,
+                            sample_left = 10,
+                            sample_top = 10,
+                            sample_right = 10,
+                            sample_bottom = 10)
+      }
+      image_export(tmp,
+                   name = paste0(names(list_objects[i]), format),
+                   subfolder = dir_processed)
+    })
+  } else{
+    if(is.null(dir_original)){
+      diretorio_original <- paste0("./")
+    } else{
+      diretorio_original <-
+        ifelse(grepl("[/\\]", dir_original),
+               dir_original,
+               paste0("./", dir_original))
     }
-    image_export(tmp,
-                 name = paste0(names(list_objects[i]), format),
-                 subfolder = subfolder)
-  })
-  rm(a)
+    if(is.null(dir_processed)){
+      diretorio_processada <- paste0("./")
+    } else{
+      diretorio_processada <-
+        ifelse(grepl("[/\\]", dir_processed),
+               dir_processed,
+               paste0("./", dir_processed))
+    }
+
+    if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      pattern <- "^[0-9].*$"
+    }
+    plants <- list.files(pattern = pattern, diretorio_original)
+    extensions <- as.character(sapply(plants, file_extension))
+    names_plant <- as.character(sapply(plants, file_name))
+    if(length(grep(pattern, names_plant)) == 0){
+      stop(paste("Pattern '", pattern, "' not found in '",
+                 paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
+           call. = FALSE)
+    }
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
+      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+    }
+
+
+    if(isTRUE(parallel)){
+
+      init_time <- Sys.time()
+      nworkers <- trunc(detectCores()*.3)
+      cl <- parallel::makePSOCKcluster(nworkers)
+      doParallel::registerDoParallel(cl)
+      on.exit(stopCluster(cl))
+
+      if(verbose == TRUE){
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
+      }
+      ## declare alias for dopar command
+      `%dopar%` <- foreach::`%dopar%`
+
+      results <-
+        foreach::foreach(i = seq_along(plants), .packages = c("pliman")) %dopar%{
+
+          tmpimg <- image_import(plants[[i]], path = diretorio_original)
+
+          list_objects <- object_split_shp(tmpimg,
+                                           nrow = nrow,
+                                           ncol = ncol,
+                                           buffer_x = buffer_x,
+                                           buffer_y = buffer_y,
+                                           interactive = interactive,
+                                           viewer = viewer)[["imgs"]]
+
+          a <- lapply(seq_along(list_objects), function(j){
+            tmp <- list_objects[[j]]
+            if(isTRUE(squarize)){
+              tmp <- image_square(tmp,
+                                  plot = FALSE,
+                                  sample_left = 10,
+                                  sample_top = 10,
+                                  sample_right = 10,
+                                  sample_bottom = 10)
+            }
+            image_export(tmp,
+                         name = paste0(file_name(plants[[i]]), "_", names(list_objects[j]), format),
+                         subfolder = diretorio_processada)
+          }
+          )
+        }
+
+      message("Done!")
+      message("Elapsed time: ", sec_to_hms(as.numeric(difftime(Sys.time(),  init_time, units = "secs"))))
+
+    } else{
+
+      for(i in seq_along(plants)){
+        tmpimg <- image_import(plants[[i]], path = diretorio_original)
+
+        list_objects <- object_split_shp(tmpimg,
+                                         nrow = nrow,
+                                         ncol = ncol,
+                                         buffer_x = buffer_x,
+                                         buffer_y = buffer_y,
+                                         interactive = interactive,
+                                         viewer = viewer)[["imgs"]]
+
+        a <- lapply(seq_along(list_objects), function(j){
+          tmp <- list_objects[[j]]
+          if(isTRUE(squarize)){
+            tmp <- image_square(tmp,
+                                plot = FALSE,
+                                sample_left = 10,
+                                sample_top = 10,
+                                sample_right = 10,
+                                sample_bottom = 10)
+          }
+          image_export(tmp,
+                       name = paste0(file_name(plants[[i]]), "_", names(list_objects[j]), format),
+                       subfolder = diretorio_processada)
+        })
+      }
+    }
+
+
+  }
+
 }
 
 

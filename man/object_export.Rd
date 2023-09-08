@@ -6,8 +6,10 @@
 \usage{
 object_export(
   img,
+  pattern = NULL,
+  dir_original = NULL,
+  dir_processed = NULL,
   format = ".jpg",
-  subfolder = NULL,
   squarize = FALSE,
   index = "NB",
   lower_size = NULL,
@@ -20,17 +22,31 @@ object_export(
   tolerance = NULL,
   object_size = "medium",
   edge = 20,
-  remove_bg = FALSE
+  remove_bg = FALSE,
+  parallel = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
 \item{img}{The image to be analyzed.}
 
-\item{format}{The format of image to be exported.}
+\item{pattern}{A pattern of file name used to identify images to be
+processed. For example, if \code{pattern = "im"} all images in the current
+working directory that the name matches the pattern (e.g., img1.-,
+image1.-, im2.-) will be imported and processed. Providing any number as
+pattern (e.g., \code{pattern = "1"}) will select images that are named as 1.-,
+2.-, and so on. An error will be returned if the pattern matches any file
+that is not supported (e.g., img1.pdf).}
 
-\item{subfolder}{Optional character string indicating a subfolder within the
+\item{dir_original}{The directory containing the original images. Defaults to
+\code{NULL}. It can be either a full path, e.g., \code{"C:/Desktop/imgs"}, or a
+subfolder within the current working directory, e.g., \code{"/imgs"}.}
+
+\item{dir_processed}{Optional character string indicating a subfolder within the
 current working directory to save the image(s). If the folder doesn't
 exist, it will be created.}
+
+\item{format}{The format of image to be exported.}
 
 \item{squarize}{Squarizes the image before the exportation? If \code{TRUE},
 \code{\link[=image_square]{image_square()}} will be called internally.}
@@ -101,6 +117,15 @@ object. Defaults to 5.}
 
 \item{remove_bg}{If \code{TRUE}, the pixels that are not part of objects are
 converted to white.}
+
+\item{parallel}{If \code{TRUE} processes the images asynchronously (in parallel) in
+separate R sessions running in the background on the same machine. It may
+speed up the processing time, especially when \code{pattern} is used is informed.
+When \code{object_index} is informed, multiple sections will be used to extract
+the RGB values for each object in the image. This may significantly speed up
+processing time when an image has lots of objects (say >1000).}
+
+\item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 }
 \value{
 A \code{NULL} object.
@@ -108,7 +133,9 @@ A \code{NULL} object.
 \description{
 Givin an image with multiple objects, \code{object_export()} will split the
 objects into a list of objects using \code{\link[=object_split]{object_split()}} and then export them to
-multiple images into the current working directory (or a subfolder).
+multiple images into the current working directory (or a subfolder). Batch
+processing is performed by declaring a file name pattern that matches the
+images within the working directory.
 }
 \examples{
 if(interactive()){
