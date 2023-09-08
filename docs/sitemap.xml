@@ -139,6 +139,9 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_square.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_thinning_guo_hall.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_to_mat.html</loc>
   </url>
   <url>
@@ -184,6 +187,12 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/object_edge.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/object_export.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/object_export_shp.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/object_label.html</loc>
   </url>
   <url>
@@ -227,6 +236,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/plot_index.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/plot_index_shp.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/plot_lw.html</loc>

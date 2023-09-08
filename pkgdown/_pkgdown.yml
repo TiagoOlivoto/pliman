@@ -82,6 +82,7 @@ reference:
       - image_create
       - image_expand
       - image_square
+      - image_thinning_guo_hall
 
   - title: "Image transformation"
     desc: "Performs spatial transformations such as rotation, reflection, and resizing"
@@ -149,6 +150,7 @@ reference:
       - make_mask
       - otsu
       - plot_index
+      - plot_index_shp
       - pixel_index
       - watershed2
       - plot.image_index
@@ -189,6 +191,8 @@ reference:
       - utils_polygon
       - object_split
       - object_edge
+      - object_export
+      - object_export_shp
       - object_label
       - object_rgb
       - pixel_index
