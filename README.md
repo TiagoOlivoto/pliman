@@ -17,7 +17,7 @@ downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](htt
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
 [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
-
+[![R-CMD-check](https://github.com/TiagoOlivoto/pliman/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/TiagoOlivoto/pliman/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The pliman (**pl**ant **im**age **an**alysis) package is designed to
