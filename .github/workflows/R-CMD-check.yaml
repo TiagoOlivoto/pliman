@@ -44,5 +44,6 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: R-CMD-check with --no-manual
-        run: R CMD check . --no-manual
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
