@@ -27,7 +27,7 @@ Let's compute the leaf area of `leaves` with `analyze_objects()`. First, we use 
 
 ```{r leaf3, fig.width=10, fig.height=8 }
 library(pliman)
-path <- "https://raw.githubusercontent.com/TiagoOlivoto/pliman/master/vignettes/imgs"
+path <- "https://raw.githubusercontent.com/TiagoOlivoto/images/master/pliman"
 leaves <- 
   image_import("leaves2.jpg",
                path = path,

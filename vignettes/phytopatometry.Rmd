@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 ```{r disease1, fig.width=12, fig.height=3}
 library(pliman)
 # set the path directory
-path_soy <- "https://raw.githubusercontent.com/TiagoOlivoto/pliman/master/vignettes/imgs"
+path_soy <- "https://raw.githubusercontent.com/TiagoOlivoto/images/master/pliman"
 # import images
 img <- image_import("leaf.jpg", path = path_soy)
 healthy <- image_import("healthy.jpg", path = path_soy)
