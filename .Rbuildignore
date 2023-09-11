@@ -11,12 +11,7 @@
 ^doc$
 ^pkgdown$
 ^man/figures$
-^vignettes/analyze_objects\.Rmd$
-^vignettes/manipulation\.Rmd$
-^vignettes/leaf_area\.Rmd$
-^vignettes/segmentation\.Rmd$
-^vignettes/phytopatometry\.Rmd$
-^vignettes/polygons\.Rmd$
+vignettes
 ^CODE_OF_CONDUCT\.md$
 ^\.github$
 ^cran-comments\.md$
