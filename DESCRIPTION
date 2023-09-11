@@ -36,8 +36,6 @@ Suggests:
 LinkingTo: 
     Rcpp,
     RcppArmadillo
-VignetteBuilder: 
-    knitr
 biocViews:
 Encoding: UTF-8
 Language: en-US

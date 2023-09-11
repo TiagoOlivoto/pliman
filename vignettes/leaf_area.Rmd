@@ -5,10 +5,6 @@ date: "`r Sys.Date()`"
 always_allow_html: yes
 output: rmarkdown::html_vignette
 fig_caption: yes
-vignette: >
-  %\VignetteIndexEntry{Measure leaf area using leaf images}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}

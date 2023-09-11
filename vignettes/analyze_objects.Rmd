@@ -7,10 +7,6 @@ output:
   html_document:
     df_print: paged
 fig_caption: yes
-vignette: >
-  %\VignetteIndexEntry{Analyzing objects in an image}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
