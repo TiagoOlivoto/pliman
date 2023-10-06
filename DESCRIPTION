@@ -21,8 +21,10 @@ Depends:
 Imports: 
     doParallel,
     foreach,
-    raster,
-    Rcpp
+    Rcpp,
+    sf,
+    stars,
+    terra
 Suggests: 
     BiocManager,
     EBImage,

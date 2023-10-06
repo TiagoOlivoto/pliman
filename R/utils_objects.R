@@ -509,6 +509,209 @@ object_split <- function(img,
   return(list_objects)
 }
 
+
+#' Augment Images
+#'
+#' This function takes an image and augments it by rotating it multiple times.
+#'
+#' @param img An {Image} object.
+#' @param pattern A regular expression pattern to select multiple images from a
+#'   directory.
+#' @param times The number of times to rotate the image.
+#' @param type The type of output: "export" to save images or "return" to return
+#'   a list of augmented images.
+#' @param dir_original The directory where original images are located.
+#' @param dir_processed The directory where processed images will be saved.
+#' @param parallel Whether to perform image augmentation in parallel.
+#' @param verbose Whether to display progress messages.
+#'
+#' @return If type is "export," augmented images are saved. If type is "return,"
+#'   a list of augmented images is returned.
+#'
+#' @export
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' img <- image_pliman("sev_leaf.jpg")
+#' imgs <- image_augment(img, type = "return", times = 4)
+#' image_combine(imgs)
+#' }
+#'
+image_augment <- function(img,
+                          pattern = NULL,
+                          times = 12,
+                          type = "export",
+                          dir_original = NULL,
+                          dir_processed = NULL,
+                          parallel = FALSE,
+                          verbose = TRUE){
+  if(is.null(dir_original)){
+    diretorio_original <- paste0("./")
+  } else{
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
+  }
+  if(is.null(dir_processed)){
+    diretorio_processada <- paste0("./")
+  } else{
+    diretorio_processada <-
+      ifelse(grepl("[/\\]", dir_processed),
+             dir_processed,
+             paste0("./", dir_processed))
+  }
+
+
+  if(is.null(pattern)){
+    angles <- seq(0, 360, by = 360 / times)
+    angles <- angles[-length(angles)]
+    obj_list <- list()
+    for(i in 1:times){
+      top <- img@.Data[1:10,,]
+      bottom <- img@.Data[(nrow(img)-10):nrow(img),,]
+      left <- img@.Data[,1:10,]
+      right <- img@.Data[,(ncol(img) - 10):ncol(img),]
+
+      rval <- mean(c(c(top[,,1]), c(bottom[,,1]), c(left[,,1]), c(right[,,1])))
+      gval <- mean(c(c(top[,,2]), c(bottom[,,2]), c(left[,,2]), c(right[,,2])))
+      bval <- mean(c(c(top[,,3]), c(bottom[,,3]), c(left[,,3]), c(right[,,3])))
+
+      tmp <- EBImage::rotate(img, angles[i], bg.col = rgb(rval, gval, bval))
+      if(type == "export"){
+        image_export(tmp,
+                     name = paste0("v", sub("\\.", "_", round(angles[i], 2)), ".jpg"),
+                     subfolder = diretorio_processada)
+      } else{
+        obj_list[[paste0("v_", sub("\\.", "_", round(angles[i], 2)), ".jpg")]] <- tmp
+      }
+    }
+  } else{
+
+    if(is.null(dir_original)){
+      diretorio_original <- paste0("./")
+    } else{
+      diretorio_original <-
+        ifelse(grepl("[/\\]", dir_original),
+               dir_original,
+               paste0("./", dir_original))
+    }
+    if(is.null(dir_processed)){
+      diretorio_processada <- paste0("./")
+    } else{
+      diretorio_processada <-
+        ifelse(grepl("[/\\]", dir_processed),
+               dir_processed,
+               paste0("./", dir_processed))
+    }
+
+    if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      pattern <- "^[0-9].*$"
+    }
+    plants <- list.files(pattern = pattern, diretorio_original)
+    extensions <- as.character(sapply(plants, file_extension))
+    names_plant <- as.character(sapply(plants, file_name))
+    if(length(grep(pattern, names_plant)) == 0){
+      stop(paste("Pattern '", pattern, "' not found in '",
+                 paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
+           call. = FALSE)
+    }
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
+      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+    }
+
+    if(isTRUE(parallel)){
+
+      init_time <- Sys.time()
+      nworkers <- trunc(detectCores()*.3)
+      cl <- parallel::makePSOCKcluster(nworkers)
+      doParallel::registerDoParallel(cl)
+      on.exit(stopCluster(cl))
+
+      if(verbose == TRUE){
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
+      }
+      ## declare alias for dopar command
+      `%dopar%` <- foreach::`%dopar%`
+      obj_list <- list()
+      results <-
+        foreach::foreach(i = seq_along(plants), .packages = c("pliman")) %dopar%{
+
+          tmpimg <- image_import(plants[[i]], path = diretorio_original)
+
+          angles <- seq(0, 360, by = 360 / times)
+          angles <- angles[-length(angles)]
+          for(j in 1:times){
+            top <- tmpimg@.Data[1:10,,]
+            bottom <- tmpimg@.Data[(nrow(tmpimg)-10):nrow(tmpimg),,]
+            left <- tmpimg@.Data[,1:10,]
+            right <- tmpimg@.Data[,(ncol(tmpimg) - 10):ncol(tmpimg),]
+
+            rval <- mean(c(c(top[,,1]), c(bottom[,,1]), c(left[,,1]), c(right[,,1])))
+            gval <- mean(c(c(top[,,2]), c(bottom[,,2]), c(left[,,2]), c(right[,,2])))
+            bval <- mean(c(c(top[,,3]), c(bottom[,,3]), c(left[,,3]), c(right[,,3])))
+
+            tmp <- EBImage::rotate(tmpimg, angles[j], bg.col = rgb(rval, gval, bval))
+
+            if(type == "export"){
+              image_export(tmp,
+                           name = paste0(file_name(plants[[j]]), "_", sub("\\.", "-", round(angles[j], 2)), ".jpg"),
+                           subfolder = diretorio_processada)
+            } else{
+              obj_list[[paste0(file_name(plants[[j]]), "_", sub("\\.", "-", round(angles[j], 2)), ".jpg")]] <- tmp
+            }
+
+
+
+          }
+        }
+
+      message("Done!")
+      message("Elapsed time: ", sec_to_hms(as.numeric(difftime(Sys.time(),  init_time, units = "secs"))))
+
+    } else{
+      obj_list <- list()
+      for(i in seq_along(plants)){
+
+        tmpimg <- image_import(plants[[i]], path = diretorio_original)
+        angles <- seq(0, 360, by = 360 / times)
+        angles <- angles[-length(angles)]
+        for(j in 1:times){
+          top <- tmpimg@.Data[1:10,,]
+          bottom <- tmpimg@.Data[(nrow(tmpimg)-10):nrow(tmpimg),,]
+          left <- tmpimg@.Data[,1:10,]
+          right <- tmpimg@.Data[,(ncol(tmpimg) - 10):ncol(tmpimg),]
+
+          rval <- mean(c(c(top[,,1]), c(bottom[,,1]), c(left[,,1]), c(right[,,1])))
+          gval <- mean(c(c(top[,,2]), c(bottom[,,2]), c(left[,,2]), c(right[,,2])))
+          bval <- mean(c(c(top[,,3]), c(bottom[,,3]), c(left[,,3]), c(right[,,3])))
+
+          tmp <- EBImage::rotate(tmpimg, angles[j], bg.col = rgb(rval, gval, bval))
+
+
+          if(type == "export"){
+            image_export(tmp,
+                         name = paste0(file_name(plants[[i]]), "_", sub("\\.", "-", round(angles[j], 2)), ".jpg"),
+                         subfolder = diretorio_processada)
+          } else{
+            obj_list[[paste0(file_name(plants[[i]]), "_", sub("\\.", "-", round(angles[j], 2)), ".jpg")]] <- tmp
+          }
+
+
+
+
+        }
+      }
+    }
+  }
+
+  if(type == "return"){
+    return(obj_list)
+  }
+
+}
+
+
 #' Export multiple objects from an image to multiple images
 #'
 #' Givin an image with multiple objects, `object_export()` will split the
@@ -520,6 +723,7 @@ object_split <- function(img,
 #' @inheritParams object_split
 #' @inheritParams utils_image
 #' @inheritParams analyze_objects
+#' @inheritParams image_augment
 #'
 #' @param pattern A pattern of file name used to identify images to be
 #'   processed. For example, if `pattern = "im"` all images in the current
@@ -528,6 +732,8 @@ object_split <- function(img,
 #'   pattern (e.g., `pattern = "1"`) will select images that are named as 1.-,
 #'   2.-, and so on. An error will be returned if the pattern matches any file
 #'   that is not supported (e.g., img1.pdf).
+#' @param augment A logical indicating if exported objects should be augmented using
+#'   [image_augment()]. Defaults to `FALSE`.
 #'@param dir_original The directory containing the original images. Defaults to
 #'  `NULL`. It can be either a full path, e.g., `"C:/Desktop/imgs"`, or a
 #'  subfolder within the current working directory, e.g., `"/imgs"`.
@@ -543,9 +749,9 @@ object_split <- function(img,
 #' @examples
 #' if(interactive()){
 #' library(pliman)
-#' img <- image_pliman("la_leaves.jpg")
-#' object_export(img)
-#'
+#' img <- image_pliman("potato_leaves.jpg")
+#' object_export(img,
+#'               remove_bg = TRUE)
 #' }
 object_export <- function(img,
                           pattern = NULL,
@@ -553,9 +759,11 @@ object_export <- function(img,
                           dir_processed = NULL,
                           format = ".jpg",
                           squarize = FALSE,
+                          augment = FALSE,
+                          times = 12,
                           index = "NB",
                           lower_size = NULL,
-                          watershed = TRUE,
+                          watershed = FALSE,
                           invert = FALSE,
                           fill_hull = FALSE,
                           filter = 2,
@@ -583,21 +791,32 @@ object_export <- function(img,
                                  remove_bg = remove_bg,
                                  plot = FALSE,
                                  verbose = FALSE)
+    names(list_objects) <-  leading_zeros(as.numeric(names(list_objects)), n = 4)
+
+    if(isTRUE(augment)){
+      bb <-
+        lapply(seq_along(list_objects), function(x){
+          image_augment(list_objects[[x]], type = "return", times = times)
+        })
+      names(bb) <- names(list_objects)
+      unlisted <- do.call(c, bb)
+      names(unlisted) <- sub("\\.", "_", names(unlisted))
+      list_objects <- unlisted
+    }
+
 
     a <- lapply(seq_along(list_objects), function(i){
       tmp <- list_objects[[i]]
       if(isTRUE(squarize)){
         tmp <- image_square(tmp,
                             plot = FALSE,
-                            sample_left = 10,
-                            sample_top = 10,
-                            sample_right = 10,
-                            sample_bottom = 10)
+                            sample_left = 5,
+                            sample_top = 5,
+                            sample_right = 5,
+                            sample_bottom = 5)
       }
       image_export(tmp,
-                   name = paste0("obj_",
-                                 leading_zeros(as.numeric(names(list_objects[i])),
-                                               n = 4), format),
+                   name = paste0(file_name(names(list_objects[i])), ".jpg"),
                    subfolder = dir_processed)
     })
   } else{
@@ -668,21 +887,36 @@ object_export <- function(img,
                                        remove_bg = remove_bg,
                                        verbose = FALSE,
                                        plot = FALSE)
+          names(list_objects) <-  paste0(leading_zeros(as.numeric(names(list_objects)), n = 4), ".jpg")
+
+          if(isTRUE(augment)){
+            bb <-
+              lapply(seq_along(list_objects), function(x){
+                image_augment(list_objects[[x]], type = "return", times = times)
+              })
+            names(bb) <- names(list_objects)
+            unlisted <- do.call(c, bb)
+            names(unlisted) <- sub("\\.", "_", names(unlisted))
+            list_objects <- unlisted
+            names(list_objects) <- sub("jpg.", "", names(list_objects))
+          }
 
           a <- lapply(seq_along(list_objects), function(j){
             tmp <- list_objects[[j]]
             if(isTRUE(squarize)){
-              tmp <- image_square(tmp,
-                                  plot = FALSE,
-                                  sample_left = 10,
-                                  sample_top = 10,
-                                  sample_right = 10,
-                                  sample_bottom = 10)
+              try(
+                tmp <- image_square(tmp,
+                                    plot = FALSE,
+                                    sample_left = 5,
+                                    sample_top = 5,
+                                    sample_right = 5,
+                                    sample_bottom = 5),
+                silent = TRUE
+              )
+
             }
             image_export(tmp,
-                         name = paste0(file_name(plants[[i]]), "_",
-                                       leading_zeros(as.numeric(names(list_objects[j])),
-                                                     n = 4), format),
+                         name = paste0(file_name(plants[[i]]), "_", names(list_objects[j])),
                          subfolder = diretorio_processada)
           }
           )
@@ -711,21 +945,35 @@ object_export <- function(img,
                                      remove_bg = remove_bg,
                                      verbose = FALSE,
                                      plot = FALSE)
+        names(list_objects) <-  paste0(leading_zeros(as.numeric(names(list_objects)), n = 4), ".jpg")
+        if(isTRUE(augment)){
+          bb <-
+            lapply(seq_along(list_objects), function(x){
+              image_augment(list_objects[[x]], type = "return", times = times)
+            })
+          names(bb) <- names(list_objects)
+          unlisted <- do.call(c, bb)
+          names(unlisted) <- sub("\\.", "_", names(unlisted))
+          list_objects <- unlisted
+          names(list_objects) <- sub("jpg.", "", names(list_objects))
+        }
 
         a <- lapply(seq_along(list_objects), function(j){
           tmp <- list_objects[[j]]
           if(isTRUE(squarize)){
-            tmp <- image_square(tmp,
-                                plot = FALSE,
-                                sample_left = 10,
-                                sample_top = 10,
-                                sample_right = 10,
-                                sample_bottom = 10)
+            try(
+              tmp <- image_square(tmp,
+                                  plot = FALSE,
+                                  sample_left = 5,
+                                  sample_top = 5,
+                                  sample_right = 5,
+                                  sample_bottom = 5),
+              silent = TRUE
+            )
+
           }
           image_export(tmp,
-                       name = paste0(file_name(plants[[i]]), "_",
-                                     leading_zeros(as.numeric(names(list_objects[j])),
-                                                   n = 4), format),
+                       name = paste0(file_name(plants[[i]]), "_", names(list_objects[j])),
                        subfolder = diretorio_processada)
         }
         )
@@ -768,6 +1016,14 @@ object_rgb <- function(img, labels){
     matrix(x, ncol = 4, byrow = TRUE)
   })))
   colnames(df2) <- c("id", "R", "G", "B")
+  if(dim(img)[[3]] == 5){
+    renir <- help_get_renir(img[,,4], img[,,5], labels)
+    df3 <- data.frame(do.call(rbind,  lapply(renir, function(x){
+      matrix(x, ncol = 3, byrow = TRUE)
+    })))
+    df2 <- cbind(df2, df3[, 2:3])
+    colnames(df2) <- c("id", "R", "G", "B", "RE", "NIR")
+  }
   return(df2)
 }
 

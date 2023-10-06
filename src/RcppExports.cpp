@@ -109,6 +109,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// help_get_renir
+std::vector<std::vector<double>> help_get_renir(const NumericMatrix& RE, const NumericMatrix& NIR, const IntegerMatrix& labels);
+RcppExport SEXP _pliman_help_get_renir(SEXP RESEXP, SEXP NIRSEXP, SEXP labelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type RE(RESEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type NIR(NIRSEXP);
+    Rcpp::traits::input_parameter< const IntegerMatrix& >::type labels(labelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(help_get_renir(RE, NIR, labels));
+    return rcpp_result_gen;
+END_RCPP
+}
 // bounding_box
 IntegerVector bounding_box(LogicalMatrix img, int edge);
 RcppExport SEXP _pliman_bounding_box(SEXP imgSEXP, SEXP edgeSEXP) {
@@ -419,6 +432,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_help_dist_transform", (DL_FUNC) &_pliman_help_dist_transform, 1},
     {"_pliman_help_watershed", (DL_FUNC) &_pliman_help_watershed, 3},
     {"_pliman_help_get_rgb", (DL_FUNC) &_pliman_help_get_rgb, 4},
+    {"_pliman_help_get_renir", (DL_FUNC) &_pliman_help_get_renir, 3},
     {"_pliman_bounding_box", (DL_FUNC) &_pliman_bounding_box, 2},
     {"_pliman_isolate_objects5", (DL_FUNC) &_pliman_isolate_objects5, 2},
     {"_pliman_help_isolate_object", (DL_FUNC) &_pliman_help_isolate_object, 6},

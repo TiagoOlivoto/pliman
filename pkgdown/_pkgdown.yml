@@ -127,6 +127,17 @@ reference:
       - poly_width_at
       - poly_pcv
 
+  - title: "Utilities for mosaics"
+    desc: "Provides utilities for analysis of mosaics class 'SpatRaster' containing RGB or multispectral (RGB + RE + NIR) bands."
+    contents:
+      - mosaic_crop
+      - mosaic_export
+      - mosaic_index
+      - mosaic_input
+      - mosaic_to_pliman
+      - mosaic_to_rgb
+      - mosaic_view
+
   - title: "Utilities for image points"
     desc: "Opens an iterative section to count objects, extract pixel intensity and create image palettes manually. "
     contents:

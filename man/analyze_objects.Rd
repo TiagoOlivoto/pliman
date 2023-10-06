@@ -11,6 +11,7 @@ analyze_objects(
   foreground = NULL,
   background = NULL,
   pick_palettes = FALSE,
+  segment_objects = TRUE,
   viewer = get_pliman_viewer(),
   reference = FALSE,
   reference_area = NULL,
@@ -39,6 +40,11 @@ analyze_objects(
   invert = FALSE,
   object_size = "medium",
   index = "NB",
+  r = 1,
+  g = 2,
+  b = 3,
+  re = 4,
+  nir = 5,
   object_index = NULL,
   pixel_level_index = FALSE,
   return_mask = FALSE,
@@ -102,6 +108,13 @@ image named "fore".}
 pick up the color palettes for foreground and background for the image. If
 \code{TRUE} \code{\link[=pick_palette]{pick_palette()}} will be called internally so that the user can sample
 color points representing foreground and background.}
+
+\item{segment_objects}{Segment objects in the image? Defaults to \code{TRUE}. In
+this case, objects are segmented using the index defined in the \code{index}
+argument, and each object is analyzed individually. If \code{segment_objects = FALSE} is used, the objects are not segmented and the entire image is
+analyzed. This is useful, for example, when analyzing an image without
+background, where an \code{object_index} could be computed for the entire image,
+like the index of a crop canopy.}
 
 \item{viewer}{The viewer option. This option controls the type of viewer to
 use for interactive plotting (eg., when \code{pick_palettes = TRUE}).  If not
@@ -235,6 +248,11 @@ grains), and \code{"elarge"} (e.g, soybean pods)`.}
 binary image when \code{foreground} and \code{background} are not declared. Defaults
 to \code{"NB"} (normalized blue). See \code{\link[=image_index]{image_index()}} for more details. User can
 also calculate your own index using the bands names, e.g. \code{index = "R+B/G"}}
+
+\item{r, g, b, re, nir}{The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.}
 
 \item{object_index}{Defaults to \code{FALSE}. If an index is informed, the average
 value for each object is returned. It can be the R, G, and B values or any

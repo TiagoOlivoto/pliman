@@ -42,7 +42,7 @@ means no buffering and 0.5 means complete buffering (default: 0). A value of
 0.25 will buffer the shape by 25\% on each side.}
 
 \item{prepare}{Logical value indicating whether to prepare the image for
-analysis using \code{\link[=image_prepare_mv]{image_prepare_mv()}} function. This allows to align and crop
+analysis using \code{\link[=image_prepare]{image_prepare()}} function. This allows to align and crop
 the image before processing. Defaults to \code{FALSE}.}
 
 \item{viewer}{The viewer option. If not provided, the value is retrieved

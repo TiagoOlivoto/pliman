@@ -257,7 +257,7 @@ measure_disease <- function(img,
                             dir_original = NULL,
                             dir_processed = NULL,
                             verbose = TRUE){
-  check_ebi()
+  # check_ebi()
   if(!missing(img) & !missing(pattern)){
     stop("Only one of `img` or `pattern` arguments can be used.", call. = FALSE)
   }
@@ -933,7 +933,9 @@ measure_disease_iter <- function(img,
                          title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
                          col = "blue")
     if(viewopt != "base"){
-      image_view(img |> reduce_dimensions(2000))
+      tmp <- terra::rast(img[1:10,1:10,]) |> stars::st_as_stars()
+      sf::st_crs(tmp) <- sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+      mapview::mapview(tmp)
     }
   } else{
     back <- NULL
@@ -953,7 +955,9 @@ measure_disease_iter <- function(img,
                        title = "Use the first mouse button to pick up LEAF colors. Click 'Done' to finish",
                        col = "black")
   if(viewopt != "base"){
-    image_view(img |> reduce_dimensions(2000))
+    tmp <- terra::rast(img[1:10,1:10,]) |> stars::st_as_stars()
+    sf::st_crs(tmp) <- sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+    mapview::mapview(tmp)
   }
 
   # Call pick_disease function

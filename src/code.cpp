@@ -443,6 +443,34 @@ std::vector<std::vector<double>> help_get_rgb(const NumericMatrix &R, const Nume
   return result;
 }
 
+// EXTRACT RE and NIR
+// [[Rcpp::export]]
+std::vector<std::vector<double>> help_get_renir(const NumericMatrix &RE, const NumericMatrix &NIR, const IntegerMatrix &labels) {
+  int labelsCount = 0;
+  int nrow = RE.nrow();
+  int ncol = RE.ncol();
+  // get the number of labels
+  for (int i = 0; i < nrow * ncol; i++) {
+    labelsCount = std::max(labelsCount, labels[i]);
+  }
+  labelsCount++;
+
+  // create a list to store the RGB values for each label
+  std::vector<std::vector<double>> result(labelsCount);
+
+  // loop through each label
+  for (int i = 0; i < nrow; i++) {
+    for (int j = 0; j < ncol; j++) {
+      int label = labels(i, j);
+      if (label > 0) {
+        result[label].push_back(label);
+        result[label].push_back(RE(i, j));
+        result[label].push_back(NIR(i, j));
+      }
+    }
+  }
+  return result;
+}
 
 // GET THE COORDINATES OF A BOUNDING BOX OF A BINARY IMAGE
 // [[Rcpp::export]]

@@ -42,3 +42,15 @@ b*;0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722));CIELab
 L*-a;((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126)));CIELab
 L*-b;((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722)));CIELab
 b*-a;(0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722))) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126)));CIELab
+NDVI;(NIR - R) / (NIR + R);MULTI
+PSRI;(R-G)/RE;MULTI
+GNDVI;(NIR - G) / (NIR + G);MULTI
+RVI;NIR/R;MULTI
+NDRE;(NIR-RE)/(NIR+RE);MULTI
+TVI;0.5*(120*(NIR-G)-200*(R-G));MULTI
+CVI;(NIR*R)/(G*G);MULTI
+EVI;2.5*(NIR-R)/(NIR+6*R-7.5*B+1);MULTI
+CIG;(NIR/G)-1;MULTI
+CIRE;(NIR/RE)-1;MULTI
+DVI;NIR-RE;MULTI
+NDWI;(G-NIR)/(G+NIR);MULTI

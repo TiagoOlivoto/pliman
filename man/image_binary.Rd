@@ -6,7 +6,13 @@
 \usage{
 image_binary(
   img,
-  index = NULL,
+  index = "R",
+  r = 1,
+  g = 2,
+  b = 3,
+  re = 4,
+  nir = 5,
+  return_class = "ebimage",
   threshold = c("Otsu", "adaptive"),
   k = 0.1,
   windowsize = NULL,
@@ -14,8 +20,6 @@ image_binary(
   resize = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
-  re = NULL,
-  nir = NULL,
   invert = FALSE,
   plot = TRUE,
   nrow = NULL,
@@ -31,6 +35,16 @@ image_binary(
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to binary image. See the available indexes with
 \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}} for more details.}
+
+\item{r, g, b, re, nir}{The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.}
+
+\item{return_class}{The class of object to be returned. If \verb{"terra} returns a
+SpatRaster object with the number of layers equal to the number of indexes
+computed. If \code{"ebimage"} (default) returns a list of \code{Image} objects, where
+each element is one index computed.}
 
 \item{threshold}{The theshold method to be used.
 \itemize{
@@ -70,12 +84,6 @@ image.}
 filtering. Higher values are more efficient to remove noise in the
 background but can dramatically impact the perimeter of objects, mainly for
 irregular perimeters such as leaves with serrated edges.}
-
-\item{re}{Respective position of the red-edge band at the original image
-file.}
-
-\item{nir}{Respective position of the near-infrared band at the original
-image file.}
 
 \item{invert}{Inverts the binary image, if desired.}
 

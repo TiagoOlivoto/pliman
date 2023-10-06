@@ -110,7 +110,6 @@ image_combine <- function(...,
 #' @param ... Alternative arguments passed to the corresponding functions from
 #'   the `jpeg`, `png`, and `tiff` packages.
 #' @md
-#' @importFrom raster stack as.array
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return
@@ -186,14 +185,7 @@ image_import <- function(img,
         lapply(seq_along(img_name),
                function(x){
                  if(file_extension(img_name[[1]]) %in% c("tif", "TIF", "tiff", "TIFF", "gri", "grd")){
-                   tmp <- raster::stack(img_name[x])
-                   nlayers <- length(tmp@layers)
-                   dims <- dim(tmp@layers[[1]])
-                   list_layers <- raster::as.array(tmp)
-                   if(max(list_layers[,,1]) > 1){
-                     list_layers <- apply(list_layers, c(1, dim(list_layers)[3]), function(x){x / 255})
-                   }
-                   img <- EBImage::Image(list_layers, colormode='Color')
+                   terra::rast(img_name[x])
                  } else{
                    EBImage::readImage(img_name[x], ...)
                  }
@@ -212,13 +204,7 @@ image_import <- function(img,
       return(ls)
     } else{
       if(file_extension(img_name) %in% c("tif", "TIF", "tiff", "TIFF", "gri", "grd")){
-        tmp <- raster::stack(img_name)
-        tmp_dir <- tempdir()
-        png(paste0(tmp_dir, "tmpimg.png"), height = nrow(tmp), width = ncol(tmp))
-        raster::plotRGB(tmp, maxpixels = raster::ncell(tmp))
-        dev.off()
-        img <- EBImage::readImage(paste0(tmp_dir, "tmpimg.png"))
-        aaa <- file.remove(paste0(tmp_dir, "tmpimg.png"))
+        img <- terra::rast(img_name)
       } else{
         img <- EBImage::readImage(img_name, ...)
       }
@@ -541,7 +527,11 @@ image_crop <- function(img,
     if (is.null(width) & is.null(height)) {
       if(vieweropt == "base"){
         message("Use the left mouse buttom to crop the image.")
-        plot(img)
+        if(EBImage::numberOfFrames(img) > 2){
+          plot(EBImage::Image(img[,,1:3], colormode = "Color"))
+        } else if(EBImage::numberOfFrames(img) == 1){
+          plot(img)
+        }
         cord <- locator(type = "p", n = 2, col = "red", pch = 19)
         minw <- min(cord$x[[1]], cord$x[[2]])
         maxw <- max(cord$x[[1]], cord$x[[2]])
@@ -562,7 +552,11 @@ image_crop <- function(img,
       }
     }
     if (isTRUE(plot)) {
-      plot(img)
+      if(EBImage::numberOfFrames(img) > 2){
+        plot(EBImage::Image(img[,,1:3], colormode = "Color"))
+      } else if(EBImage::numberOfFrames(img) == 1){
+        plot(img)
+      }
     }
     return(img)
   }
@@ -662,8 +656,8 @@ image_rotate <- function(img,
     }
   } else{
     img <- EBImage::rotate(img, angle, bg.col = bg_col)
-    if (isTRUE(plot)) {
-      plot(img)
+    if (isTRUE(plot) & EBImage::numberOfFrames(img) > 2) {
+      plot(EBImage::Image(img[,,1:3], colormode = "Color"))
     }
     return(img)
   }
@@ -1492,7 +1486,7 @@ image_create <- function(color,
 #' using a given color channel (red, green blue) or even color indexes. The
 #' Otsu's thresholding method (Otsu, 1979) is used to automatically perform
 #' clustering-based image thresholding.
-#'
+#' @inheritParams image_index
 #' @param img An image object.
 #' @param index A character value (or a vector of characters) specifying the
 #'   target mode for conversion to binary image. See the available indexes with
@@ -1529,10 +1523,6 @@ image_create <- function(color,
 #'   filtering. Higher values are more efficient to remove noise in the
 #'   background but can dramatically impact the perimeter of objects, mainly for
 #'   irregular perimeters such as leaves with serrated edges.
-#' @param re Respective position of the red-edge band at the original image
-#'   file.
-#' @param nir Respective position of the near-infrared band at the original
-#'   image file.
 #' @param invert Inverts the binary image, if desired.
 #' @param plot Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
@@ -1564,7 +1554,13 @@ image_create <- function(color,
 #'image_binary(img, index = c("R, G"))
 #'
 image_binary <- function(img,
-                         index = NULL,
+                         index = "R",
+                         r = 1,
+                         g = 2,
+                         b = 3,
+                         re = 4,
+                         nir = 5,
+                         return_class = "ebimage",
                          threshold = c("Otsu", "adaptive"),
                          k = 0.1,
                          windowsize = NULL,
@@ -1572,8 +1568,6 @@ image_binary <- function(img,
                          resize = FALSE,
                          fill_hull = FALSE,
                          filter = FALSE,
-                         re = NULL,
-                         nir = NULL,
                          invert = FALSE,
                          plot = TRUE,
                          nrow = NULL,
@@ -1598,6 +1592,12 @@ image_binary <- function(img,
                        img,
                        image_binary,
                        index,
+                       r,
+                       g,
+                       b,
+                       re,
+                       nir,
+                       return_class,
                        threshold,
                        k,
                        windowsize,
@@ -1615,6 +1615,12 @@ image_binary <- function(img,
       res <- lapply(img,
                     image_binary,
                     index,
+                    r,
+                    g,
+                    b,
+                    re,
+                    nir,
+                    return_class,
                     threshold,
                     k,
                     windowsize,
@@ -1672,8 +1678,8 @@ image_binary <- function(img,
           if(is.numeric(threshold)){
             threshold <- threshold
           } else{
-            pixels <- raster::raster(t(imgs@.Data))
-            raster::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+            pixels <- terra::rast(t(imgs@.Data))
+            terra::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
             threshold <- readline("Selected threshold: ")
           }
         }
@@ -1694,7 +1700,7 @@ image_binary <- function(img,
       return(imgs)
     }
 
-    imgs <- lapply(image_index(img, index, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
+    imgs <- lapply(image_index(img, index, r, g, b, re, nir, return_class, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
                    bin_img,
                    invert,
                    fill_hull,
@@ -1774,20 +1780,28 @@ image_binary <- function(img,
 #' - `a*`: `0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))`
 #'
 #' @name image_index
-#' @param img An image object.
+#' @inheritParams plot_index
+#' @param img An `Image` object. Multispectral mosaics can be converted to an
+#'   `Image` object using `mosaic_as_ebimage()`.
 #' @param index A character value (or a vector of characters) specifying the
-#'   target mode for conversion to binary image. Use [pliman_indexes()] or the
-#'   `details` section to see the available indexes.  Defaults to `NULL`
-#'   ((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
-#'   "NRGB" for normalized RGB, or "all" for all indexes. User can also
-#'   calculate your own index using the bands names, e.g. `index = "R+B/G"`.
+#'   target mode for conversion to a binary image. Use [pliman_indexes()] or the
+#'   `details` section to see the available indexes. Defaults to `NULL`
+#'   (normalized Red, Green, and Blue). You can also use "RGB" for RGB only,
+#'   "NRGB" for normalized RGB,  "MULTISPECTRAL" for multispectral indices
+#'   (provided NIR and RE bands are available) or "all" for all indexes. Users
+#'   can also calculate their own index using the band names, e.g., `index =
+#'   "R+B/G"`.
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and near-infrared bands
+#'   of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+#'   a multispectral image is provided (5 bands), check the order of bands,
+#'   which are frequently presented in the 'BGR' format.
+#' @param return_class The class of object to be returned. If `"terra` returns a
+#'   SpatRaster object with the number of layers equal to the number of indexes
+#'   computed. If `"ebimage"` (default) returns a list of `Image` objects, where
+#'   each element is one index computed.
 #' @param resize Resize the image before processing? Defaults to `resize =
 #'   FALSE`. Use `resize = 50`, which resizes the image to 50% of the original
 #'   size to speed up image processing.
-#' @param re Respective position of the red-edge band at the original image
-#'   file.
-#' @param nir Respective position of the near-infrared band at the original
-#'   image file.
 #' @param has_white_bg Logical indicating whether a white background is present.
 #'   If TRUE, pixels that have R, G, and B values equals to 1 will be considered
 #'   as NA. This may be useful to compute an image index for objects that have,
@@ -1818,17 +1832,24 @@ image_binary <- function(img,
 #'image_index(img, index = c("R, NR"))
 image_index <- function(img,
                         index = NULL,
+                        r = 1,
+                        g = 2,
+                        b = 3,
+                        re = 4,
+                        nir = 5,
+                        return_class = c("ebimage", "terra"),
                         resize = FALSE,
-                        re = NULL,
-                        nir = NULL,
                         has_white_bg = FALSE,
                         plot = TRUE,
                         nrow = NULL,
                         ncol = NULL,
+                        max_pixels = 100000,
                         parallel = FALSE,
                         workers = NULL,
                         verbose = TRUE,
                         ...){
+  return_classopt <- c("terra", "ebimage")
+  return_classopt <- return_classopt[pmatch(return_class[1], return_classopt)]
   if(is.list(img)){
     if(!all(sapply(img, class) == "Image")){
       stop("All images must be of class 'Image'")
@@ -1841,9 +1862,9 @@ image_index <- function(img,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
+      res <- parLapply(clust, img, image_index, index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
     } else{
-      res <- lapply(img, image_index, index, resize, re, nir, has_white_bg, plot, nrow, ncol)
+      res <- lapply(img, image_index, index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
     }
     return(structure(res, class = "index_list"))
   } else{
@@ -1851,15 +1872,25 @@ image_index <- function(img,
       img <- image_resize(img, resize)
     }
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-
+    nir_ind <- as.character(ind$Index[ind$Band %in% c("MULTI")])
+    hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
     if(is.null(index)){
       index <- c("R", "G", "B", "NR", "NG", "NB")
     }else{
-      if(index[[1]] %in% c("RGB", "NRGB", "all")){
+      RE <- try(img@.Data[,,re], TRUE)
+      NIR <- try(img@.Data[,,nir], TRUE)
+      test_multi <- any(sapply(list(RE, NIR), class) == "try-error")
+      if(isTRUE(test_multi)){
+        all_ind <- ind$Index[!ind$Index %in% nir_ind]
+      } else{
+        all_ind <- ind$Index
+      }
+      if(index[[1]] %in% c("RGB", "NRGB", "MULTISPECTRAL", "all")){
         index <-  switch (index,
                           RGB = c("R", "G", "B"),
                           NRGB = c("NR", "NG", "NB"),
-                          all = ind$Index
+                          MULTISPECTRAL = c("NDVI", "PSRI", "GNDVI", "RVI", "NDRE", "TVI", "CVI", "EVI", "CIG", "CIRE", "DVI", "NDWI"),
+                          all = all_ind
         )} else{
           if(length(index) > 1){
             index <- index
@@ -1868,80 +1899,65 @@ image_index <- function(img,
           }
         }
     }
-    nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
-    hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
 
-    R <- try(img@.Data[,,1], TRUE)
-    G <- try(img@.Data[,,2], TRUE)
-    B <- try(img@.Data[,,3], TRUE)
+    R <- try(img@.Data[,,r], TRUE)
+    G <- try(img@.Data[,,g], TRUE)
+    B <- try(img@.Data[,,b], TRUE)
     test_band <- any(sapply(list(R, G, B), class) == "try-error")
-
     if(any(index %in% hsb_ind)){
       hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
       h <- matrix(hsb$h, nrow = nrow(img), ncol = ncol(img))
       s <- matrix(hsb$s, nrow = nrow(img), ncol = ncol(img))
       b <- matrix(hsb$b, nrow = nrow(img), ncol = ncol(img))
     }
+    if(any(index %in% nir_ind)){
+      if(isTRUE(test_multi)){
+        stop("Near-Infrared and RedeEdge bands are not available in the provided image.", call. = FALSE)
+      }
+    }
     if(isTRUE(test_band)){
       stop("At least 3 bands (RGB) are necessary to calculate indices available in pliman.", call. = FALSE)
     }
-
     imgs <- list()
     for(i in 1:length(index)){
       indx <- index[[i]]
-      if(indx %in% c("R", "G", "B")){
-        indx <-
-          switch (indx,
-                  R = "red",
-                  G = "green",
-                  B = "blue",
-                  GR = "gray"
-          )
-        imgs[[i]] <- EBImage::channel(img, indx)
-      } else{
-        if(!indx %in% ind$Index){
-          if(isTRUE(verbose)){
-            message(paste("Index '",indx,"' is not available. Trying to compute your own index.",sep = ""))
-          }
+      if(!indx %in% ind$Index){
+        if(isTRUE(verbose)){
+          message(paste("Index '",indx,"' is not available. Trying to compute your own index.",sep = ""))
         }
-        if(!is.null(re)|!is.null(nir)){
-          if(indx %in% nir_ind & is.null(nir)){
-            stop(paste("Index ", indx, " need NIR/RedEdge band to be calculated."), call. = FALSE)
-          }
-          if(!is.null(re)){
-            RE <-  try(img@.Data[,,re], TRUE)
-          }
-          if(!is.null(nir)){
-            NIR <- try(img@.Data[,,nir], TRUE)
-          }
-          test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
-          if(isTRUE(test_nir_ne)){
-            stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
-          }
-        }
-        if(isTRUE(has_white_bg)){
-          R[which(R == 1 & G == 1 & B == 1)] <- NA
-          G[which(R == 1 & G == 1 & B == 1)] <- NA
-          B[which(R == 1 & G == 1 & B == 1)] <- NA
-        }
+      }
+      if(isTRUE(has_white_bg)){
+        R[which(R == 1 & G == 1 & B == 1)] <- NA
+        G[which(R == 1 & G == 1 & B == 1)] <- NA
+        B[which(R == 1 & G == 1 & B == 1)] <- NA
+      }
 
-        if(indx %in% ind$Index){
-          imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==indx]))))
-        } else{
-          imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(indx))))
-        }
+      if(indx %in% ind$Index){
+        imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==indx]))))
+      } else{
+        imgs[[i]] <- EBImage::Image(eval(parse(text = as.character(indx))))
       }
     }
     names(imgs) <- index
     class(imgs) <- "image_index"
     if(plot == TRUE){
-      plot_index(imgs, nrow = nrow, ncol = ncol, ...)
+      plot_index(imgs, nrow = nrow, ncol = ncol, max_pixels = max_pixels, ...)
     }
-    invisible(imgs)
+    if(return_classopt == "ebimage"){
+      invisible(imgs)
+    } else{
+      terras <-
+        terra::rast(
+          lapply(1:length(imgs), function(i){
+            terra::rast(t(imgs[[i]]@.Data))
+          }
+          )
+        )
+      names(terras) <- names(imgs)
+      invisible(terras)
+    }
   }
 }
-
-
 
 
 #' Plots an `image_index` object
@@ -2039,6 +2055,7 @@ plot.image_index <- function(x,
 #' the proportions of segmented pixels.
 #'
 #' @inheritParams image_binary
+#' @inheritParams image_index
 #' @param img An image object or a list of image objects.
 #' @param index
 #'  * For `image_segment()`, a character value (or a vector of characters)
@@ -2059,10 +2076,6 @@ plot.image_index <- function(x,
 #'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
 #'   size of the median filtering. Larger values are effective at removing
 #'   noise, but adversely affect edges.
-#' @param re Respective position of the red-edge band at the original image
-#'   file.
-#' @param nir Respective position of the near-infrared band at the original
-#'   image file.
 #' @param invert Inverts the binary image, if desired. For
 #'   `image_segmentation_iter()` use a vector with the same length of `nseg`.
 #' @param plot Show image after processing?
@@ -2102,6 +2115,11 @@ plot.image_index <- function(x,
 #'
 image_segment <- function(img,
                           index = NULL,
+                          r = 1,
+                          g = 2,
+                          b = 3,
+                          re = 4,
+                          nir = 5,
                           threshold = c("Otsu", "adaptive"),
                           k = 0.1,
                           windowsize = NULL,
@@ -2109,8 +2127,6 @@ image_segment <- function(img,
                           has_white_bg = FALSE,
                           fill_hull = FALSE,
                           filter = FALSE,
-                          re = NULL,
-                          nir = NULL,
                           invert = FALSE,
                           plot = TRUE,
                           nrow = NULL,
@@ -2134,21 +2150,32 @@ image_segment <- function(img,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
+      res <- parLapply(clust, img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter,invert, plot = plot, nrow, ncol)
     } else{
-      res <- lapply(img, image_segment, index, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, re, nir, invert, plot = plot, nrow, ncol)
+      res <- lapply(img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, invert, plot = plot, nrow, ncol)
     }
     return(structure(res, class = "segment_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+    nir_ind <- as.character(ind$Index[ind$Band %in% c("MULTI")])
+    hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
     if(is.null(index)){
       index <- c("R", "G", "B", "NR", "NG", "NB")
     }else{
-      if(index %in% c("RGB", "NRGB", "all")){
+      RE <- try(img@.Data[,,re], TRUE)
+      NIR <- try(img@.Data[,,nir], TRUE)
+      test_multi <- any(sapply(list(RE, NIR), class) == "try-error")
+      if(isTRUE(test_multi)){
+        all_ind <- ind$Index[!ind$Index %in% nir_ind]
+      } else{
+        all_ind <- ind$Index
+      }
+      if(index[[1]] %in% c("RGB", "NRGB", "MULTISPECTRAL", "all")){
         index <-  switch (index,
                           RGB = c("R", "G", "B"),
                           NRGB = c("NR", "NG", "NB"),
-                          all = ind$Index
+                          MULTISPECTRAL = c("NDVI", "PSRI", "GNDVI", "RVI", "NDRE", "TVI", "CVI", "EVI", "CIG", "CIRE", "DVI", "NDWI"),
+                          all = all_ind
         )} else{
           index <- strsplit(index, "\\s*(,)\\s*")[[1]]
         }
@@ -2167,6 +2194,11 @@ image_segment <- function(img,
       indx <- index[[i]]
       img2 <- help_binary(img,
                           index = indx,
+                          r = r,
+                          g = g,
+                          b = b,
+                          re = re,
+                          nir = nir,
                           threshold = threshold,
                           k = k,
                           windowsize = windowsize,
@@ -2174,13 +2206,15 @@ image_segment <- function(img,
                           resize = FALSE,
                           fill_hull = fill_hull,
                           filter = filter,
-                          re = re,
-                          nir = nir,
                           invert = invert)
       ID <- which(img2@.Data == FALSE)
       imgmask@.Data[,,1][ID] <- col_background[1]
       imgmask@.Data[,,2][ID] <- col_background[2]
       imgmask@.Data[,,3][ID] <- col_background[3]
+      if(dim(img)[[3]] > 3){
+        imgmask@.Data[,,4][ID] <- 1
+        imgmask@.Data[,,5][ID] <- 1
+      }
       imgs[[i]] <- imgmask
     }
     names(imgs) <- index
@@ -2199,7 +2233,9 @@ image_segment <- function(img,
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
       for(i in 1:length(imgs)){
-        plot(imgs[[i]])
+        tmps <- imgs[[i]][,,1:3]
+        EBImage::colorMode(tmps) <- "Color"
+        plot(tmps)
         if(verbose == TRUE){
           dim <- image_dimension(imgs[[i]], verbose = FALSE)
           text(0, dim[[2]]*0.075, index[[i]], pos = 4, col = "red")
@@ -3301,6 +3337,11 @@ rgb_to_lab <- function(object){
 # Faster alternatives (makes only the needed)
 help_segment <- function(img,
                          index = NULL,
+                         r = 1,
+                         g = 2,
+                         b = 3,
+                         re = 4,
+                         nir = 5,
                          threshold = c("Otsu", "adaptive"),
                          k = 0.1,
                          windowsize = NULL,
@@ -3308,11 +3349,14 @@ help_segment <- function(img,
                          has_white_bg = FALSE,
                          fill_hull = FALSE,
                          filter = FALSE,
-                         re = NULL,
-                         nir = NULL,
                          invert = FALSE){
   img2 <- help_binary(img,
                       index = index,
+                      r = r,
+                      g = g,
+                      b = b,
+                      re = re,
+                      nir = nir,
                       threshold = threshold,
                       k = k,
                       windowsize = windowsize,
@@ -3320,13 +3364,24 @@ help_segment <- function(img,
                       resize = FALSE,
                       fill_hull = fill_hull,
                       filter = filter,
-                      re = re,
-                      nir = nir,
                       invert = invert)
   ID <- which(img2@.Data == FALSE)
-  img@.Data[,,1][ID] <- 1
-  img@.Data[,,2][ID] <- 1
-  img@.Data[,,3][ID] <- 1
+  if(dim(img)[3] == 3){
+    img@.Data[,,r][ID] <- 1
+    img@.Data[,,g][ID] <- 1
+    img@.Data[,,b][ID] <- 1
+  } else if(dim(img)[3] == 4){
+    img@.Data[,,r][ID] <- 1
+    img@.Data[,,g][ID] <- 1
+    img@.Data[,,b][ID] <- 1
+    img@.Data[,,re][ID] <- 1
+  } else{
+    img@.Data[,,r][ID] <- 1
+    img@.Data[,,g][ID] <- 1
+    img@.Data[,,b][ID] <- 1
+    img@.Data[,,re][ID] <- 1
+    img@.Data[,,nir][ID] <- 1
+  }
   invisible(img)
 }
 
@@ -3334,6 +3389,11 @@ help_segment <- function(img,
 
 help_binary <- function(img,
                         index = NULL,
+                        r = 1,
+                        g = 2,
+                        b = 3,
+                        re = 4,
+                        nir = 5,
                         threshold = c("Otsu", "adaptive"),
                         k = 0.1,
                         windowsize = NULL,
@@ -3341,8 +3401,6 @@ help_binary <- function(img,
                         resize = FALSE,
                         fill_hull = FALSE,
                         filter = FALSE,
-                        re = NULL,
-                        nir = NULL,
                         invert = FALSE){
   threshold <- threshold[[1]]
 
@@ -3386,8 +3444,8 @@ help_binary <- function(img,
         if(is.numeric(threshold)){
           threshold <- threshold
         } else{
-          pixels <- raster::raster(t(imgs@.Data))
-          raster::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+          pixels <- terra::rast(EBImage::transpose(imgs)@.Data)
+          terra::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
           threshold <- readline("Selected threshold: ")
         }
       }
@@ -3408,7 +3466,7 @@ help_binary <- function(img,
     return(imgs)
   }
 
-  gray_img <- help_imageindex(img, index, resize, re, nir, has_white_bg)
+  gray_img <- help_imageindex(img, index, r, g, b, re, nir, resize, has_white_bg)
   bin_img <- bin_img(gray_img,
                      invert,
                      fill_hull,
@@ -3421,21 +3479,26 @@ help_binary <- function(img,
 
 help_imageindex <- function(img,
                             index = NULL,
+                            r = 1,
+                            g = 2,
+                            b = 3,
+                            re = 4,
+                            nir = 5,
                             resize = FALSE,
-                            re = NULL,
-                            nir = NULL,
                             has_white_bg = FALSE){
   if(resize != FALSE){
     img <- image_resize(img, resize)
   }
   ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
 
-  nir_ind <- as.character(ind$Index[ind$Band %in% c("RedEdge","NIR")])
+  nir_ind <- as.character(ind$Index[ind$Band %in% c("MULTI")])
   hsb_ind <- as.character(ind$Index[ind$Band == "HSB"])
 
-  R <- try(img@.Data[,,1], TRUE)
-  G <- try(img@.Data[,,2], TRUE)
-  B <- try(img@.Data[,,3], TRUE)
+  R <- try(img@.Data[,,r], TRUE)
+  G <- try(img@.Data[,,g], TRUE)
+  B <- try(img@.Data[,,b], TRUE)
+  RE <- try(img@.Data[,,re], TRUE)
+  NIR <- try(img@.Data[,,nir], TRUE)
 
   if(any(index %in% hsb_ind)){
     hsb <- rgb_to_hsb(data.frame(R = c(R), G = c(G), B = c(B)))
@@ -3444,19 +3507,10 @@ help_imageindex <- function(img,
     b <- matrix(hsb$b, nrow = nrow(img), ncol = ncol(img))
   }
 
-  if(!is.null(re)|!is.null(nir)){
-    if(index %in% nir_ind & is.null(nir)){
-      stop(paste("Index ", index, " need NIR/RedEdge band to be calculated."), call. = FALSE)
-    }
-    if(!is.null(re)){
-      RE <-  try(img@.Data[,,re], TRUE)
-    }
-    if(!is.null(nir)){
-      NIR <- try(img@.Data[,,nir], TRUE)
-    }
-    test_nir_ne <- any(lapply(list(RE, NIR), class)  == "try-error" )
-    if(isTRUE(test_nir_ne)){
-      stop("RE and/or NIR is/are not available in your image.", call. = FALSE)
+  if(any(index %in% nir_ind)){
+    test_multi <- any(sapply(list(RE, NIR), class) == "try-error")
+    if(isTRUE(test_multi)){
+      stop("Near-Infrared and RedeEdge bands are not available in the provided image.", call. = FALSE)
     }
   }
   if(isTRUE(has_white_bg)){

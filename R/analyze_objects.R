@@ -114,7 +114,8 @@
 #'  angle). The base angle is computed in the same way but from the first base
 #'  pixel.
 #'
-#'@inheritParams image_binary
+#' @inheritParams image_binary
+#' @inheritParams image_index
 #'
 #'@param img The image to be analyzed.
 #'@param foreground,background A color palette for the foregrond and background,
@@ -125,6 +126,13 @@
 #'   pick up the color palettes for foreground and background for the image. If
 #'   `TRUE` [pick_palette()] will be called internally so that the user can sample
 #'   color points representing foreground and background.
+#' @param segment_objects Segment objects in the image? Defaults to `TRUE`. In
+#'   this case, objects are segmented using the index defined in the `index`
+#'   argument, and each object is analyzed individually. If `segment_objects =
+#'   FALSE` is used, the objects are not segmented and the entire image is
+#'   analyzed. This is useful, for example, when analyzing an image without
+#'   background, where an `object_index` could be computed for the entire image,
+#'   like the index of a crop canopy.
 #' @param viewer The viewer option. This option controls the type of viewer to
 #'   use for interactive plotting (eg., when `pick_palettes = TRUE`).  If not
 #'   provided, the value is retrieved using [get_pliman_viewer()].
@@ -519,6 +527,7 @@ analyze_objects <- function(img,
                             foreground = NULL,
                             background = NULL,
                             pick_palettes = FALSE,
+                            segment_objects = TRUE,
                             viewer = get_pliman_viewer(),
                             reference = FALSE,
                             reference_area = NULL,
@@ -547,6 +556,11 @@ analyze_objects <- function(img,
                             invert = FALSE,
                             object_size = "medium",
                             index = "NB",
+                            r = 1,
+                            g = 2,
+                            b = 3,
+                            re = 4,
+                            nir = 5,
                             object_index = NULL,
                             pixel_level_index = FALSE,
                             return_mask = FALSE,
@@ -742,30 +756,42 @@ analyze_objects <- function(img,
           }
 
         } else{
-          img2 <- help_binary(img,
-                              index = index,
-                              invert = invert,
-                              fill_hull = fill_hull,
-                              threshold = threshold,
-                              k = k,
-                              windowsize = windowsize,
-                              filter = filter,
-                              resize = FALSE)
-          if(isTRUE(watershed)){
-            parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-            res <- length(img2)
-            parms2 <- parms[parms$object_size == object_size,]
-            rowid <-
-              which(sapply(as.character(parms2$resolution), function(x) {
-                eval(parse(text=x))}))
-            ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
-            tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
-            nmask <- EBImage::watershed(EBImage::distmap(img2),
-                                        tolerance = tol,
-                                        ext = ext)
+          if(isTRUE(segment_objects)){
+            img2 <- help_binary(img,
+                                index = index,
+                                r = r,
+                                g = g,
+                                b = b,
+                                re = re,
+                                nir = nir,
+                                invert = invert,
+                                fill_hull = fill_hull,
+                                threshold = threshold,
+                                k = k,
+                                windowsize = windowsize,
+                                filter = filter,
+                                resize = FALSE)
+            if(isTRUE(watershed)){
+              parms <- read.csv(file=system.file("parameters.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+              res <- length(img2)
+              parms2 <- parms[parms$object_size == object_size,]
+              rowid <-
+                which(sapply(as.character(parms2$resolution), function(x) {
+                  eval(parse(text=x))}))
+              ext <- ifelse(is.null(extension),  parms2[rowid, 3], extension)
+              tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
+              nmask <- EBImage::watershed(EBImage::distmap(img2),
+                                          tolerance = tol,
+                                          ext = ext)
+            } else{
+              nmask <- EBImage::bwlabel(img2)
+            }
           } else{
+            img2 <- img[,,1]
+            img2[img2@.Data == 0 | img2@.Data != 0] <- TRUE
             nmask <- EBImage::bwlabel(img2)
           }
+
           ID <- which(img2 == 1)
           ID2 <- which(img2 == 0)
         }
@@ -799,6 +825,11 @@ analyze_objects <- function(img,
                         threshold = threshold,
                         index = back_fore_index,
                         filter = filter,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
                         k = k,
                         windowsize = windowsize,
                         invert = invert1,
@@ -819,6 +850,11 @@ analyze_objects <- function(img,
             help_binary(img3,
                         threshold = threshold,
                         index = fore_ref_index,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
                         filter = filter,
                         k = k,
                         windowsize = windowsize,
@@ -963,6 +999,11 @@ analyze_objects <- function(img,
               help_binary(img,
                           threshold = threshold,
                           index = index,
+                          r = r,
+                          g = g,
+                          b = b,
+                          re = re,
+                          nir = nir,
                           k = k,
                           windowsize = windowsize,
                           filter = filter,
@@ -1105,7 +1146,7 @@ analyze_objects <- function(img,
         }
         ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
         if(any(object_index %in% ind$Index)){
-          ind_formula <- ind[which(ind$Index %in% object_index), 2]
+          ind_formula <- ind[match(object_index, ind$Index), 2]
         } else{
           ind_formula <- object_index
         }
@@ -1122,7 +1163,7 @@ analyze_objects <- function(img,
                data.frame(
                  do.call(cbind,
                          lapply(seq_along(ind_formula), function(i){
-                           data.frame(transform(x, index = eval(parse(text = ind_formula[i])))[,8])
+                           data.frame(transform(x, index = eval(parse(text = ind_formula[i])))[,ncol(obj_rgb)+1])
                          })
                  )
                )
@@ -1193,7 +1234,8 @@ analyze_objects <- function(img,
         }
 
         if(show_original == TRUE & show_segmentation == FALSE){
-          im2 <- img
+          im2 <- img[,,1:3]
+          EBImage::colorMode(im2) <- "Color"
           if(backg){
             im3 <- EBImage::colorLabels(nmask)
             im2@.Data[,,1][which(im3@.Data[,,1]==0)] <- col_background[1]
@@ -1220,7 +1262,8 @@ analyze_objects <- function(img,
             im2@.Data[,,2][which(im2@.Data[,,2]==0)] <- col_background[2]
             im2@.Data[,,3][which(im2@.Data[,,3]==0)] <- col_background[3]
           } else{
-            im2 <- img
+            im2 <- img[,,1:3]
+            EBImage::colorMode(im2) <- "Color"
             im2@.Data[,,1][ID] <- col_foreground[1]
             im2@.Data[,,2][ID] <- col_foreground[2]
             im2@.Data[,,3][ID] <- col_foreground[3]

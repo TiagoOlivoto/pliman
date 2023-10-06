@@ -8,13 +8,18 @@
 image_index(
   img,
   index = NULL,
+  r = 1,
+  g = 2,
+  b = 3,
+  re = 4,
+  nir = 5,
+  return_class = c("ebimage", "terra"),
   resize = FALSE,
-  re = NULL,
-  nir = NULL,
   has_white_bg = FALSE,
   plot = TRUE,
   nrow = NULL,
   ncol = NULL,
+  max_pixels = 1e+05,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -24,23 +29,29 @@ image_index(
 \method{plot}{image_index}(x, type = c("raster", "density"), nrow = NULL, ncol = NULL, ...)
 }
 \arguments{
-\item{img}{An image object.}
+\item{img}{An \code{Image} object. Multispectral mosaics can be converted to an
+\code{Image} object using \code{mosaic_as_ebimage()}.}
 
 \item{index}{A character value (or a vector of characters) specifying the
-target mode for conversion to binary image. Use \code{\link[=pliman_indexes]{pliman_indexes()}} or the
-\code{details} section to see the available indexes.  Defaults to \code{NULL}
-((normalized) Red, Green and Blue).  One can also use "RGB" for RGB only,
-"NRGB" for normalized RGB, or "all" for all indexes. User can also
-calculate your own index using the bands names, e.g. \code{index = "R+B/G"}.}
+target mode for conversion to a binary image. Use \code{\link[=pliman_indexes]{pliman_indexes()}} or the
+\code{details} section to see the available indexes. Defaults to \code{NULL}
+(normalized Red, Green, and Blue). You can also use "RGB" for RGB only,
+"NRGB" for normalized RGB,  "MULTISPECTRAL" for multispectral indices
+(provided NIR and RE bands are available) or "all" for all indexes. Users
+can also calculate their own index using the band names, e.g., \code{index = "R+B/G"}.}
+
+\item{r, g, b, re, nir}{The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.}
+
+\item{return_class}{The class of object to be returned. If \verb{"terra} returns a
+SpatRaster object with the number of layers equal to the number of indexes
+computed. If \code{"ebimage"} (default) returns a list of \code{Image} objects, where
+each element is one index computed.}
 
 \item{resize}{Resize the image before processing? Defaults to \code{resize = FALSE}. Use \code{resize = 50}, which resizes the image to 50\% of the original
 size to speed up image processing.}
-
-\item{re}{Respective position of the red-edge band at the original image
-file.}
-
-\item{nir}{Respective position of the near-infrared band at the original
-image file.}
 
 \item{has_white_bg}{Logical indicating whether a white background is present.
 If TRUE, pixels that have R, G, and B values equals to 1 will be considered
@@ -52,6 +63,10 @@ considered for the threshold computation.}
 
 \item{nrow, ncol}{The number of rows or columns in the plot grid. Defaults to
 \code{NULL}, i.e., a square grid is produced.}
+
+\item{max_pixels}{integer > 0. Maximum number of cells to plot the index. If
+\code{max_pixels < npixels(img)}, downsampling is performed before plotting the
+index. Using a large number of pixels may slow down the plotting time.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

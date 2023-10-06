@@ -549,13 +549,12 @@ correct_coords <- function(coords, nrowimg, ncolimg, nrow, ncol){
 
 
 check_mapview <- function() {
-  packages <- c("raster", "mapview", "mapedit", "leaflet", "leafem")
-  rast <- !requireNamespace("raster", quietly = TRUE)
+  packages <- c("mapview", "mapedit", "leaflet", "leafem")
   mapv <- !requireNamespace("mapview", quietly = TRUE)
   mape <- !requireNamespace("mapedit", quietly = TRUE)
   leafl <- !requireNamespace("leaflet", quietly = TRUE)
   leafe <- !requireNamespace("leafem", quietly = TRUE)
-  missing_packages <- packages[c(rast, mapv, mape, leafl, leafe)]
+  missing_packages <- packages[c(mapv, mape, leafl, leafe)]
   if (length(missing_packages) > 0) {
     if (interactive()) {
       inst <- switch(menu(c("Yes", "No"),
@@ -789,4 +788,6 @@ open_wd <- function(path = getwd()){
     utils::browseURL(url = path)
   }
 }
+
+
 

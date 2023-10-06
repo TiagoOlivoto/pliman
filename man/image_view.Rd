@@ -9,7 +9,8 @@ image_view(
   title = "Edit the image",
   show = c("rgb", "index"),
   index = "B",
-  max_pixels = 2500000,
+  max_pixels = 1e+06,
+  downsample = NULL,
   color_regions = custom_palette(),
   ...
 )
@@ -28,10 +29,14 @@ view and "index" for index view.}
 \item{max_pixels}{integer > 0. Maximum number of cells to use for the plot.
 If \code{max_pixels < npixels(img)}, regular sampling is used before plotting.}
 
+\item{downsample}{integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to \code{NULL}, which will
+find the best downsampling factor to approximate the \code{max_pixels} value.}
+
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}
 
-\item{...}{Additional arguments to be passed to \code{\link[mapview:mapView]{mapview::mapview()}}.}
+\item{...}{Additional arguments to be passed to \code{downsample_fun}.}
 }
 \value{
 An \code{sf} object, the same object returned by \code{\link[mapedit:editMap]{mapedit::editMap()}}.

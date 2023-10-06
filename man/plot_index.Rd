@@ -10,8 +10,11 @@ plot_index(
   index = NULL,
   remove_bg = TRUE,
   viewer = get_pliman_viewer(),
+  all_layers = TRUE,
   layer = 1,
-  max_pixels = 1e+06,
+  max_pixels = 5e+05,
+  downsample = NULL,
+  downsample_fun = NULL,
   color_regions = custom_palette(),
   ncol = NULL,
   nrow = NULL,
@@ -43,13 +46,23 @@ argument globally for all functions in the package, you can use the
 \code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
 all functions.}
 
+\item{all_layers}{Render all layers when \code{img} is an object computed with
+\code{\link[=image_index]{image_index()}} and \code{viewer = "mapview"}?.}
+
 \item{layer}{The layer to plot when \code{img} is an object computed with
 \code{\link[=image_index]{image_index()}} and \code{viewer = "mapview"}. Defaults to the first layer
 (first index computed).}
 
 \item{max_pixels}{integer > 0. Maximum number of cells to plot the index. If
-\code{max_pixels < npixels(img)}, regular sampling is used before plotting.
-Using a large number of pixels may slow down the plotting time.}
+\code{max_pixels < npixels(img)}, downsampling is performed before plotting the
+index. Using a large number of pixels may slow down the plotting time.}
+
+\item{downsample}{integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to \code{NULL}, which will
+find the best downsampling factor to approximate the \code{max_pixels} value.}
+
+\item{downsample_fun}{function; if given, downsampling will apply
+\verb{downsample_fun`` } to each of the the subtiles.}
 
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}

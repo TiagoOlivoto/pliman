@@ -8,6 +8,11 @@
 image_segment(
   img,
   index = NULL,
+  r = 1,
+  g = 2,
+  b = 3,
+  re = 4,
+  nir = 5,
   threshold = c("Otsu", "adaptive"),
   k = 0.1,
   windowsize = NULL,
@@ -15,8 +20,6 @@ image_segment(
   has_white_bg = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
-  re = NULL,
-  nir = NULL,
   invert = FALSE,
   plot = TRUE,
   nrow = NULL,
@@ -56,6 +59,11 @@ same length of \code{nseg}. It can be either an available index (described above
 or any operation involving the RGB values (e.g., \code{"B/R+G"}).
 }}
 
+\item{r, g, b, re, nir}{The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.}
+
 \item{threshold}{The theshold method to be used.
 \itemize{
 \item By default (\code{threshold = "Otsu"}), a threshold value based
@@ -91,12 +99,6 @@ background will not be considered for the threshold computation.}
 \code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.}
-
-\item{re}{Respective position of the red-edge band at the original image
-file.}
-
-\item{nir}{Respective position of the near-infrared band at the original
-image file.}
 
 \item{invert}{Inverts the binary image, if desired. For
 \code{image_segmentation_iter()} use a vector with the same length of \code{nseg}.}

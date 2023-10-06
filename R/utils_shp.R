@@ -18,11 +18,11 @@
 #'   that will contain the grid.
 #' @param viewer The viewer option. If not provided, the value is retrieved
 #'   using [get_pliman_viewer()]. This option controls the type of viewer to use
-#'   for interactive plotting. The available options are "base" and "mapview".
-#'   If set to "base", the base R graphics system is used for interactive
-#'   plotting. If set to "mapview", the mapview package is used. To set this
-#'   argument globally for all functions in the package, you can use the
-#'   [set_pliman_viewer()] function. For example, you can run
+#'   for interactive plotting. The available options are `"base"` and
+#'   `"mapview"`. If set to "base", the base R graphics system is used for
+#'   interactive plotting. If set to "mapview", the mapview package is used. To
+#'   set this argument globally for all functions in the package, you can use
+#'   the [set_pliman_viewer()] function. For example, you can run
 #'   `set_pliman_viewer("mapview")` to set the viewer option to "mapview" for
 #'   all functions.
 #' @param col_line,col_text The color of the line/text in the grid. Defaults to
@@ -407,7 +407,7 @@ object_export_shp <- function(img,
 
 #' Aligns an `Image` object by hand
 #'
-#' [image_rotate()] rotate an image given a line of desired aligment along the y
+#' [image_align()] rotate an image given a line of desired aligment along the y
 #' axis that corresponds to the alignment of the objects (e.g., field plots). By
 #' default, the aligment will be to the vertical, which means that if the drawed
 #' line have an angle < 90º parallel to the x axis, the rotation angle wil be
@@ -456,9 +456,9 @@ image_align <- function(img,
   alignopt <- alignopt[pmatch(align[1], alignopt)]
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
-  if(viewer[[1]] == "base"){
+  if(vieweropt == "base"){
     message("Select 2 points drawing a line of desired aligment along the y axis.")
-    plot(img)
+    plot(EBImage::Image(img[,,1:3], colormode = "Color"))
     cord <- locator(type = "p", n = 2, col = "red", pch = 19)
     c1 <- data.frame(do.call(rbind, cord)) |> t()
     lines(c1, col = "red", lty = 2, lwd = 2)
@@ -501,7 +501,7 @@ image_align <- function(img,
 #'
 #' @details The `analyze_objects_shp` function performs object analysis on an
 #' image and generates shapefiles representing the analyzed objects. The
-#' function first prepares the image for analysis using the [image_prepare_mv()]
+#' function first prepares the image for analysis using the [image_prepare()]
 #' function if the `prepare` argument is set to `TRUE`. If a shapefile object is
 #' provided, the number of rows and columns for splitting the image is obtained
 #' from the shapefile. Otherwise, the image is split into multiple sub-images
@@ -509,7 +509,7 @@ image_align <- function(img,
 #' [object_split_shp()] function. The objects in each sub-image are analyzed
 #' using the [analyze_objects()] function, and the results are stored in a list.
 #' If parallel processing is enabled, the analysis is performed in parallel
-#' using multiple workers. The analysis results is
+#' using multiple workers.
 #'
 #' The output object provides access to various components of the analysis
 #' results, such as the analyzed object coordinates and properties.
@@ -525,7 +525,7 @@ image_align <- function(img,
 #' @param nrow,ncol The number of rows and columns to generate the shapefile
 #'   when `shapefile` is not declared. Defaults to `1`.
 #' @param prepare Logical value indicating whether to prepare the image for
-#'   analysis using [image_prepare_mv()] function. Defaults to `FALSE`. Set to
+#'   analysis using [image_prepare()] function. Defaults to `FALSE`. Set to
 #'   `TRUE` to interactively align and crop the image before processing.
 #' @param viewer The viewer option. If not provided, the value is retrieved
 #'   using [get_pliman_viewer()]. This option controls the type of viewer to use
@@ -573,8 +573,14 @@ analyze_objects_shp <- function(img,
                                 buffer_x = 0,
                                 buffer_y = 0,
                                 prepare = FALSE,
+                                segment_objects = TRUE,
                                 viewer = get_pliman_viewer(),
                                 index = "R",
+                                r = 1,
+                                g = 2,
+                                b = 3,
+                                re = 4,
+                                nir = 5,
                                 shapefile = NULL,
                                 interactive = FALSE,
                                 plot = FALSE,
@@ -590,13 +596,19 @@ analyze_objects_shp <- function(img,
                                 invert = FALSE,
                                 ...){
   if(isTRUE(prepare)){
-    img <- image_prepare_mv(img, viewer = viewer)
+    img <- image_prepare(img, viewer = viewer)
   } else{
     img <- img
   }
   mask <- analyze_objects(img,
                           index = index,
+                          r = r,
+                          g = g,
+                          b = b,
+                          re = re,
+                          nir = nir,
                           invert = invert,
+                          segment_objects = segment_objects,
                           plot = FALSE,
                           return_mask = TRUE,
                           watershed = watershed,
@@ -629,7 +641,7 @@ analyze_objects_shp <- function(img,
   }
 
   if(parallel == TRUE){
-    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.3), workers)
     cl <- parallel::makePSOCKcluster(workers)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
@@ -642,6 +654,12 @@ analyze_objects_shp <- function(img,
       foreach::foreach(i = seq_along(imgs), .packages = "pliman") %dopar%{
         analyze_objects(imgs[[i]],
                         index = index,
+                        segment_objects = segment_objects,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
                         plot = plot,
                         object_size = object_size,
                         object_index = object_index,
@@ -658,6 +676,12 @@ analyze_objects_shp <- function(img,
       lapply(seq_along(imgs), function(i){
         analyze_objects(imgs[[i]],
                         index = index,
+                        segment_objects = segment_objects,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
                         plot = plot,
                         object_size = object_size,
                         object_index = object_index,
@@ -792,10 +816,6 @@ analyze_objects_shp <- function(img,
     veins <- NULL
   }
   res[, 1:4] <- correct_coords(res[, 1:4],  nrow(img),  ncol(img), nrow, ncol)
-  img2 <- img
-  img2@.Data[,,1][which(mask@.Data == 0)] <- 1
-  img2@.Data[,,2][which(mask@.Data == 0)] <- 1
-  img2@.Data[,,3][which(mask@.Data == 0)] <- 1
   return(
     structure(
       list(results = res,
@@ -812,8 +832,7 @@ analyze_objects_shp <- function(img,
            mask = mask,
            index = index,
            object_index_computed = object_index_used,
-           final_image = img,
-           final_image_masked = img2),
+           final_image = img),
       class = "anal_obj"
     )
   )
@@ -950,7 +969,8 @@ plot_shp <- function(coords,
 #' specified in the `attribute` argument and should be present in the
 #' `object_index` of the `object` computed using [analyze_objects_shp()]. The
 #' rectangles are colored using a color scale.
-#'
+#' @inheritParams image_shp
+#' @inheritParams plot_index
 #' @param object An object computed with [analyze_objects_shp()].
 #' @param attribute The name of the quantitative variable in the
 #'   \code{object_index} to be used for coloring the rectangles.
@@ -991,69 +1011,186 @@ plot_shp <- function(coords,
 plot_index_shp <- function(object,
                            attribute = "coverage",
                            color = c("red","green"),
+                           viewer = c("mapview", "base"),
+                           max_pixels = 500000,
+                           downsample = NULL,
+                           downsample_fun = NULL,
                            alpha = 0.5,
                            legend.position = "bottom",
                            na.color = "gray",
                            classes = 6,
                            round = 3,
                            horiz = TRUE) {
-  if(!is.null(object$object_index)){
-    quant_var <- aggregate(. ~ img, data = object[["object_index"]], FUN = mean)
-    quant_var <- cbind(quant_var, coverage =  aggregate(coverage ~ img, data = object$results, FUN = sum)$coverage)
+  vieweropt <- c("base", "mapview")
+  vieweropt <- vieweropt[pmatch(viewer[[1]], vieweropt)]
+  if(vieweropt == "mapview"){
+    quant_var <- get_measures(object)$summary
+    quant_var <- quant_var[, c(1, 4, 5, 35:ncol(quant_var))]
+    quant_var$img <- gsub("obj", "shp", quant_var$img)
+    get_numeric_from_img <- function(x) {
+      as.numeric(gsub("shp", "", x))
+    }
+    quant_var <- quant_var[order(get_numeric_from_img(quant_var$img)), ]
+    if(!attribute %in% names(quant_var)){
+      stop("Attribute not found. Have you included it in the `object_index` argument from `analyze_objects_shp()`?", call. = FALSE)
+    }
+    num_rows <- object$shapefiles$nrow
+    num_cols <- object$shapefiles$ncol
+
+    list_of_polygons <- lapply(object$shapefiles$shapefiles, function(x) {
+      sf::st_polygon(list(as.matrix(x[,2:3])))
+    })
+
+    if(num_rows > 1 & num_cols > 1){
+      total_elements <- num_rows * num_cols
+      num_groups <- floor(total_elements / num_cols)
+      start_values <- seq(total_elements, by = -num_cols, length.out = num_groups) - (num_cols - 1)
+      list_seq <- list()
+      for (i in 1:length(start_values)) {
+        list_seq[[i]] <-  c(start_values[[i]], seq(start_values[[i]] + 1, start_values[[i]] + (num_cols - 1)))
+      }
+      quant_var <- quant_var[unlist(list_seq), ]
+      # rownames(quant_var) <- unlist(list_seq)
+      quant_var$img <- paste0("shp", 1:nrow(quant_var))
+
+      # Convert the list of polygons to an "sf" data frame
+      sf_df <- sf::st_sf(
+        geometry = list_of_polygons,
+        data = data.frame(img = paste0("shp", unlist(list_seq))),
+        crs = sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+      )
+    } else{
+      if(num_cols == 1){
+        quant_var <- quant_var[order(get_numeric_from_img(quant_var$img), decreasing = TRUE), ]
+        sf_df <- sf::st_sf(
+          geometry = list_of_polygons,
+          data = data.frame(img = paste0("shp", nrow(quant_var):1)),
+          crs = sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+        )
+      }
+      if(num_rows == 1){
+        quant_var <- quant_var[order(get_numeric_from_img(quant_var$img)), ]
+        sf_df <- sf::st_sf(
+          geometry = list_of_polygons,
+          data = data.frame(img = paste0("shp", 1:nrow(quant_var))),
+          crs = sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+        )
+      }
+    }
+
+    sf_df <- cbind(sf_df, quant_var[, 2:ncol(quant_var)])
+    sf_df <- sf::st_transform(sf_df, crs = sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
+    mp <-
+      mapview::mapview(sf_df,
+                       map.types = "OpenStreetMap",
+                       zcol = attribute,
+                       legend = TRUE,
+                       alpha.regions = alpha,
+                       layer.name = attribute)
+    rgb <- stars::st_as_stars(terra::rast(EBImage::transpose(object$final_image)@.Data[,,1:3]))
+    dimsto <- dim(rgb[,,,1])
+    nr <- dimsto[1]
+    nc <- dimsto[2]
+    npix <- nc * nr
+    if(max_pixels > 500000){
+      message("The number of pixels is too high, which might slow the rendering process.")
+    }
+    if(npix > max_pixels){
+      if(is.null(downsample)){
+        compute_downsample <- function(nr, nc, n) {
+          if (n == 0) {
+            return(nr * nc)
+          } else if (n == 1) {
+            return(ceiling(nr/2) * ceiling(nc/2))
+          } else if (n > 1) {
+            return(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+          } else {
+            stop("Invalid downsampling factor. n must be a non-negative integer.")
+          }
+        }
+        possible_downsamples <- 0:100
+        possible_npix <- sapply(possible_downsamples, function(x){
+          compute_downsample(nr, nc, x)
+        })
+        downsample <- which.min(abs(possible_npix - max_pixels)) - 1
+        message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+      }
+      rs <- stars::st_downsample(rgb[,,,1], n = downsample)
+      gs <- stars::st_downsample(rgb[,,,2], n = downsample)
+      bs <- stars::st_downsample(rgb[,,,3], n = downsample)
+      rgb <- terra::rast(c(rs, gs, bs, along = 3)) |> stars::st_as_stars()
+    }
+
+    sf::st_crs(rgb) <- sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m ")
+
+    leafem::addStarsRGB(map = mp,
+                        x = rgb,
+                        r = 1,
+                        g = 2,
+                        b = 3,
+                        maxBytes = 16 * 1024 * 1024,
+                        na.color = "#00000000")
+
   } else{
-    quant_var <- aggregate(coverage ~ img, data = object$results, FUN = sum)
+    if(!is.null(object$object_index)){
+      quant_var <- aggregate(. ~ img, data = object[["object_index"]], FUN = mean)
+      quant_var <- cbind(quant_var, coverage =  aggregate(coverage ~ img, data = object$results, FUN = sum)$coverage)
+    } else{
+      quant_var <- aggregate(coverage ~ img, data = object$results, FUN = sum)
+    }
+    get_numeric_from_img <- function(x) {
+      as.numeric(gsub("shp", "", x))
+    }
+    quant_var <- quant_var[order(get_numeric_from_img(quant_var$img)), ]
+    if(!attribute %in% names(quant_var)){
+      stop("Attribute not found. Have you included it in the `object_index` argument from `analyze_objects_shp()`?", call. = FALSE)
+    }
+    quant_variable <- quant_var[, attribute]
+    coords_list <- object$shapefiles$shapefiles
+
+    # Combine all rectangles into one data frame for plotting
+    all_rectangles <- do.call(rbind, coords_list)
+
+    # Define the xmax, xmin, ymax, ymin of the image
+    xmax <- max(all_rectangles$x)
+    xmin <- min(all_rectangles$x)
+    ymax <- max(all_rectangles$y)
+    ymin <- min(all_rectangles$y)
+
+    # Normalize the quantitative variable for color scaling
+    rr <- range(quant_variable, na.rm = TRUE)
+    svals <- (quant_variable - rr[1]) / diff(rr)
+    svals[is.na(svals)] <- 0
+
+    # Create the color ramp function
+    f <- colorRamp(color)
+
+    # Calculate colors based on the normalized values and alpha
+    valcol <- rgb(f(svals)/255, alpha = alpha)
+    valcol[is.na(svals)] <- rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha)
+
+    # Add RGB image (raster) on the plot
+    fin_img <- object$final_image[,,1:3]
+    EBImage::colorMode(fin_img) <- "Color"
+    plot(fin_img)
+    for (i in 1:length(coords_list)) {
+      rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = valcol[i], border = NA)
+      rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = NA, border = "black")
+    }
+
+    # Generate the legend
+    pos <- round(seq(min(quant_variable, na.rm = TRUE),
+                     max(quant_variable, na.rm = TRUE),
+                     length.out = classes), round)
+    if (any(is.na(quant_variable))) {
+      pos <- c(pos, "NA")
+    }
+    col <- rgb(f(seq(0, 1, length.out = classes))/255, alpha = alpha)
+    if (any(is.na(quant_variable))) {
+      col <- c(col, rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha))
+    }
+    legend(legend.position, title = attribute, legend = pos, fill = col, bty = "n", horiz = horiz)
   }
-  get_numeric_from_img <- function(x) {
-    as.numeric(gsub("shp", "", x))
-  }
-  quant_var <- quant_var[order(get_numeric_from_img(quant_var$img)), ]
-  if(!attribute %in% names(quant_var)){
-    stop("Attribute not found. Have you included it in the `object_index` argument from `analyze_objects_shp()`?", call. = FALSE)
-  }
-  quant_variable <- quant_var[, attribute]
-  coords_list <- object$shapefiles$shapefiles
-
-  # Combine all rectangles into one data frame for plotting
-  all_rectangles <- do.call(rbind, coords_list)
-
-  # Define the xmax, xmin, ymax, ymin of the image
-  xmax <- max(all_rectangles$x)
-  xmin <- min(all_rectangles$x)
-  ymax <- max(all_rectangles$y)
-  ymin <- min(all_rectangles$y)
-
-  # Normalize the quantitative variable for color scaling
-  rr <- range(quant_variable, na.rm = TRUE)
-  svals <- (quant_variable - rr[1]) / diff(rr)
-  svals[is.na(svals)] <- 0
-
-  # Create the color ramp function
-  f <- colorRamp(color)
-
-  # Calculate colors based on the normalized values and alpha
-  valcol <- rgb(f(svals)/255, alpha = alpha)
-  valcol[is.na(svals)] <- rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha)
-
-  # Add RGB image (raster) on the plot
-  plot(object$final_image)
-
-  for (i in 1:length(coords_list)) {
-    rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = valcol[i], border = NA)
-    rect(min(coords_list[[i]]$x), min(coords_list[[i]]$y), max(coords_list[[i]]$x), max(coords_list[[i]]$y), col = NA, border = "black")
-  }
-
-  # Generate the legend
-  pos <- round(seq(min(quant_variable, na.rm = TRUE),
-                   max(quant_variable, na.rm = TRUE),
-                   length.out = classes), round)
-  if (any(is.na(quant_variable))) {
-    pos <- c(pos, "NA")
-  }
-  col <- rgb(f(seq(0, 1, length.out = classes))/255, alpha = alpha)
-  if (any(is.na(quant_variable))) {
-    col <- c(col, rgb(t(col2rgb(col = na.color, alpha = FALSE))/255, alpha = alpha))
-  }
-  legend(legend.position, title = attribute, legend = pos, fill = col, bty = "n", horiz = horiz)
 }
 
 
@@ -1073,7 +1210,7 @@ plot_index_shp <- function(object,
 #' @param nrow,ncol The number of rows and columns to generate the shapefile.
 #'   Defaults to `1`.
 #' @param prepare Logical value indicating whether to prepare the image for
-#'   analysis using [image_prepare_mv()] function. This allows to align and crop
+#'   analysis using [image_prepare()] function. This allows to align and crop
 #'   the image before processing. Defaults to `FALSE`.
 #' @param dir_original The directory containing the original and processed images.
 #'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
@@ -1122,7 +1259,7 @@ measure_disease_shp <- function(img,
                                 verbose = TRUE,
                                 ...){
   if(isTRUE(prepare)){
-    img <- image_prepare_mv(img, viewer = viewer)
+    img <- image_prepare(img, viewer = viewer)
   }
   if(is.null(dir_original)){
     diretorio_original <- paste("./", sep = "")
@@ -1269,7 +1406,7 @@ measure_disease_shp <- function(img,
     }
 
     if(parallel == TRUE){
-      workers2 <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+      workers2 <- ifelse(is.null(workers), ceiling(detectCores() * 0.2), workers)
       cl2 <- parallel::makePSOCKcluster(workers2)
       doParallel::registerDoParallel(cl2)
       on.exit(stopCluster(cl2))

@@ -11,9 +11,11 @@ object_export(
   dir_processed = NULL,
   format = ".jpg",
   squarize = FALSE,
+  augment = FALSE,
+  times = 12,
   index = "NB",
   lower_size = NULL,
-  watershed = TRUE,
+  watershed = FALSE,
   invert = FALSE,
   fill_hull = FALSE,
   filter = 2,
@@ -50,6 +52,11 @@ exist, it will be created.}
 
 \item{squarize}{Squarizes the image before the exportation? If \code{TRUE},
 \code{\link[=image_square]{image_square()}} will be called internally.}
+
+\item{augment}{A logical indicating if exported objects should be augmented using
+\code{\link[=image_augment]{image_augment()}}. Defaults to \code{FALSE}.}
+
+\item{times}{The number of times to rotate the image.}
 
 \item{index}{A character value specifying the target mode for conversion to
 binary image when \code{foreground} and \code{background} are not declared. Defaults
@@ -140,8 +147,8 @@ images within the working directory.
 \examples{
 if(interactive()){
 library(pliman)
-img <- image_pliman("la_leaves.jpg")
-object_export(img)
-
+img <- image_pliman("potato_leaves.jpg")
+object_export(img,
+              remove_bg = TRUE)
 }
 }

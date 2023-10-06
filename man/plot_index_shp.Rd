@@ -9,6 +9,10 @@ plot_index_shp(
   object,
   attribute = "coverage",
   color = c("red", "green"),
+  viewer = c("mapview", "base"),
+  max_pixels = 5e+05,
+  downsample = NULL,
+  downsample_fun = NULL,
   alpha = 0.5,
   legend.position = "bottom",
   na.color = "gray",
@@ -24,6 +28,27 @@ plot_index_shp(
 \code{object_index} to be used for coloring the rectangles.}
 
 \item{color}{A vector of two colors to be used for the color scale.}
+
+\item{viewer}{The viewer option. If not provided, the value is retrieved
+using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use
+for interactive plotting. The available options are \code{"base"} and
+\code{"mapview"}. If set to "base", the base R graphics system is used for
+interactive plotting. If set to "mapview", the mapview package is used. To
+set this argument globally for all functions in the package, you can use
+the \code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
+\code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
+all functions.}
+
+\item{max_pixels}{integer > 0. Maximum number of cells to plot the index. If
+\code{max_pixels < npixels(img)}, downsampling is performed before plotting the
+index. Using a large number of pixels may slow down the plotting time.}
+
+\item{downsample}{integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to \code{NULL}, which will
+find the best downsampling factor to approximate the \code{max_pixels} value.}
+
+\item{downsample_fun}{function; if given, downsampling will apply
+\verb{downsample_fun`` } to each of the the subtiles.}
 
 \item{alpha}{The transparency level of the rectangles' color (between 0 and 1).}
 

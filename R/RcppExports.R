@@ -33,6 +33,10 @@ help_get_rgb <- function(R, G, B, labels) {
     .Call(`_pliman_help_get_rgb`, R, G, B, labels)
 }
 
+help_get_renir <- function(RE, NIR, labels) {
+    .Call(`_pliman_help_get_renir`, RE, NIR, labels)
+}
+
 bounding_box <- function(img, edge) {
     .Call(`_pliman_bounding_box`, img, edge)
 }
