@@ -87,11 +87,11 @@ mosaic_view <- function(mosaic,
   }
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
-      return(nr * nc)
+      invisible(nr * nc)
     } else if (n == 1) {
-      return(ceiling(nr/2) * ceiling(nc/2))
+      invisible(ceiling(nr/2) * ceiling(nc/2))
     } else if (n > 1) {
-      return(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+      invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
     } else {
       stop("Invalid downsampling factor. n must be a non-negative integer.")
     }
@@ -150,7 +150,7 @@ mosaic_view <- function(mosaic,
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
       if(!is.na(sf::st_crs(mosaic))){
-        message("Using `show = 'rgb' may not produce accurate cropping coordinates. Please, consider using `show = 'index'`instead.")
+        message("Using `show = 'rgb' may not produce accurate cropping coordinates.\n Please, consider using `show = 'index'`instead.")
         map <-
           leaflet::leaflet() |>
           leaflet::addScaleBar(position = "bottomleft") |>
@@ -195,7 +195,7 @@ mosaic_view <- function(mosaic,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
-        return(map)
+        invisible(map)
       }
 
     }
@@ -220,7 +220,7 @@ mosaic_view <- function(mosaic,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
-        return(map)
+        invisible(map)
       }
     } else{
       if(vieweropt == "base"){
@@ -241,7 +241,7 @@ mosaic_view <- function(mosaic,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
-        return(map)
+        invisible(map)
       }
     }
   }
@@ -359,7 +359,7 @@ mosaic_crop <- function(mosaic,
       sf::st_transform(sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
   }
   cropped <- terra::crop(mosaic, grids)
-  return(cropped)
+  invisible(cropped)
 }
 
 
@@ -430,7 +430,7 @@ mosaic_index <- function(mosaic,
   } else{
     suppressWarnings(sf::st_crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
   }
-  return(mosaic_gray)
+  invisible(mosaic_gray)
 }
 
 
@@ -486,7 +486,7 @@ mosaic_to_pliman <- function(mosaic,
   if(terra::nlyr(mosaic) == 3){
     EBImage::colorMode(eb) <- "color"
   }
-  return(eb + coef)
+  invisible(eb + coef)
 }
 
 #' Mosaic to RGB
@@ -529,7 +529,7 @@ mosaic_to_rgb <- function(mosaic,
                            b = b,
                            coef = coef)[,,c(r, g, b)]
   EBImage::colorMode(ebim) <- "color"
-  return(ebim)
+  invisible(ebim)
 }
 
 
@@ -622,5 +622,5 @@ mosaic_prepare <- function(mosaic,
   if(dim(cropped)[3] == 3){
     EBImage::colorMode(cropped) <- "color"
   }
-  return(cropped)
+  invisible(cropped)
 }

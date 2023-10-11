@@ -170,7 +170,7 @@ image_import <- function(img,
       }
       list_img <- image_resize(list_img, resize)
     }
-    return(list_img)
+    invisible(list_img)
   } else{
     img_dir <- ifelse(is.null(path), file_dir(img), path)
     all_files <- sapply(list.files(img_dir), file_name)
@@ -201,7 +201,7 @@ image_import <- function(img,
         }
         ls <- image_resize(ls, resize)
       }
-      return(ls)
+      invisible(ls)
     } else{
       if(file_extension(img_name) %in% c("tif", "TIF", "tiff", "TIFF", "gri", "grd")){
         img <- terra::rast(img_name)
@@ -217,7 +217,7 @@ image_import <- function(img,
         }
         img <- image_resize(img, resize)
       }
-      return(img)
+      invisible(img)
     }
   }
 }
@@ -304,7 +304,7 @@ image_pliman <- function(img, plot = FALSE){
     if(isTRUE(plot)){
       plot(im)
     }
-    return(im)
+    invisible(im)
   } else{
     path
   }
@@ -454,7 +454,7 @@ image_autocrop <- function(img,
     } else{
       res <- lapply(img, image_autocrop, index, edge)
     }
-    return(structure(res, class = "autocrop_list"))
+    invisible(structure(res, class = "autocrop_list"))
   } else{
     conv_hull <- object_coord(img,
                               index = index,
@@ -468,7 +468,7 @@ image_autocrop <- function(img,
     if(isTRUE(plot)){
       plot(segmented)
     }
-    return(segmented)
+    invisible(segmented)
   }
 }
 #' @name utils_transform
@@ -505,7 +505,7 @@ image_crop <- function(img,
     } else{
       res <- lapply(img, image_crop, width, height, viewer)
     }
-    return(res)
+    invisible(res)
   } else{
     if (!is.null(width) | !is.null(height)) {
       dim <- dim(img)[1:2]
@@ -558,7 +558,7 @@ image_crop <- function(img,
         plot(img)
       }
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -659,7 +659,7 @@ image_rotate <- function(img,
     if (isTRUE(plot) & EBImage::numberOfFrames(img) > 2) {
       plot(EBImage::Image(img[,,1:3], colormode = "Color"))
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -701,7 +701,7 @@ image_horizontal <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -743,7 +743,7 @@ image_vertical <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -779,7 +779,7 @@ image_hreflect <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -815,7 +815,7 @@ image_vreflect <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -858,7 +858,7 @@ image_resize <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -913,7 +913,7 @@ image_trim <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -960,7 +960,7 @@ image_dilate <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -1007,7 +1007,7 @@ image_erode <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -1053,7 +1053,7 @@ image_opening <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -1099,7 +1099,7 @@ image_closing <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -1153,7 +1153,7 @@ image_skeleton <- function(img,
     if (plot == TRUE) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -1211,7 +1211,7 @@ image_thinning <- function(img,
     if (plot == TRUE) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -1284,7 +1284,7 @@ image_thinning_guo_hall <- function(img,
     if(isTRUE(plot)){
       plot(thin)
     }
-    return(thin)
+    invisible(thin)
   }
 }
 
@@ -1329,7 +1329,7 @@ image_filter <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -1365,7 +1365,7 @@ image_blur <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 #' @name utils_transform
@@ -1403,7 +1403,7 @@ image_contrast <- function(img,
           factors[i] <- i
         }
       }
-      return(factors[!is.na(factors)])
+      invisible(factors[!is.na(factors)])
     }
     img_width <- dim(img)[1]
     img_height <- dim(img)[2]
@@ -1441,7 +1441,7 @@ image_contrast <- function(img,
     if (isTRUE(plot)) {
       plot(img)
     }
-    return(img)
+    invisible(img)
   }
 }
 
@@ -1477,7 +1477,7 @@ image_create <- function(color,
   if(isTRUE(plot)){
     plot(img)
   }
-  return(img)
+  invisible(img)
 }
 
 #' Creates a binary image
@@ -1635,7 +1635,7 @@ image_binary <- function(img,
                     nrow,
                     ncol)
     }
-    return(structure(res, class = "binary_list"))
+    invisible(structure(res, class = "binary_list"))
   } else{
     bin_img <- function(imgs,
                         invert,
@@ -1697,7 +1697,7 @@ image_binary <- function(img,
       if(is.numeric(filter) & filter > 1){
         imgs <- EBImage::medianFilter(imgs, filter)
       }
-      return(imgs)
+      invisible(imgs)
     }
 
     imgs <- lapply(image_index(img, index, r, g, b, re, nir, return_class, resize, re, nir, has_white_bg, plot = FALSE, nrow, ncol, verbose = verbose),
@@ -1866,7 +1866,7 @@ image_index <- function(img,
     } else{
       res <- lapply(img, image_index, index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
     }
-    return(structure(res, class = "index_list"))
+    invisible(structure(res, class = "index_list"))
   } else{
     if(resize != FALSE){
       img <- image_resize(img, resize)
@@ -2154,7 +2154,7 @@ image_segment <- function(img,
     } else{
       res <- lapply(img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, invert, plot = plot, nrow, ncol)
     }
-    return(structure(res, class = "segment_list"))
+    invisible(structure(res, class = "segment_list"))
   } else{
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
     nir_ind <- as.character(ind$Index[ind$Band %in% c("MULTI")])
@@ -2295,8 +2295,8 @@ image_segment_iter <- function(img,
       lapply(a, function(x){
         x$images
       })
-    return(list(results = results,
-                images = images))
+    invisible(list(results = results,
+                   images = images))
   } else{
     avali_index <- pliman_indexes()
     if(nseg == 1){
@@ -2540,9 +2540,9 @@ image_segment_kmeans <-   function (img,
       suppressWarnings(image(m, useRaster = TRUE))
     }
   }
-  return(list(img = im2,
-              clusters = m,
-              masks = LIST))
+  invisible(list(img = im2,
+                 clusters = m,
+                 masks = LIST))
 }
 
 
@@ -2695,7 +2695,7 @@ image_segment_manual <-  function(img,
       imF[i, min(coorr[, 2], na.rm = T):max(coorr[, 2], na.rm = T)] = 1
     }
     mask <- EBImage::fillHull(EBImage::bwlabel(imF))
-    # return(mask)
+    # invisible(mask)
     if(type[1] == "select"){
       id <- mask != 1
     } else{
@@ -2727,7 +2727,7 @@ image_segment_manual <-  function(img,
     if(isTRUE(plot)){
       plot(img)
     }
-    return(list(img = image, mask = EBImage::Image(mask)))
+    invisible(list(img = image, mask = EBImage::Image(mask)))
   }
 }
 
@@ -2775,7 +2775,7 @@ image_to_mat <- function(img,
     } else{
       res <- lapply(img, image_to_mat)
     }
-    return(structure(res, class = "img_mat_list"))
+    invisible(structure(res, class = "img_mat_list"))
   } else{
     mat <- cbind(expand.grid(Row = 1:dim(img)[1], Col = 1:dim(img)[2]))
     if(length(dim(img)) == 3){
@@ -2787,7 +2787,7 @@ image_to_mat <- function(img,
       mat <- cbind(mat, c(img))
       colnames(mat) = c("row", "col", "B1")
     }
-    return(mat)
+    invisible(mat)
   }
 }
 
@@ -2893,10 +2893,10 @@ image_palette <- function (img,
   if (plot == TRUE) {
     plot(im2)
   }
-  return(list(palette_list = pal_list,
-              joint = im2,
-              proportions = props,
-              rgbs = pal_rgb))
+  invisible(list(palette_list = pal_list,
+                 joint = im2,
+                 proportions = props,
+                 rgbs = pal_rgb))
 }
 
 
@@ -3212,7 +3212,7 @@ distance <- function(img,
       coords2 <- mv_two_points(img)
       pix <- sqrt((coords2$x1 - coords2$x2)^2 + (coords2$y1 - coords2$y2)^2)
     }
-    return(pix)
+    invisible(pix)
   }
 }
 
@@ -3284,7 +3284,7 @@ rgb_to_hsb <- function(object){
                       b = c(object[,,3]))
     colnames(hsb) <- c("h", "s", "b")
   }
-  return(data.frame(hsb))
+  invisible(data.frame(hsb))
 }
 
 #' @export
@@ -3316,7 +3316,7 @@ rgb_to_srgb <- function(object){
     srgb <- rgb_to_srgb_help(cbind(c(object[,,1]), c(object[,,2]), c(object[,,3])))
     colnames(srgb) <- c("sR", "sG", "sB")
   }
-  return(data.frame(srgb))
+  invisible(data.frame(srgb))
 }
 
 
@@ -3328,7 +3328,7 @@ rgb_to_lab <- function(object){
                      g = object[, 2],
                      b = object[, 3])
   lab <- convertColor(srgb, from = "sRGB", to = "Lab")
-  return(lab)
+  invisible(lab)
 }
 
 
@@ -3463,7 +3463,7 @@ help_binary <- function(img,
     if(is.numeric(filter) & filter > 1){
       imgs <- EBImage::medianFilter(imgs, filter)
     }
-    return(imgs)
+    invisible(imgs)
   }
 
   gray_img <- help_imageindex(img, index, r, g, b, re, nir, resize, has_white_bg)
@@ -3568,6 +3568,6 @@ prepare_to_shp <- function(img,
                            align = "vertical"){
   aligned <- image_align(img, viewer = "base")
   cropped <- image_crop(aligned, viewer = "base", plot = TRUE)
-  return(cropped)
+  invisible(cropped)
 }
 

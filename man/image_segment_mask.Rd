@@ -11,6 +11,7 @@ image_segment_mask(
   rel_pos_x = 0.5,
   rel_pos_y = 0.5,
   type = c("binary", "shadow"),
+  col_background = "white",
   plot = TRUE,
   ...
 )
@@ -33,6 +34,9 @@ respectively.}
 \item{type}{Defines the type of the mask. By default, a binary mask is
 applied. This results in white pixels in the original image that matches
 the 0s pixels in the brush. If \code{type = "shadow"} is used, a shadow mask is produced}
+
+\item{col_background}{Background color after image segmentation. Defaults to
+\code{"white"}.}
 
 \item{plot}{Plots the generated mask? Defaults to \code{TRUE}.}
 

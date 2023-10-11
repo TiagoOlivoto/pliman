@@ -103,5 +103,5 @@ sad <- function(object,
                   ncol = ncol,
                   nrow = nrow)
   }
-  return(leaves)
+  invisible(leaves)
 }

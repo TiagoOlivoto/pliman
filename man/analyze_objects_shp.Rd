@@ -95,7 +95,7 @@ processing time when an image has lots of objects (say >1000).}
 
 \item{workers}{A positive numeric scalar or a function specifying the number
 of parallel processes that can be active at the same time. By default, the
-number of sections is set up to 50\% of available cores.}
+number of sections is set up to 30\% of available cores.}
 
 \item{watershed}{If \code{TRUE} (default) performs watershed-based object
 detection. This will detect objects even when they are touching one other.

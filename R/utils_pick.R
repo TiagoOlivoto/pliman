@@ -77,7 +77,7 @@ pick_count <- function(img,
       if (isTRUE(plot)) {
         plot(img)
       }
-      on.exit(return(length(x)))
+      on.exit(invisible(length(x)))
       if(isTRUE(verbose)){
         message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
       }
@@ -100,7 +100,7 @@ pick_count <- function(img,
       }
     } else {
       points <- mv_points(img, title = "Use the 'Draw Marker' tool to pick up points in the plot")
-      return(nrow(points))
+      invisible(nrow(points))
     }
   }
 }
@@ -119,7 +119,7 @@ pick_coords <- function(img,
     pixels <- NULL
     if(vieweropt == "base"){
       plot(img)
-      on.exit(return(data.frame(x = x, y = y)))
+      on.exit(invisible(data.frame(x = x, y = y)))
       if(isTRUE(verbose)){
         message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
       }
@@ -141,7 +141,7 @@ pick_coords <- function(img,
       }
     } else{
       points <- mv_points(img, title = "Use the 'Draw Marker' tool to pick up points in the plot")
-      return(points)
+      invisible(points)
     }
   }
 }
@@ -163,7 +163,7 @@ pick_rgb <- function(img,
       if (isTRUE(plot)) {
         plot(img)
       }
-      on.exit(return(pixels))
+      on.exit(invisible(pixels))
       if(isTRUE(verbose)){
         message("Use the first mouse button to pick up points in the plot.\nPress Esc to exit.")
       }
@@ -202,7 +202,7 @@ pick_rgb <- function(img,
     pixels$id <- 1:nrow(pixels)
     pixels <- pixels[, c("id", "R", "G", "B")]
   }
-  return(pixels)
+  invisible(pixels)
 }
 
 #' @name utils_pick
@@ -260,6 +260,9 @@ pick_palette <- function(img,
       if(i == 1){
         stop("Process interrupted", call. = FALSE)
       }
+      if(i > 1){
+        on.exit(invisible(pal))
+      }
     } else{
       mvpoin <- mv_points(img, show = show, title = title, index = index)
       bind <- NULL
@@ -290,8 +293,6 @@ pick_palette <- function(img,
     if(isTRUE(palette)){
       plot(pal)
     }
-    if(i > 1){
-      on.exit(return(pal))
-    }
+    return(pal)
   }
 }

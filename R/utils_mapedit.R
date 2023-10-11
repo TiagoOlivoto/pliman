@@ -39,11 +39,11 @@ image_view <- function(img,
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
-      return(nr * nc)
+      invisible(nr * nc)
     } else if (n == 1) {
-      return(ceiling(nr/2) * ceiling(nc/2))
+      invisible(ceiling(nr/2) * ceiling(nc/2))
     } else if (n > 1) {
-      return(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+      invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
     } else {
       stop("Invalid downsampling factor. n must be a non-negative integer.")
     }
@@ -100,7 +100,7 @@ image_view <- function(img,
         )
       )
   }
-  return(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
+  invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
 }
 
 
@@ -205,11 +205,11 @@ plot_index <- function(img = NULL,
   check_mapview()
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
-      return(nr * nc)
+      invisible(nr * nc)
     } else if (n == 1) {
-      return(ceiling(nr/2) * ceiling(nc/2))
+      invisible(ceiling(nr/2) * ceiling(nc/2))
     } else if (n > 1) {
-      return(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+      invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
     } else {
       stop("Invalid downsampling factor. n must be a non-negative integer.")
     }
@@ -467,7 +467,7 @@ image_prepare <- function(img, viewer = get_pliman_viewer()){
     image_view(img[1:10, 1:10, ])
   }
   cropped <- image_crop(align, viewer = vieweropt)
-  return(cropped)
+  invisible(cropped)
 }
 
 
@@ -487,7 +487,7 @@ mv_two_points <- function(img,
   x2 <- e[[1]][2]
   x3 <- e[[1]][3]
   x4 <- e[[1]][4]
-  return(list(x1 = x1,
+  invisible(list(x1 = x1,
               y1 = nc - x3,
               x2 = x2,
               y2 = nc - x4))
@@ -506,7 +506,7 @@ mv_rectangle <- function(img,
   coords <- e[[1]][[1]]
   coords[, 2] <- nc - coords[, 2]
   colnames(coords) <- c("x", "y")
-  return(coords)
+  invisible(coords)
 }
 
 # mv_polygon: Allows the user to create a polygon in an image and retrieves its coordinates.
@@ -522,7 +522,7 @@ mv_polygon <- function(img,
   coords <- e[[1]][[1]]
   colnames(coords) <- c("x", "y")
   coords[, 2] <- nc - coords[, 2]
-  return(coords)
+  invisible(coords)
 }
 
 # mv_points: Enables the user to select multiple points in an image and returns their coordinates.
@@ -534,7 +534,6 @@ mv_points <- function(img,
   if(!inherits(e, "sfc_POINT")){
     stop("The geometry used is not valid. Please, use 'Draw Marker' tool to select two points.", call. = FALSE)
   }
-  e <- image_view(img)
   nc <- ncol(img)
   coords <-
     do.call(rbind, lapply(e, function(x){
@@ -542,7 +541,7 @@ mv_points <- function(img,
     }))
   colnames(coords) <- c("x", "y")
   coords[, 2] <- nc - coords[, 2]
-  return(coords)
+  invisible(coords)
 }
 
 
@@ -596,7 +595,7 @@ mosaic_index <- function(mosaic,
   } else{
     suppressWarnings(sf::st_crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
   }
-  return(mosaic_gray)
+  invisible(mosaic_gray)
 }
 
 # image_orientation: Determines the orientation of an image (vertical or horizontal).

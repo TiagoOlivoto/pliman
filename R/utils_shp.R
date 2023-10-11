@@ -88,7 +88,7 @@ image_shp <- function(img,
               bbox = bbox,
               nrow = nrow,
               ncol = ncol)
-  return(structure(lst, class = "image_shp"))
+  invisible(structure(lst, class = "image_shp"))
 }
 
 
@@ -194,7 +194,7 @@ object_split_shp <- function(img,
       max_x <- max(x[,1])
       min_y <- min(x[,2])
       max_y <- max(x[,2])
-      return(list(min_x, max_x, min_y, max_y))
+      invisible(list(min_x, max_x, min_y, max_y))
     }
     for (i in 1:length(shapefile)) {
       tmp <- shapefile[[i]][-1]
@@ -207,7 +207,7 @@ object_split_shp <- function(img,
   } else{
     imgs <- img
   }
-  return(list(imgs = imgs,
+  invisible(list(imgs = imgs,
               shapefile = shps))
 }
 
@@ -494,7 +494,7 @@ image_align <- function(img,
     message(paste("Angle to align in the vertical: ", round(anglev, 3)))
     message(paste("Angle to align in the horizontal: ", round(angleh, 3)))
   }
-  return(img2)
+  invisible(img2)
 }
 
 #' Analyzes objects using shapefiles
@@ -816,7 +816,7 @@ analyze_objects_shp <- function(img,
     veins <- NULL
   }
   res[, 1:4] <- correct_coords(res[, 1:4],  nrow(img),  ncol(img), nrow, ncol)
-  return(
+  invisible(
     structure(
       list(results = res,
            statistics = statistics,
@@ -913,7 +913,7 @@ object_map <- function(object,
     (sd(x) / mean(x)) * 100
   })
   means <- sapply(distances, mean)
-  return(list(distances = distances, cvs = cvs, means = means))
+  invisible(list(distances = distances, cvs = cvs, means = means))
 }
 
 #' Mark Object Points
@@ -1099,11 +1099,11 @@ plot_index_shp <- function(object,
       if(is.null(downsample)){
         compute_downsample <- function(nr, nc, n) {
           if (n == 0) {
-            return(nr * nc)
+            invisible(nr * nc)
           } else if (n == 1) {
-            return(ceiling(nr/2) * ceiling(nc/2))
+            invisible(ceiling(nr/2) * ceiling(nc/2))
           } else if (n > 1) {
-            return(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+            invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
           } else {
             stop("Invalid downsampling factor. n must be a non-negative integer.")
           }
@@ -1365,7 +1365,7 @@ measure_disease_shp <- function(img,
     res <- cbind(res[, 1], xycoords, res[, 2:3])
     colnames(res) <- c("img", "x", "y",  "healthy", "symptomatic")
 
-    return(
+    invisible(
       structure(
         list(severity = res,
              shape = shape,
@@ -1480,7 +1480,7 @@ measure_disease_shp <- function(img,
                     shape = shape,
                     statistics = stats)
   }
-  return(structure(
+  invisible(structure(
     results, class = "plm_disease_byl"
   ))
 

@@ -12,7 +12,7 @@ create_mat <- function(vect, nr){
   diag(mat) <- 0
   rownames(mat) <- paste0("L", 1:ncol(mat))
   colnames(mat) <- paste0("L", 1:ncol(mat))
-  return(mat)
+  invisible(mat)
 }
 
 
@@ -77,7 +77,7 @@ landmarks <- function(img,
     viewopt <- viewopt[pmatch(viewer[[1]], viewopt)]
     if(viewopt == "base"){
       plot(img)
-      on.exit(return(coords))
+      on.exit(invisible(coords))
       message("Use the first mouse button to select landmarks in the plot.\nPress Esc to exit.")
       i <- 1
       coords <- data.frame(x = NA, y = NA)
@@ -100,7 +100,7 @@ landmarks <- function(img,
     } else{
       coords <- mv_points(img, title = "Use the first mouse button to select landmarks in the plot. Press 'Done' to exit.")
       rownames(coords) <- paste0("L", 1:nrow(coords))
-      return(coords)
+      invisible(coords)
     }
   }
 }
@@ -157,7 +157,7 @@ landmarks_regradi <- function(x,
     op <- par(mfrow = c(nrow, ncol))
     on.exit(par(op))
     coords <- lapply(x, landmarks_regradi, n, close, plot)
-    return(coords)
+    invisible(coords)
   } else{
     Rx <- x[,1]
     Ry <- x[,2]
@@ -198,7 +198,7 @@ landmarks_regradi <- function(x,
                coords[,2],
                col = "gray")
     }
-    return(
+    invisible(
       structure(
         list(pixindices = V2,
              radii = M2[V2,2],
@@ -269,7 +269,7 @@ landmarks_add <- function(x,
     op <- par(mfrow = c(nrow, ncol))
     on.exit(par(op))
     coords <- lapply(x, landmarks_add, n, smooth_iter, plot)
-    return(coords)
+    invisible(coords)
   } else{
     if(inherits(x, "landmarks_regradi")){
       M <- as.matrix(x$coords)
@@ -292,7 +292,7 @@ landmarks_add <- function(x,
     if(isTRUE(plot)){
       plot_polygon(M)
     }
-    return(M)
+    invisible(M)
   }
 }
 

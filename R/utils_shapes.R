@@ -49,7 +49,7 @@ draw_circle <- function(radius = 1,
          y = 0.5 * radius,
          label = radius)
   }
-  return(as.matrix(circ))
+  invisible(as.matrix(circ))
 }
 
 
@@ -80,7 +80,7 @@ draw_square <- function(side = 2,
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(as.matrix(df))
+  invisible(as.matrix(df))
 }
 
 
@@ -112,7 +112,7 @@ draw_rectangle <- function(side1 = 2,
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(as.matrix(df))
+  invisible(as.matrix(df))
 }
 
 #' @name utils_shapes
@@ -145,7 +145,7 @@ draw_trian_equi <- function(side = 2,
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(as.matrix(df))
+  invisible(as.matrix(df))
 }
 
 #' @param cat1,cat2 The first and second cathetus of the right triangle.
@@ -175,7 +175,7 @@ draw_trian_rect <- function(cat1 = 1,
     plot(df, type = "n", xlab = "", ylab = "", asp = 1)
     with(df, polygon(x, y, col = "red"))
   }
-  return(as.matrix(rbind(df, df[1,])))
+  invisible(as.matrix(rbind(df, df[1,])))
 }
 
 #' @param n The number of sides in the `n`-tagon.
@@ -205,5 +205,5 @@ draw_n_tagon <- function(n, plot = TRUE){
          asp = 1)
     polygon(coords, col = "red")
   }
-  return(as.matrix(coords))
+  invisible(as.matrix(coords))
 }

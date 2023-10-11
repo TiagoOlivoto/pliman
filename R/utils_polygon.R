@@ -933,7 +933,7 @@ plot_polygon <- function(x,
       }
       op <- par(mfrow = c(nrow, ncol))
       on.exit(par(op))
-      invisible(lapply(x, plot_polygon,  fill, random_fill, points, merge, border, alpha, add, aspect_ratio = aspect_ratio, ...))
+      return(lapply(x, plot_polygon,  fill, random_fill, points, merge, border, alpha, add, aspect_ratio = aspect_ratio, ...))
     }
   } else{
     if(inherits(x, "landmarks_regradi")){
@@ -979,9 +979,9 @@ plot_mass <- function(x,
                       lwd = 1){
   if (inherits(x, "list")) {
     if(is.null(id)){
-      invisible(lapply(x, plot_mass, y, id, col, cex, lwd))
+      return(lapply(x, plot_mass, y, id, col, cex, lwd))
     } else{
-      invisible(lapply(x[id], plot_mass, y, id, col, cex, lwd))
+      return(lapply(x[id], plot_mass, y, id, col, cex, lwd))
     }
   } else{
     if(is.data.frame(x) | is.matrix(x)){
@@ -1126,7 +1126,7 @@ poly_width_at <- function(x,
       axis(1)
       axis(2)
     }
-    invisible(wd)
+    return(wd)
   }
 }
 

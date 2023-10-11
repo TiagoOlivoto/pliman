@@ -121,6 +121,7 @@ measure_disease_byl <- function(img,
                            extension = extension,
                            tolerance = tolerance,
                            object_size = object_size,
+                           remove_bg = TRUE,
                            plot = FALSE,
                            verbose = FALSE)
     results <- list()
@@ -142,7 +143,8 @@ measure_disease_byl <- function(img,
                                  dir_processed = tmp_dir,
                                  prefix = paste0(name_ori, "_", i),
                                  name = "",
-                                 filter = FALSE,
+                                 filter = filter,
+                                 threshold = threshold,
                                  ...)
                })
 
@@ -160,7 +162,8 @@ measure_disease_byl <- function(img,
                                  dir_processed = tmp_dir,
                                  prefix = paste0(name_ori, "_", i),
                                  name = "",
-                                 filter = FALSE,
+                                 filter = filter,
+                                 threshold = threshold,
                                  ...)
                })
     }
@@ -211,7 +214,7 @@ measure_disease_byl <- function(img,
       shape <- NULL
       stats <- NULL
     }
-    return(
+    invisible(
       structure(
         list(severity = severity,
              stats = stats,
@@ -245,7 +248,7 @@ measure_disease_byl <- function(img,
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
-        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
       results <-
         parLapply(clust, names_plant,
@@ -286,7 +289,7 @@ measure_disease_byl <- function(img,
                       dir_original = diretorio_original,
                       save_image = save_image))
   }
-  return(structure(
+  invisible(structure(
     results, class = "plm_disease_byl"
   ))
 }

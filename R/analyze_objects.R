@@ -175,7 +175,7 @@
 #'  processing time when an image has lots of objects (say >1000).
 #'@param workers A positive numeric scalar or a function specifying the number
 #'  of parallel processes that can be active at the same time. By default, the
-#'  number of sections is set up to 50% of available cores.
+#'  number of sections is set up to 30% of available cores.
 #'@param watershed If `TRUE` (default) performs watershed-based object
 #'  detection. This will detect objects even when they are touching one other.
 #'  If `FALSE`, all pixels for each connected set of foreground pixels are set
@@ -675,7 +675,7 @@ analyze_objects <- function(img,
                                        title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
                                        viewer = viewer)
             if(viewopt != "base"){
-              image_view(img |> reduce_dimensions(2000))
+              image_view(img[1:10, 1:10,])
             }
             if(viewopt == "base"){
               message("Use the first mouse button to pick up FOREGROUND colors. Press Est to exit")
@@ -1391,7 +1391,7 @@ analyze_objects <- function(img,
     }
     if(parallel == TRUE){
       init_time <- Sys.time()
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
       cl <- parallel::makePSOCKcluster(nworkers)
       doParallel::registerDoParallel(cl)
       on.exit(stopCluster(cl))

@@ -27,7 +27,7 @@ watershed2 <- function(binary,
   if(isTRUE(plot)){
     plot(EBImage::colorLabels(wts))
   }
-  return(wts)
+  invisible(wts)
 }
 
 

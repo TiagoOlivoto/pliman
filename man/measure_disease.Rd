@@ -91,7 +91,7 @@ filtering.}
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, especially when \code{pattern} is used is informed. The
-number of sections is set up to 70\% of available cores.}
+number of sections is set up to 30\% of available cores.}
 
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}

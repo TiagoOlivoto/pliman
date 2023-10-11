@@ -59,5 +59,5 @@ object_edge <- function(img,
   if(isTRUE(plot)){
     plot(edata)
   }
-  return(edata)
+  invisible(edata)
 }

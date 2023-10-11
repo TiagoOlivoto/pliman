@@ -75,7 +75,7 @@ efourier <- function(x,
       })
     }
     coords <- lapply(x, efourier, nharm, align, center, smooth_iter)
-    return(structure(coords, class = "efourier_lst"))
+    invisible(structure(coords, class = "efourier_lst"))
   } else{
     if(inherits(x, "landmarks_regradi")){
       coord <-x$coords
@@ -127,7 +127,7 @@ efourier <- function(x,
                   nr = nr,
                   nharm = nharm,
                   coords = coord)
-    return(structure(coefs, class = "efourier"))
+    invisible(structure(coefs, class = "efourier"))
   }
 }
 
@@ -163,7 +163,7 @@ efourier_inv <- function(x,
                          npoints = 500) {
   if (inherits(x, "efourier_lst")) {
     coords <- lapply(x, efourier_inv, nharm, a0, c0, npoints)
-    return(structure(coords, class = "iefourier_lst"))
+    invisible(structure(coords, class = "iefourier_lst"))
   } else{
     if (is.null(x$a0)){
       x$a0 <- 0
@@ -196,7 +196,7 @@ efourier_inv <- function(x,
     y <- (c0/2) + apply(hy, 2, sum)
     coord <- cbind(x, y)
     colnames(coord) <- c("x", "y")
-    return(structure(coord, class = "iefourier"))
+    invisible(structure(coord, class = "iefourier"))
   }
 }
 
@@ -280,7 +280,7 @@ efourier_error <- function(x,
     rownames(err) <- NULL
 
     dev_points <- lapply(error, function(x){x$dev_points})
-    return(list(
+    invisible(list(
       stats = err,
       dev_points = dev_points
     ))
@@ -421,7 +421,7 @@ efourier_error <- function(x,
 efourier_norm <- function(x, start = FALSE) {
   if (inherits(x, "efourier_lst")) {
     coords <- lapply(x, efourier_norm, start)
-    return(structure(coords, class = "nefourier_lst"))
+    invisible(structure(coords, class = "nefourier_lst"))
   } else{
     A1 <- x$an[1]
     B1 <- x$bn[1]
@@ -475,7 +475,7 @@ efourier_norm <- function(x, start = FALSE) {
            c0 = x$c0,
            lnef = lnef,
            nharm = nharm)
-    return(structure(coefs, class = "nefourier"))
+    invisible(structure(coefs, class = "nefourier"))
   }
 }
 
@@ -554,7 +554,7 @@ efourier_coefs <- function(x){
       coefs <- cbind(an, bn, cn, dn)
     }
   }
-  return(data.frame(coefs))
+  invisible(data.frame(coefs))
 }
 
 
@@ -631,7 +631,7 @@ efourier_power <- function(x,
     min_harm$object <- names(power)
     min_harm <- min_harm[, c(ncol(min_harm), 1:ncol(min_harm)-1)]
     rownames(min_harm) <- NULL
-    return(list(
+    invisible(list(
       cum_power = pwer,
       min_harm = min_harm
     ))
@@ -678,7 +678,7 @@ efourier_power <- function(x,
     }
     minh <- data.frame(t(minh))
     colnames(minh) <- paste0("p", thresh)
-    return(list(
+    invisible(list(
       cum_power = cum_power,
       min_harm = minh
     ))
@@ -779,7 +779,7 @@ efourier_shape <- function(an = NULL,
   if (isTRUE(plot)){
     plot_polygon(shapes)
   }
-  return(shapes)
+  invisible(shapes)
 }
 
 

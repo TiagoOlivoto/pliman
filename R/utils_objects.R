@@ -165,7 +165,7 @@ object_coord <- function(img,
              ytop = coord[,4])
       }
     }
-    return(coord)
+    invisible(coord)
   }
 }
 #' @name utils_objects
@@ -257,7 +257,7 @@ object_contour <- function(img,
           plot_contour(contour, col = "red")
         }
       }
-      return(contour)
+      invisible(contour)
     } else{
       if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
         pattern <- "^[0-9].*$"
@@ -345,7 +345,7 @@ object_contour <- function(img,
 
       }
       names(results) <- plants
-      return(results)
+      invisible(results)
     }
   }
 }
@@ -381,7 +381,7 @@ object_isolate <- function(img,
     segmented <- img[coord[1]:coord[2],
                      coord[3]:coord[4],
                      1:3]
-    return(segmented)
+    invisible(segmented)
   }
 }
 #' @name utils_objects
@@ -506,7 +506,7 @@ object_split <- function(img,
   if(isTRUE(plot)){
     image_combine(list_objects, ...)
   }
-  return(list_objects)
+  invisible(list_objects)
 }
 
 
@@ -706,7 +706,7 @@ image_augment <- function(img,
   }
 
   if(type == "return"){
-    return(obj_list)
+    invisible(obj_list)
   }
 
 }
@@ -1024,7 +1024,7 @@ object_rgb <- function(img, labels){
     df2 <- cbind(df2, df3[, 2:3])
     colnames(df2) <- c("id", "R", "G", "B", "RE", "NIR")
   }
-  return(df2)
+  invisible(df2)
 }
 
 

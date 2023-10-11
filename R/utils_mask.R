@@ -87,7 +87,7 @@ make_mask <- function(img,
   if(isTRUE(plot)){
     plot(mask)
   }
-  return(mask)
+  invisible(mask)
 }
 
 
@@ -102,6 +102,8 @@ make_mask <- function(img,
 #' @param type Defines the type of the mask. By default, a binary mask is
 #'   applied. This results in white pixels in the original image that matches
 #'   the 0s pixels in the brush. If `type = "shadow"` is used, a shadow mask is produced
+#' @param col_background Background color after image segmentation. Defaults to
+#'   `"white"`.
 #' @return A color `Image` object
 #' @export
 #'
@@ -121,6 +123,7 @@ image_segment_mask <- function(img,
                                rel_pos_x = 0.5,
                                rel_pos_y = 0.5,
                                type = c("binary", "shadow"),
+                               col_background = "white",
                                plot = TRUE,
                                ...){
   mask <- make_mask(img,
@@ -128,17 +131,18 @@ image_segment_mask <- function(img,
                     rel_pos_x = rel_pos_x,
                     rel_pos_y = rel_pos_y,
                     plot = FALSE)
+  col_background <- col2rgb(col_background) / 255
   ID <- which(mask == 0)
   if(type[[1]] == "binary"){
-    img@.Data[, , 1][ID] <- 1
-    img@.Data[, , 2][ID] <- 1
-    img@.Data[, , 3][ID] <- 1
+    img@.Data[, , 1][ID] <- col_background[1]
+    img@.Data[, , 2][ID] <- col_background[2]
+    img@.Data[, , 3][ID] <- col_background[3]
   } else{
     img@.Data[, , 1][ID] <- 1
   }
   if(isTRUE(plot)){
     plot(img)
   }
-  return(img)
+  invisible(img)
 }
 

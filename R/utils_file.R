@@ -97,7 +97,7 @@ file_dir <- function(file){
                     substring(fd[x], 3, nchar(fd[x])),
                     fd[x])
            })
-  return(fd)
+  invisible(fd)
 }
 #' @export
 #' @name utils_file

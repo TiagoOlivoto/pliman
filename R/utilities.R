@@ -60,7 +60,7 @@ remove_rownames <- function(.data){
 round_cols <- function(.data, digits = 2){
   num_col <- which(sapply(.data,  is.numeric))
   .data[num_col] <- apply(.data[num_col], 2, round, digits  = digits)
-  return(.data)
+  invisible(.data)
 }
 
 
@@ -196,10 +196,10 @@ pca <- function(x, scale = TRUE){
   colnames(ind_cord) <- paste0("PC", 1:ncol(ind_cord))
 
   getdistance <- function(ind_row, center, scale){
-    return(sum(((ind_row - center)/scale)^2))
+    invisible(sum(((ind_row - center)/scale)^2))
   }
   d2 <- apply(df, 1, getdistance, center, scale)
-  cos2 <- function(ind, d2){return(ind^2/d2)}
+  cos2 <- function(ind, d2){invisible(ind^2/d2)}
   ind.cos2 <- apply(scores, 2, cos2, d2) |> as.data.frame()
   colnames(ind.cos2) <- paste0("PC", 1:ncol(ind.cos2))
   contribi <- function(ind, comp.sdev, n.ind){
@@ -214,7 +214,7 @@ pca <- function(x, scale = TRUE){
     coord = ind_cord
   )
 
-  return(structure(
+  invisible(structure(
     list(
       data = df,
       variances = variances,
@@ -460,7 +460,7 @@ progress <- function(min = 0,
                      width = getOption("width"),
                      time = Sys.time()){
   # Adapted from https://stackoverflow.com/a/26920123/15245107
-  return(list(min = min,
+  invisible(list(min = min,
               max = max,
               leftd = leftd,
               rightd = rightd,
@@ -529,7 +529,7 @@ check_ebi <- function(){
 correct_coords <- function(coords, nrowimg, ncolimg, nrow, ncol){
   get_row_number <- function(vector, rows, cols) {
     row_numbers <- ((vector - 1) %/% cols) + 1
-    return(row_numbers)
+    invisible(row_numbers)
   }
   npixperrow <- ncolimg / nrow
   npixpercol <- nrowimg / ncol
@@ -542,7 +542,7 @@ correct_coords <- function(coords, nrowimg, ncolimg, nrow, ncol){
     transform(y = ifelse(row == 1, y, y + npixperrow * (row - 1)),
               x = ifelse(col == 1, x, x + npixpercol * (col - 1)))
 
-  return(coords[, 1:4])
+  invisible(coords[, 1:4])
 }
 
 
@@ -626,7 +626,7 @@ separate_col <- function(.data, col, into, sep = "[^[:alnum:]]+"){
     as.data.frame()
   .data[[var]] <- NULL
   names(df) <- into
-  return(cbind(df, .data))
+  invisible(cbind(df, .data))
 }
 
 
@@ -649,7 +649,7 @@ separate_col <- function(.data, col, into, sep = "[^[:alnum:]]+"){
 #' random_color(n = 3)
 random_color <- function(n = 1, distinct = FALSE){
   replace <- ifelse(n > length(colors()), TRUE, FALSE)
-  return(sample(colors(distinct = distinct), n, replace = replace))
+  invisible(sample(colors(distinct = distinct), n, replace = replace))
 }
 
 

@@ -434,7 +434,7 @@ get_measures <- function(object,
              index = aggr)
     }
     class(out) <- c("measures_ls")
-    return(out)
+    invisible(out)
   } else{
 
     # bind object_index, if it exists
@@ -464,7 +464,7 @@ get_measures <- function(object,
 
     res <- round_cols(res, digits = digits)
     class(res) <- c("data.frame", "measures")
-    return(res)
+    invisible(res)
   }
 }
 
@@ -858,7 +858,7 @@ features_moment <- function(x){
   }))
   res <- cbind(mc, moms)
   colnames(res) <- c("mx", "my", "maj_axis", "min_axis", "eccentricity", "theta")
-  return(data.frame(res))
+  invisible(data.frame(res))
 }
 
 features_shape <- function(x){
@@ -877,7 +877,7 @@ features_shape <- function(x){
                     radius_min = rmin,
                     radius_max = rmax,
                     radius_sd = rsd)
-  return(res)
+  invisible(res)
 }
 
 ## helper function to compute the measures based on a mask
@@ -968,7 +968,7 @@ compute_measures <- function(mask,
     shape <- cbind(shape, hal[valid, ])
     colnames(shape) <- c(names_measures(), har_names())
   }
-  return(list(shape = shape,
+  invisible(list(shape = shape,
               cont = ocont,
               ch = ch))
 }
@@ -1009,7 +1009,7 @@ compute_measures_disease <- function(mask){
                      "min_axis",
                      "length",
                      "width")]
-  return(list(shape = shape,
+  invisible(list(shape = shape,
               cont = ocont))
 }
 
