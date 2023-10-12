@@ -55,15 +55,16 @@ measure_disease_byl <- function(img,
                                 extension = NULL,
                                 tolerance = NULL,
                                 object_size = "large",
-                                dir_original = NULL,
                                 img_healthy = NULL,
                                 img_symptoms = NULL,
+                                plot = TRUE,
+                                save_image = FALSE,
+                                dir_original = NULL,
+                                dir_processed = NULL,
                                 pattern = NULL,
                                 parallel = FALSE,
                                 workers = NULL,
-                                plot = TRUE,
                                 show_features = FALSE,
-                                save_image = FALSE,
                                 verbose = TRUE,
                                 ...){
 
@@ -74,6 +75,14 @@ measure_disease_byl <- function(img,
       ifelse(grepl("[/\\]", dir_original),
              dir_original,
              paste0("./", dir_original))
+  }
+  if(is.null(dir_processed)){
+    diretorio_processada <- paste("./", sep = "")
+  } else{
+    diretorio_processada <-
+      ifelse(grepl("[/\\]", dir_processed),
+             dir_processed,
+             paste0("./", dir_processed))
   }
   if (is.character(img_healthy)){
     all_files <- sapply(list.files(getwd()), file_name)
@@ -125,11 +134,6 @@ measure_disease_byl <- function(img,
                            plot = FALSE,
                            verbose = FALSE)
     results <- list()
-    tmp_dir <- tempdir()
-    if(isTRUE(plot)){
-      save_image <- FALSE
-      clear_td()
-    }
     if(is.null(img_healthy)){
       results <-
         lapply(seq_along(splits),
@@ -137,10 +141,10 @@ measure_disease_byl <- function(img,
                  measure_disease(splits[[i]],
                                  index_dh = index_dh,
                                  index_lb = index_lb,
-                                 plot = FALSE,
-                                 save_image = TRUE,
+                                 plot = plot,
+                                 save_image = save_image,
                                  show_features = show_features,
-                                 dir_processed = tmp_dir,
+                                 dir_processed = diretorio_processada,
                                  prefix = paste0(name_ori, "_", i),
                                  name = "",
                                  filter = filter,
@@ -156,10 +160,12 @@ measure_disease_byl <- function(img,
                                  img_healthy = img_healthy,
                                  img_symptoms = img_symptoms,
                                  img_background = back,
-                                 plot = FALSE,
+                                 plot = plot,
                                  save_image = TRUE,
                                  show_features = show_features,
-                                 dir_processed = tmp_dir,
+                                 save_image = save_image,
+                                 show_features = show_features,
+                                 dir_processed = diretorio_processada,
                                  prefix = paste0(name_ori, "_", i),
                                  name = "",
                                  filter = filter,
@@ -168,11 +174,6 @@ measure_disease_byl <- function(img,
                })
     }
     names(results) <- paste0(name_ori, "-", 1:length(results))
-    if(isTRUE(plot)){
-      imgs <- image_import(pattern = as.character(name_ori), path = tmp_dir)
-      image_combine(imgs)
-      clear_td()
-    }
     severity <-
       do.call(rbind,
               lapply(seq_along(results), function(i){

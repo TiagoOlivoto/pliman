@@ -18,15 +18,16 @@ measure_disease_byl(
   extension = NULL,
   tolerance = NULL,
   object_size = "large",
-  dir_original = NULL,
   img_healthy = NULL,
   img_symptoms = NULL,
+  plot = TRUE,
+  save_image = FALSE,
+  dir_original = NULL,
+  dir_processed = NULL,
   pattern = NULL,
   parallel = FALSE,
   workers = NULL,
-  plot = TRUE,
   show_features = FALSE,
-  save_image = FALSE,
   verbose = TRUE,
   ...
 )
@@ -104,13 +105,19 @@ which is the highest.}
 (e.g, wheat grains), \code{"medium"} (e.g, soybean grains), \code{"large"}(e.g, peanut
 grains), and \code{"elarge"} (e.g, soybean pods)`.}
 
-\item{dir_original}{The directory containing the original and processed images.
-Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
-current working directory.}
-
 \item{img_healthy}{A color palette of healthy tissues.}
 
 \item{img_symptoms}{A color palette of lesioned tissues.}
+
+\item{plot}{Show image after processing?}
+
+\item{save_image}{Save the image after processing? The image is saved in the
+current working directory named as \verb{proc_*} where \code{*} is the image name
+given in \code{img}.}
+
+\item{dir_original}{The directory containing the original and processed images.
+Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
+current working directory.}
 
 \item{pattern}{A pattern of file name used to identify images to be
 processed. For example, if \code{pattern = "im"} all images that the name
@@ -126,14 +133,8 @@ number of sections is set up to 30\% of available cores.}
 \item{workers}{A positive numeric scalar or a function specifying the maximum
 number of parallel processes that can be active at the same time.}
 
-\item{plot}{Show image after processing?}
-
 \item{show_features}{If \code{TRUE} returnS the lesion features such as number,
 area, perimeter, and radius. Defaults to \code{FALSE}.}
-
-\item{save_image}{Save the image after processing? The image is saved in the
-current working directory named as \verb{proc_*} where \code{*} is the image name
-given in \code{img}.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 
