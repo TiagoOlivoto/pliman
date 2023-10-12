@@ -10,9 +10,13 @@
 #'
 #' @inheritParams object_split
 #' @inheritParams measure_disease
-#' @param dir_original The directory containing the original and processed images.
-#'   Defaults to `NULL`. In this case, the function will search for the image `img` in the
-#'   current working directory.
+#' @param dir_original,dir_processed The directory containing the original and
+#'   processed images. Defaults to `NULL`. In this case, the function will
+#'   search for the image `img` in the current working directory. After
+#'   processing, when `save_image = TRUE`, the processed image will be also
+#'   saved in such a directory. It can be either a full path, e.g.,
+#'   `"C:/Desktop/imgs"`, or a subfolder within the current working directory,
+#'   e.g., `"/imgs"`.
 #' @param index A character value specifying the target mode for
 #'   conversion to binary to segment the leaves from background. Defaults to "B"
 #'   (blue). See [image_index()] for more details. Personalized indexes can be

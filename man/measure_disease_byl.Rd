@@ -115,9 +115,13 @@ grains), and \code{"elarge"} (e.g, soybean pods)`.}
 current working directory named as \verb{proc_*} where \code{*} is the image name
 given in \code{img}.}
 
-\item{dir_original}{The directory containing the original and processed images.
-Defaults to \code{NULL}. In this case, the function will search for the image \code{img} in the
-current working directory.}
+\item{dir_original, dir_processed}{The directory containing the original and
+processed images. Defaults to \code{NULL}. In this case, the function will
+search for the image \code{img} in the current working directory. After
+processing, when \code{save_image = TRUE}, the processed image will be also
+saved in such a directory. It can be either a full path, e.g.,
+\code{"C:/Desktop/imgs"}, or a subfolder within the current working directory,
+e.g., \code{"/imgs"}.}
 
 \item{pattern}{A pattern of file name used to identify images to be
 processed. For example, if \code{pattern = "im"} all images that the name
