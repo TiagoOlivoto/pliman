@@ -15,7 +15,8 @@ sad(
 )
 }
 \arguments{
-\item{object}{An object computed with \code{\link[=measure_disease]{measure_disease()}}.}
+\item{object}{An object computed with \code{\link[=measure_disease]{measure_disease()}} or
+\code{\link[=measure_disease_byl]{measure_disease_byl()}}.}
 
 \item{n}{The number of leaves in the Standard Area Diagram.}
 
@@ -37,8 +38,9 @@ A data frame with the severity values for the \code{n} sampled leaves. A plot wi
 the standard area diagram can be saved by wrapping \code{\link[=sad]{sad()}} with \code{\link[=png]{png()}}.
 }
 \description{
-Given an object computed with \code{\link[=measure_disease]{measure_disease()}} a Standard Area Diagram
-(SAD) with \code{n} images are returned with the respective severity values.
+Given an object computed with \code{\link[=measure_disease]{measure_disease()}} or \code{\link[=measure_disease_byl]{measure_disease_byl()}}
+a Standard Area Diagram (SAD) with \code{n} images are returned with the
+respective severity values.
 }
 \details{
 The leaves with the smallest and highest severity will always be in the SAD.

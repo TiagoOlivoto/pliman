@@ -1,7 +1,8 @@
 #' Produces Santandard Area Diagrams
 #'
-#' Given an object computed with [measure_disease()] a Standard Area Diagram
-#' (SAD) with `n` images are returned with the respective severity values.
+#' Given an object computed with [measure_disease()] or [measure_disease_byl()]
+#' a Standard Area Diagram (SAD) with `n` images are returned with the
+#' respective severity values.
 #'
 #' @details
 #' The leaves with the smallest and highest severity will always be in the SAD.
@@ -16,7 +17,8 @@
 #' will be retrevied from `dir_processed` directory. Otherwise, the severity
 #' will be computed again to generate the images.
 #'
-#' @param object An object computed with [measure_disease()].
+#' @param object An object computed with [measure_disease()] or
+#'   [measure_disease_byl()].
 #' @param n The number of leaves in the Standard Area Diagram.
 #' @param nrow,ncol The number of rows and columns in the plot. See
 #'   [image_combine())]
@@ -56,52 +58,85 @@ sad <- function(object,
                 nrow = NULL,
                 ncol = NULL,
                 ...){
-  patt <- object$parms$pattern
-  h <- object$parms$img_healthy
-  s <- object$parms$img_symptoms
-  b <- object$parms$img_background
-  dir <- object$parms$dir_original
-  dir_proc <- object$parms$dir_processed
-  save_image <- object$parms$save_image
-  nsamples <- n
-  measures <-
-    transform(object$severity,
-              rank = rank(symptomatic))
-  n <- nrow(measures)
-  seq <- trunc(seq(1, n, length.out = nsamples))
-  seq[c(1, length(seq))] <- c(1, n)
-  leaves <- measures[which(measures$rank %in% seq),]
-  leaves <- leaves[order(leaves$rank),]
-  leaves_name <- paste0("proc_", leaves$img, ".jpg")
-  if(isFALSE(save_image)){
-  if(is.null(patt) | is.null(h) | is.null(s)){
-    stop("'pattern', 'img_healthy', and 'img_symptoms' are mandatory arguments.")
+  if(inherits(object, "plm_disease")){
+    patt <- object$parms$pattern
+    h <- object$parms$img_healthy
+    s <- object$parms$img_symptoms
+    b <- object$parms$img_background
+    dir <- object$parms$dir_original
+    dir_proc <- object$parms$dir_processed
+    save_image <- object$parms$save_image
+    nsamples <- n
+    measures <-
+      transform(object$severity,
+                rank = rank(symptomatic))
+    n <- nrow(measures)
+    seq <- trunc(seq(1, n, length.out = nsamples))
+    seq[c(1, length(seq))] <- c(1, n)
+    leaves <- measures[which(measures$rank %in% seq),]
+    leaves <- leaves[order(leaves$rank),]
+    leaves_name <- paste0("proc_", leaves$img, ".jpg")
+    if(isFALSE(save_image)){
+      if(is.null(patt) | is.null(h) | is.null(s)){
+        stop("'pattern', 'img_healthy', and 'img_symptoms' are mandatory arguments.")
+      }
+      td <- tempdir()
+      temp <-
+        measure_disease(pattern = patt,
+                        img_healthy = h,
+                        img_symptoms = s,
+                        img_background = b,
+                        dir_original = dir,
+                        dir_processed = td,
+                        show_original = show_original,
+                        show_contour = FALSE,
+                        save_image = TRUE,
+                        parallel = TRUE,
+                        verbose = FALSE,
+                        ...)
+      sads <- image_import(leaves_name, path = td)
+      image_combine(sads,
+                    labels = paste0(round(leaves$symptomatic, 1), "%"),
+                    ncol = ncol,
+                    nrow = nrow)
+    } else{
+      sads <- image_import(leaves_name, path = dir_proc)
+      image_combine(sads,
+                    labels = paste0(round(leaves$symptomatic, 1), "%"),
+                    ncol = ncol,
+                    nrow = nrow)
+    }
+    invisible(leaves)
   }
-  td <- tempdir()
-  temp <-
-    measure_disease(pattern = patt,
-                    img_healthy = h,
-                    img_symptoms = s,
-                    img_background = b,
-                    dir_original = dir,
-                    dir_processed = td,
-                    show_original = show_original,
-                    show_contour = FALSE,
-                    save_image = TRUE,
-                    parallel = TRUE,
-                    verbose = FALSE,
-                    ...)
-  sads <- image_import(leaves_name, path = td)
-  image_combine(sads,
-                labels = paste0(round(leaves$symptomatic, 1), "%"),
-                ncol = ncol,
-                nrow = nrow)
-  } else{
-    sads <- image_import(leaves_name, path = dir_proc)
-    image_combine(sads,
-                  labels = paste0(round(leaves$symptomatic, 1), "%"),
-                  ncol = ncol,
-                  nrow = nrow)
+  if(inherits(object, "plm_disease_byl")){
+    patt <- object$parms$pattern
+    h <- object$parms$img_healthy
+    s <- object$parms$img_symptoms
+    b <- object$parms$img_background
+    dir <- object$parms$dir_original
+    dir_proc <- object$parms$dir_processed
+    save_image <- object$parms$save_image
+    nsamples <- n
+    measures <-
+      transform(object$severity,
+                rank = rank(symptomatic),
+                img = paste0(img, "_", leaf, ".jpg"))
+    n <- nrow(measures)
+    seq <- trunc(seq(1, n, length.out = nsamples))
+    seq[c(1, length(seq))] <- c(1, n)
+    leaves <- measures[which(measures$rank %in% seq),]
+    leaves <- leaves[order(leaves$rank),]
+    leaves_name <- leaves$img
+    if(isFALSE(save_image)){
+      stop("Standard Area Diagram can only be generated using `save_image = TRUE` set in `measure_disease_byl()`.")
+    } else{
+      sads <- image_import(leaves_name, path = dir_proc)
+      image_combine(sads,
+                    labels = paste0(round(leaves$symptomatic, 1), "%"),
+                    ncol = ncol,
+                    nrow = nrow)
+    }
+    invisible(leaves)
   }
-  invisible(leaves)
+
 }

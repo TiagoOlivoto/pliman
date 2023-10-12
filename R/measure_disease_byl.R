@@ -161,10 +161,8 @@ measure_disease_byl <- function(img,
                                  img_symptoms = img_symptoms,
                                  img_background = back,
                                  plot = plot,
-                                 save_image = TRUE,
                                  show_features = show_features,
                                  save_image = save_image,
-                                 show_features = show_features,
                                  dir_processed = diretorio_processada,
                                  prefix = paste0(name_ori, "_", i),
                                  name = "",
@@ -288,6 +286,7 @@ measure_disease_byl <- function(img,
                       img_healthy = img_healthy,
                       img_symptoms = img_symptoms,
                       dir_original = diretorio_original,
+                      dir_processed = diretorio_processada,
                       save_image = save_image))
   }
   invisible(structure(
