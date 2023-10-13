@@ -88,21 +88,21 @@ measure_disease_byl <- function(img,
              dir_processed,
              paste0("./", dir_processed))
   }
-  if (is.character(img_healthy)){
-    all_files <- sapply(list.files(getwd()), file_name)
-    imag <- list.files(getwd(), pattern = img_healthy)
-    check_names_dir(img_healthy, all_files, getwd())
-    name <- file_name(imag)
+  if(is.character(img_healthy)){
+    all_files <- sapply(list.files(diretorio_original), file_name)
+    imag <- list.files(diretorio_original, pattern = img_healthy)
+    check_names_dir(img_healthy, all_files, "")
+    name_h <- file_name(imag)
     extens <- file_extension(imag)
-    img_healthy <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
+    img_healthy <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
   }
-  if (is.character(img_symptoms)){
-    all_files <- sapply(list.files(getwd()), file_name)
-    imag <- list.files(getwd(), pattern = img_symptoms)
-    check_names_dir(img_symptoms, all_files, getwd())
-    name <- file_name(imag)
+  if(is.character(img_symptoms)){
+    all_files <- sapply(list.files(diretorio_original), file_name)
+    imag <- list.files(diretorio_original, pattern = img_symptoms)
+    check_names_dir(img_symptoms, all_files, "")
+    name_h <- file_name(imag)
     extens <- file_extension(imag)
-    img_symptoms <- image_import(paste(getwd(), "/", name, ".", extens, sep = ""))
+    img_symptoms <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
   }
   back <- EBImage::Image(rep(1, 100*300),dim=c(100,300,3), colormode = 'Color')
 

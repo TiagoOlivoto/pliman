@@ -278,28 +278,28 @@ measure_disease <- function(img,
              paste0("./", dir_processed))
   }
   if(is.character(img_healthy)){
-    all_files <- sapply(list.files(getwd()), file_name)
-    imag <- list.files(getwd(), pattern = img_healthy)
+    all_files <- sapply(list.files(diretorio_original), file_name)
+    imag <- list.files(diretorio_original, pattern = img_healthy)
     check_names_dir(img_healthy, all_files, "")
     name_h <- file_name(imag)
     extens <- file_extension(imag)
-    img_healthy <- image_import(paste(getwd(), "/", name_h, ".", extens, sep = ""))
+    img_healthy <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
   }
   if(is.character(img_symptoms)){
-    all_files <- sapply(list.files(getwd()), file_name)
-    imag <- list.files(getwd(), pattern = img_symptoms)
+    all_files <- sapply(list.files(diretorio_original), file_name)
+    imag <- list.files(diretorio_original, pattern = img_symptoms)
     check_names_dir(img_symptoms, all_files, "")
-    name_s <- file_name(imag)
+    name_h <- file_name(imag)
     extens <- file_extension(imag)
-    img_symptoms <- image_import(paste(getwd(), "/", name_s, ".", extens, sep = ""))
+    img_symptoms <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
   }
   if(is.character(img_background)){
-    all_files <- sapply(list.files(getwd()), file_name)
-    imag <- list.files(getwd(), pattern = img_background)
+    all_files <- sapply(list.files(diretorio_original), file_name)
+    imag <- list.files(diretorio_original, pattern = img_background)
     check_names_dir(img_background, all_files, "")
-    name_b <- file_name(imag)
+    name_h <- file_name(imag)
     extens <- file_extension(imag)
-    img_background <- image_import(paste(getwd(), "/", name_b, ".", extens, sep = ""))
+    img_background <- image_import(paste(diretorio_original, "/", name_h, ".", extens, sep = ""))
   }
   help_count <-
     function(img, img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
