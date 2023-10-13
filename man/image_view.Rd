@@ -7,6 +7,9 @@
 image_view(
   img,
   object = NULL,
+  r = 1,
+  g = 2,
+  b = 3,
   alpha = 0.7,
   attribute = "area",
   title = "Edit the image",
@@ -25,8 +28,11 @@ image_view(
 
 \item{object}{(Optional). An object computed with \code{\link[=analyze_objects]{analyze_objects()}}. If an
 object is informed, an additional layer is added to the plot, showing the
-object contours of the analyzed objects, with a color gradient defined by
+contour of the analyzed objects, with a color gradient defined by
 \code{attribute}.}
+
+\item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
+Defaults to \code{1}, \code{2}, and \code{3}.}
 
 \item{alpha}{The transparency level of the rectangles' color (between 0 and 1).}
 

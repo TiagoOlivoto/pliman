@@ -130,18 +130,18 @@ mosaic_view <- function(mosaic,
   sto[sto == 65535] <- NA
 
   if(viewopt == "rgb"){
-    ind_mat <- sto
+    sto <- sto
   } else{
     if(terra::nlyr(mosaic) > 2){
-      ind_mat <- mosaic_index(terra::rast(sto), index = index)
+      sto <- mosaic_index(terra::rast(sto), index = index)
     } else{
-      ind_mat <- sto
+      sto <- sto
     }
   }
   if(!is.na(sf::st_crs(mosaic))){
-    suppressWarnings(sf::st_crs(ind_mat) <- sf::st_crs(mosaic))
+    suppressWarnings(sf::st_crs(sto) <- sf::st_crs(mosaic))
   } else{
-    suppressWarnings(sf::st_crs(ind_mat) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
+    suppressWarnings(sf::st_crs(sto) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
   }
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
@@ -152,7 +152,7 @@ mosaic_view <- function(mosaic,
           leaflet::leaflet() |>
           leaflet::addScaleBar(position = "bottomleft") |>
           leaflet::addTiles(options = leaflet::providerTileOptions(minZoom = 3, maxZoom = 30)) |>
-          leafem::addStarsRGB(ind_mat,
+          leafem::addStarsRGB(sto,
                               r = r,
                               g = g,
                               b = b,
@@ -166,7 +166,7 @@ mosaic_view <- function(mosaic,
 
         map <-
           leaflet::leaflet() |>
-          leafem::addStarsRGB(ind_mat,
+          leafem::addStarsRGB(sto,
                               r = r,
                               g = g,
                               b = b,
@@ -179,14 +179,14 @@ mosaic_view <- function(mosaic,
       }
     } else{
       if(vieweropt == "base"){
-        terra::plot(terra::rast(ind_mat),
+        terra::plot(terra::rast(sto),
                     axes = axes,
                     colNA = "white",
                     ...)
       } else{
         index <- gsub("[/\\\\]", "_", index, perl = TRUE)
         map <-
-          mapview::mapview(ind_mat,
+          mapview::mapview(sto,
                            layer.name = index,
                            map.types = mapview::mapviewGetOption("basemaps"),
                            maxpixels =  max_pixels,
@@ -205,13 +205,13 @@ mosaic_view <- function(mosaic,
     if(terra::nlyr(mosaic) > 2){
       index <- gsub("[/\\\\]", "_", index, perl = TRUE)
       if(vieweropt == "base"){
-        terra::plot(terra::rast(ind_mat),
+        terra::plot(terra::rast(sto),
                     axes = axes,
                     colNA = "white",
                     ...)
       } else{
         map <-
-          mapview::mapview(ind_mat,
+          mapview::mapview(sto,
                            layer.name = index,
                            map.types = mapview::mapviewGetOption("basemaps"),
                            maxpixels =  max_pixels,
@@ -226,13 +226,13 @@ mosaic_view <- function(mosaic,
       }
     } else{
       if(vieweropt == "base"){
-        terra::plot(terra::rast(ind_mat),
+        terra::plot(terra::rast(sto),
                     axes = axes,
                     colNA = "white",
                     ...)
       } else{
         map <-
-          mapview::mapview(ind_mat,
+          mapview::mapview(sto,
                            layer.name = names(mosaic),
                            map.types = mapview::mapviewGetOption("basemaps"),
                            maxpixels =  max_pixels,
@@ -456,7 +456,7 @@ mosaic_index <- function(mosaic,
 #'   can be used for image analysis in `pliman`. Note that if a large
 #'   `SpatRaster` is loaded, the resulting object may increase considerably the
 #'   memory usage.
-#'
+#' @importFrom stars st_dimensions
 #' @export
 #' @examples
 #' library(pliman)
@@ -476,23 +476,25 @@ mosaic_to_pliman <- function(mosaic,
   if(class(mosaic) %in% c("RasterStack","RasterLayer","RasterBrick")){
     mosaic <- terra::rast(mosaic)
   }
-  stars_object <- stars::st_as_stars(mosaic, proxy = FALSE)
-  stars_object[is.na(stars_object)] <- FALSE
-  if(terra::nlyr(mosaic) > 3){
-    eb <- EBImage::Image(stars_object[[1]])[,, c(r, g, b, re, nir)]
-  } else if(terra::nlyr(mosaic) == 3){
-    eb <- EBImage::Image(stars_object[[1]])[,, c(r, g, b)]
+  nlr <- terra::nlyr(mosaic)
+  mosaic <- stars::st_as_stars(mosaic, proxy = FALSE)
+  mosaic[mosaic == 65535] <- NA
+  if(nlr == 5){
+    mosaic <- EBImage::Image(mosaic[[1]])[,, c(r, g, b, re, nir)]
+  } else if(nlr == 3){
+    mosaic <- EBImage::Image(mosaic[[1]])[,, c(r, g, b)]
   } else{
-    eb <- EBImage::Image(stars_object[[1]])
+    mosaic <- EBImage::Image(mosaic[[1]])
   }
   if(isTRUE(rescale)){
-    eb <- eb / max(eb)
+    mosaic <- mosaic / max(mosaic, na.rm = TRUE)
   }
-  if(terra::nlyr(mosaic) == 3){
-    EBImage::colorMode(eb) <- "color"
+  if(nlr == 3){
+    EBImage::colorMode(mosaic) <- "color"
   }
-  invisible(eb + coef)
+  return(mosaic + coef)
 }
+
 
 #' Mosaic to RGB
 #'

@@ -95,7 +95,7 @@ res <-
                       buffer_x = 0.1, # defaults is 0
                       index = "HUE", # used to segment the soil
                       object_index = "NGRDI") 
-plot_index_shp(res, attribute = "coverage")
+plot_index_shp(res, attribute = "coverage", viewer = "base")
 ```
 
 

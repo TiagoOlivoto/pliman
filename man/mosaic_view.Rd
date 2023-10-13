@@ -80,9 +80,6 @@ is \code{\link[=custom_palette]{custom_palette()}}.}
 \item{axes}{logical. Draw axes? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[terra:plot]{terra::plot()}} when \code{viewer = "base"}.}
-
-\item{attribute}{The name of the quantitative variable in the
-\code{object_index} to be used for coloring the rectangles.}
 }
 \value{
 An sf object, the same object returned by \code{\link[mapedit:editMap]{mapedit::editMap()}}.

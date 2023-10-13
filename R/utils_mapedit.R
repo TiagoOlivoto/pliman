@@ -7,8 +7,10 @@
 #' @param img An `Image` object.
 #' @param object (Optional). An object computed with [analyze_objects()]. If an
 #'   object is informed, an additional layer is added to the plot, showing the
-#'   object contours of the analyzed objects, with a color gradient defined by
+#'   contour of the analyzed objects, with a color gradient defined by
 #'   `attribute`.
+#' @param r,g,b The layer for the Red, Green and Blue band, respectively.
+#'   Defaults to `1`, `2`, and `3`.
 #' @param alpha The transparency level of the rectangles' color (between 0 and 1).
 #' @param attribute The name of the quantitative variable in the
 #'   \code{object_index} to be used for coloring the rectangles.
@@ -40,6 +42,9 @@
 #'
 image_view <- function(img,
                        object = NULL,
+                       r = 1,
+                       g = 2,
+                       b = 3,
                        alpha = 0.7,
                        attribute = "area",
                        title = "Edit the image",
@@ -54,7 +59,7 @@ image_view <- function(img,
   if(!is.null(domain)){
     quantiles <- NULL
   }
-  # check_mapview()
+  check_mapview()
   viewopt <- c("rgb", "index")
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
   compute_downsample <- function(nr, nc, n) {
@@ -107,14 +112,15 @@ image_view <- function(img,
       colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
       mapview::mapview(sf_df,
                        map.types = "OpenStreetMap",
+                       col.regions = color_regions,
                        zcol = attribute,
                        legend = TRUE,
                        alpha.regions = alpha,
                        layer.name = attribute) |>
         leafem::addRasterRGB(ras,
-                             r = 1,
-                             g = 2,
-                             b = 3,
+                             r = r,
+                             g = g,
+                             b = b,
                              maxBytes = 64 * 1024 * 1024,
                              domain = domain,
                              quantiles = quantiles)
@@ -122,9 +128,9 @@ image_view <- function(img,
       map <-
         leaflet::leaflet() |>
         leafem::addRasterRGB(ras,
-                             r = 1,
-                             g = 2,
-                             b = 3,
+                             r = r,
+                             g = g,
+                             b = b,
                              maxBytes = 64 * 1024 * 1024,
                              domain = domain,
                              quantiles = quantiles) |>

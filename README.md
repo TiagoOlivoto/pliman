@@ -100,13 +100,13 @@ flax <-
 # summary statistics
 flax$statistics
 #        stat        value
-# 1         n 271.00000000
-# 2  min_area   0.01868645
-# 3 mean_area   0.06165272
-# 4  max_area   0.07969222
-# 5   sd_area   0.00654426
-# 6  sum_area  16.70788678
-# 7  coverage   0.05391447
+# 1         n 2.680000e+02
+# 2  min_area 3.606989e-02
+# 3 mean_area 6.250403e-02
+# 4  max_area 1.262446e-01
+# 5   sd_area 8.047152e-03
+# 6  sum_area 1.675108e+01
+# 7  coverage 5.388462e-02
 
 # plot the density of the grain's length (in cm)
 plot(flax, measure = "length")
@@ -134,7 +134,7 @@ res <-
                       buffer_x = 0.1, # defaults is 0
                       index = "HUE", # used to segment the soil
                       object_index = "NGRDI") 
-plot_index_shp(res, attribute = "coverage")
+plot_index_shp(res, attribute = "coverage", viewer = "base")
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
