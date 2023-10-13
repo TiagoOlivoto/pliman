@@ -1212,6 +1212,7 @@ analyze_objects <- function(img,
                       angles = angles,
                       mask = mask,
                       pcv = pcv,
+                      contours = object_contour,
                       parms = list(index = index))
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){

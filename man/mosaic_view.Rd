@@ -18,6 +18,8 @@ mosaic_view(
   max_pixels = 5e+05,
   downsample = NULL,
   alpha = 1,
+  quantiles = c(0, 1),
+  domain = NULL,
   color_regions = custom_palette(),
   axes = FALSE,
   ...
@@ -63,7 +65,14 @@ x height) is greater than \code{max_pixels} a downsampling factor will be
 automatically chosen so that the number of plotted pixels approximates the
 \code{max_pixels}.}
 
-\item{alpha}{opacity of the fill color of the raster layer(s)}
+\item{alpha}{opacity of the fill color of the raster layer(s).}
+
+\item{quantiles}{the upper and lower quantiles used for color stretching. If
+set to \code{NULL}, stretching is performed basing on 'domain' argument.}
+
+\item{domain}{the upper and lower values used for color stretching. This is
+used only if \code{'quantiles'} is \code{NULL}. If both '\verb{domain'} and \code{'quantiles'} are
+set to \code{NULL}, stretching is applied based on min-max values.}
 
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}
@@ -71,6 +80,9 @@ is \code{\link[=custom_palette]{custom_palette()}}.}
 \item{axes}{logical. Draw axes? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[terra:plot]{terra::plot()}} when \code{viewer = "base"}.}
+
+\item{attribute}{The name of the quantitative variable in the
+\code{object_index} to be used for coloring the rectangles.}
 }
 \value{
 An sf object, the same object returned by \code{\link[mapedit:editMap]{mapedit::editMap()}}.

@@ -5,6 +5,13 @@
 #'
 #' @inheritParams plot_index
 #' @param img An `Image` object.
+#' @param object (Optional). An object computed with [analyze_objects()]. If an
+#'   object is informed, an additional layer is added to the plot, showing the
+#'   object contours of the analyzed objects, with a color gradient defined by
+#'   `attribute`.
+#' @param alpha The transparency level of the rectangles' color (between 0 and 1).
+#' @param attribute The name of the quantitative variable in the
+#'   \code{object_index} to be used for coloring the rectangles.
 #' @param title The title of the map view. Use to provide short orientations to
 #'   the user.
 #' @param show The display option for the map view. Options are "rgb" for RGB
@@ -14,6 +21,11 @@
 #'   If `max_pixels < npixels(img)`, regular sampling is used before plotting.
 #' @param color_regions The color palette for displaying index values. Default
 #'   is [custom_palette()].
+#' @param quantiles the upper and lower quantiles used for color stretching. If
+#'   set to `NULL`, stretching is performed basing on 'domain' argument.
+#' @param domain the upper and lower values used for color stretching. This is
+#'   used only if `'quantiles'` is `NULL`. If both '`domain'` and `'quantiles'`
+#'   are set to `NULL`, stretching is applied based on min-max values.
 #' @param ... Additional arguments to be passed to `downsample_fun`.
 #' @return An `sf` object, the same object returned by [mapedit::editMap()].
 #'
@@ -27,13 +39,21 @@
 #' @export
 #'
 image_view <- function(img,
+                       object = NULL,
+                       alpha = 0.7,
+                       attribute = "area",
                        title = "Edit the image",
                        show = c("rgb", "index"),
                        index = "B",
                        max_pixels = 1000000,
                        downsample = NULL,
                        color_regions = custom_palette(),
+                       quantiles = c(0, 1),
+                       domain = NULL,
                        ...){
+  if(!is.null(domain)){
+    quantiles <- NULL
+  }
   # check_mapview()
   viewopt <- c("rgb", "index")
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
@@ -63,29 +83,59 @@ image_view <- function(img,
       downsample <- which.min(abs(possible_npix - max_pixels)) - 1
       message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
     }
-    rs <- stars::st_downsample(ras[,,,1], n = downsample)
-    gs <- stars::st_downsample(ras[,,,2], n = downsample)
-    bs <- stars::st_downsample(ras[,,,3], n = downsample)
-    ras <- terra::rast(c(rs, gs, bs, along = 3)) |> stars::st_as_stars()
+
+    ras <- terra::rast(
+      Map(c,
+          lapply(1:3, function(x){
+            stars::st_downsample(ras[,,,x], n = downsample) |> terra::rast()
+          }))
+    ) |>
+      stars::st_as_stars()
   }
   if(viewopt == "rgb"){
     sf::st_crs(ras) <- sf::st_crs("EPSG:3857")
-    map <-
-      suppressWarnings(
-        suppressMessages(
-          leaflet::leaflet() |>
-            leafem::addRasterRGB(ras,
-                                 r = 1,
-                                 g = 2,
-                                 b = 3,
-                                 maxBytes = 4 * 2048 * 2048) |>
-            mapedit::editMap(editor = "leafpm",
-                             title = title)
-        )
+    if(!is.null(object)){
+      sf_df <- sf::st_sf(
+        geometry = lapply(object$contours, function(x) {
+          tmp <- x
+          tmp[, 2] <- ncol(img) - tmp[, 2]
+          sf::st_polygon(list(as.matrix(tmp |> poly_close())))
+        }),
+        data = data.frame(get_measures(object)),
+        crs = sf::st_crs("EPSG:3857")
       )
+      colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
+      mapview::mapview(sf_df,
+                       map.types = "OpenStreetMap",
+                       zcol = attribute,
+                       legend = TRUE,
+                       alpha.regions = alpha,
+                       layer.name = attribute) |>
+        leafem::addRasterRGB(ras,
+                             r = 1,
+                             g = 2,
+                             b = 3,
+                             maxBytes = 64 * 1024 * 1024,
+                             domain = domain,
+                             quantiles = quantiles)
+    } else{
+      map <-
+        leaflet::leaflet() |>
+        leafem::addRasterRGB(ras,
+                             r = 1,
+                             g = 2,
+                             b = 3,
+                             maxBytes = 64 * 1024 * 1024,
+                             domain = domain,
+                             quantiles = quantiles) |>
+        mapedit::editMap(editor = "leafpm",
+                         title = "title")
+      invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
+    }
   } else{
     ind <- mosaic_index(terra::rast(ras), index = index)
     sf::st_crs(ind) <- sf::st_crs("EPSG:3857")
+
     map <-
       suppressWarnings(
         suppressMessages(
@@ -99,8 +149,8 @@ image_view <- function(img,
                              title = title)
         )
       )
+    invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
   }
-  invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
 }
 
 
@@ -488,9 +538,9 @@ mv_two_points <- function(img,
   x3 <- e[[1]][3]
   x4 <- e[[1]][4]
   invisible(list(x1 = x1,
-              y1 = nc - x3,
-              x2 = x2,
-              y2 = nc - x4))
+                 y1 = nc - x3,
+                 x2 = x2,
+                 y2 = nc - x4))
 }
 
 # mv_rectangle: Enables the user to create a rectangle in an image and retrieves its coordinates.

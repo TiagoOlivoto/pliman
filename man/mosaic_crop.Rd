@@ -14,7 +14,8 @@ mosaic_crop(
   show = c("rgb", "index"),
   index = "R",
   max_pixels = 5e+05,
-  downsample = NULL
+  downsample = NULL,
+  ...
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ view and "index" for index view.}
 x height) is greater than \code{max_pixels} a downsampling factor will be
 automatically chosen so that the number of plotted pixels approximates the
 \code{max_pixels}.}
+
+\item{...}{Additional arguments passed to \code{\link[=mosaic_view]{mosaic_view()}}.}
 }
 \value{
 A cropped version of \code{mosaic} based on the user-defined selection.

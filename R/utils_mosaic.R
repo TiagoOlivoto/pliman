@@ -23,7 +23,12 @@
 #'   x height) is greater than `max_pixels` a downsampling factor will be
 #'   automatically chosen so that the number of plotted pixels approximates the
 #'   `max_pixels`.
-#' @param alpha opacity of the fill color of the raster layer(s)
+#' @param alpha opacity of the fill color of the raster layer(s).
+#' @param quantiles the upper and lower quantiles used for color stretching. If
+#'   set to `NULL`, stretching is performed basing on 'domain' argument.
+#' @param domain the upper and lower values used for color stretching. This is
+#'   used only if `'quantiles'` is `NULL`. If both '`domain'` and `'quantiles'` are
+#'   set to `NULL`, stretching is applied based on min-max values.
 #' @param axes logical. Draw axes? Defaults to `FALSE`.
 #' @param ... Additional arguments passed on to [terra::plot()] when `viewer =
 #'   "base"`.
@@ -60,10 +65,15 @@ mosaic_view <- function(mosaic,
                         max_pixels = 500000,
                         downsample = NULL,
                         alpha = 1,
+                        quantiles = c(0, 1),
+                        domain = NULL,
                         color_regions = custom_palette(),
                         axes = FALSE,
                         ...){
-  check_mapview()
+  # check_mapview()
+  if(!is.null(domain)){
+    quantiles <- NULL
+  }
   mapview::mapviewOptions(layers.control.pos = "topright")
   on.exit(mapview::mapviewOptions(default = TRUE))
   viewopt <- c("rgb", "index")
@@ -104,39 +114,25 @@ mosaic_view <- function(mosaic,
     downsample <- which.min(abs(possible_npix - max_pixels)) - 1
   }
   if(downsample > 0){
-    if(is.null(downsample)){
-      message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
-    }
-    if(terra::nlyr(mosaic) < 3){
+    message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+    if(terra::nlyr(mosaic) == 1){
       sto <- stars::st_downsample(sto, n = downsample)
     } else{
-      rs <- stars::st_downsample(sto[,,,r], n = downsample)
-      gs <- stars::st_downsample(sto[,,,g], n = downsample)
-      bs <- stars::st_downsample(sto[,,,b], n = downsample)
-      if(terra::nlyr(mosaic) > 3){
-        nirs <- stars::st_downsample(sto[,,,nir], n = downsample)
-        res <- stars::st_downsample(sto[,,,re], n = downsample)
-        sto <- terra::rast(c(rs, gs, bs, nirs, res, along = 3)) |> stars::st_as_stars()
-      } else{
-        sto <- terra::rast(c(rs, gs, bs, along = 3)) |> stars::st_as_stars()
-      }
-    }
-  } else{
-    if(terra::nlyr(mosaic) > 3){
-      sto <- sto[,,,c(r, g, b, re, nir)]
-    } else if(terra::nlyr(mosaic) < 3){
-      sto <- sto
-    } else{
-      sto <- sto[,,,c(r, g, b)]
+      downsampled <-
+        lapply(1:terra::nlyr(mosaic), function(x){
+          stars::st_downsample(sto[,,,x], n = downsample) |> terra::rast()
+        })
+
+      sto <- terra::rast(Map(c, downsampled)) |> stars::st_as_stars()
     }
   }
-  # check for NA
-  # sto[is.na(sto)] <- NA
+
   sto[sto == 65535] <- NA
+
   if(viewopt == "rgb"){
     ind_mat <- sto
   } else{
-    if(terra::nlyr(mosaic) < 3){
+    if(terra::nlyr(mosaic) > 2){
       ind_mat <- mosaic_index(terra::rast(sto), index = index)
     } else{
       ind_mat <- sto
@@ -150,27 +146,33 @@ mosaic_view <- function(mosaic,
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
       if(!is.na(sf::st_crs(mosaic))){
+
         message("Using `show = 'rgb' may not produce accurate cropping coordinates.\n Please, consider using `show = 'index'`instead.")
         map <-
           leaflet::leaflet() |>
           leaflet::addScaleBar(position = "bottomleft") |>
           leaflet::addTiles(options = leaflet::providerTileOptions(minZoom = 3, maxZoom = 30)) |>
           leafem::addStarsRGB(ind_mat,
-                              r = 1,
-                              g = 2,
-                              b = 3,
-                              maxBytes = 16 * 1024 * 1024,
+                              r = r,
+                              g = g,
+                              b = b,
+                              quantiles = quantiles,
+                              domain = domain,
+                              maxBytes = 64 * 1024 * 1024,
                               na.color = "#00000000") |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
       } else{
+
         map <-
           leaflet::leaflet() |>
           leafem::addStarsRGB(ind_mat,
-                              r = 1,
-                              g = 2,
-                              b = 3,
-                              maxBytes = 16 * 1024 * 1024,
+                              r = r,
+                              g = g,
+                              b = b,
+                              quantiles = quantiles,
+                              domain = domain,
+                              maxBytes = 64 * 1024 * 1024,
                               na.color = "#00000000") |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
@@ -191,7 +193,7 @@ mosaic_view <- function(mosaic,
                            col.regions = color_regions,
                            alpha.regions = alpha,
                            na.color = "#00000000",
-                           maxBytes = 16 * 1024 * 1024,
+                           maxBytes = 64 * 1024 * 1024,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
@@ -216,7 +218,7 @@ mosaic_view <- function(mosaic,
                            col.regions = color_regions,
                            alpha.regions = 1,
                            na.color = "#00000000",
-                           maxBytes = 16 * 1024 * 1024,
+                           maxBytes = 64 * 1024 * 1024,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
@@ -237,7 +239,7 @@ mosaic_view <- function(mosaic,
                            col.regions = color_regions,
                            alpha.regions = 1,
                            na.color = "#00000000",
-                           maxBytes = 16 * 1024 * 1024,
+                           maxBytes = 64 * 1024 * 1024,
                            verbose = FALSE) |>
           mapedit::editMap(editor = "leafpm",
                            title = title)
@@ -310,6 +312,7 @@ mosaic_export <- function(mosaic,
 #'   from the input mosaic and returned as a new `SpatRaster` object.
 #'
 #' @inheritParams mosaic_view
+#' @param ... Additional arguments passed to [mosaic_view()].
 #'
 #' @return A cropped version of `mosaic` based on the user-defined selection.
 #' @export
@@ -334,7 +337,8 @@ mosaic_crop <- function(mosaic,
                         show = c("rgb", "index"),
                         index = "R",
                         max_pixels = 500000,
-                        downsample = NULL){
+                        downsample = NULL,
+                        ...){
   showopt <- c("rgb", "index")
   showopt <- showopt[pmatch(show[[1]], showopt)]
   controls <- mosaic_view(mosaic,
@@ -347,7 +351,8 @@ mosaic_crop <- function(mosaic,
                           re = re,
                           max_pixels = max_pixels,
                           downsample = downsample,
-                          title = "Use the 'Draw rectangle' tool to select the cropping area.")
+                          title = "Use the 'Draw rectangle' tool to select the cropping area.",
+                          ...)
   if(!is.na(sf::st_crs(mosaic))){
     grids <-
       sf::st_make_grid(controls$finished, n = c(1, 1)) |>

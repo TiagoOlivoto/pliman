@@ -6,17 +6,32 @@
 \usage{
 image_view(
   img,
+  object = NULL,
+  alpha = 0.7,
+  attribute = "area",
   title = "Edit the image",
   show = c("rgb", "index"),
   index = "B",
   max_pixels = 1e+06,
   downsample = NULL,
   color_regions = custom_palette(),
+  quantiles = c(0, 1),
+  domain = NULL,
   ...
 )
 }
 \arguments{
 \item{img}{An \code{Image} object.}
+
+\item{object}{(Optional). An object computed with \code{\link[=analyze_objects]{analyze_objects()}}. If an
+object is informed, an additional layer is added to the plot, showing the
+object contours of the analyzed objects, with a color gradient defined by
+\code{attribute}.}
+
+\item{alpha}{The transparency level of the rectangles' color (between 0 and 1).}
+
+\item{attribute}{The name of the quantitative variable in the
+\code{object_index} to be used for coloring the rectangles.}
 
 \item{title}{The title of the map view. Use to provide short orientations to
 the user.}
@@ -35,6 +50,13 @@ find the best downsampling factor to approximate the \code{max_pixels} value.}
 
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}
+
+\item{quantiles}{the upper and lower quantiles used for color stretching. If
+set to \code{NULL}, stretching is performed basing on 'domain' argument.}
+
+\item{domain}{the upper and lower values used for color stretching. This is
+used only if \code{'quantiles'} is \code{NULL}. If both '\verb{domain'} and \code{'quantiles'}
+are set to \code{NULL}, stretching is applied based on min-max values.}
 
 \item{...}{Additional arguments to be passed to \code{downsample_fun}.}
 }
