@@ -30,6 +30,7 @@ analyze_objects_shp(
   efourier = FALSE,
   object_index = NULL,
   veins = FALSE,
+  width_at = FALSE,
   verbose = TRUE,
   invert = FALSE,
   ...
@@ -127,6 +128,9 @@ This will call \code{\link[=object_edge]{object_edge()}} and applies the Sobel-F
 detect edges. The result is the proportion of edges in relation to the
 entire area of the object(s) in the image. Note that \strong{THIS WILL BE AN
 OPERATION ON AN IMAGE LEVEL, NOT OBJECT!}.}
+
+\item{width_at}{Logical. If \code{TRUE}, the widths of the object at a given set
+of quantiles of the height are computed.}
 
 \item{verbose}{If \code{TRUE} (default) a summary is shown in the console.}
 

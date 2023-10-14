@@ -13,6 +13,7 @@
 ## Minor improvements 
 * Arguments r, g, b, re, and nir now included in `analyze_objects()`, `analyze_objects_shp()`, and `image_view()`, allowing to correctly choose the image band.
 * `image_segment_mask()` now has a `col_background` argument.
+* Argument `width_at` included in `analyze_objects()`.
 
 # pliman 2.0.1
 ## New functions

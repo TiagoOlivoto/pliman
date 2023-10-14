@@ -1045,7 +1045,7 @@ plot_index_shp <- function(object,
   vieweropt <- vieweropt[pmatch(viewer[[1]], vieweropt)]
   if(vieweropt == "mapview"){
     quant_var <- get_measures(object)$summary
-    quant_var <- quant_var[, c(1, 4, 5, 35:ncol(quant_var))]
+    quant_var <- quant_var[, c(1, 4:ncol(quant_var))]
     quant_var$img <- gsub("obj", "shp", quant_var$img)
     get_numeric_from_img <- function(x) {
       as.numeric(gsub("shp", "", x))

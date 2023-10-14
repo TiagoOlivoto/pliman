@@ -155,6 +155,8 @@ argument <code>object_index</code> is used in the function <code>analyze_objects
 <span>  sigma_veins <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  ab_angles <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ab_angles_percentiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
+<span>  width_at <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  width_at_percentiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">0.95</span><span class="op">)</span>,</span>
 <span>  haralick <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  har_nbins <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  har_scales <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -359,6 +361,19 @@ with the argument <code>ab_angles_percentiles</code>.</p></dd>
 object for which the angle should be computed (from the apex and the
 bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
 75th percentiles of the object height.</p></dd>
+
+
+<dt>width_at</dt>
+<dd><p>Logical. If <code>TRUE</code>, the widths of the object at a given set
+of quantiles of the height are computed.</p></dd>
+
+
+<dt>width_at_percentiles</dt>
+<dd><p>A vector of heights along the vertical axis of
+the object at which the width will be computed. The default value is
+c(0.05, 0.25, 0.5, 0.75, 0.95), which means the function will return the
+width at the 5th, 25th, 50th, 75th, and 95th percentiles of the object's
+height.</p></dd>
 
 
 <dt>haralick</dt>
@@ -838,6 +853,9 @@ the angle from the first pixel of the apex of the object to the two pixels
 that slice the object at the 25th percentile of the object height (apex
 angle). The base angle is computed in the same way but from the first base
 pixel.</p></li>
+<li><p>If <code>width_at = TRUE</code>, the width at the  5th, 25th, 50th, 75th, and 95th
+percentiles of the object height are computed by default. These quantiles can
+be adjusted with the <code>width_at_percentiles</code> argument.</p></li>
 </ul></li>
 </ul></div>
     <div class="section level2">

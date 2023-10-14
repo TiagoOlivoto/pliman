@@ -102,6 +102,23 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.0" id="pliman-210">pliman 2.1.0<a class="anchor" aria-label="anchor" href="#pliman-210"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-2-1-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-2-1-0"></a></h3>
+<ul><li><p>A new <code>mosaic_*()</code> family of functions to handle orthomosaics from RGB and multispectral images.</p></li>
+<li><p><code><a href="../reference/object_export.html">object_export()</a></code> and <code><a href="../reference/object_export_shp.html">object_export_shp()</a></code> to export objects from single images to multiple images.</p></li>
+<li><p><code><a href="../reference/image_augment.html">image_augment()</a></code> to augment an image by rotating it multiple times.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-2-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-1-0"></a></h3>
+<ul><li>Setting <code>save_image = TRUE</code> in <code><a href="../reference/measure_disease_byl.html">measure_disease_byl()</a></code> now exports the processed images to a local directory, allowing the use of <code><a href="../reference/sad.html">sad()</a></code> call to the created object.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-2-1-0">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-2-1-0"></a></h3>
+<ul><li>Arguments r, g, b, re, and nir now included in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>, <code><a href="../reference/analyze_objects_shp.html">analyze_objects_shp()</a></code>, and <code><a href="../reference/image_view.html">image_view()</a></code>, allowing to correctly choose the image band.</li>
+<li>
+<code><a href="../reference/image_segment_mask.html">image_segment_mask()</a></code> now has a <code>col_background</code> argument.</li>
+<li>Argument <code>width_at</code> included in <code><a href="../reference/analyze_objects.html">analyze_objects()</a></code>.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.1" id="pliman-201">pliman 2.0.1<a class="anchor" aria-label="anchor" href="#pliman-201"></a></h2><p class="text-muted">CRAN release: 2023-09-11</p>

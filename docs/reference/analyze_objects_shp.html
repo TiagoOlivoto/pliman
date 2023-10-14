@@ -133,6 +133,7 @@
 <span>  efourier <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  object_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  veins <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  width_at <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  invert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -269,6 +270,11 @@ This will call <code><a href="object_edge.html">object_edge()</a></code> and app
 detect edges. The result is the proportion of edges in relation to the
 entire area of the object(s) in the image. Note that <strong>THIS WILL BE AN
 OPERATION ON AN IMAGE LEVEL, NOT OBJECT!</strong>.</p></dd>
+
+
+<dt>width_at</dt>
+<dd><p>Logical. If <code>TRUE</code>, the widths of the object at a given set
+of quantiles of the height are computed.</p></dd>
 
 
 <dt>verbose</dt>
