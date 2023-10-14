@@ -36,7 +36,7 @@ the proportions of segmented pixels.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,6 +137,11 @@ the proportions of segmented pixels.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_segment</span><span class="op">(</span></span>
 <span>  <span class="va">img</span>,</span>
 <span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  r <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  g <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  b <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  re <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  nir <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Otsu"</span>, <span class="st">"adaptive"</span><span class="op">)</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  windowsize <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -144,8 +149,6 @@ the proportions of segmented pixels.</p></li>
 <span>  has_white_bg <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  fill_hull <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  filter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  re <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  invert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -188,6 +191,13 @@ indexes with <code><a href="utils_file.html">pliman_indexes()</a></code>.  See <
 same length of <code>nseg</code>. It can be either an available index (described above)
 or any operation involving the RGB values (e.g., <code>"B/R+G"</code>).</p></li>
 </ul></dd>
+
+
+<dt>r, g, b, re, nir</dt>
+<dd><p>The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.</p></dd>
 
 
 <dt>threshold</dt>
@@ -236,16 +246,6 @@ background will not be considered for the threshold computation.</p></dd>
 <code><a href="utils_transform.html">image_filter()</a></code>. Defaults to <code>FALSE</code>. Use a positive integer to define the
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.</p></dd>
-
-
-<dt>re</dt>
-<dd><p>Respective position of the red-edge band at the original image
-file.</p></dd>
-
-
-<dt>nir</dt>
-<dd><p>Respective position of the near-infrared band at the original
-image file.</p></dd>
 
 
 <dt>invert</dt>

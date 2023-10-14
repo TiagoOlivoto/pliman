@@ -28,7 +28,7 @@ analyses (Claude, 2008)."><meta property="og:image" content="https://tiagoolivot
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,33 +172,11 @@ Springer 316 pp.</p>
 <span class="r-in"><span><span class="co"># compute the Fourier coefficients</span></span></span>
 <span class="r-in"><span><span class="va">ef</span> <span class="op">&lt;-</span> <span class="fu"><a href="efourier.html">efourier</a></span><span class="op">(</span><span class="va">leaf1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier_coefs.html">efourier_coefs</a></span><span class="op">(</span><span class="va">ef</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            an           bn          cn           dn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  21.1298663 -382.7540180 -364.126202 -21.29189747</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   1.6804167  151.6255507  -40.467153  10.80476561</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   4.3779839   -0.9870311 -129.212508   3.20445130</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -3.1329537  -46.3028113  -26.380285  -4.12257511</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -1.6548827    3.6997248   19.343685  -3.32106033</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   4.9296483   39.2656639  -15.461424   0.48631684</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   1.2043295    0.5415148  -15.556049   0.96104147</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.5959547  -13.0422412  -18.885184   1.42268431</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.8187422    3.9795071   -4.368973   0.04457129</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.3849895   -5.7461417   -2.553430  -1.11528942</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Normalized Fourier coefficients</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">efn</span> <span class="op">&lt;-</span> <span class="fu">efourier_norm</span><span class="op">(</span><span class="va">ef</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier_coefs.html">efourier_coefs</a></span><span class="op">(</span><span class="va">efn</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              an            bn            cn            dn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1.000000000  1.853479e-17  9.267394e-18 -0.9514067664</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.019954383 -3.957299e-01  1.047938e-01 -0.0202869737</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.002321877 -2.216469e-04  3.269770e-02  0.3357663692</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -0.021985444 -1.195120e-01 -6.884594e-02 -0.0001935063</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -0.009614050 -1.523015e-03  1.496870e-02  0.0491334898</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  -0.026121940 -9.969463e-02  4.060766e-02 -0.0037886893</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.001169439 -2.036878e-03  9.228959e-03  0.0396746712</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  -0.006527314 -3.324696e-02 -4.745917e-02  0.0141460581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.010675203 -2.227608e-04 -2.210092e-03 -0.0111050934</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.004773081  1.435275e-02  7.009215e-03  0.0007721095</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,8 +113,11 @@
 <span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  remove_bg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  all_layers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  layer <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  max_pixels <span class="op">=</span> <span class="fl">1e+06</span>,</span>
+<span>  max_pixels <span class="op">=</span> <span class="fl">5e+05</span>,</span>
+<span>  downsample <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  downsample_fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  color_regions <span class="op">=</span> <span class="fu"><a href="custom_palette.html">custom_palette</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -158,6 +161,11 @@ argument globally for all functions in the package, you can use the
 all functions.</p></dd>
 
 
+<dt>all_layers</dt>
+<dd><p>Render all layers when <code>img</code> is an object computed with
+<code><a href="image_index.html">image_index()</a></code> and <code>viewer = "mapview"</code>?.</p></dd>
+
+
 <dt>layer</dt>
 <dd><p>The layer to plot when <code>img</code> is an object computed with
 <code><a href="image_index.html">image_index()</a></code> and <code>viewer = "mapview"</code>. Defaults to the first layer
@@ -166,8 +174,19 @@ all functions.</p></dd>
 
 <dt>max_pixels</dt>
 <dd><p>integer &gt; 0. Maximum number of cells to plot the index. If
-<code>max_pixels &lt; npixels(img)</code>, regular sampling is used before plotting.
-Using a large number of pixels may slow down the plotting time.</p></dd>
+<code>max_pixels &lt; npixels(img)</code>, downsampling is performed before plotting the
+index. Using a large number of pixels may slow down the plotting time.</p></dd>
+
+
+<dt>downsample</dt>
+<dd><p>integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to <code>NULL</code>, which will
+find the best downsampling factor to approximate the <code>max_pixels</code> value.</p></dd>
+
+
+<dt>downsample_fun</dt>
+<dd><p>function; if given, downsampling will apply
+<code>downsample_fun`` </code> to each of the the subtiles.</p></dd>
 
 
 <dt>color_regions</dt>

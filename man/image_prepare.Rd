@@ -2,9 +2,7 @@
 % Please edit documentation in R/utils_mapedit.R
 \name{image_prepare}
 \alias{image_prepare}
-\title{This function aligns and crops the image using either base or mapview
-visualization. This is useful to prepare the images to be analyzed with
-\code{\link[=analyze_objects_shp]{analyze_objects_shp()}}}
+\title{Prepare an image}
 \usage{
 image_prepare(img, viewer = get_pliman_viewer())
 }

@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,8 +114,14 @@
 <span>  buffer_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  buffer_y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  prepare <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  segment_objects <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"R"</span>,</span>
+<span>  r <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  g <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  b <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  re <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  nir <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  shapefile <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -153,8 +159,17 @@ means no buffering and 0.5 means complete buffering (default: 0). A value of
 
 <dt>prepare</dt>
 <dd><p>Logical value indicating whether to prepare the image for
-analysis using <code><a href="image_prepare_mv.html">image_prepare_mv()</a></code> function. Defaults to <code>FALSE</code>. Set to
+analysis using <code><a href="image_prepare.html">image_prepare()</a></code> function. Defaults to <code>FALSE</code>. Set to
 <code>TRUE</code> to interactively align and crop the image before processing.</p></dd>
+
+
+<dt>segment_objects</dt>
+<dd><p>Segment objects in the image? Defaults to <code>TRUE</code>. In
+this case, objects are segmented using the index defined in the <code>index</code>
+argument, and each object is analyzed individually. If <code>segment_objects = FALSE</code> is used, the objects are not segmented and the entire image is
+analyzed. This is useful, for example, when analyzing an image without
+background, where an <code>object_index</code> could be computed for the entire image,
+like the index of a crop canopy.</p></dd>
 
 
 <dt>viewer</dt>
@@ -174,6 +189,13 @@ all functions.</p></dd>
 binary image when <code>foreground</code> and <code>background</code> are not declared. Defaults
 to <code>"NB"</code> (normalized blue). See <code><a href="image_index.html">image_index()</a></code> for more details. User can
 also calculate your own index using the bands names, e.g. <code>index = "R+B/G"</code></p></dd>
+
+
+<dt>r, g, b, re, nir</dt>
+<dd><p>The red, green, blue, red-edge, and near-infrared bands
+of the image, respectively. Defaults to 1, 2, 3, 4, and 5, respectively. If
+a multispectral image is provided (5 bands), check the order of bands,
+which are frequently presented in the 'BGR' format.</p></dd>
 
 
 <dt>shapefile</dt>
@@ -203,7 +225,7 @@ processing time when an image has lots of objects (say &gt;1000).</p></dd>
 <dt>workers</dt>
 <dd><p>A positive numeric scalar or a function specifying the number
 of parallel processes that can be active at the same time. By default, the
-number of sections is set up to 50% of available cores.</p></dd>
+number of sections is set up to 30% of available cores.</p></dd>
 
 
 <dt>watershed</dt>
@@ -281,7 +303,7 @@ threshold).</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The <code>analyze_objects_shp</code> function performs object analysis on an
 image and generates shapefiles representing the analyzed objects. The
-function first prepares the image for analysis using the <code><a href="image_prepare_mv.html">image_prepare_mv()</a></code>
+function first prepares the image for analysis using the <code><a href="image_prepare.html">image_prepare()</a></code>
 function if the <code>prepare</code> argument is set to <code>TRUE</code>. If a shapefile object is
 provided, the number of rows and columns for splitting the image is obtained
 from the shapefile. Otherwise, the image is split into multiple sub-images
@@ -289,7 +311,7 @@ based on the specified number of rows and columns using the
 <code><a href="object_split_shp.html">object_split_shp()</a></code> function. The objects in each sub-image are analyzed
 using the <code><a href="analyze_objects.html">analyze_objects()</a></code> function, and the results are stored in a list.
 If parallel processing is enabled, the analysis is performed in parallel
-using multiple workers. The analysis results is</p>
+using multiple workers.</p>
 <p>The output object provides access to various components of the analysis
 results, such as the analyzed object coordinates and properties.
 Additionally, the shapefiles representing the analyzed objects are included

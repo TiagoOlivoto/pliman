@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@
                         <h4 data-toc-skip class="author">Tiago
 Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2023-09-11</h4>
+            <h4 data-toc-skip class="date">2023-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/polygons.Rmd" class="external-link"><code>vignettes/polygons.Rmd</code></a></small>
       <div class="d-none name"><code>polygons.Rmd</code></div>
@@ -159,20 +159,18 @@ polygons. Let’s start with a simple example, related to the area and
 perimeter of a square.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
-<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
-<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
-<span><span class="co">#&gt; The sp package is now running under evolution status 2</span></span>
-<span><span class="co">#&gt;      (status 2 uses the sf package in place of rgdal)</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
 <span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 2.0.1)            |</span></span>
 <span><span class="co">#&gt; | Author: Tiago Olivoto                                    |</span></span>
 <span><span class="co">#&gt; | Type `citation('pliman')` to know how to cite pliman     |</span></span>
 <span><span class="co">#&gt; | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
+<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
+<span><span class="co">#&gt; which was just loaded, were retired in October 2023.</span></span>
+<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
+<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
+<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
+<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
 <span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_shapes.html">draw_square</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -191,12 +189,28 @@ the number of sides up to 1000.</p>
 <span>               <span class="va">side100</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_shapes.html">draw_n_tagon</a></span><span class="op">(</span><span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">shapes</span>, merge <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<pre><code><span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[4]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[5]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[6]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_area</a></span><span class="op">(</span><span class="va">shapes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2.598076 3.000000 3.105829 3.139526 3.141510 3.141572</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_perimeter</a></span><span class="op">(</span><span class="va">shapes</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5.000000 5.694019 6.004205 6.219330 6.270578 6.276892</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 5.000000 5.694019 6.004205 6.219330 6.270578 6.276892</span></span></code></pre>
 <p>Note that when <span class="math inline">\(n \to \infty\)</span>, the
 sum of sides becomes the circumference of the circle, given by <span class="math inline">\(2\pi r\)</span>, and the area becomes <span class="math inline">\(\pi r^2\)</span>. This is cool, but
 <code>pliman</code> is mainly designed to analyze plant image analysis.
@@ -476,6 +490,11 @@ to flip shapes along the x and y axis, respectively.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">flip</span>, merge <span class="op">=</span> <span class="cn">FALSE</span>, aspect_ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-21-1.png" width="768"></p>
+<pre><code><span><span class="co">#&gt; $fx</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fy</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="sample-points">Sample points<a class="anchor" aria-label="anchor" href="#sample-points"></a>
@@ -483,12 +502,12 @@ to flip shapes along the x and y axis, respectively.</p>
 <p><code><a href="../reference/utils_polygon.html">poly_sample()</a></code> samples <code>n</code> coordinates among
 existing points, and <code><a href="../reference/utils_polygon.html">poly_sample_prop()</a></code> samples a
 proportion of coordinates among existing.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># sample 50 coordinates</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_sample</a></span><span class="op">(</span><span class="va">o2</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-22-1.png" width="384"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># sample 10% of the coordinates</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon.html">poly_sample_prop</a></span><span class="op">(</span><span class="va">o2</span>, prop <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -500,7 +519,7 @@ proportion of coordinates among existing.</p>
 <p><code><a href="../reference/utils_polygon.html">poly_smooth()</a></code> smooths a polygon contour by combining
 sampling <code>prop</code> coordinate points and interpolating them
 using <code>vertices</code> vertices.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smooths</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_polygon.html">poly_smooth</a></span><span class="op">(</span><span class="va">o2</span>, prop <span class="op">=</span> <span class="fl">0.2</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -509,13 +528,21 @@ using <code>vertices</code> vertices.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="va">smooths</span>, merge <span class="op">=</span> <span class="cn">FALSE</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-23-1.png" width="768"></p>
+<pre><code><span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="add-noise-to-a-polygon">Add noise to a polygon<a class="anchor" aria-label="anchor" href="#add-noise-to-a-polygon"></a>
 </h3>
 <p><code><a href="../reference/utils_polygon.html">poly_jitter()</a></code> adds a small amount of noise to a set of
 point coordinates. See <code><a href="https://rdrr.io/r/base/jitter.html" class="external-link">base::jitter()</a></code> for more details.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/utils_polygon.html">poly_jitter</a></span><span class="op">(</span><span class="va">o2</span>, noise_x <span class="op">=</span> <span class="fl">5</span>, noise_y <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/utils_polygon_plot.html">plot_polygon</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="polygons_files/figure-html/unnamed-chunk-24-1.png" width="384"></p>
 </div>

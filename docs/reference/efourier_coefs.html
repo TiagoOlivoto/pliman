@@ -18,7 +18,7 @@ efourier_norm() returning a 'ready-to-analyze' data frame."><meta property="og:i
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,71 +132,11 @@ efourier_norm() returning a 'ready-to-analyze' data frame."><meta property="og:i
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a list of objects</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier.html">efourier</a></span><span class="op">(</span><span class="va">contours</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">efourier_coefs</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   object         A1         A2         A3         A4         A5         A6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      1  -26.81446  -1.020677  -5.101594 -0.6044017  -1.737430  0.5477908</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      2 -446.11163  -5.077747 -41.457959 -2.8494414 -14.470822 -0.5854536</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      3 -153.34051  10.219867  38.480398 -5.9588528 -14.671502  5.3867878</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      4   21.12987   1.680417   4.377984 -3.1329537  -1.654883  4.9296483</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      5   24.17204 -10.674299   2.016357  5.1368729   1.941578 -5.6116916</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      6  185.70771  22.900274  65.355121  9.1963003  -9.718945 12.7074908</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           A7          A8         A9        A10        B1         B2         B3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.9186428  0.64203755 -1.2924775  0.2035948 -148.7221  28.119190 -0.2461177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -8.1727080  0.05443768 -5.3078616  0.6146517 -118.1324   4.406516 -9.0589414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  5.5530146 -5.65155391 -1.8064063  4.2759473 -574.5693   4.859407 33.5419810</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.2043295  0.59595465 -0.8187422 -0.3849895 -382.7540 151.625551 -0.9870311</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.7175588  3.85557662 -1.3206717  2.2832033 -270.7823 101.786207 -3.5506182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  8.0520457  8.36941459  1.8579864  0.4215073 -197.5489  75.003155 -5.9601824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           B4          B5        B6         B7         B8         B9       B10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -11.401916 -11.0137336 -5.493582  2.6283813   5.920910  3.9081015  1.594003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -4.581074  -0.3650273 -4.361229  0.5225924  -2.400882 -0.6261401 -1.753473</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -8.844474  -4.1349826  4.522949 -1.2860416  -1.065522  1.9296365 -1.158945</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -46.302811   3.6997248 39.265664  0.5415148 -13.042241  3.9795071 -5.746142</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -35.816977   2.3674823 21.981432  0.5890628  -6.907170  0.9685829 -3.273101</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -23.565309   5.2700281 19.481690 -1.5097008  -8.652852  1.8574676 -2.699077</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          C1         C2         C3         C4          C5          C6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -405.5923   7.376273  -40.80992  -7.680440 -18.0240037   0.2254621</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -303.4839  -3.095435  -27.99859  -2.382727  -9.2424147  -1.0202905</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -222.9291 -33.893442    6.03481  13.601618   0.5631769  -3.5639251</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -364.1262 -40.467153 -129.21251 -26.380285  19.3436849 -15.4614244</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -238.5666 -33.343917  -85.70162 -18.748409  15.1300285 -11.0203562</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -188.1656 -18.230309  -67.00263 -16.936475   9.8040583  -4.2937119</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            C7          C8        C9        C10          D1          D2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -5.6241993   2.1379721 -3.324373 -0.2705189    6.847621   0.2335718</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -5.3699042   0.8183129 -3.995362  0.4537936  162.589617 -15.3591697</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   0.1645273  -0.6077500 -0.482035  0.2929498   43.599766 -22.7744048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -15.5560493 -18.8851841 -4.368973 -2.5534298  -21.291897  10.8047656</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -10.5162891  -9.6050074 -3.617288 -1.7649747  -17.818338  12.7143164</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  -7.5704581 -10.3911201 -2.289949 -2.0593015 -194.328820  80.9442040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            D3          D4         D5          D6         D7         D8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -0.2185792   1.4600886 -0.3577973  0.07669717 -0.7776518 -0.0128856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   3.8448490   3.4345218 -1.8327855  3.72584352 -2.6956081  1.4753024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -12.9286806   2.7969155  6.3424795  2.27741660 -0.5999832 -2.3972162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   3.2044513  -4.1225751 -3.3210603  0.48631684  0.9610415  1.4226843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -8.6505475  -0.2271619  6.2968401 -3.77538268  0.2967408 -2.8939163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   4.3280779 -23.8162331 -0.2466535 19.64028886  1.3743670 -4.0190823</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            D9        D10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -1.02470042  0.1741323</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.83546430  0.9224907</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.70912680  0.1860412</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.04457129 -1.1152894</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.93813705 -2.5501708</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2.38429526 -3.4088104</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># one object, normalized coefficients</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier.html">efourier</a></span><span class="op">(</span><span class="va">contours</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="efourier_norm.html">efourier_norm</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">efourier_coefs</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              an            bn            cn            dn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1.000000000  1.853479e-17  9.267394e-18 -0.9514067664</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.019954383 -3.957299e-01  1.047938e-01 -0.0202869737</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.002321877 -2.216469e-04  3.269770e-02  0.3357663692</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -0.021985444 -1.195120e-01 -6.884594e-02 -0.0001935063</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -0.009614050 -1.523015e-03  1.496870e-02  0.0491334898</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  -0.026121940 -9.969463e-02  4.060766e-02 -0.0037886893</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.001169439 -2.036878e-03  9.228959e-03  0.0396746712</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  -0.006527314 -3.324696e-02 -4.745917e-02  0.0141460581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.010675203 -2.227608e-04 -2.210092e-03 -0.0111050934</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.004773081  1.435275e-02  7.009215e-03  0.0007721095</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

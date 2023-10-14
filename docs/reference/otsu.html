@@ -20,7 +20,7 @@ variance"><meta property="og:image" content="https://tiagoolivoto.github.io/plim
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,7 +139,7 @@ histograms. IEEE Trans Syst Man Cybern SMC-9(1): 62–66. doi:
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"soybean_touch.jpg"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">thresh</span> <span class="op">&lt;-</span> <span class="fu">otsu</span><span class="op">(</span><span class="va">img</span><span class="op">@</span><span class="va">.Data</span><span class="op">[</span>,,<span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">img</span><span class="op">[</span>,,<span class="fl">3</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">thresh</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">img</span><span class="op">[</span>,,<span class="fl">3</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">thresh</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="otsu-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

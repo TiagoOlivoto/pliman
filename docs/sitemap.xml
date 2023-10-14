@@ -103,6 +103,9 @@
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_align.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_augment.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_binary.html</loc>
   </url>
   <url>
@@ -116,6 +119,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_index.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/image_prepare.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/image_prepare_mv.html</loc>
@@ -182,6 +188,27 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/measure_disease_shp.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_crop.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_index.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_input.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_prepare.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_to_pliman.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_to_rgb.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/mosaic_view.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/object_edge.html</loc>

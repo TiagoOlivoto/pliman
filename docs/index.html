@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,13 +176,13 @@
 <code class="sourceCode R"><span><span class="co"># summary statistics</span></span>
 <span><span class="va">flax</span><span class="op">$</span><span class="va">statistics</span></span>
 <span><span class="co">#        stat        value</span></span>
-<span><span class="co"># 1         n 271.00000000</span></span>
-<span><span class="co"># 2  min_area   0.01868645</span></span>
-<span><span class="co"># 3 mean_area   0.06165272</span></span>
-<span><span class="co"># 4  max_area   0.07969222</span></span>
-<span><span class="co"># 5   sd_area   0.00654426</span></span>
-<span><span class="co"># 6  sum_area  16.70788678</span></span>
-<span><span class="co"># 7  coverage   0.05391447</span></span>
+<span><span class="co"># 1         n 2.680000e+02</span></span>
+<span><span class="co"># 2  min_area 3.606989e-02</span></span>
+<span><span class="co"># 3 mean_area 6.250403e-02</span></span>
+<span><span class="co"># 4  max_area 1.262446e-01</span></span>
+<span><span class="co"># 5   sd_area 8.047152e-03</span></span>
+<span><span class="co"># 6  sum_area 1.675108e+01</span></span>
+<span><span class="co"># 7  coverage 5.388462e-02</span></span>
 <span></span>
 <span><span class="co"># plot the density of the grain's length (in cm)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">flax</span>, measure <span class="op">=</span> <span class="st">"length"</span><span class="op">)</span></span></code></pre></div>
@@ -191,7 +191,7 @@
 <div class="section level1">
 <h1 id="analyzing-shapefiles">Analyzing shapefiles<a class="anchor" aria-label="anchor" href="#analyzing-shapefiles"></a>
 </h1>
-<p>The <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> function performs object analysis based on shapefiles (rows and columns). Possible applications include computing canopy coverage and vegetation indexes useful for high-throughput phenotyping. By default <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> calls <code><a href="reference/image_prepare_mv.html">image_prepare_mv()</a></code> internally, allowing alignment and crop the image before processing. In the following example, we compute the canopy coverage and the Normalized Green Red Difference Index (NGRDI) for each one of the 12 soybean plots.</p>
+<p>The <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> function performs object analysis based on shapefiles (rows and columns). Possible applications include computing canopy coverage and vegetation indexes useful for high-throughput phenotyping. By default <code><a href="reference/analyze_objects_shp.html">analyze_objects_shp()</a></code> calls <code>image_prepare_mv()</code> internally, allowing alignment and crop the image before processing. In the following example, we compute the canopy coverage and the Normalized Green Red Difference Index (NGRDI) for each one of the 12 soybean plots.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"field_mosaic.jpg"</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> </span>
@@ -201,7 +201,7 @@
 <span>                      buffer_x <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># defaults is 0</span></span>
 <span>                      index <span class="op">=</span> <span class="st">"HUE"</span>, <span class="co"># used to segment the soil</span></span>
 <span>                      object_index <span class="op">=</span> <span class="st">"NGRDI"</span><span class="op">)</span> </span>
-<span><span class="fu"><a href="reference/plot_index_shp.html">plot_index_shp</a></span><span class="op">(</span><span class="va">res</span>, attribute <span class="op">=</span> <span class="st">"coverage"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/plot_index_shp.html">plot_index_shp</a></span><span class="op">(</span><span class="va">res</span>, attribute <span class="op">=</span> <span class="st">"coverage"</span>, viewer <span class="op">=</span> <span class="st">"base"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
 </div>
 <div class="section level1">

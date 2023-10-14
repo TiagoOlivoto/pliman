@@ -134,6 +134,7 @@ reference:
       - mosaic_export
       - mosaic_index
       - mosaic_input
+      - mosaic_prepare
       - mosaic_to_pliman
       - mosaic_to_rgb
       - mosaic_view
@@ -147,6 +148,7 @@ reference:
   - title: "Image segmentation"
     desc: "Performs image segmentation based on indexes such as RGB bands or vegetation indexes "
     contents:
+      - image_augment
       - image_binary
       - image_index
       - palettes
@@ -235,7 +237,7 @@ reference:
   - title: "Iterative visualization"
     desc: "Tools to plot images and create polygons, points, and lines using mapview and mapedit packages."
     contents:
-      - image_prepare_mv
+      - image_prepare
       - image_view
       - pliman_viewer
 

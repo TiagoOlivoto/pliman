@@ -80,6 +80,7 @@ analyzed.
 }
 \examples{
 if(interactive()){
+library(pliman)
 mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
 mosaic_prepare(mosaic)
 }

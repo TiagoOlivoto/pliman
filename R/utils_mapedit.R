@@ -490,6 +490,7 @@ plot_index <- function(img = NULL,
 }
 
 
+#' Prepare an image
 #'
 #' This function aligns and crops the image using either base or mapview
 #' visualization. This is useful to prepare the images to be analyzed with

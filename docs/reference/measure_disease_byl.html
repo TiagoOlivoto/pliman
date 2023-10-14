@@ -26,7 +26,7 @@ leaves."><meta property="og:image" content="https://tiagoolivoto.github.io/plima
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,15 +136,16 @@ leaves.</p>
 <span>  extension <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object_size <span class="op">=</span> <span class="st">"large"</span>,</span>
-<span>  dir_original <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  img_healthy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  img_symptoms <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  save_image <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dir_original <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dir_processed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_features <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  save_image <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -248,18 +249,32 @@ which is the highest.</p></dd>
 grains), and <code>"elarge"</code> (e.g, soybean pods)`.</p></dd>
 
 
-<dt>dir_original</dt>
-<dd><p>The directory containing the original and processed images.
-Defaults to <code>NULL</code>. In this case, the function will search for the image <code>img</code> in the
-current working directory.</p></dd>
-
-
 <dt>img_healthy</dt>
 <dd><p>A color palette of healthy tissues.</p></dd>
 
 
 <dt>img_symptoms</dt>
 <dd><p>A color palette of lesioned tissues.</p></dd>
+
+
+<dt>plot</dt>
+<dd><p>Show image after processing?</p></dd>
+
+
+<dt>save_image</dt>
+<dd><p>Save the image after processing? The image is saved in the
+current working directory named as <code>proc_*</code> where <code>*</code> is the image name
+given in <code>img</code>.</p></dd>
+
+
+<dt>dir_original, dir_processed</dt>
+<dd><p>The directory containing the original and
+processed images. Defaults to <code>NULL</code>. In this case, the function will
+search for the image <code>img</code> in the current working directory. After
+processing, when <code>save_image = TRUE</code>, the processed image will be also
+saved in such a directory. It can be either a full path, e.g.,
+<code>"C:/Desktop/imgs"</code>, or a subfolder within the current working directory,
+e.g., <code>"/imgs"</code>.</p></dd>
 
 
 <dt>pattern</dt>
@@ -274,7 +289,7 @@ images that are named as 1.-, 2.-, and so on.</p></dd>
 <dd><p>Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up
 the processing time, especially when <code>pattern</code> is used is informed. The
-number of sections is set up to 70% of available cores.</p></dd>
+number of sections is set up to 30% of available cores.</p></dd>
 
 
 <dt>workers</dt>
@@ -282,19 +297,9 @@ number of sections is set up to 70% of available cores.</p></dd>
 number of parallel processes that can be active at the same time.</p></dd>
 
 
-<dt>plot</dt>
-<dd><p>Show image after processing?</p></dd>
-
-
 <dt>show_features</dt>
 <dd><p>If <code>TRUE</code> returnS the lesion features such as number,
 area, perimeter, and radius. Defaults to <code>FALSE</code>.</p></dd>
-
-
-<dt>save_image</dt>
-<dd><p>Save the image after processing? The image is saved in the
-current working directory named as <code>proc_*</code> where <code>*</code> is the image name
-given in <code>img</code>.</p></dd>
 
 
 <dt>verbose</dt>
@@ -328,11 +333,13 @@ results.</p></li>
 <span class="r-in"><span>                     index_dh <span class="op">=</span> <span class="st">"NGRDI"</span>,</span></span>
 <span class="r-in"><span>                     workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="measure_disease_byl-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="measure_disease_byl-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="measure_disease_byl-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">sev</span><span class="op">$</span><span class="va">severity</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   img leaf  healthy symptomatic</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 img    1 84.41849    15.58151</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 img    2 79.77534    20.22466</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 img    3 68.41733    31.58267</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 img    1 84.36079    15.63921</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 img    2 79.76666    20.23334</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 img    3 68.39437    31.60563</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

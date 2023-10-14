@@ -18,7 +18,7 @@ mapview and mapedit packages."><meta property="og:image" content="https://tiagoo
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,11 +112,20 @@ mapview and mapedit packages.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">image_view</span><span class="op">(</span></span>
 <span>  <span class="va">img</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  r <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  g <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  b <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  attribute <span class="op">=</span> <span class="st">"area"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Edit the image"</span>,</span>
 <span>  show <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rgb"</span>, <span class="st">"index"</span><span class="op">)</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"B"</span>,</span>
-<span>  max_pixels <span class="op">=</span> <span class="fl">2500000</span>,</span>
+<span>  max_pixels <span class="op">=</span> <span class="fl">1e+06</span>,</span>
+<span>  downsample <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  color_regions <span class="op">=</span> <span class="fu"><a href="custom_palette.html">custom_palette</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -125,6 +134,27 @@ mapview and mapedit packages.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>img</dt>
 <dd><p>An <code>Image</code> object.</p></dd>
+
+
+<dt>object</dt>
+<dd><p>(Optional). An object computed with <code><a href="analyze_objects.html">analyze_objects()</a></code>. If an
+object is informed, an additional layer is added to the plot, showing the
+contour of the analyzed objects, with a color gradient defined by
+<code>attribute</code>.</p></dd>
+
+
+<dt>r, g, b</dt>
+<dd><p>The layer for the Red, Green and Blue band, respectively.
+Defaults to <code>1</code>, <code>2</code>, and <code>3</code>.</p></dd>
+
+
+<dt>alpha</dt>
+<dd><p>The transparency level of the rectangles' color (between 0 and 1).</p></dd>
+
+
+<dt>attribute</dt>
+<dd><p>The name of the quantitative variable in the
+<code>object_index</code> to be used for coloring the rectangles.</p></dd>
 
 
 <dt>title</dt>
@@ -146,13 +176,30 @@ view and "index" for index view.</p></dd>
 If <code>max_pixels &lt; npixels(img)</code>, regular sampling is used before plotting.</p></dd>
 
 
+<dt>downsample</dt>
+<dd><p>integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to <code>NULL</code>, which will
+find the best downsampling factor to approximate the <code>max_pixels</code> value.</p></dd>
+
+
 <dt>color_regions</dt>
 <dd><p>The color palette for displaying index values. Default
 is <code><a href="custom_palette.html">custom_palette()</a></code>.</p></dd>
 
 
+<dt>quantiles</dt>
+<dd><p>the upper and lower quantiles used for color stretching. If
+set to <code>NULL</code>, stretching is performed basing on 'domain' argument.</p></dd>
+
+
+<dt>domain</dt>
+<dd><p>the upper and lower values used for color stretching. This is
+used only if <code>'quantiles'</code> is <code>NULL</code>. If both '<code>domain'</code> and <code>'quantiles'</code>
+are set to <code>NULL</code>, stretching is applied based on min-max values.</p></dd>
+
+
 <dt>...</dt>
-<dd><p>Additional arguments to be passed to <code><a href="https://rdrr.io/pkg/mapview/man/mapView.html" class="external-link">mapview::mapview()</a></code>.</p></dd>
+<dd><p>Additional arguments to be passed to <code>downsample_fun</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

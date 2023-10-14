@@ -30,7 +30,7 @@ current plot. The object identification ("id") is drawn by default.
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -248,7 +248,7 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Image with four objects with a known resolution of 300 dpi</span></span></span>
 <span class="r-in"><span><span class="co"># Higher square: 10 x 10 cm</span></span></span>
 <span class="r-in"><span><span class="co"># Lower square: 5 x 5 cm</span></span></span>
@@ -311,26 +311,6 @@ the x and y coordinates of the objects in <code>object</code>.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Total    : 40.001 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Average  : 13.334 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   id        x         y     area  area_ch perimeter radius_mean radius_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2 1736.502  452.0009 24.99993 24.91543  19.94781     2.86407    2.49154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3 1736.580 1295.3127  7.04878  7.04907  10.07553     1.49403    1.48207</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4 1736.500  938.0042  7.95224  7.90176  11.91077     1.66866    0.98788</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   radius_max radius_sd diam_mean diam_min diam_max major_axis minor_axis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    3.52806   0.31434   5.72813  4.98307  7.05612    2.03866    2.03606</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1.50921   0.00396   2.98807  2.96414  3.01842    1.05974    1.05314</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    2.22536   0.42388   3.33731  1.97576  4.45073    1.48334    0.87388</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   caliper  length   width radius_ratio    theta eccentricity form_factor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 7.01134 4.99999 4.99152      1.41602 -1.56995      0.05045     0.78951</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 3.00140 3.00284 2.99944      1.01831  0.45900      0.11144     0.87255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 4.43456 3.98816 1.98138      2.25267  0.00000      0.80804     0.70440</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   narrow_factor asp_ratio rectangularity pd_ratio plw_ratio solidity convexity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1.40227   1.00170        0.99831  2.84508   1.99647  1.00339   0.74991</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.99952   1.00113        1.27779  3.35694   1.67862  0.99996   0.90873</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       1.11193   2.01282        0.99369  2.68590   1.99526  1.00639   0.83578</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   elongation circularity circularity_haralick circularity_norm coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    0.00169    15.91665              9.11125          0.78684  0.10685</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    0.00113    14.40196            377.39777          0.86794  0.03013</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    0.50318    17.83980              3.93664          0.69993  0.03399</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>

@@ -18,7 +18,7 @@ y-coordinates coordinates."><meta property="og:image" content="https://tiagooliv
     
     <a class="navbar-brand me-2" href="../index.html">pliman</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -182,72 +182,12 @@ closed contour. Computer Graphics and Image Processing 18, 236–258. doi:
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ef</span> <span class="op">&lt;-</span> <span class="fu">efourier</span><span class="op">(</span><span class="va">leaf1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier_coefs.html">efourier_coefs</a></span><span class="op">(</span><span class="va">ef</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            an           bn          cn           dn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  21.1298663 -382.7540180 -364.126202 -21.29189747</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   1.6804167  151.6255507  -40.467153  10.80476561</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   4.3779839   -0.9870311 -129.212508   3.20445130</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -3.1329537  -46.3028113  -26.380285  -4.12257511</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -1.6548827    3.6997248   19.343685  -3.32106033</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   4.9296483   39.2656639  -15.461424   0.48631684</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   1.2043295    0.5415148  -15.556049   0.96104147</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.5959547  -13.0422412  -18.885184   1.42268431</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.8187422    3.9795071   -4.368973   0.04457129</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.3849895   -5.7461417   -2.553430  -1.11528942</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># object is aligned along the major caliper with `poly_align()`</span></span></span>
 <span class="r-in"><span><span class="co"># object is centered on the origin with `poly_center()`</span></span></span>
 <span class="r-in"><span><span class="co"># using a list of object coordinates</span></span></span>
 <span class="r-in"><span><span class="va">ef2</span> <span class="op">&lt;-</span> <span class="fu">efourier</span><span class="op">(</span><span class="va">contours</span>, align <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="efourier_coefs.html">efourier_coefs</a></span><span class="op">(</span><span class="va">ef2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   object          A1          A2          A3          A4          A5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      1   -3.454896   1.4236717   2.0106840   0.1466309   0.5199967</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      2   -6.334470  -0.2967615  -0.7702261   0.2801859  -0.6714594</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      3  218.575292  34.2419339  -4.9119088 -13.7802222  -1.0202461</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      4  364.641136  40.4763360 129.1371411  26.0505297 -19.3876516</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      5  239.132916  33.0146334  85.7776812  18.8680604 -15.1400194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      6 -264.070968 -29.1909758 -93.4285366 -18.2405782  13.7512553</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            A6           A7          A8         A9         A10          B1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -0.4408357   0.44137596  -0.6056412  0.9417381 -0.26564910 -148.824787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   0.4311535  -0.22620126  -0.6846717  0.2515723 -0.05888466  200.920820</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3.6849989  -0.00647676   0.4886815  0.4219516 -0.18070193   59.582410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  15.8259341  15.59258473  18.8435168  4.2933668  2.52397439    9.673004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  10.9262111  10.55175506   9.7457787  3.5449760  1.87498734  -10.324537</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -12.2561200 -11.02228148 -13.1404595 -2.9138170 -1.71374125  -13.650309</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              B2          B3          B4         B5         B6         B7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  28.029518485  -0.2127443 -11.4786529 -10.949379 -5.4915306  2.6883177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -15.123601609   8.3273886   5.4390320  -1.302683  5.5558649 -2.5143876</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -22.772838905 -13.8616981   2.9352695   6.443341  2.1943531 -0.5649768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -1.145858707   3.8285493  -0.2855784  -3.743367 -2.4951148  1.0716896</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  10.225308487  -8.0119622   0.8561190   6.073920 -4.2025875  0.4377322</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   0.005283962  -7.8696590  -1.2793494   4.173352  0.8257853 -2.1945136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          B8         B9        B10          C1        C2          C3        C4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  5.893369  3.9981753  1.5697637 -406.469731  7.290806 -41.0790328 -7.697306</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2.571339 -0.3229630  1.7582312  539.528656  5.957966  50.0543857  3.715272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -2.360508  0.6635131  0.2141676  160.384260 -9.311378 -38.8115119  5.651363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  2.669661 -0.2159548 -0.6196221    8.382921  1.100087   5.8929473  5.483243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -2.550309  1.9803590 -2.4258117  -17.439016 11.098566   0.2180498 -4.348582</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -3.833611 -0.3067454  0.2984537  -12.638361  2.597616  -4.8345028 -6.457647</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             C5         C6          C7         C8         C9        C10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -18.11801594  0.2606615 -5.68731105  2.1891199 -3.4289571 -0.2464125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  17.17030986  1.0820960  9.79104866 -0.4928921  6.6569005 -0.7439777</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  14.68641558 -5.3380193 -5.53831281  5.6818998  1.7865148 -4.2605136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   0.09001916 -4.0242602  0.02777567  1.0524829  1.1115069  0.6698001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -2.35767498  5.6158684 -1.45450075 -3.4880139  1.3938644 -2.1658376</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   0.63438360  5.8021373 -0.09256805 -2.0875489 -0.3663413 -1.3115065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            D1          D2          D3         D4         D5          D6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    3.298372   -2.314733 -0.09430072  -0.678610  0.9444166   0.3421264</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   -2.865168   -5.135947 -4.91431850  -1.764671 -1.1627028  -1.4357995</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -572.881478    4.205287 32.96616840  -8.724172 -3.8271289   4.5248076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -383.224931  152.008578 -0.70426128 -46.453237  3.4252380  39.1472283</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -271.189230  102.128067 -3.77118279 -35.849002  2.5042633  21.9498152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  276.773140 -110.341939  0.83957168  33.434955 -3.3904501 -27.5795990</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            D7         D8         D9        D10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.47040544  -0.386826  0.6443593 -0.3005889</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.96461765  -1.135715 -0.8628120 -0.9279190</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.37287058  -1.047192  1.9778502 -1.2315894</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.61638325 -12.876975  3.9851780 -5.8075146</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.57504583  -7.039522  1.0449584 -3.3843351</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.01447241   8.793250 -3.0186753  4.3101466</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># reconstruct the perimeter of the object</span></span></span>
 <span class="r-in"><span><span class="co"># Use only the first one for simplicity</span></span></span>
