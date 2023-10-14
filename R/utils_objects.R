@@ -514,7 +514,7 @@ object_split <- function(img,
 #'
 #' This function takes an image and augments it by rotating it multiple times.
 #'
-#' @param img An {Image} object.
+#' @param img An `Image` object.
 #' @param pattern A regular expression pattern to select multiple images from a
 #'   directory.
 #' @param times The number of times to rotate the image.

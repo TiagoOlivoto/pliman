@@ -70,7 +70,7 @@ mosaic_view <- function(mosaic,
                         color_regions = custom_palette(),
                         axes = FALSE,
                         ...){
-  # check_mapview()
+  check_mapview()
   if(!is.null(domain)){
     quantiles <- NULL
   }

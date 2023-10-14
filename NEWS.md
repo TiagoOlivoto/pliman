@@ -1,4 +1,18 @@
 # pliman 2.1.0
+## New functions
+* A new `mosaic_*()` family of functions to handle orthomosaics from RGB and multispectral images.
+
+* `object_export()` and `object_export_shp()` to export objects from single images to multiple images.
+* `image_augment()` to augment an image by rotating it multiple times.
+
+
+## Bug fixes
+* Setting `save_image = TRUE` in `measure_disease_byl()` now exports the processed images to a local directory, allowing the use of `sad()` call to the created object.
+
+
+## Minor improvements 
+* Arguments r, g, b, re, and nir now included in `analyze_objects()`, `analyze_objects_shp()`, and `image_view()`, allowing to correctly choose the image band.
+* `image_segment_mask()` now has a `col_background` argument.
 
 # pliman 2.0.1
 ## New functions

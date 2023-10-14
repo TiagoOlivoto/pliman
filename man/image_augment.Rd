@@ -16,7 +16,7 @@ image_augment(
 )
 }
 \arguments{
-\item{img}{An {Image} object.}
+\item{img}{An \code{Image} object.}
 
 \item{pattern}{A regular expression pattern to select multiple images from a
 directory.}
