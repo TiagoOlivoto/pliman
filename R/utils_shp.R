@@ -592,6 +592,7 @@ analyze_objects_shp <- function(img,
                                 efourier = FALSE,
                                 object_index = NULL,
                                 veins = FALSE,
+                                width_at = FALSE,
                                 verbose = TRUE,
                                 invert = FALSE,
                                 ...){
@@ -664,6 +665,7 @@ analyze_objects_shp <- function(img,
                         object_size = object_size,
                         object_index = object_index,
                         veins = veins,
+                        width_at = width_at,
                         efourier = efourier,
                         invert = invert,
                         watershed = watershed,
@@ -686,6 +688,7 @@ analyze_objects_shp <- function(img,
                         object_size = object_size,
                         object_index = object_index,
                         veins = veins,
+                        width_at = width_at,
                         efourier = efourier,
                         invert = invert,
                         watershed = watershed,
@@ -815,6 +818,22 @@ analyze_objects_shp <- function(img,
   } else{
     veins <- NULL
   }
+
+  # WIDTH AT
+  if(isTRUE(width_at)){
+    width_at <-
+      do.call(rbind,
+              lapply(seq_along(results), function(i){
+                transform(results[[i]][["width_at"]],
+                          img =  names(results[i]))
+              })
+      )
+
+    width_at <- width_at[, c(ncol(width_at), 1:ncol(width_at)-1)]
+  } else{
+    width_at <- NULL
+  }
+
   res[, 1:4] <- correct_coords(res[, 1:4],  nrow(img),  ncol(img), nrow, ncol)
   invisible(
     structure(
@@ -828,6 +847,7 @@ analyze_objects_shp <- function(img,
            efourier_power = efourier_power,
            efourier_minharm = efourier_minharm,
            veins = veins,
+           width_at = width_at,
            shapefiles = tmp$shapefile,
            mask = mask,
            index = index,

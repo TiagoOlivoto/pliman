@@ -114,6 +114,10 @@
 #'  angle). The base angle is computed in the same way but from the first base
 #'  pixel.
 #'
+#'    - If `width_at = TRUE`, the width at the  5th, 25th, 50th, 75th, and 95th
+#' percentiles of the object height are computed by default. These quantiles can
+#' be adjusted with the `width_at_percentiles` argument.
+#'
 #' @inheritParams image_binary
 #' @inheritParams image_index
 #'
@@ -197,6 +201,13 @@
 #'   object for which the angle should be computed (from the apex and the
 #'   bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
 #'   75th percentiles of the object height.
+#' @param width_at Logical. If `TRUE`, the widths of the object at a given set
+#'   of quantiles of the height are computed.
+#' @param width_at_percentiles  A vector of heights along the vertical axis of
+#'   the object at which the width will be computed. The default value is
+#'   c(0.05, 0.25, 0.5, 0.75, 0.95), which means the function will return the
+#'   width at the 5th, 25th, 50th, 75th, and 95th percentiles of the object's
+#'   height.
 #'@param haralick Logical value indicating whether Haralick features are
 #'  computed. Defaults to `FALSE`.
 #'@param har_nbins An integer indicating the number of bins using to compute the
@@ -543,6 +554,8 @@ analyze_objects <- function(img,
                             sigma_veins = 1,
                             ab_angles = FALSE,
                             ab_angles_percentiles = c(0.25, 0.75),
+                            width_at = FALSE,
+                            width_at_percentiles = c(0.05, 0.25, 0.50, 0.75, 0.95),
                             haralick = FALSE,
                             har_nbins = 32,
                             har_scales = 1,
@@ -629,7 +642,7 @@ analyze_objects <- function(img,
              tolerance, extension, randomize, nrows, plot, show_original,
              show_background, marker, marker_col, marker_size, save_image,
              prefix, dir_original, dir_processed, verbose, col_background,
-             col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv){
+             col_foreground, lower_noise, ab_angles, ab_angles_percentiles, width_at, width_at_percentiles, return_mask, pcv){
       if(is.character(img)){
         all_files <- sapply(list.files(diretorio_original), file_name)
         check_names_dir(img, all_files, diretorio_original)
@@ -1121,8 +1134,21 @@ analyze_objects <- function(img,
       # check if angles should be computed
       if(isTRUE(ab_angles)){
         angles <- poly_apex_base_angle(object_contour, ab_angles_percentiles)
+    } else{
+      angles <- NULL
+    }
+
+      # check if width at should be computed
+      if(isTRUE(width_at)){
+        widths <-
+          do.call(rbind, lapply(object_contour, function(x){
+            x |> poly_align(plot = FALSE) |> poly_width_at(width_at_percentiles)
+          })) |>
+          as.data.frame() |>
+          rownames_to_column("id")
+        names(widths) <- c("id", paste0("width", width_at_percentiles))
       } else{
-        angles <- NULL
+        widths <- NULL
       }
 
       # check if veins is computed
@@ -1210,6 +1236,7 @@ analyze_objects <- function(img,
                       efourier_minharm = min_harm,
                       veins = prop_veins,
                       angles = angles,
+                      width_at = widths,
                       mask = mask,
                       pcv = pcv,
                       contours = object_contour,
@@ -1367,14 +1394,14 @@ analyze_objects <- function(img,
         }
       }
       invisible(results)
-    }
+}
 
   if(missing(pattern)){
     help_count(img, foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
                tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose, col_background,
-               col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
+               col_foreground, lower_noise, ab_angles, ab_angles_percentiles, width_at, width_at_percentiles, return_mask, pcv)
   } else{
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
       pattern <- "^[0-9].*$"
@@ -1410,7 +1437,7 @@ analyze_objects <- function(img,
                      tolerance , extension, randomize, nrows, plot, show_original,
                      show_background, marker, marker_col, marker_size, save_image, prefix,
                      dir_original, dir_processed, verbose, col_background,
-                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
+                     col_foreground, lower_noise, ab_angles, ab_angles_percentiles, width_at, width_at_percentiles, return_mask, pcv)
         }
 
     } else{
@@ -1425,7 +1452,7 @@ analyze_objects <- function(img,
                    tolerance , extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image, prefix,
                    dir_original, dir_processed, verbose, col_background,
-                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles, return_mask, pcv)
+                   col_foreground, lower_noise, ab_angles, ab_angles_percentiles, width_at, width_at_percentiles, return_mask, pcv)
       }
       results <-
         lapply(seq_along(names_plant), function(i){
@@ -1566,6 +1593,20 @@ analyze_objects <- function(img,
       angles <- NULL
     }
 
+    if(isTRUE(width_at)){
+      width_at <-
+        do.call(rbind,
+                lapply(seq_along(results), function(i){
+                  transform(results[[i]][["width_at"]],
+                            img =  names(results[i]))
+                })
+        )
+
+      width_at <- width_at[, c(ncol(width_at), 1:ncol(width_at)-1)]
+    } else{
+      width_at <- NULL
+    }
+
     if(isTRUE(pcv)){
       pcv <-
         do.call(rbind,
@@ -1615,12 +1656,13 @@ analyze_objects <- function(img,
              efourier_minharm = efourier_minharm,
              veins = veins,
              angles = angles,
+             width_at = width_at,
              pcv = pcv),
         class = "anal_obj_ls"
       )
     )
   }
-}
+  }
 
 
 #' @name analyze_objects

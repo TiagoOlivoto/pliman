@@ -394,6 +394,10 @@ get_measures <- function(object,
       if(!is.null(object$angles)){
         res <- cbind(res, object$angles[, -c(1:2)])
       }
+      # bind width_at if it exists
+      if(!is.null(object$width_at)){
+        res <- cbind(res, object$width_at[, -c(1:2)])
+      }
       # bind perimeter complexity value if it exists
       if(!is.null(object$pcv)){
         res <- cbind(res, pcv = object$pcv)
@@ -455,6 +459,11 @@ get_measures <- function(object,
     # bind apex and base angles if it exists
     if(!is.null(object$angles)){
       res <- cbind(res, object$angles[, -1])
+    }
+
+    # bind width_at if it exists
+    if(!is.null(object$width_at)){
+      res <- cbind(res, object$width_at[, -1])
     }
 
     # bind perimeter complexity value if it exists

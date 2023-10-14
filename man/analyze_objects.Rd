@@ -27,6 +27,8 @@ analyze_objects(
   sigma_veins = 1,
   ab_angles = FALSE,
   ab_angles_percentiles = c(0.25, 0.75),
+  width_at = FALSE,
+  width_at_percentiles = c(0.05, 0.25, 0.5, 0.75, 0.95),
   haralick = FALSE,
   har_nbins = 32,
   har_scales = 1,
@@ -193,6 +195,15 @@ with the argument \code{ab_angles_percentiles}.}
 object for which the angle should be computed (from the apex and the
 bottom). Defaults to c(0.25, 0.75), which means considering the 25th and
 75th percentiles of the object height.}
+
+\item{width_at}{Logical. If \code{TRUE}, the widths of the object at a given set
+of quantiles of the height are computed.}
+
+\item{width_at_percentiles}{A vector of heights along the vertical axis of
+the object at which the width will be computed. The default value is
+c(0.05, 0.25, 0.5, 0.75, 0.95), which means the function will return the
+width at the 5th, 25th, 50th, 75th, and 95th percentiles of the object's
+height.}
 
 \item{haralick}{Logical value indicating whether Haralick features are
 computed. Defaults to \code{FALSE}.}
@@ -601,6 +612,9 @@ the angle from the first pixel of the apex of the object to the two pixels
 that slice the object at the 25th percentile of the object height (apex
 angle). The base angle is computed in the same way but from the first base
 pixel.
+\item If \code{width_at = TRUE}, the width at the  5th, 25th, 50th, 75th, and 95th
+percentiles of the object height are computed by default. These quantiles can
+be adjusted with the \code{width_at_percentiles} argument.
 }
 }
 }
