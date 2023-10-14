@@ -824,7 +824,7 @@ measure_disease <- function(img,
                     envir=environment())
       on.exit(stopCluster(clust))
       if(verbose == TRUE){
-        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
       results <-
         parLapply(clust, names_plant,

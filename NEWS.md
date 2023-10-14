@@ -1,3 +1,5 @@
+# pliman 2.1.0
+
 # pliman 2.0.1
 ## New functions
 
