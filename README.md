@@ -16,7 +16,8 @@ downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](ht
 downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
-[![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/badge/latestdoi/352844585)
+[![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/doi/10.5281/zenodo.4757333)
+
 <!-- badges: end -->
 
 The pliman (**pl**ant **im**age **an**alysis) package is designed to
