@@ -94,7 +94,8 @@ A \code{NULL} object
 }
 \description{
 \code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and
-NIR bands. See xxx for a detailed list of available indexes
+NIR bands. See \href{https://tiagoolivoto.github.io/pliman/articles/indexes.html}{this page} for a
+detailed list of available indexes.
 
 The S3 method \code{plot()} can be used to generate a raster or density plot of
 the index values computed with \code{image_index()}

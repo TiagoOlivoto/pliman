@@ -6,16 +6,21 @@ Standard Red Green Blue (sRGB), using a gamma correction of 2.2. The
 function performs the conversion by applying a gamma correction to the input
 RGB values (raising them to the power of 2.2) and then transforming them
 using a specific transformation matrix. The result is clamped to the range
-0, 1 to ensure valid sRGB values.
+0-1 to ensure valid sRGB values.
 rgb_to_hsb() Transforms colors from RGB space (red/green/blue) to HSB
 space (hue/saturation/brightness). The HSB values are calculated as follows
 (see https://www.rapidtables.com/convert/color/rgb-to-hsv.html for more
 details).
-Hue: The hue is determined based on the maximum value among R, G, and B, and it ranges from 0 to 360 degrees.
-Saturation: Saturation is calculated as the difference between the maximum and minimum channel values, expressed as a percentage.
-Brightness: Brightness is equal to the maximum channel value, expressed as a percentage.
+Hue: The hue is determined based on the maximum value among R, G, and B,
+and it ranges from 0 to 360 degrees.
+Saturation: Saturation is calculated as the difference between the maximum
+and minimum channel values, expressed as a percentage.
+Brightness: Brightness is equal to the maximum channel value, expressed as
+a percentage.
 
-rgb_to_lab() Transforms colors from RGB space (red/green/blue) to CIE-LAB space, using the sRGB values. See grDevices::convertColor() for more details.
+rgb_to_lab() Transforms colors from RGB space (red/green/blue) to CIE-LAB
+space, using the sRGB values. See grDevices::convertColor() for more
+details.
 
 "><title>Convert between colour spaces — utils_colorspace • pliman</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Convert between colour spaces — utils_colorspace"><meta property="og:description" content="
 
@@ -24,16 +29,21 @@ Standard Red Green Blue (sRGB), using a gamma correction of 2.2. The
 function performs the conversion by applying a gamma correction to the input
 RGB values (raising them to the power of 2.2) and then transforming them
 using a specific transformation matrix. The result is clamped to the range
-0, 1 to ensure valid sRGB values.
+0-1 to ensure valid sRGB values.
 rgb_to_hsb() Transforms colors from RGB space (red/green/blue) to HSB
 space (hue/saturation/brightness). The HSB values are calculated as follows
 (see https://www.rapidtables.com/convert/color/rgb-to-hsv.html for more
 details).
-Hue: The hue is determined based on the maximum value among R, G, and B, and it ranges from 0 to 360 degrees.
-Saturation: Saturation is calculated as the difference between the maximum and minimum channel values, expressed as a percentage.
-Brightness: Brightness is equal to the maximum channel value, expressed as a percentage.
+Hue: The hue is determined based on the maximum value among R, G, and B,
+and it ranges from 0 to 360 degrees.
+Saturation: Saturation is calculated as the difference between the maximum
+and minimum channel values, expressed as a percentage.
+Brightness: Brightness is equal to the maximum channel value, expressed as
+a percentage.
 
-rgb_to_lab() Transforms colors from RGB space (red/green/blue) to CIE-LAB space, using the sRGB values. See grDevices::convertColor() for more details.
+rgb_to_lab() Transforms colors from RGB space (red/green/blue) to CIE-LAB
+space, using the sRGB values. See grDevices::convertColor() for more
+details.
 
 "><meta property="og:image" content="https://tiagoolivoto.github.io/pliman/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -145,15 +155,20 @@ Standard Red Green Blue (sRGB), using a gamma correction of 2.2. The
 function performs the conversion by applying a gamma correction to the input
 RGB values (raising them to the power of 2.2) and then transforming them
 using a specific transformation matrix. The result is clamped to the range
-0, 1 to ensure valid sRGB values.</p></li>
+0-1 to ensure valid sRGB values.</p></li>
 <li><p><code>rgb_to_hsb()</code> Transforms colors from RGB space (red/green/blue) to HSB
 space (hue/saturation/brightness). The HSB values are calculated as follows
 (see https://www.rapidtables.com/convert/color/rgb-to-hsv.html for more
-details).</p><ul><li><p>Hue: The hue is determined based on the maximum value among R, G, and B, and it ranges from 0 to 360 degrees.</p></li>
-<li><p>Saturation: Saturation is calculated as the difference between the maximum and minimum channel values, expressed as a percentage.</p></li>
-<li><p>Brightness: Brightness is equal to the maximum channel value, expressed as a percentage.</p></li>
+details).</p><ul><li><p>Hue: The hue is determined based on the maximum value among R, G, and B,
+and it ranges from 0 to 360 degrees.</p></li>
+<li><p>Saturation: Saturation is calculated as the difference between the maximum
+and minimum channel values, expressed as a percentage.</p></li>
+<li><p>Brightness: Brightness is equal to the maximum channel value, expressed as
+a percentage.</p></li>
 </ul></li>
-<li><p><code>rgb_to_lab()</code> Transforms colors from RGB space (red/green/blue) to CIE-LAB space, using the sRGB values. See <code><a href="https://rdrr.io/r/grDevices/convertColor.html" class="external-link">grDevices::convertColor()</a></code> for more details.</p></li>
+<li><p><code>rgb_to_lab()</code> Transforms colors from RGB space (red/green/blue) to CIE-LAB
+space, using the sRGB values. See <code><a href="https://rdrr.io/r/grDevices/convertColor.html" class="external-link">grDevices::convertColor()</a></code> for more
+details.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -168,10 +183,9 @@ details).</p><ul><li><p>Hue: The hue is determined based on the maximum value am
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
-<dd><p>An <code>Image</code> object, an object computed with
-<code><a href="analyze_objects.html">analyze_objects()</a></code> with a valid <code>object_index</code> argument, or a
-<code>data.frame/matrix</code>. For the last, a three-column data (R, G, and B, respectively)
-is required.</p></dd>
+<dd><p>An <code>Image</code> object, an object computed with <code><a href="analyze_objects.html">analyze_objects()</a></code>
+with a valid <code>object_index</code> argument, or a <code>data.frame/matrix</code>. For the
+last, a three-column data (R, G, and B, respectively) is required.</p></dd>
 
 </dl></div>
     <div class="section level2">

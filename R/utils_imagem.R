@@ -1739,7 +1739,9 @@ image_binary <- function(img,
 #' Image indexes
 #'
 #' `image_index()` Builds image indexes using Red, Green, Blue, Red-Edge, and
-#' NIR bands. See xxx for a detailed list of available indexes
+#' NIR bands. See [this
+#' page](https://tiagoolivoto.github.io/pliman/articles/indexes.html) for a
+#' detailed list of available indexes.
 #'
 #'
 #' @name image_index
