@@ -991,6 +991,7 @@ plot_shp <- function(coords,
 #' rectangles are colored using a color scale.
 #' @inheritParams image_shp
 #' @inheritParams plot_index
+#' @inheritParams image_view
 #' @param object An object computed with [analyze_objects_shp()].
 #' @param attribute The name of the quantitative variable in the
 #'   \code{object_index} to be used for coloring the rectangles.
@@ -1030,6 +1031,9 @@ plot_shp <- function(coords,
 #'
 plot_index_shp <- function(object,
                            attribute = "coverage",
+                           r = 1,
+                           g = 2,
+                           b = 3,
                            color = c("red","green"),
                            viewer = c("mapview", "base"),
                            max_pixels = 500000,
@@ -1145,10 +1149,10 @@ plot_index_shp <- function(object,
 
     leafem::addStarsRGB(map = mp,
                         x = rgb,
-                        r = 1,
-                        g = 2,
-                        b = 3,
-                        maxBytes = 16 * 1024 * 1024,
+                        r = r,
+                        g = g,
+                        b = b,
+                        maxBytes = 64 * 1024 * 1024,
                         na.color = "#00000000")
 
   } else{

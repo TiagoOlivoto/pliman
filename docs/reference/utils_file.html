@@ -58,6 +58,7 @@ in pliman.
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -133,8 +134,8 @@ in pliman.
 <li><p><code>manipulate_files()</code> Manipulate files in a directory with options to rename
 (insert prefix or suffix) and save the new files to the same or other provided
 directory.</p></li>
-<li><p><code>pliman_indexes()</code> Get the indexes available in pliman.</p></li>
-<li><p><code>pliman_indexes_eq()</code> Get the equation of the indexes available
+<li><p><code><a href="utils_indexes.html">pliman_indexes()</a></code> Get the indexes available in pliman.</p></li>
+<li><p><code><a href="utils_indexes.html">pliman_indexes_eq()</a></code> Get the equation of the indexes available
 in pliman.</p></li>
 </ul></div>
 
@@ -158,11 +159,7 @@ in pliman.</p></li>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  remove_original <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">pliman_indexes</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">pliman_indexes_eq</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -252,18 +249,18 @@ attempted.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bslib-d8f79fa3acd9314074b3a3e3b7405d4b"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "downlit"                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "file2a0c121d200c"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "file2a0c44cf24cb"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file2a0c7a3e4f80"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "file1954395493"                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "file195469543612"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file195478c41808"                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6] "test.tif"                              </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"/test.txt"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bslib-d8f79fa3acd9314074b3a3e3b7405d4b"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "downlit"                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "file2a0c121d200c"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "file2a0c44cf24cb"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file2a0c7a3e4f80"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "file1954395493"                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "file195469543612"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file195478c41808"                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6] "test.tif"                              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [7] "test.txt"                              </span>
 <span class="r-in"><span><span class="fu">manipulate_files</span><span class="op">(</span><span class="st">"test"</span>,</span></span>
@@ -271,15 +268,15 @@ attempted.</p></li>
 <span class="r-in"><span>                prefix <span class="op">=</span> <span class="st">"chang_"</span>,</span></span>
 <span class="r-in"><span>                save_to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"\\"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2 files successfully copied to 'C:\Users\tiago\AppData\Local\Temp\RtmpKQzHWR\'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2 files successfully copied to 'C:\Users\tiago\AppData\Local\Temp\RtmpqSNYtF\'</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bslib-d8f79fa3acd9314074b3a3e3b7405d4b"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "chang_test.tif"                        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] "chang_test.txt"                        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "downlit"                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file2a0c121d200c"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "file2a0c44cf24cb"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [7] "file2a0c7a3e4f80"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "file1954395493"                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "file195469543612"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [7] "file195478c41808"                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [8] "test.tif"                              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [9] "test.txt"                              </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

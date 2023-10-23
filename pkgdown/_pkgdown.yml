@@ -29,6 +29,8 @@ navbar:
       href: index.html
     - text: "Examples"
       menu:
+      - text: "Image indexes"
+        href: articles/indexes.html
       - text: "Image manipulation"
         href: articles/manipulation.html
       - text: "Image segmentation"
@@ -151,6 +153,7 @@ reference:
       - image_augment
       - image_binary
       - image_index
+      - utils_indexes
       - palettes
       - dist_transform
       - dist_transform

@@ -1,0 +1,167 @@
+---
+title: "Image indexes"
+author: "Tiago Olivoto"
+date: "`r Sys.Date()`"
+always_allow_html: yes
+output: rmarkdown::html_vignette
+fig_caption: yes
+bibliography: references.yaml
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  rmarkdown.html_vignette.check_title = FALSE
+)
+```
+
+# Getting started
+
+In this vignette, you will learn about the color space indexes provided by the package, with a focus on the RGB color space, the HSB color space, and the CIE-Lab color space.
+
+Throughout the vignette, we will delve into the underlying formulas and methodologies used for converting colors between different color spaces, ensuring that you have a comprehensive understanding of how these transformations work.
+
+# RGB Color Space
+
+The RGB (Red, Green, Blue) color space is a widely used color representation in computer graphics and digital imaging. In the `pliman` package, we provide a range of indexes to analyze and manipulate color data within the RGB color space:
+
+## Indexes in the RGB Color Space
+
+| Abbreviation | Name                                    | Formula                                                                       | Reference         |
+|--------------|-----------------------------------------|-------------------------------------------------------------------------------|-------------------|
+| R            | Red (650 nm)                            | `R`                                                                           |                   |
+| G            | Green (545 nm)                          | `G`                                                                           |                   |
+| B            | Blue (445 nm)                           | `B`                                                                           |                   |
+| NR           | Normalized Red                          | `R / (R + G + B)`                                                             | @yang2015         |
+| NG           | Normalized Green                        | `G / (R + G + B)`                                                             | @yang2015         |
+| NB           | Normalized Blue                         | `B / (R + G + B)`                                                             | @yang2015         |
+| GB           | Green-Blue Ratio                        | `G / B`                                                                       |                   |
+| RB           | Red-Blue Ratio                          | `R / B`                                                                       |                   |
+| GR           | Green-Red Ratio                         | `G / R`                                                                       |                   |
+| BI           | Brightness Index                        | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 | @richardson1977   |
+| BI2          | Brightness Index 2                      | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 |                   |
+| SCI          | Soil Colour Index                       | `(R - G) / (R + G)`                                                           | @mathieu1998      |
+| GLI          | Green Leaf Index                        | `((G-R)+(G-B))/(G+R+G+B)`                                                     | @louhaichi2001    |
+| HI           | Primary Colours Hue Index               | `(2*R-G-B)/(G-B)`                                                             | @escadafal1994    |
+| NGRDI        | Normalized Green-Red Difference Index   | `(G-R)/(G+R)`                                                                 | @tucker1979       |
+| NGBDI        | Normalized Green-Blue Difference Index  | `(G-B)/(G+B)`                                                                 | @bannari1995      |
+| SI           | Normalized Red-Blue Difference Index    | `(R-B)/(R+B)`                                                                 | @escadafal1994    |
+| I            | Total intensity                         | `R + G + B`                                                                   |                   |
+| S            | Saturation                              | `((R + G + B) - 3 * B) / (R + G + B)`                                         |                   |
+| L            | Average Intensity                       | `(R + G + B) / 3`                                                             |                   |
+| VARI         | Visible Atmospherically Resistant Index | `(G-R)/(G+R-B)`                                                               | @gitelson2002     |
+| HUE          | Overall Hue Index                       | `atan(2*(B-G-R)/30.5*(G-R))`                                                  | @escadafal1994    |
+| HUE2         | Overall Hue Index 2                     | `atan(2*(R-G-R)/30.5*(G-B))`                                                  | @escadafal1994    |
+| BGI          | Blue Green Pigment                      | `B/G`                                                                         | @zarco-tejada2005 |
+| GRAY         |                                         | `0.299 * R + 0.587 * G + 0.114 * B`                                           |                   |
+| GRAY2        |                                         | `((R^2.2 + (1.5 * G)^2.2 + (0.6 * B)^2.2) / (1 + 1.5^2.2 + 0.6^2.2))^(1/2.2)` |                   |
+| GLAI         |                                         | `(25 * (G - R) / (G + R - B) + 1.25)`                                         |                   |
+| CI           | Coloration Index                        | `((R - B) / R)`                                                               |                   |
+| SAT          | Overall Saturation Index                | `((max(R, G, B) - min(R, G, B)) / max(R, G, B))`                              |                   |
+| SHP          | Shape Index                             | `(2 * (R - G - B) / (G - B))`                                                 |                   |
+| RI           | Redness Index                           | `(R^2 / (B * G^3))`                                                           |                   |
+| SAVI         | Soild Adjusted Vegetation Index         | `(1 + 0.5)*(G-R)/(G+R+0.5)`                                                   | @li2010           |
+
+## Multispectral indexes
+
+{pliman} provides tools to analyze up to 5 bands , which are generally B, G, R, RE (red-edge) and NIR (near-infrared). The following build-in indexes are available.
+
+| Abbreviation | Name                                               | Formula                                                                                                              | Reference          |
+|--------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|--------------------|
+| NDVI         | Normalized Diference Vegetation Index              | `(NIR - R) / (NIR + R)`                                                                                              | @j1969             |
+| PSRI         | Plant Senescence Reflectance Index                 | `(R-G)/RE`                                                                                                           | @merzlyak1999      |
+| GNDVI        | Normalized Difference NIR/G                        | `(NIR - G) / (NIR + G)`                                                                                              | @gitelson1996      |
+| RVI          | Ratio Vegetation Index                             | `R/NIR`                                                                                                              | @pearson1972       |
+| VIN          | Vegetation Index Number                            | `NIR/R`                                                                                                              | @pearson1972       |
+| NDRE         | Normalized Difference NIR/Rededge                  | `(NIR-RE)/(NIR+RE)`                                                                                                  | @gitelson1994a     |
+| SAVI         | Soild Adjusted Vegetation Index                    | `((NIR-R) / (NIR + R + 0.5) * 1 + 0.5)`                                                                              | @huete1988         |
+| TSAVI        | Transformed Soil Adjusted Vegetation Index         | `(2*((NIR-2)*(R-1)))/(R+2*(NIR-1)+0.5*(1+2*2))`                                                                      | @baret1989         |
+| TVI          | Transformed Vegetation Index                       | `sqrt((NIR - R) / (NIR + R) + 0.5)`                                                                                  | @broge2001         |
+| CVI          | Chlorophyll vegetation index                       | `NIR*(R/G^2)`                                                                                                        | @vincini2008       |
+| EVI          | Enhanced Vegetation Index                          | `2.5*(NIR-R)/(NIR+6*R-7.5*B+1)`                                                                                      | @huete2002         |
+| CIG          | Chlorophyll Index Green                            | `(NIR/G)-1`                                                                                                          | @gitelson2003      |
+| CIRE         | Chlorophyll Index - Red-Edge                       | `(NIR/RE)-1`                                                                                                         | @gitelson2003      |
+| RESR         | Red-Edge Simple Ratio                              | `NIR/RE`                                                                                                             | @gitelson2002a     |
+| GDVI         | Green Difference Vegetation Index                  | `NIR-G`                                                                                                              | @indexdatabase2023 |
+| REDVI        | Red-Edge Difference Vegetation Index               | `NIR-RE`                                                                                                             | @jordan1969        |
+| NDWI         | Normalized Difference Water Index                  | `(G-NIR)/(G+NIR)`                                                                                                    | @mcfeeters1996     |
+| CVI          | Chlorophyll vegetation index                       | `NIR * (R/(G*G))`                                                                                                    | @indexdatabase2023 |
+| PNDVI        | Pan NDVI                                           | `((NIR-(G+R+B))/(NIR+(G+R+B)))`                                                                                      | @indexdatabase2023 |
+| CCCI         | Canopy Chlorophyll Content Index                   | `((NIR-R)/(NIR+R))/((NIR-R)/(NIR+R))`                                                                                | @indexdatabase2023 |
+| OSAVI        | Optimized Soil Adjusted Vegetation Index           | `(NIR-R)/(NIR+R+0.16)`                                                                                               | @rondeaux1996      |
+| GOSAVI       | Green Optimized Soil Adjusted Vegetation Index     | `(NIR-G)/(NIR+G+0.16)`                                                                                               | @indexdatabase2023 |
+| GSAVI        | Green Soil Adjusted Vegetation Index               | `((NIR-G)/(NIR+G+0.5))*(1+0.5)`                                                                                      | @indexdatabase2023 |
+| BAI          | Burn Area Index                                    | `1/((0.1 - R)^2 + (0.06 - NIR)^2)`                                                                                   | @chuvieco2002      |
+| GEMI         | Global Environmental Monitoring Index              | `(2*(NIR*NIR-R*R)+1.5*NIR+0.5*R)/(NIR+R+0.5)*(1-0.25*(2*(NIR*NIR-R*R)+1.5*NIR+0.5*R)/(NIR+R+0.5))-((R-0.125)/(1-R))` | @pinty1992         |
+| MSAVI        | Modified Soil Adjusted Vegetation Index            | `(1/2)*(2*(NIR+1)-sqrt((2*NIR+1)*2-8*(NIR-R)))`                                                                      | @qi1994            |
+| MSAVI2       | Modified Soil Adjusted Vegetation Index 2          | `(2 * NIR + 1 -  sqrt((2 * NIR + 1)^2 - 8 * (NIR - R)  )) / 2`                                                       | @qi1994            |
+| VIG          | Vegetation Index (green)                           | `(G-R)/(G+R)`                                                                                                        | @gitelson2002b     |
+| VIRE         | Vegetation Index (red-edge)                        | `(RE-R)/(RE+R)`                                                                                                      | @gitelson2002b     |
+| VARIRE       | Visible Atmospherically Resistant Index (red-edge) | `(RE - 1.7 * R + 0.7 * B) / (RE  + 2.3 * R - 1.3 * B)`                                                               | @gitelson2002b     |
+| ARVI         | Atmospherically resistant vegetation index         | `(NIR - (R - 0.1*(R-B))) / (NIR + (R - 0.1*(R-B)))`                                                                  | @kaufman1992       |
+| GARI         | Green Atmospherically Resistant Index              | `(NIR - (1.7 * (B-R))) / (NIR + (1.7 * (B-R)))`                                                                      | @gitelson1996b     |
+| GRVI         | Green Ratio Vegetation Index                       | `NIR / G`                                                                                                            | @sripada2006       |
+| IPVI         | Infrared Percentage Vegetation Index               | `NIR / (NIR + R)`                                                                                                    | @crippen1990       |
+| LAI          | Leaf Area Index                                    | `3.368 * (2.5*(NIR-R)/(NIR+6*R-7.5*B+1)) - 0.118`                                                                    | @boegh2002         |
+| MSR          | Modified Simple Ratio                              | `(NIR / R - 1) / (sqrt(NIR / R) + 1)`                                                                                | @chen1996          |
+| NLI          | Non-Linear index                                   | `(NIR ^2 - R) / (NIR ^2 + R)`                                                                                        | @goel1994          |
+| RDVI         | Renormalized Difference Vegetation Index           | `(NIR - R) / (sqrt(NIR + R))`                                                                                        | @roujean1995       |
+| TDVI         | Transformed Difference Vegetation Index            | `1.5 * ((NIR - R) / (sqrt(NIR ^2 + R + 0.5)))`                                                                       | @bannari2002       |
+| WDRVI        | Wide Dynamic Range Vegetation Index                | `(0.2 * NIR - R) / (0.2 * NIR + R)`                                                                                  | @gitelson2004      |
+| ARI          | Anthocyanin Reflectance Index                      | `(1 / G) - (1 / RE)`                                                                                                 | @gitelson2001      |
+
+**Usefull references**
+
+-   [Broadband greenness vegetation indexes](https://www.nv5geospatialsoftware.com/docs/broadbandgreenness.html#Differen){.uri}
+
+-   [Band Arithmetic function](https://pro.arcgis.com/en/pro-app/latest/help/analysis/raster-functions/band-arithmetic-function.htm){.uri}
+
+-   [Index Database](https://www.indexdatabase.de/)
+
+# HSB Color Space
+
+The HSB (Hue, Saturation, Brightness) color space is an alternative color representation that emphasizes the perceptual aspects of color.
+
+## Conversion to CIE-Lab
+
+The `rgb_to_hsb()` function can be used to convert RGB to HSB color space. The conversion is performed according to described by @karcher2003.
+
+-   **Hue (H)**:
+    -   If max (R,G,B) = R, `H = 60 * (G - B) / (max(R,G,B) - min(R,G,B))`
+    -   If max (R,G,B) = G, `H = 60 * (2 + (B - R) / (max(R,G,B) - min(R,G,B))`
+    -   If max (R,G,B) = B, `H = 60 * (4 + (R - G) / (max(R,G,B) - min(R,G,B))`
+-   **Saturation (S)**:
+    -   `S = (max(R,G,B) - min(R,G,B)) / max(R,G,B)`
+-   **Brightness (B)**:
+    -   `B = max(R,G,B)`
+
+## Indexes in the HSB Color Space
+
+| Abbreviation | Name                  | Formula                                           | Reference    |
+|--------------|-----------------------|---------------------------------------------------|--------------|
+| DGCI         | Dark Green Color Inde | `((H - 60) / 60 + (1 - S/100) + (1 - B/100)) / 3` | @karcher2003 |
+
+# CIE-Lab Color Space
+
+The CIE-Lab (CIELAB) color space is a color model that approximates human vision and is often used for color difference analysis and color correction. In the `pliman` package, we support the conversion from RGB to Lab color space.
+
+## Conversion to CIE-Lab
+
+The conversion from RGB to Lab is performed by the `rgb_to_lab()` function in the `pliman` package. This involves several steps, including the transformation from RGB to sRGB, sRGB to XYZ, and then from XYZ to Lab.
+
+To understand the specific formulas and steps involved in this conversion, please refer to [the detailed formulas](https://www.example.com).
+
+## Indexes in the CIE-Lab Color Space (soon)
+
+| Abbreviation | Name | Formula | Reference |
+|--------------|------|---------|-----------|
+|              |      |         |           |
+
+# <i class="fas fa-scroll"></i> References
+
+<!-- inicio font awesome -->
+
+```{=html}
+<script src="https://kit.fontawesome.com/1f72d6921a.js" crossorigin="anonymous"></script>
+```

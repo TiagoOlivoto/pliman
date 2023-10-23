@@ -84,6 +84,7 @@ image_skeleton() Performs image skeletonization.
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -195,6 +196,8 @@ histogram equalization. See more at <code><a href="https://rdrr.io/pkg/EBImage/m
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  viewer <span class="op">=</span> <span class="fu"><a href="get_pliman_viewer.html">get_pliman_viewer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  downsample <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_pixels <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  show <span class="op">=</span> <span class="st">"rgb"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  workers <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -428,6 +431,17 @@ argument globally for all functions in the package, you can use the
 <code><a href="set_pliman_viewer.html">set_pliman_viewer()</a></code> function. For example, you can run
 <code>set_pliman_viewer("mapview")</code> to set the viewer option to "mapview" for
 all functions.</p></dd>
+
+
+<dt>downsample</dt>
+<dd><p>integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to <code>NULL</code>, which will
+find the best downsampling factor to approximate the <code>max_pixels</code> value.</p></dd>
+
+
+<dt>max_pixels</dt>
+<dd><p>integer &gt; 0. Maximum number of cells to use for the plot.
+If <code>max_pixels &lt; npixels(img)</code>, regular sampling is used before plotting.</p></dd>
 
 
 <dt>show</dt>

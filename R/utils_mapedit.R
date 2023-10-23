@@ -11,6 +11,7 @@
 #'   `attribute`.
 #' @param r,g,b The layer for the Red, Green and Blue band, respectively.
 #'   Defaults to `1`, `2`, and `3`.
+#' @param edit If `TRUE` enable editing options using [mapedit::editMap()].
 #' @param alpha The transparency level of the rectangles' color (between 0 and 1).
 #' @param attribute The name of the quantitative variable in the
 #'   \code{object_index} to be used for coloring the rectangles.
@@ -45,6 +46,7 @@ image_view <- function(img,
                        r = 1,
                        g = 2,
                        b = 3,
+                       edit = FALSE,
                        alpha = 0.7,
                        attribute = "area",
                        title = "Edit the image",
@@ -74,8 +76,11 @@ image_view <- function(img,
     }
   }
 
-  ras <- terra::rast(EBImage::transpose(img)@.Data) |> stars::st_as_stars()
-  dimsto <- dim(ras[,,,1])
+  ras <- terra::rast(EBImage::transpose(img)@.Data)
+  nly <- terra::nlyr(ras)
+  ras <- stars::st_as_stars(ras)
+  sf::st_crs(ras) <- sf::st_crs("EPSG:3857")
+  dimsto <- dim(ras)[1:2]
   nr <- dimsto[1]
   nc <- dimsto[2]
   npix <- nc * nr
@@ -88,60 +93,104 @@ image_view <- function(img,
       downsample <- which.min(abs(possible_npix - max_pixels)) - 1
       message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
     }
+    if(nly == 1){
+      ras <- stars::st_downsample(ras, n = downsample)
+    } else{
+      downsampled <-
+        lapply(1:nly, function(x){
+          stars::st_downsample(ras[,,,x], n = downsample) |> terra::rast()
+        })
 
-    ras <- terra::rast(
-      Map(c,
-          lapply(1:3, function(x){
-            stars::st_downsample(ras[,,,x], n = downsample) |> terra::rast()
-          }))
-    ) |>
-      stars::st_as_stars()
+      ras <- terra::rast(Map(c, downsampled)) |> stars::st_as_stars()
+    }
+
   }
   if(viewopt == "rgb"){
-    sf::st_crs(ras) <- sf::st_crs("EPSG:3857")
-    if(!is.null(object)){
-      sf_df <- sf::st_sf(
-        geometry = lapply(object$contours, function(x) {
-          tmp <- x
-          tmp[, 2] <- ncol(img) - tmp[, 2]
-          sf::st_polygon(list(as.matrix(tmp |> poly_close())))
-        }),
-        data = data.frame(get_measures(object)),
-        crs = sf::st_crs("EPSG:3857")
-      )
-      colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
-      mapview::mapview(sf_df,
-                       map.types = "OpenStreetMap",
-                       col.regions = color_regions,
-                       zcol = attribute,
-                       legend = TRUE,
-                       alpha.regions = alpha,
-                       layer.name = attribute) |>
-        leafem::addRasterRGB(ras,
-                             r = r,
-                             g = g,
-                             b = b,
-                             maxBytes = 64 * 1024 * 1024,
-                             domain = domain,
-                             quantiles = quantiles)
+    if(nly >= 3){
+      if(!is.null(object)){
+        sf_df <- sf::st_sf(
+          geometry = lapply(object$contours, function(x) {
+            tmp <- x
+            tmp[, 2] <- ncol(img) - tmp[, 2]
+            sf::st_polygon(list(as.matrix(tmp |> poly_close())))
+          }),
+          data = data.frame(get_measures(object)),
+          crs = sf::st_crs("EPSG:3857")
+        )
+        colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
+        mapview::mapview(sf_df,
+                         map.types = "OpenStreetMap",
+                         col.regions = color_regions,
+                         zcol = attribute,
+                         legend = TRUE,
+                         alpha.regions = alpha,
+                         layer.name = attribute) |>
+          leafem::addRasterRGB(ras,
+                               r = r,
+                               g = g,
+                               b = b,
+                               maxBytes = 64 * 1024 * 1024,
+                               domain = domain,
+                               quantiles = quantiles)
+      } else{
+        if(isTRUE(edit)){
+          map <-
+            leaflet::leaflet() |>
+            leafem::addRasterRGB(ras,
+                                 r = r,
+                                 g = g,
+                                 b = b,
+                                 maxBytes = 64 * 1024 * 1024,
+                                 domain = domain,
+                                 quantiles = quantiles) |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
+        } else{
+          map <-
+            leaflet::leaflet() |>
+            leafem::addRasterRGB(ras,
+                                 r = r,
+                                 g = g,
+                                 b = b,
+                                 maxBytes = 64 * 1024 * 1024,
+                                 domain = domain,
+                                 quantiles = quantiles)
+          map
+        }
+      }
     } else{
-      map <-
-        leaflet::leaflet() |>
-        leafem::addRasterRGB(ras,
-                             r = r,
-                             g = g,
-                             b = b,
-                             maxBytes = 64 * 1024 * 1024,
-                             domain = domain,
-                             quantiles = quantiles) |>
-        mapedit::editMap(editor = "leafpm",
-                         title = "title")
-      invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
+      if(isTRUE(edit)){
+        map <-
+          mapview::mapview(ras,
+                           map.types = "OpenStreetMap",
+                           layer.name = "layer",
+                           maxpixels =  max_pixels,
+                           col.regions = color_regions,
+                           alpha.regions = alpha,
+                           na.color = "#00000000",
+                           maxBytes = 64 * 1024 * 1024,
+                           verbose = FALSE) |>
+          mapedit::editMap(editor = "leafpm",
+                           title = title)
+        invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
+      } else{
+        map <-
+          mapview::mapview(ras,
+                           map.types = "OpenStreetMap",
+                           layer.name = "layer",
+                           maxpixels =  max_pixels,
+                           col.regions = color_regions,
+                           alpha.regions = alpha,
+                           na.color = "#00000000",
+                           maxBytes = 64 * 1024 * 1024,
+                           verbose = FALSE)
+        map
+      }
     }
   } else{
     ind <- mosaic_index(terra::rast(ras), index = index)
     sf::st_crs(ind) <- sf::st_crs("EPSG:3857")
-
     map <-
       suppressWarnings(
         suppressMessages(
@@ -186,7 +235,7 @@ image_view <- function(img,
 #' library(pliman)
 #' custom_palette(n = 5)
 #'
-custom_palette <- function(colors = c("#4B0055", "#00588B", "#009B95", "#53CC67", "yellow"), n = 100){
+custom_palette <- function(colors = c("yellow", "#53CC67", "#009B95", "#00588B","#4B0055"), n = 100){
   grDevices::colorRampPalette(colors)(n)
 }
 
@@ -341,8 +390,6 @@ plot_index <- function(img = NULL,
 
     }
 
-
-
     names(sts) <- names(img)
 
     num_plots <- terra::nlyr(sts)
@@ -490,12 +537,13 @@ plot_index <- function(img = NULL,
 }
 
 
+
 #' Prepare an image
 #'
 #' This function aligns and crops the image using either base or mapview
 #' visualization. This is useful to prepare the images to be analyzed with
 #' [analyze_objects_shp()]
-#'
+#' @inheritParams image_view
 #' @param img An optional `Image` object
 #' @param viewer The viewer option. If not provided, the value is retrieved
 #'   using [get_pliman_viewer()]. This option controls the type of viewer to use
@@ -515,15 +563,18 @@ plot_index <- function(img = NULL,
 #' image_prepare(img, viewer = "mapview")
 #'}
 #' @export
-image_prepare <- function(img, viewer = get_pliman_viewer()){
+image_prepare <- function(img,
+                          viewer = get_pliman_viewer(),
+                          downsample = NULL,
+                          max_pixels = 1000000){
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
 
   align <- image_align(img, viewer = vieweropt)
   if(vieweropt != "base"){
-    image_view(img[1:10, 1:10, ])
+    image_view(img[1:5, 1:5, ], edit = TRUE)
   }
-  cropped <- image_crop(align, viewer = vieweropt)
+  cropped <- image_crop(align, viewer = vieweropt, downsample = downsample, max_pixels = max_pixels)
   invisible(cropped)
 }
 
@@ -534,8 +585,16 @@ image_prepare <- function(img, viewer = get_pliman_viewer()){
 mv_two_points <- function(img,
                           show = "rgb",
                           index = "NGRDI",
-                          title = "Use the 'Draw Polyline' tool to Select 2 points"){
-  e <- image_view(img, show = show, title = title, index = index)
+                          title = "Use the 'Draw Polyline' tool to Select 2 points",
+                          downsample = NULL,
+                          max_pixels = 1000000){
+  e <- image_view(img,
+                  show = show,
+                  title = title,
+                  index = index,
+                  downsample = downsample,
+                  max_pixels = max_pixels,
+                  edit = TRUE)
   if(!inherits(e, "sfc_LINESTRING")){
     stop("The geometry used is not valid. Please, use 'Draw Polyline' tool to select two points.", call. = FALSE)
   }
@@ -554,8 +613,16 @@ mv_two_points <- function(img,
 mv_rectangle <- function(img,
                          show = "rgb",
                          index = "NGRDI",
-                         title = "Use the 'Draw Rectangle' tool to create a rectangle in the image"){
-  e <- image_view(img, show = show, title = title, index = index)
+                         title = "Use the 'Draw Rectangle' tool to create a rectangle in the image",
+                         downsample = NULL,
+                         max_pixels = 1000000){
+  e <- image_view(img,
+                  show = show,
+                  title = title,
+                  index = index,
+                  downsample = downsample,
+                  max_pixels = max_pixels,
+                  edit = TRUE)
   if(!inherits(e, "sfc_POLYGON")){
     stop("The geometry used is not valid. Please, use 'Draw Rectangle' tool to select two points.", call. = FALSE)
   }
@@ -570,8 +637,16 @@ mv_rectangle <- function(img,
 mv_polygon <- function(img,
                        show = "rgb",
                        index = "NGRDI",
-                       title = "Use the 'Draw Polygon' tool to create a polygon in the image"){
-  e <- image_view(img, show = show, title = title, index = index)
+                       title = "Use the 'Draw Polygon' tool to create a polygon in the image",
+                       downsample = NULL,
+                       max_pixels = 1000000){
+  e <- image_view(img,
+                  show = show,
+                  title = title,
+                  index = index,
+                  downsample = downsample,
+                  max_pixels = max_pixels,
+                  edit = TRUE)
   if(!inherits(e, "sfc_POLYGON")){
     stop("The geometry used is not valid. Please, use 'Draw Polygon' tool to select two points.", call. = FALSE)
   }
@@ -586,8 +661,16 @@ mv_polygon <- function(img,
 mv_points <- function(img,
                       show = "rgb",
                       index = "NGRDI",
-                      title = "Use the 'Draw Marker' tool to select points in the image"){
-  e <- image_view(img, show = show, title = title, index = index)
+                      title = "Use the 'Draw Marker' tool to select points in the image",
+                      downsample = NULL,
+                      max_pixels = 1000000){
+  e <- image_view(img,
+                  show = show,
+                  title = title,
+                  index = index,
+                  downsample = downsample,
+                  max_pixels = max_pixels,
+                  edit = TRUE)
   if(!inherits(e, "sfc_POINT")){
     stop("The geometry used is not valid. Please, use 'Draw Marker' tool to select two points.", call. = FALSE)
   }

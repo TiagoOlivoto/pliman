@@ -14,25 +14,37 @@ rgb_to_srgb(object)
 rgb_to_lab(object)
 }
 \arguments{
-\item{object}{An \code{Image} object, an object computed with
-\code{analyze_objects()} with a valid \code{object_index} argument, or a
-\code{data.frame/matrix}. For the last, a three-column data (R, G, and B, respectively)
-is required.}
+\item{object}{An \code{Image} object, an object computed with \code{analyze_objects()}
+with a valid \code{object_index} argument, or a \code{data.frame/matrix}. For the
+last, a three-column data (R, G, and B, respectively) is required.}
 }
 \value{
 A data frame with the columns of the converted color space
 }
 \description{
-\code{rgb_to_srgb()} Transforms colors from RGB space (red/green/blue) to
-Standard Red Green Blue (sRGB), using a gamma correction of 2.2.
 \itemize{
+\item \code{rgb_to_srgb()} Transforms colors from RGB space (red/green/blue) to
+Standard Red Green Blue (sRGB), using a gamma correction of 2.2. The
+function performs the conversion by applying a gamma correction to the input
+RGB values (raising them to the power of 2.2) and then transforming them
+using a specific transformation matrix. The result is clamped to the range
+0-1 to ensure valid sRGB values.
 \item \code{rgb_to_hsb()} Transforms colors from RGB space (red/green/blue) to HSB
-space (hue/saturation/brightness).
-\item \code{rgb_to_lab()} Transforms colors from RGB space (red/green/blue) to
-CIE-LAB space
+space (hue/saturation/brightness). The HSB values are calculated as follows
+(see https://www.rapidtables.com/convert/color/rgb-to-hsv.html for more
+details).
+\itemize{
+\item Hue: The hue is determined based on the maximum value among R, G, and B,
+and it ranges from 0 to 360 degrees.
+\item Saturation: Saturation is calculated as the difference between the maximum
+and minimum channel values, expressed as a percentage.
+\item Brightness: Brightness is equal to the maximum channel value, expressed as
+a percentage.
 }
-
-It is assumed that
+\item \code{rgb_to_lab()} Transforms colors from RGB space (red/green/blue) to CIE-LAB
+space, using the sRGB values. See \code{\link[grDevices:convertColor]{grDevices::convertColor()}} for more
+details.
+}
 }
 \examples{
 if(interactive()){
@@ -44,6 +56,9 @@ rgb_to_lab(img)
 anal <- analyze_objects(img, object_index = "B", pixel_level_index = TRUE)
 rgb_to_lab(anal)
 }
+}
+\references{
+See \href{https://www.example.com}{the detailed formulas here}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

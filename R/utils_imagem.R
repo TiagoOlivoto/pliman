@@ -343,6 +343,7 @@ image_pliman <- function(img, plot = FALSE){
 #'
 #'
 #' @name utils_transform
+#' @inheritParams image_view
 #' @param img An image or a list of images of class `Image`.
 #' @param index The index to segment the image. See [image_index()] for more
 #'   details. Defaults to `"NB"` (normalized blue).
@@ -478,6 +479,8 @@ image_crop <- function(img,
                        width = NULL,
                        height = NULL,
                        viewer = get_pliman_viewer(),
+                       downsample = NULL,
+                       max_pixels = 1000000,
                        show = "rgb",
                        parallel = FALSE,
                        workers = NULL,
@@ -501,9 +504,9 @@ image_crop <- function(img,
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_crop, width, height, viewer)
+      res <- parLapply(clust, img, image_crop, width, height, viewer, downsample, max_pixels)
     } else{
-      res <- lapply(img, image_crop, width, height, viewer)
+      res <- lapply(img, image_crop, width, height, viewer, downsample, max_pixels)
     }
     invisible(res)
   } else{
@@ -541,7 +544,7 @@ image_crop <- function(img,
         h <- round(minh, 0):round(maxh, 0)
       } else{
         nc <- ncol(img)
-        mv <- mv_rectangle(img, show = show)
+        mv <- mv_rectangle(img, show = show, downsample = downsample, max_pixels = max_pixels)
         w <- round(min(mv[,1]):max(mv[,1]))
         h <- round((min(mv[,2]))):round(max(mv[,2]))
       }
@@ -1735,49 +1738,9 @@ image_binary <- function(img,
 
 #' Image indexes
 #'
-#' `image_index()` Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+#' `image_index()` Builds image indexes using Red, Green, Blue, Red-Edge, and
+#' NIR bands. See xxx for a detailed list of available indexes
 #'
-#' @details
-#' The following indexes are available in pliman.
-#' * RGB color space
-#' - `R` red
-#' - `G` green
-#' - `B` blue
-#' - `NR` normalized red `R/(R+G+B)`.
-#' - `NG` normalized green `G/(R+G+B)`
-#' - `NB` normalized blue `B/(R+G+B)`
-#' - `GB` green blue ratio `G/B`
-#' - `RB` red blue ratio `R/B`
-#' - `GR` green red ratio `G/R`
-#' - `BI` brightness Index `sqrt((R^2+G^2+B^2)/3)`
-#' - `BIM` brightness Index 2 `sqrt((R*2+G*2+B*2)/3)`
-#' - `SCI` Soil Colour Index `(R-G)/(R+G)`
-#' - `GLI` Green leaf index Vis Louhaichi et al. (2001) `(2*G-R-B)/(2*G+R+B)`
-#' - `HI` Primary colours Hue Index    (2*R-G-B)/(G-B)
-#' - `NDGRI` Normalized green red difference index (Tucker, 1979) `(G-R)/(G+R)`
-#' - `NDGBI` Normalized green blue difference index `(G-B)/(G+B)`
-#' - `NDRBI` Normalized red blue difference index `(R-B)/(R+B)`
-#' - `I`     R+G+B
-#' - `S`     `((R+G+B)-3*B)/(R+G+B)`
-#' - `L`     R+G+B/3
-#' - `VARI` A Visible Atmospherically Resistant Index `(G-R)/(G+R-B)`
-#' - `HUE` Overall Hue Index `atan(2*(B-G-R)/30.5*(G-R))`
-#' - `HUE2`  atan(2*(R-G-R)/30.5*(G-B))
-#' - `BGI`   B/G
-#' - `GRAY`	`0.299*R + 0.587*G + 0.114*B`
-#' - `GRAY2` `((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2`
-#' - `GLAI` `(25*(G-R)/(G+R-B)+1.25)`
-#' - `CI` Coloration Index `(R-B)/R`
-#' - `SAT` Overhall Saturation Index `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`
-#' - `SHP` Shape Index `2*(R-G-B)/(G-B)`
-#' - `RI` Redness Index `R**2/(B*G**3)`
-#'
-#' * HSB color space
-#' * `DGCI` Dark Green Color Index, based on HSB color space `60\*((G - B) / (max(R, G, B) - min(R, G, B)))`
-#'
-#' * CIE-Lab color space
-#' - `L*`: relative luminance `(0.2126 * R + 0.7152 * G + 0.0722 * B)`
-#' - `a*`: `0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))`
 #'
 #' @name image_index
 #' @inheritParams plot_index
@@ -1818,9 +1781,19 @@ image_binary <- function(img,
 #'   number of parallel processes that can be active at the same time.
 #' @param ... Additional arguments passed on to [plot index()].
 #' @param verbose If `TRUE` (default) a summary is shown in the console.
-#' @references Nobuyuki Otsu, "A threshold selection method from gray-level
+#' @references
+#' Nobuyuki Otsu, "A threshold selection method from gray-level
 #'   histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
 #'   \doi{10.1109/TSMC.1979.4310076}
+#'
+#' Karcher, D.E., and M.D. Richardson. 2003. Quantifying Turfgrass Color Using
+#' Digital Image Analysis. Crop Science 43(3): 943–951.
+#' \doi{10.2135/cropsci2003.9430}
+#'
+#' Bannari, A., D. Morin, F. Bonn, and A.R. Huete. 1995. A review of vegetation
+#' indices. Remote Sensing Reviews 13(1–2): 95–120.
+#' \doi{10.1080/02757259509532298}
+#'
 #' @md
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -1962,9 +1935,8 @@ image_index <- function(img,
 
 #' Plots an `image_index` object
 #'
-#' Generates a raster or density plot of the index values computed with
-#' `image_index()`.
-
+#' The S3 method `plot()` can be used to generate a raster or density plot of
+#' the index values computed with `image_index()`
 #'
 #' @details When `type = "raster"` (default), the function calls [plot_index()]
 #' to create a raster plot for each index present in `x`. If `type = "density"`,
@@ -3102,6 +3074,7 @@ image_square <- function(img, plot = TRUE, ...){
 #'   known distance in the image (e.g., `la_leaves.jpg`).
 #'
 #' @name utils_dpi
+#' @inheritParams image_view
 #' @param img An image object.
 #' @param dpi The image resolution in dots per inch.
 #' @param viewer The viewer option. If not provided, the value is retrieved
@@ -3185,9 +3158,11 @@ npixels <- function(img){
 #' @name utils_dpi
 #' @export
 dpi <- function(img,
-                viewer = get_pliman_viewer()){
+                viewer = get_pliman_viewer(),
+                downsample = NULL,
+                max_pixels = 1000000){
   if(isTRUE(interactive())){
-    pix <- distance(img, viewer = viewer)
+    pix <- distance(img, viewer = viewer, downsample = downsample, max_pixels = max_pixels)
     known <- as.numeric(readline("known distance (cm): "))
     pix / (known / 2.54)
   }
@@ -3196,7 +3171,9 @@ dpi <- function(img,
 #' @name utils_dpi
 #' @export
 distance <- function(img,
-                     viewer = get_pliman_viewer()){
+                     viewer = get_pliman_viewer(),
+                     downsample = NULL,
+                     max_pixels = 1000000){
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[1], vieweropt)]
   if(isTRUE(interactive())){
@@ -3209,7 +3186,7 @@ distance <- function(img,
                         col = "red")
       pix <- sqrt((coords$x[1] - coords$x[2])^2 + (coords$y[1] - coords$y[2])^2)
     } else{
-      coords2 <- mv_two_points(img)
+      coords2 <- mv_two_points(img, downsample = downsample, max_pixels = max_pixels)
       pix <- sqrt((coords2$x1 - coords2$x2)^2 + (coords2$y1 - coords2$y2)^2)
     }
     invisible(pix)
@@ -3217,21 +3194,40 @@ distance <- function(img,
 }
 
 
-
 #' Convert between colour spaces
 #' @description
-#'  `rgb_to_srgb()` Transforms colors from RGB space (red/green/blue) to
-#'  Standard Red Green Blue (sRGB), using a gamma correction of 2.2.
-#' * `rgb_to_hsb()` Transforms colors from RGB space (red/green/blue) to HSB
-#' space (hue/saturation/brightness).
-#' * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) to
-#' CIE-LAB space
+#'  * `rgb_to_srgb()` Transforms colors from RGB space (red/green/blue) to
+#'  Standard Red Green Blue (sRGB), using a gamma correction of 2.2. The
+#'  function performs the conversion by applying a gamma correction to the input
+#'  RGB values (raising them to the power of 2.2) and then transforming them
+#'  using a specific transformation matrix. The result is clamped to the range
+#'  0-1 to ensure valid sRGB values.
 #'
-#' It is assumed that
-#' @param object An `Image` object, an object computed with
-#'   `analyze_objects()` with a valid `object_index` argument, or a
-#'   `data.frame/matrix`. For the last, a three-column data (R, G, and B, respectively)
-#'   is required.
+#'
+#' * `rgb_to_hsb()` Transforms colors from RGB space (red/green/blue) to HSB
+#' space (hue/saturation/brightness). The HSB values are calculated as follows
+#' (see https://www.rapidtables.com/convert/color/rgb-to-hsv.html for more
+#' details).
+#'    - Hue: The hue is determined based on the maximum value among R, G, and B,
+#'    and it ranges from 0 to 360 degrees.
+#'    - Saturation: Saturation is calculated as the difference between the maximum
+#'    and minimum channel values, expressed as a percentage.
+#'    - Brightness: Brightness is equal to the maximum channel value, expressed as
+#'    a percentage.
+#'
+#'
+#'  * `rgb_to_lab()` Transforms colors from RGB space (red/green/blue) to CIE-LAB
+#'  space, using the sRGB values. See [grDevices::convertColor()] for more
+#'  details.
+#'
+#'
+#' @param object An `Image` object, an object computed with `analyze_objects()`
+#'   with a valid `object_index` argument, or a `data.frame/matrix`. For the
+#'   last, a three-column data (R, G, and B, respectively) is required.
+#'
+#' @references
+#'See [the detailed formulas here](https://www.example.com)
+#'
 #' @export
 #' @name utils_colorspace
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}

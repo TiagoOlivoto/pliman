@@ -54,6 +54,7 @@ argument object_index is used in the function analyze_objects().
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -285,7 +286,7 @@ leaves and a blue reference object.</p></dd>
 <dt>fore_ref_index</dt>
 <dd><p>A character value to indicate the index to segment
 objects and the reference object. It can be either an available index in
-<code>pliman</code> (see <code><a href="utils_file.html">pliman_indexes()</a></code> or an own index computed with the R, G, and
+<code>pliman</code> (see <code><a href="utils_indexes.html">pliman_indexes()</a></code> or an own index computed with the R, G, and
 B bands. Defaults to <code>"B-R"</code>. This index is optimized to segment green
 leaves from a blue reference object after a white background has been
 removed.</p></dd>
@@ -469,7 +470,7 @@ which are frequently presented in the 'BGR' format.</p></dd>
 value for each object is returned. It can be the R, G, and B values or any
 operation involving them, e.g., <code>object_index = "R/B"</code>. In this case, it
 will return for each object in the image, the average value of the R/B
-ratio. Use <code><a href="utils_file.html">pliman_indexes_eq()</a></code> to see the equations of available indexes.</p></dd>
+ratio. Use <code><a href="utils_indexes.html">pliman_indexes_eq()</a></code> to see the equations of available indexes.</p></dd>
 
 
 <dt>pixel_level_index</dt>

@@ -36,6 +36,7 @@ number of colors."><meta property="og:image" content="https://tiagoolivoto.githu
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -111,7 +112,7 @@ number of colors.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">custom_palette</span><span class="op">(</span></span>
-<span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#4B0055"</span>, <span class="st">"#00588B"</span>, <span class="st">"#009B95"</span>, <span class="st">"#53CC67"</span>, <span class="st">"yellow"</span><span class="op">)</span>,</span>
+<span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"#53CC67"</span>, <span class="st">"#009B95"</span>, <span class="st">"#00588B"</span>, <span class="st">"#4B0055"</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -138,21 +139,21 @@ c("steelblue", "salmon", "forestgreen").</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate a custom color palette with default colors and 10 colors</span></span></span>
 <span class="r-in"><span><span class="fu">custom_palette</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] "#4B0055" "#470357" "#440759" "#410A5B" "#3E0E5D" "#3B115F" "#381562"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [8] "#351864" "#321C66" "#2F2068" "#2C236A" "#29276D" "#262A6F" "#232E71"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [15] "#203173" "#1D3575" "#1A3877" "#173C7A" "#14407C" "#11437E" "#0E4780"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [22] "#0B4A82" "#084E84" "#055187" "#025589" "#00588B" "#005B8B" "#005E8B"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [29] "#00608C" "#00638C" "#00668D" "#00688D" "#006B8D" "#006E8E" "#00718E"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [36] "#00738F" "#00768F" "#00798F" "#007B90" "#007E90" "#008191" "#008391"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] "#008691" "#008992" "#008C92" "#008E93" "#009193" "#009493" "#009694"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [50] "#009994" "#019B94" "#059D92" "#089F90" "#0BA18E" "#0FA38C" "#12A58A"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] "#15A788" "#19A987" "#1CAB85" "#1FAD83" "#23AF81" "#26B17F" "#29B37D"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [64] "#2DB57B" "#30B77A" "#33B978" "#37BB76" "#3ABD74" "#3EBF72" "#41C170"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [71] "#44C36E" "#48C56D" "#4BC76B" "#4EC969" "#52CB67" "#58CD63" "#5FCF5F"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [78] "#66D15B" "#6DD357" "#74D553" "#7AD74F" "#81D94A" "#88DB46" "#8FDE42"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] "#96E03E" "#9DE23A" "#A4E436" "#ABE631" "#B2E82D" "#B9EA29" "#C0EC25"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [92] "#C7EE21" "#CEF01D" "#D5F218" "#DCF414" "#E3F610" "#EAF80C" "#F1FA08"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [99] "#F8FC04" "#FFFF00"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] "#FFFF00" "#F8FC04" "#F1FA08" "#EAF80C" "#E3F610" "#DCF414" "#D5F218"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [8] "#CEF01D" "#C7EE21" "#C0EC25" "#B9EA29" "#B2E82D" "#ABE631" "#A4E436"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [15] "#9DE23A" "#96E03E" "#8FDE42" "#88DB46" "#81D94A" "#7AD74F" "#74D553"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [22] "#6DD357" "#66D15B" "#5FCF5F" "#58CD63" "#52CB67" "#4EC969" "#4BC76B"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [29] "#48C56D" "#44C36E" "#41C170" "#3EBF72" "#3ABD74" "#37BB76" "#33B978"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [36] "#30B77A" "#2DB57B" "#29B37D" "#26B17F" "#23AF81" "#1FAD83" "#1CAB85"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] "#19A987" "#15A788" "#12A58A" "#0FA38C" "#0BA18E" "#089F90" "#059D92"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [50] "#019B94" "#009994" "#009694" "#009493" "#009193" "#008E93" "#008C92"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] "#008992" "#008691" "#008391" "#008191" "#007E90" "#007B90" "#00798F"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [64] "#00768F" "#00738F" "#00718E" "#006E8E" "#006B8D" "#00688D" "#00668D"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [71] "#00638C" "#00608C" "#005E8B" "#005B8B" "#00588B" "#025589" "#055187"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [78] "#084E84" "#0B4A82" "#0E4780" "#11437E" "#143F7C" "#173C7A" "#1A3877"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] "#1D3575" "#203173" "#232E71" "#262A6F" "#29276C" "#2C236A" "#2F1F68"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [92] "#321C66" "#351864" "#381562" "#3B115F" "#3E0E5D" "#410A5B" "#440759"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [99] "#470357" "#4B0055"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate a custom color palette with specified colors and 20 colors</span></span></span>
 <span class="r-in"><span><span class="fu">custom_palette</span><span class="op">(</span>colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"red"</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
@@ -163,7 +164,7 @@ c("steelblue", "salmon", "forestgreen").</p></dd>
 <span class="r-in"><span><span class="co"># example code</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">custom_palette</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#4B0055" "#00588B" "#009B95" "#53CC67" "#FFFF00"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#FFFF00" "#53CC67" "#009B95" "#00588B" "#4B0055"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

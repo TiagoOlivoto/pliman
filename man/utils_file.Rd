@@ -6,8 +6,6 @@
 \alias{file_name}
 \alias{file_dir}
 \alias{manipulate_files}
-\alias{pliman_indexes}
-\alias{pliman_indexes_eq}
 \title{Utilities for file manipulation}
 \usage{
 file_extension(file)
@@ -29,10 +27,6 @@ manipulate_files(
   remove_original = FALSE,
   verbose = TRUE
 )
-
-pliman_indexes()
-
-pliman_indexes_eq()
 }
 \arguments{
 \item{file}{The file name.}

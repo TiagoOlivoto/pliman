@@ -15,6 +15,7 @@
 #' @param b The layer for the Blue band (default: 1).
 #' @param re The layer for the Red-edge band (default: 4).
 #' @param nir The layer for the Near-infrared band(default: 5).
+#' @param edit If `TRUE` enable editing options using [mapedit::editMap()].
 #' @param title A title for the generated map or plot (default: "").
 #' @param max_pixels Maximum number of pixels to render in the map or plot
 #'   (default: 500000).
@@ -58,11 +59,12 @@ mosaic_view <- function(mosaic,
                         b = 1,
                         re = 4,
                         nir = 5,
+                        edit = FALSE,
                         title = "",
                         viewer = c("mapview", "base"),
                         show = c("rgb", "index"),
                         index = "B",
-                        max_pixels = 500000,
+                        max_pixels = 1000000,
                         downsample = NULL,
                         alpha = 1,
                         quantiles = c(0, 1),
@@ -70,7 +72,7 @@ mosaic_view <- function(mosaic,
                         color_regions = custom_palette(),
                         axes = FALSE,
                         ...){
-  check_mapview()
+  # check_mapview()
   if(!is.null(domain)){
     quantiles <- NULL
   }
@@ -80,19 +82,20 @@ mosaic_view <- function(mosaic,
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
   vieweropt <- c("base", "mapview")
   vieweropt <- vieweropt[pmatch(viewer[[1]], vieweropt)]
+
+  if(inherits(mosaic, "Image")){
+    mosaic <- terra::rast(EBImage::transpose(mosaic)@.Data)
+  }
   if(viewopt == "rgb" & vieweropt == "base" & terra::nlyr(mosaic) > 1){
     message("`viewer = 'base' can only be used with `show = 'index'`. Defaulting to viewer = 'mapview'")
     vieweropt <- "mapview"
-  }
-  if(inherits(mosaic, "Image")){
-    mosaic <- t(terra::rast(mosaic@.Data))
   }
   sto <- suppressWarnings(stars::st_as_stars(mosaic, proxy = FALSE))
   dimsto <- dim(sto)
   nr <- dimsto[1]
   nc <- dimsto[2]
   npix <- nc * nr
-  if(max_pixels > 500000){
+  if(max_pixels > 1000000){
     message("The number of pixels is too high, which might slow the rendering process.")
   }
   compute_downsample <- function(nr, nc, n) {
@@ -146,36 +149,67 @@ mosaic_view <- function(mosaic,
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
       if(!is.na(sf::st_crs(mosaic))){
-
-        message("Using `show = 'rgb' may not produce accurate cropping coordinates.\n Please, consider using `show = 'index'`instead.")
-        map <-
-          leaflet::leaflet() |>
-          leaflet::addScaleBar(position = "bottomleft") |>
-          leaflet::addTiles(options = leaflet::providerTileOptions(minZoom = 3, maxZoom = 30)) |>
-          leafem::addStarsRGB(sto,
-                              r = r,
-                              g = g,
-                              b = b,
-                              quantiles = quantiles,
-                              domain = domain,
-                              maxBytes = 64 * 1024 * 1024,
-                              na.color = "#00000000") |>
-          mapedit::editMap(editor = "leafpm",
-                           title = title)
+        if(edit){
+          message("Using `show = 'rgb' may not produce accurate cropping coordinates.\n Please, consider using `show = 'index'`instead.")
+          map <-
+            leaflet::leaflet() |>
+            leaflet::addScaleBar(position = "bottomleft") |>
+            leaflet::addTiles(options = leaflet::providerTileOptions(minZoom = 3, maxZoom = 30)) |>
+            leafem::addStarsRGB(sto,
+                                r = r,
+                                g = g,
+                                b = b,
+                                quantiles = quantiles,
+                                domain = domain,
+                                maxBytes = 64 * 1024 * 1024,
+                                na.color = "#00000000") |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          invisible(map)
+        } else{
+          map <-
+            leaflet::leaflet() |>
+            leaflet::addScaleBar(position = "bottomleft") |>
+            leaflet::addTiles(options = leaflet::providerTileOptions(minZoom = 3, maxZoom = 30)) |>
+            leafem::addStarsRGB(sto,
+                                r = r,
+                                g = g,
+                                b = b,
+                                quantiles = quantiles,
+                                domain = domain,
+                                maxBytes = 64 * 1024 * 1024,
+                                na.color = "#00000000")
+          map
+        }
       } else{
+        if(edit){
+          map <-
+            leaflet::leaflet() |>
+            leafem::addStarsRGB(sto,
+                                r = r,
+                                g = g,
+                                b = b,
+                                quantiles = quantiles,
+                                domain = domain,
+                                maxBytes = 64 * 1024 * 1024,
+                                na.color = "#00000000") |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          map
+        } else{
+          map <-
+            leaflet::leaflet() |>
+            leafem::addStarsRGB(sto,
+                                r = r,
+                                g = g,
+                                b = b,
+                                quantiles = quantiles,
+                                domain = domain,
+                                maxBytes = 64 * 1024 * 1024,
+                                na.color = "#00000000")
+          map
+        }
 
-        map <-
-          leaflet::leaflet() |>
-          leafem::addStarsRGB(sto,
-                              r = r,
-                              g = g,
-                              b = b,
-                              quantiles = quantiles,
-                              domain = domain,
-                              maxBytes = 64 * 1024 * 1024,
-                              na.color = "#00000000") |>
-          mapedit::editMap(editor = "leafpm",
-                           title = title)
       }
     } else{
       if(vieweropt == "base"){
@@ -184,20 +218,34 @@ mosaic_view <- function(mosaic,
                     colNA = "white",
                     ...)
       } else{
-        index <- gsub("[/\\\\]", "_", index, perl = TRUE)
-        map <-
-          mapview::mapview(sto,
-                           layer.name = index,
-                           map.types = mapview::mapviewGetOption("basemaps"),
-                           maxpixels =  max_pixels,
-                           col.regions = color_regions,
-                           alpha.regions = alpha,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE) |>
-          mapedit::editMap(editor = "leafpm",
-                           title = title)
-        invisible(map)
+        if(edit){
+          index <- gsub("[/\\\\]", "_", index, perl = TRUE)
+          map <-
+            mapview::mapview(sto,
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             layer.name = index,
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE) |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          map
+        } else{
+          map <-
+            mapview::mapview(sto,
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             layer.name = index,
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE)
+          map
+        }
       }
 
     }
@@ -210,19 +258,33 @@ mosaic_view <- function(mosaic,
                     colNA = "white",
                     ...)
       } else{
-        map <-
-          mapview::mapview(sto,
-                           layer.name = index,
-                           map.types = mapview::mapviewGetOption("basemaps"),
-                           maxpixels =  max_pixels,
-                           col.regions = color_regions,
-                           alpha.regions = 1,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE) |>
-          mapedit::editMap(editor = "leafpm",
-                           title = title)
-        invisible(map)
+        if(edit){
+          map <-
+            mapview::mapview(sto,
+                             layer.name = index,
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = 1,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE) |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          map
+        } else{
+          map <-
+            mapview::mapview(sto,
+                             layer.name = index,
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = 1,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE)
+          map
+        }
       }
     } else{
       if(vieweropt == "base"){
@@ -231,19 +293,33 @@ mosaic_view <- function(mosaic,
                     colNA = "white",
                     ...)
       } else{
-        map <-
-          mapview::mapview(sto,
-                           layer.name = names(mosaic),
-                           map.types = mapview::mapviewGetOption("basemaps"),
-                           maxpixels =  max_pixels,
-                           col.regions = color_regions,
-                           alpha.regions = 1,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE) |>
-          mapedit::editMap(editor = "leafpm",
-                           title = title)
-        invisible(map)
+        if(edit){
+          map <-
+            mapview::mapview(sto,
+                             layer.name = names(mosaic),
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = 1,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE) |>
+            mapedit::editMap(editor = "leafpm",
+                             title = title)
+          map
+        } else{
+          map <-
+            mapview::mapview(sto,
+                             layer.name = names(mosaic),
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = 1,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE)
+          map
+        }
       }
     }
   }
@@ -310,7 +386,7 @@ mosaic_export <- function(mosaic,
 #'   interactive map or plot of the mosaic raster, allowing users to draw a
 #'   rectangle to select the cropping area. The selected area is then cropped
 #'   from the input mosaic and returned as a new `SpatRaster` object.
-#'
+#' @importFrom terra crs
 #' @inheritParams mosaic_view
 #' @param ... Additional arguments passed to [mosaic_view()].
 #'
@@ -351,6 +427,7 @@ mosaic_crop <- function(mosaic,
                           re = re,
                           max_pixels = max_pixels,
                           downsample = downsample,
+                          edit = TRUE,
                           title = "Use the 'Draw rectangle' tool to select the cropping area.",
                           ...)
   if(!is.na(sf::st_crs(mosaic))){
@@ -358,7 +435,7 @@ mosaic_crop <- function(mosaic,
       sf::st_make_grid(controls$finished, n = c(1, 1)) |>
       sf::st_transform(sf::st_crs(mosaic))
   } else{
-    sf::st_crs(mosaic) <- sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+    terra::crs(mosaic) <- terra::crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
     grids <-
       sf::st_make_grid(controls$finished, n = c(1, 1)) |>
       sf::st_transform(sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
@@ -556,7 +633,7 @@ mosaic_to_rgb <- function(mosaic,
 #'   (default: TRUE).
 #'
 #' @return A prepared object of class `Image`.
-#'
+#' @export
 #'
 #' @examples
 #' if(interactive()){
@@ -571,7 +648,7 @@ mosaic_prepare <- function(mosaic,
                            b = 1,
                            re = 4,
                            nir = 5,
-                           crop_mosaic = FALSE,
+                           crop_mosaic = TRUE,
                            align = TRUE,
                            crop_aligned = TRUE,
                            rescale =  TRUE,
@@ -601,7 +678,7 @@ mosaic_prepare <- function(mosaic,
                               rescale = rescale,
                               coef = coef)
     if(vieweropt != "base"){
-      image_view(ebimg[1:5, 1:5,])
+      image_view(ebimg[1:5, 1:5,], edit = TRUE)
     }
   } else{
     ebimg <- mosaic_to_pliman(mosaic,
@@ -614,9 +691,9 @@ mosaic_prepare <- function(mosaic,
                               coef = coef)
   }
   if(isTRUE(align)){
-    aligned <- image_align(ebimg, viewer = viewer)
+    aligned <- image_align(ebimg, viewer = vieweropt)
     if(vieweropt != "base"){
-      image_view(aligned[1:5, 1:5,])
+      image_view(aligned[1:5, 1:5,], edit = TRUE)
     }
   } else{
     aligned <- ebimg

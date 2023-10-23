@@ -11,11 +11,12 @@ mosaic_view(
   b = 1,
   re = 4,
   nir = 5,
+  edit = FALSE,
   title = "",
   viewer = c("mapview", "base"),
   show = c("rgb", "index"),
   index = "B",
-  max_pixels = 5e+05,
+  max_pixels = 1e+06,
   downsample = NULL,
   alpha = 1,
   quantiles = c(0, 1),
@@ -38,6 +39,8 @@ mosaic_view(
 \item{re}{The layer for the Red-edge band (default: 4).}
 
 \item{nir}{The layer for the Near-infrared band(default: 5).}
+
+\item{edit}{If \code{TRUE} enable editing options using \code{\link[mapedit:editMap]{mapedit::editMap()}}.}
 
 \item{title}{A title for the generated map or plot (default: "").}
 

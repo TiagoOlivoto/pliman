@@ -21,9 +21,14 @@ cm_to_pixels(cm, dpi)
 
 npixels(img)
 
-dpi(img, viewer = get_pliman_viewer())
+dpi(img, viewer = get_pliman_viewer(), downsample = NULL, max_pixels = 1e+06)
 
-distance(img, viewer = get_pliman_viewer())
+distance(
+  img,
+  viewer = get_pliman_viewer(),
+  downsample = NULL,
+  max_pixels = 1e+06
+)
 }
 \arguments{
 \item{dpi}{The image resolution in dots per inch.}
@@ -43,6 +48,13 @@ argument globally for all functions in the package, you can use the
 \code{\link[=set_pliman_viewer]{set_pliman_viewer()}} function. For example, you can run
 \code{set_pliman_viewer("mapview")} to set the viewer option to "mapview" for
 all functions.}
+
+\item{downsample}{integer; for each dimension the number of
+pixels/lines/bands etc that will be skipped; Defaults to \code{NULL}, which will
+find the best downsampling factor to approximate the \code{max_pixels} value.}
+
+\item{max_pixels}{integer > 0. Maximum number of cells to use for the plot.
+If \code{max_pixels < npixels(img)}, regular sampling is used before plotting.}
 }
 \value{
 \itemize{

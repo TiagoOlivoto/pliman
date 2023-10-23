@@ -53,52 +53,6 @@ create_markdown_table <- function(data) {
 ```
 
 
-| Index | Equation | Band |
-| --- | --- | --- |
-| R | R | RGB |
-| G | G | RGB |
-| B | B | RGB |
-| NR | R/(R+G+B) | RGB |
-| NG | G/(R+G+B) | RGB |
-| NB | B/(R+G+B) | RGB |
-| GB | G/B | RGB |
-| RB | R/B | RGB |
-| GR | G/R | RGB |
-| BI | sqrt((R^2+G^2+B^2)/3) | RGB |
-| BIM | sqrt((R*2+G*2+B*2)/3) | RGB |
-| SCI | (R-G)/(R+G) | RGB |
-| GLI | (2*G-R-B)/(2*G+R+B) | RGB |
-| HI | (2*R-G-B)/(G-B) | RGB |
-| NGRDI | (G-R)/(G+R) | RGB |
-| NDGBI | (G-B)/(G+B) | RGB |
-| NDRBI | (R-B)/(R+B) | RGB |
-| I | R+G+B | RGB |
-| S | ((R+G+B)-3*B)/(R+G+B) | RGB |
-| VARI | (G-R)/(G+R-B) | RGB |
-| HUE | atan(2*(B-G-R)/30.5*(G-R)) | RGB |
-| HUE2 | atan(2*(R-G-R)/30.5*(G-B)) | RGB |
-| BGI | B/G | RGB |
-| L | R+G+B/3 | RGB |
-| GRAY | 0.299*R + 0.587*G + 0.114*B | RGB |
-| GLAI | (25*(G-R)/(G+R-B)+1.25) | RGB |
-| CI | (R-B)/R | RGB |
-| SHP | 2*(R-G-B)/(G-B) | RGB |
-| RI | R**2/(B*G**3) | RGB |
-| G-B | G-B | RGB |
-| G-R | G-R | RGB |
-| R-G | R-G | RGB |
-| R-B | R-B | RGB |
-| B-R | B-R | RGB |
-| B-G | B-G | RGB |
-| DGCI | ((h - 60)/60 + (1 - s/100) + (1 - b/100)) / 3 | HSB |
-| GRAY2 | ((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2 | RGB |
-| L* | (0.2126 * R + 0.7152 * G + 0.0722 * B) | CIELab |
-| a | 0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126)) | CIELab |
-| b* | 0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722)) | CIELab |
-| L*-a | ((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))) | CIELab |
-| L*-b | ((0.2126 * R + 0.7152 * G + 0.0722 * B)) - (0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722))) | CIELab |
-| b*-a | (0.55*( (B - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.0722))) - (0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))) | CIELab |
-
 Here, I use the argument `index"` to test the segmentation based on the RGB and their normalized values. Users can also provide their own index by explicitly providing the formula. e.g., `index = "R-B"`.
 
 ```{r segmentation1 }
@@ -109,8 +63,8 @@ soy <- image_pliman("soybean_touch.jpg")
 
 ```{r segmentation2, fig.width=10, fig.height=5}
 # Compute the indexes
-# Only show the first 16 to reduce the image size
-indexes <- image_index(soy, index = pliman_indexes()[1:16], plot = FALSE)
+# Only show the first 8 to reduce the image size
+indexes <- image_index(soy, index = pliman_indexes()[1:9], plot = FALSE)
 
 # Create a raster plot with the RGB values
 plot(indexes)
@@ -149,32 +103,7 @@ seg_iter <- image_pliman("sev_leaf_nb.jpg", plot = TRUE)
 
 ```
 
-Using a soybean sample leaf (above), I will use the function `image_segment_iter` to segment the diseased tissue from healthy tissue. The aim is to segment the symptoms into two classes, namely, necrosis (brown areas) and chlorosis (yellow areas), and compute the percentage of each symptom class.
-
-First, we need to find a suitable index for segmentation.
-
-```{r segmentation6, fig.width=10, fig.height=10}
-# First segmentation
-seg <-
-  image_segment(seg_iter,
-                index = "all")
-
-# second segmentation
-seg2 <-
-  image_segment(seg$VARI,
-                index = "all")
-
-```
-
-Note that the same results can be obtained with `image_segment_iter()` using an iterative section.
-
-```{r segmentation7, eval=FALSE}
-# Only run iteratively
-image_segment_iter(seg_iter, nseg = 2)
-```
-
-
-The `"VARI"` seems to be a suitable index to segment symptoms (necrosis and chlorosis) from healthy tissues. The `"GLI"` can be used to segment necrosis from chlorosis. Knowing this, we can now use `image_segment_iter()` explicitly indicating these indexes, as follows
+Using a soybean sample leaf (above), I will use the function `image_segment_iter` to segment the diseased tissue from healthy tissue. The aim is to segment the symptoms into two classes, namely, necrosis (brown areas) and chlorosis (yellow areas), and compute the percentage of each symptom class. The `"VARI"` seems to be a suitable index to segment symptoms (necrosis and chlorosis) from healthy tissues. The `"GLI"` can be used to segment necrosis from chlorosis. Knowing this, we can now use `image_segment_iter()` explicitly indicating these indexes, as follows
 
 ```{r segmentation8, fig.width=10}
 
@@ -209,7 +138,6 @@ image_combine(seg_iter1$images$seg1,
 ```
 
 Users can then set the argument `threshold` for their specific case, depending on the aims of the segmentation.
-
 
 
 # Producing a binary image

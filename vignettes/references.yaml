@@ -1,0 +1,1296 @@
+---
+references:
+- id: louhaichi2001
+  author:
+  - family: Louhaichi
+    given: Mounir
+  - family: Borman
+    given: Michael M.
+  - family: Johnson
+    given: Douglas E.
+  container-title: Geocarto International
+  container-title-short: Geocarto International
+  DOI: 10.1080/10106040108542184
+  is-referenced-by-count: 324
+  ISSN: 1010-6049
+  issue: 1
+  issued: 2001-03
+  language: en
+  member: 301
+  page: 65-70
+  prefix: 10.1080
+  publisher: Informa UK Limited
+  reference-count: 10
+  references-count: 10
+  score: 1
+  source: Crossref
+  subject: Water Science and Technology
+  title: Spatially Located Platform and Aerial Photography for
+    Documentation of Grazing Impacts on Wheat
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/10106040108542184"
+  volume: 16
+- id: bannari1995
+  author:
+  - family: Bannari
+    given: A.
+  - family: Morin
+    given: D.
+  - family: Bonn
+    given: F.
+  - family: Huete
+    given: A. R.
+  container-title: Remote Sensing Reviews
+  container-title-short: Remote Sensing Reviews
+  DOI: 10.1080/02757259509532298
+  is-referenced-by-count: 898
+  ISSN: 0275-7257
+  issue: 1-2
+  issued: 1995-08
+  language: en
+  member: 301
+  page: 95-120
+  prefix: 10.1080
+  publisher: Informa UK Limited
+  reference-count: 122
+  references-count: 122
+  score: 1
+  source: Crossref
+  subject: Instrumentation
+  title: A review of vegetation indices
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/02757259509532298"
+  volume: 13
+- id: tucker1979
+  author:
+  - family: Tucker
+    given: Compton J.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(79)90013-0
+  is-referenced-by-count: 6683
+  ISSN: 0034-4257
+  issue: 2
+  issued: 1979-05
+  language: en
+  member: 78
+  page: 127-150
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 27
+  references-count: 27
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: Red and photographic infrared linear combinations for
+    monitoring vegetation
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/0034-4257(79)90013-0"
+  volume: 8
+- id: gitelson2002
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Kaufman
+    given: Yoram J.
+  - family: Stark
+    given: Robert
+  - family: Rundquist
+    given: Don
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/s0034-4257(01)00289-9
+  is-referenced-by-count: 1170
+  ISSN: 0034-4257
+  issue: 1
+  issued: 2002-04
+  language: en
+  member: 78
+  page: 76-87
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 44
+  references-count: 44
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: Novel algorithms for remote estimation of vegetation fraction
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/S0034-4257(01)00289-9"
+  volume: 80
+- id: gitelson1996
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Merzlyak
+    given: Mark N.
+  container-title: Journal of Plant Physiology
+  container-title-short: Journal of Plant Physiology
+  DOI: 10.1016/s0176-1617(96)80284-7
+  is-referenced-by-count: 502
+  ISSN: 0176-1617
+  issue: 3-4
+  issued: 1996-01
+  language: en
+  member: 78
+  page: 494-500
+  prefix: 10.1016
+  publisher: Elsevier BV
+  reference-count: 23
+  references-count: 23
+  score: 1
+  source: Crossref
+  subject: Plant Science
+  title: "Signature Analysis of Leaf Reflectance Spectra: Algorithm
+    Development for Remote Sensing of Chlorophyll"
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/S0176-1617(96)80284-7"
+  volume: 148
+- id: j1969
+  accessed: "16:29:21"
+  author:
+  - family: Kriegler
+    given:  F.
+  container-title: Proceedings of the Sixth International Symposium on
+    Remote Sesning of Environment
+  issued: 1969
+  key: F4SWCA6K
+  libraryID: 1
+  page: 97-131
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: cir.nii.ac.jp
+  title: Preprocessing transformations and their effects on multspectral
+    recognition
+  type: article-journal
+  URL: "https://cir.nii.ac.jp/crid/1572261549021269760"
+- id: d.m.woebbecke1995
+  author:
+  - family: Woebbecke
+    given: D. M.
+  - family: Meyer
+    given: G. E.
+  - family: Von Bargen
+    given: K.
+  - family: Mortensen
+    given: D. A.
+  container-title: Transactions of the ASAE
+  DOI: 10.13031/2013.27838
+  is-referenced-by-count: 821
+  ISSN: 2151-0059
+  issue: 1
+  issued: 1995
+  language: en
+  member: 5183
+  page: 259-269
+  prefix: 10.13031
+  providerKey: doi
+  publisher: American Society of Agricultural and Biological Engineers
+    (ASABE)
+  reference-count: 0
+  references-count: 0
+  score: 1
+  source: Crossref
+  subject: Agricultural and Biological Sciences (miscellaneous)
+  title: Color Indices for Weed Identification Under Various Soil,
+    Residue, and Lighting Conditions
+  type: article-journal
+  URL: "http://dx.doi.org/10.13031/2013.27838"
+  volume: 38
+- id: escadafal1994
+  author:
+  - family: Escadafal
+    given: R.
+  - family: Belghit
+    given: A.
+  - family: Ben-Moussa
+    given: A.
+  container-title: Actes du 6eme Symposium international sur les mesures
+    physiques et signatures en télédétection
+  editor:
+  - family: Guyot
+    given: G.
+  issued: 1994-01-17
+  key: KZYSJZ5C
+  libraryID: 1
+  page: 253-259
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  publisher-place: Val d'Isère (France)
+  title: Indices spectraux pour la télédétection de la dégradation des
+    milieux naturels en Tunisie aride
+  type: paper-conference
+- id: zarco-tejada2005
+  accessed: "17:11:48"
+  author:
+  - family: Zarco-Tejada
+    given: P. J.
+  - family: Berjón
+    given: A.
+  - family: López-Lozano
+    given: R.
+  - family: Miller
+    given: J. R.
+  - family: Martín
+    given: P.
+  - family: Cachorro
+    given: V.
+  - family: González
+    given: M. R.
+  - family: Frutos
+    given: A.
+    non-dropping-particle: de
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/j.rse.2005.09.002
+  ISSN: 0034-4257
+  issue: 3
+  issued: 2005-11-30
+  key: FNILS4SC
+  libraryID: 1
+  page: 271-287
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: "Assessing vineyard condition with hyperspectral indices: Leaf
+    and canopy reflectance simulation in a row-structured discontinuous
+    canopy"
+  title-short: Assessing vineyard condition with hyperspectral indices
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425705002865"
+  volume: 99
+- id: yang2015
+  author:
+  - family: Yang
+    given: Wenzhu
+  - family: Wang
+    given: Sile
+  - family: Zhao
+    given: Xiaolan
+  - family: Zhang
+    given: Jingsi
+  - family: Feng
+    given: Jiaqi
+  container-title: Information Processing in Agriculture
+  container-title-short: Information Processing in Agriculture
+  DOI: 10.1016/j.inpa.2015.07.003
+  is-referenced-by-count: 52
+  ISSN: 2214-3173
+  issue: 3-4
+  issued: 2015-10
+  language: en
+  member: 78
+  page: 149-160
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 18
+  references-count: 18
+  score: 1
+  source: Crossref
+  subject: Computer Science Applications
+  title: Greenness identification based on HSV decision tree
+  type: article-journal
+  update-policy: "http://dx.doi.org/10.1016/elsevier_cm_policy"
+  URL: "http://dx.doi.org/10.1016/j.inpa.2015.07.003"
+  volume: 2
+- id: merzlyak1999
+  author:
+  - family: Merzlyak
+    given: Mark N.
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Chivkunova
+    given: Olga B.
+  - family: Rakitin
+    given: Victor YU.
+  container-title: Physiologia Plantarum
+  container-title-short: Physiologia Plantarum
+  DOI: 10.1034/j.1399-3054.1999.106119.x
+  is-referenced-by-count: 716
+  ISSN: 0031-9317
+  issue: 1
+  issued: 1999-05
+  language: en
+  member: 311
+  page: 135-141
+  prefix: 10.1111
+  providerKey: doi
+  publisher: Wiley
+  reference-count: 28
+  references-count: 28
+  score: 1
+  source: Crossref
+  subject: Cell Biology
+  title: Non-destructive optical detection of pigment changes during
+    leaf senescence and fruit ripening
+  type: article-journal
+  URL: "http://dx.doi.org/10.1034/j.1399-3054.1999.106119.x"
+  volume: 106
+- id: li2010
+  accessed: "16:46:01"
+  author:
+  - family: Li
+    given: Y.
+  - family: Chen
+    given: D.
+  - family: Walker
+    given: C. N.
+  - family: Angus
+    given: J. F.
+  container-title: Field Crops Research
+  container-title-short: Field Crops Research
+  DOI: 10.1016/j.fcr.2010.05.011
+  ISSN: 0378-4290
+  issue: 3
+  issued: 2010-09-10
+  key: Y8CDMQ67
+  libraryID: 1
+  page: 221-227
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Estimating the nitrogen status of crops using a digital camera
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0378429010001358"
+  volume: 118
+- id: pearson1972
+  accessed: "20:07:22"
+  ADS Bibcode: 1972rse..conf.1355P
+  author:
+  - family: Pearson
+    given: R. L.
+  - family: Miller
+    given: L. D.
+  Conference Name: Remote
+  issued: 1972-10-01
+  key: EBTJNXJX
+  libraryID: 1
+  note: "Conference Name: Remote Sensing of Environment, VIII Pages:
+    1355 ADS Bibcode: 1972rse..conf.1355P"
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  Pages: 1355
+  source: NASA ADS
+  title: Remote Mapping of Standing Crop Biomass for Estimation of the
+    Productivity of the Shortgrass Prairie
+  type: book
+  URL: "https://ui.adsabs.harvard.edu/abs/1972rse..conf.1355P"
+- id: rouse1974
+  NTRS Document ID: 19750020419
+  accessed: "20:15:07"
+  author:
+  - family: Rouse
+    given: J. W.
+  - family: Haas
+    given: R. H.
+  - family: Deering
+    given: D. W.
+  - family: Schell
+    given: J. A.
+  - family: Harlan
+    given: J. C.
+  issued: 1974-11-01
+  key: ILU63UKP
+  libraryID: 1
+  note: "NTRS Author Affiliations: Texas A&M Univ. NTRS Document ID:
+    19750020419 NTRS Research Center: Headquarters (HQ)"
+  NTRS Author Affiliations: Texas
+  NTRS Research Center: Headquarters
+  number: E75-10354
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: NASA NTRS
+  title: Monitoring the Vernal Advancement and Retrogradation (Green
+    Wave Effect) of Natural Vegetation
+  type: report
+  URL: "https://ntrs.nasa.gov/citations/19750020419"
+- id: idb-in
+  accessed: "20:18:58"
+  key: ALM9NHZ4
+  libraryID: 1
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  title: "IDB - Index: Chlorophyll vegetation index"
+  type: webpage
+  URL: "https://www.indexdatabase.de/db/i-single.php?id=391"
+- id: indexdatabase
+  accessed: "20:21:04"
+  author:
+  - family: Index DataBase
+  key: DU25U3FU
+  libraryID: 1
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  title: "IDB - Index: Normalized Difference NIR/Rededge Normalized
+    Difference Red-Edge"
+  type: webpage
+  URL: "https://www.indexdatabase.de/db/i-single.php?id=223"
+- id: huete1988
+  author:
+  - family: Huete
+    given: A.R
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(88)90106-x
+  is-referenced-by-count: 4224
+  ISSN: 0034-4257
+  issue: 3
+  issued: 1988-08
+  language: en
+  member: 78
+  page: 295-309
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 25
+  references-count: 25
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: A soil-adjusted vegetation index (SAVI)
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/0034-4257(88)90106-X"
+  volume: 25
+- id: baret1989
+  accessed: "20:43:22"
+  author:
+  - family: Baret
+    given: F.
+  - family: Guyot
+    given: G.
+  - family: Major
+    given: D.J.
+  container-title: 12th Canadian Symposium on Remote Sensing Geoscience
+    and Remote Sensing Symposium,
+  DOI: 10.1109/IGARSS.1989.576128
+  event: 12th Canadian Symposium on Remote Sensing Geoscience and Remote
+    Sensing Symposium,
+  issued: 1989-07
+  key: 3MYTREAI
+  libraryID: 1
+  page: 1355-1358
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: IEEE Xplore
+  title: "TSAVI: A Vegetation Index Which Minimizes Soil Brightness
+    Effects On LAI And APAR Estimation"
+  title-short: TSAVI
+  type: paper-conference
+  URL: "https://ieeexplore.ieee.org/document/576128"
+  volume: 3
+- id: gitelson1996a
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Kaufman
+    given: Yoram J.
+  - family: Merzlyak
+    given: Mark N.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/s0034-4257(96)00072-7
+  is-referenced-by-count: 1630
+  ISSN: 0034-4257
+  issue: 3
+  issued: 1996-12
+  language: en
+  member: 78
+  page: 289-298
+  prefix: 10.1016
+  publisher: Elsevier BV
+  reference-count: 33
+  references-count: 33
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: Use of a green channel in remote sensing of global vegetation
+    from EOS-MODIS
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/S0034-4257(96)00072-7"
+  volume: 58
+- id: gitelson1994
+  author:
+  - family: Gitelson
+    given: Anatoly
+  - family: Merzlyak
+    given: Mark N.
+  container-title: "Journal of Photochemistry and Photobiology B:
+    Biology"
+  container-title-short: "Journal of Photochemistry and Photobiology B:
+    Biology"
+  DOI: 10.1016/1011-1344(93)06963-4
+  is-referenced-by-count: 501
+  ISSN: 1011-1344
+  issue: 3
+  issued: 1994-03
+  language: en
+  member: 78
+  page: 247-252
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 18
+  references-count: 18
+  score: 1
+  source: Crossref
+  subject: Radiology, Nuclear Medicine and imaging
+  title: "Quantitative estimation of chlorophyll-a using reflectance
+    spectra: Experiments with autumn chestnut and maple leaves"
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/1011-1344(93)06963-4"
+  volume: 22
+- id: huete2002
+  author:
+  - family: Huete
+    given: A
+  - family: Didan
+    given: K
+  - family: Miura
+    given: T
+  - family: Rodriguez
+    given: E.P
+  - family: Gao
+    given: X
+  - family: Ferreira
+    given: L.G
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/s0034-4257(02)00096-2
+  is-referenced-by-count: 5784
+  ISSN: 0034-4257
+  issue: 1-2
+  issued: 2002-11
+  language: en
+  member: 78
+  page: 195-213
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 40
+  references-count: 40
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: Overview of the radiometric and biophysical performance of the
+    MODIS vegetation indices
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/S0034-4257(02)00096-2"
+  volume: 83
+- id: gitelson2002a
+  accessed: "16:13:28"
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Kaufman
+    given: Yoram J.
+  - family: Stark
+    given: Robert
+  - family: Rundquist
+    given: Don
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(01)00289-9
+  ISSN: 0034-4257
+  issue: 1
+  issued: 2002-04-01
+  key: PJE7NIS5
+  libraryID: 1
+  page: 76-87
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Novel algorithms for remote estimation of vegetation fraction
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425701002899"
+  volume: 80
+- id: indexdatabase2023
+  accessed: "21:14:48"
+  author:
+  - family: Index DataBase
+  issued: 2023
+  key: VHSVCAEL
+  libraryID: 1
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  title: IDB - List of available Indices
+  type: webpage
+  URL: "https://www.indexdatabase.de/db/i.php"
+- id: chuvieco2002
+  author:
+  - family: Chuvieco
+    given: E.
+  - family: Martín
+    given: M. P.
+  - family: Palacios
+    given: A.
+  container-title: International Journal of Remote Sensing
+  container-title-short: International Journal of Remote Sensing
+  DOI: 10.1080/01431160210153129
+  is-referenced-by-count: 244
+  ISSN: 0143-1161
+  issue: 23
+  issued: 2002-01
+  language: en
+  member: 301
+  page: 5103-5110
+  prefix: 10.1080
+  providerKey: doi
+  publisher: Informa UK Limited
+  reference-count: 11
+  references-count: 11
+  score: 1
+  source: Crossref
+  subject: General Earth and Planetary Sciences
+  title: Assessment of different spectral indices in the
+    red-near-infrared spectral domain for burned land discrimination
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/01431160210153129"
+  volume: 23
+- id: pinty1992
+  author:
+  - family: Pinty
+    given: B.
+  - family: Verstraete
+    given: M. M.
+  container-title: Vegetatio
+  container-title-short: Vegetatio
+  DOI: 10.1007/bf00031911
+  is-referenced-by-count: 476
+  ISSN: 0042-3106
+  issue: 1
+  issued: 1992-07
+  language: en
+  member: 297
+  page: 15-20
+  prefix: 10.1007
+  publisher: Springer Science and Business Media LLC
+  reference-count: 20
+  references-count: 20
+  score: 1
+  source: Crossref
+  subject: Plant Science
+  title: "GEMI: a non-linear index to monitor global vegetation from
+    satellites"
+  type: article-journal
+  URL: "http://dx.doi.org/10.1007/BF00031911"
+  volume: 101
+- id: qi1994
+  author:
+  - family: Qi
+    given: J.
+  - family: Chehbouni
+    given: A.
+  - family: Huete
+    given: A.R.
+  - family: Kerr
+    given: Y.H.
+  - family: Sorooshian
+    given: S.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(94)90134-1
+  is-referenced-by-count: 1806
+  ISSN: 0034-4257
+  issue: 2
+  issued: 1994-05
+  language: en
+  member: 78
+  page: 119-126
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 12
+  references-count: 12
+  score: 1
+  source: Crossref
+  subject: Computers in Earth Sciences
+  title: A modified soil adjusted vegetation index
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/0034-4257(94)90134-1"
+  volume: 48
+- id: mcfeeters1996
+  author:
+  - family: McFEETERS
+    given: S. K.
+  container-title: International Journal of Remote Sensing
+  container-title-short: International Journal of Remote Sensing
+  DOI: 10.1080/01431169608948714
+  is-referenced-by-count: 3837
+  ISSN: 0143-1161
+  issue: 7
+  issued: 1996-05
+  language: en
+  member: 301
+  page: 1425-1432
+  prefix: 10.1080
+  providerKey: doi
+  publisher: Informa UK Limited
+  reference-count: 14
+  references-count: 14
+  score: 1
+  source: Crossref
+  subject: General Earth and Planetary Sciences
+  title: The use of the Normalized Difference Water Index (NDWI) in the
+    delineation of open water features
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/01431169608948714"
+  volume: 17
+- id: richardson1977
+  author:
+  - family: Richardson
+    given: A J
+  - family: Wiegand
+    given: Claudia
+  container-title: Photogrammetric Engineering and Remote Sensing
+  issue: 12
+  issued: 1977
+  key: MYK826KU
+  language: en
+  libraryID: 1
+  page: 1541-1552
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: Zotero
+  title: Distinguishing Vegetation from Soil Background Information
+  type: article-journal
+  URL: "https://www.asprs.org/wp-content/uploads/pers/1977journal/dec/1977_dec_1541-1552.pdf"
+  volume: 43
+- id: mathieu1998
+  accessed: "13:00:45"
+  author:
+  - family: Mathieu
+    given: Renaud
+  - family: Pouget
+    given: Marcel
+  - family: Cervelle
+    given: Bernard
+  - family: Escadafal
+    given: Richard
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(98)00030-3
+  ISSN: 0034-4257
+  issue: 1
+  issued: 1998-10-01
+  key: DHID4GD8
+  libraryID: 1
+  page: 17-28
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Relationships between Satellite-Based Radiometric Indices
+    Simulated Using Laboratory Reflectance Data and Typic Soil Color of
+    an Arid Environment
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425798000303"
+  volume: 66
+- id: gitelson1994a
+  accessed: "20:50:38"
+  author:
+  - family: Gitelson
+    given: Anatoly
+  - family: Merzlyak
+    given: Mark N.
+  container-title: "Journal of Photochemistry and Photobiology B:
+    Biology"
+  container-title-short: "Journal of Photochemistry and Photobiology B:
+    Biology"
+  DOI: 10.1016/1011-1344(93)06963-4
+  ISSN: 1011-1344
+  issue: 3
+  issued: 1994-03-01
+  key: R3PIRWAE
+  libraryID: 1
+  page: 247-252
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: "Quantitative estimation of chlorophyll-a using reflectance
+    spectra: Experiments with autumn chestnut and maple leaves"
+  title-short: Quantitative estimation of chlorophyll-a using
+    reflectance spectra
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/1011134493069634"
+  volume: 22
+- id: broge2001
+  accessed: "13:07:02"
+  author:
+  - family: Broge
+    given: N. H
+  - family: Leblanc
+    given: E
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(00)00197-8
+  ISSN: 0034-4257
+  issue: 2
+  issued: 2001-05-01
+  key: 64GK3DJI
+  libraryID: 1
+  page: 156-172
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Comparing prediction power and stability of broadband and
+    hyperspectral vegetation indices for estimation of green leaf area
+    index and canopy chlorophyll density
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425700001978"
+  volume: 76
+- id: vincini2008
+  accessed: "13:09:25"
+  author:
+  - family: Vincini
+    given: M.
+  - family: Frazzi
+    given: E.
+  - family: D'Alessio
+    given: P.
+  container-title: Precision Agriculture
+  container-title-short: Precision Agric
+  DOI: 10.1007/s11119-008-9075-z
+  ISSN: 1573-1618
+  issue: 5
+  issued: 2008-10-01
+  key: VNKFGKZ4
+  language: en
+  libraryID: 1
+  page: 303-319
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: Springer Link
+  title: A broad-band leaf chlorophyll vegetation index at the canopy
+    scale
+  type: article-journal
+  URL: "https://doi.org/10.1007/s11119-008-9075-z"
+  volume: 9
+- id: gitelson2003
+  accessed: "13:11:22"
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Gritz †
+    given: Yuri
+  - family: Merzlyak
+    given: Mark N.
+  container-title: Journal of Plant Physiology
+  container-title-short: Journal of Plant Physiology
+  DOI: 10.1078/0176-1617-00887
+  ISSN: 0176-1617
+  issue: 3
+  issued: 2003-01-01
+  key: 6DFB7432
+  libraryID: 1
+  page: 271-282
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Relationships between leaf chlorophyll content and spectral
+    reflectance and algorithms for non-destructive chlorophyll
+    assessment in higher plant leaves
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0176161704704034"
+  volume: 160
+- id: jordan1969
+  author:
+  - family: Jordan
+    given: Carl F.
+  container-title: Ecology
+  DOI: 10.2307/1936256
+  is-referenced-by-count: 1536
+  ISSN: 0012-9658
+  issue: 4
+  issued: 1969-07
+  language: en
+  member: 311
+  page: 663-666
+  prefix: 10.1002
+  providerKey: doi
+  publisher: Wiley
+  reference-count: 0
+  references-count: 0
+  score: 1
+  source: Crossref
+  subject: Ecology, Evolution, Behavior and Systematics
+  title: Derivation of Leaf-Area Index from Quality of Light on the
+    Forest Floor
+  type: article-journal
+  URL: "http://dx.doi.org/10.2307/1936256"
+  volume: 50
+- id: gitelson2002b
+  accessed: "16:13:28"
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Kaufman
+    given: Yoram J.
+  - family: Stark
+    given: Robert
+  - family: Rundquist
+    given: Don
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(01)00289-9
+  ISSN: 0034-4257
+  issue: 1
+  issued: 2002-04-01
+  key: PJE7NIS5
+  libraryID: 1
+  page: 76-87
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Novel algorithms for remote estimation of vegetation fraction
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425701002899"
+  volume: 80
+- id: kaufman1992
+  author:
+  - family: Kaufman
+    given: Y.J.
+  - family: Tanre
+    given: D.
+  container-title: IEEE Transactions on Geoscience and Remote Sensing
+  container-title-short: IEEE Trans. Geosci. Remote Sensing
+  DOI: 10.1109/36.134076
+  is-referenced-by-count: 788
+  ISSN: 0196-2892
+  issue: 2
+  issued: 1992-03
+  member: 263
+  page: 261-270
+  prefix: 10.1109
+  providerKey: doi
+  publisher: Institute of Electrical and Electronics Engineers (IEEE)
+  reference-count: 44
+  references-count: 44
+  score: 1
+  source: Crossref
+  subject: General Earth and Planetary Sciences
+  title: Atmospherically resistant vegetation index (ARVI) for EOS-MODIS
+  type: article-journal
+  URL: "http://dx.doi.org/10.1109/36.134076"
+  volume: 30
+- id: gitelson1996b
+  accessed: "20:48:56"
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  - family: Kaufman
+    given: Yoram J.
+  - family: Merzlyak
+    given: Mark N.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(96)00072-7
+  ISSN: 0034-4257
+  issue: 3
+  issued: 1996-12-01
+  key: 4ZCU5IPS
+  libraryID: 1
+  page: 289-298
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: Use of a green channel in remote sensing of global vegetation
+    from EOS-MODIS
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425796000727"
+  volume: 58
+- id: sripada2006
+  _eprint: "https://onlinelibrary.wiley.com/doi/pdf/10.2134/agronj2005.0200"
+  accessed: "14:14:39"
+  author:
+  - family: Sripada
+    given: Ravi P.
+  - family: Heiniger
+    given: Ronnie W.
+  - family: White
+    given: Jeffrey G.
+  - family: Meijer
+    given: Alan D.
+  container-title: Agronomy Journal
+  DOI: 10.2134/agronj2005.0200
+  ISSN: 1435-0645
+  issue: 4
+  issued: 2006
+  key: DNXAYE38
+  language: en
+  libraryID: 1
+  note: "\\_eprint:
+    https://onlinelibrary.wiley.com/doi/pdf/10.2134/agronj2005.0200"
+  page: 968-977
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  rights: Copyright © 2006 by the American Society of Agronomy
+  source: Wiley Online Library
+  title: Aerial Color Infrared Photography for Determining Early
+    In-Season Nitrogen Requirements in Corn
+  type: article-journal
+  URL: "https://onlinelibrary.wiley.com/doi/abs/10.2134/agronj2005.0200"
+  volume: 98
+- id: crippen1990
+  accessed: "14:23:26"
+  author:
+  - family: Crippen
+    given: Robert E.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(90)90085-Z
+  ISSN: 0034-4257
+  issue: 1
+  issued: 1990-10-01
+  key: Z3IRZDI7
+  libraryID: 1
+  page: 71-73
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Calculating the vegetation index faster
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/003442579090085Z"
+  volume: 34
+- id: boegh2002
+  accessed: "14:28:34"
+  author:
+  - family: Boegh
+    given: Eva
+  - family: Soegaard
+    given: H.
+  - family: Broge
+    given: N.
+  - family: Hasager
+    given: C. B.
+  - family: Jensen
+    given: N. O.
+  - family: Schelde
+    given: K.
+  - family: Thomsen
+    given: A.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(01)00342-X
+  ISSN: 0034-4257
+  issue: 2
+  issued: 2002-08-01
+  key: 57W2Z2BN
+  libraryID: 1
+  page: 179-193
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Airborne multispectral data for quantifying leaf area index,
+    nitrogen concentration, and photosynthetic efficiency in agriculture
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S003442570100342X"
+  volume: 81
+- id: qi1994a
+  accessed: "21:42:53"
+  author:
+  - family: Qi
+    given: J.
+  - family: Chehbouni
+    given: A.
+  - family: Huete
+    given: A. R.
+  - family: Kerr
+    given: Y. H.
+  - family: Sorooshian
+    given: S.
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(94)90134-1
+  ISSN: 0034-4257
+  issue: 2
+  issued: 1994-05-01
+  key: X5WMS65Z
+  libraryID: 1
+  page: 119-126
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: ScienceDirect
+  title: A modified soil adjusted vegetation index
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/0034425794901341"
+  volume: 48
+- id: chen1996
+  author:
+  - family: Chen
+    given: Jing M.
+  container-title: Canadian Journal of Remote Sensing
+  container-title-short: Canadian Journal of Remote Sensing
+  DOI: 10.1080/07038992.1996.10855178
+  is-referenced-by-count: 633
+  ISSN: 0703-8992
+  issue: 3
+  issued: 1996-09
+  language: en
+  member: 301
+  page: 229-242
+  prefix: 10.1080
+  publisher: Informa UK Limited
+  reference-count: 24
+  references-count: 24
+  score: 1
+  source: Crossref
+  subject: General Earth and Planetary Sciences
+  title: Evaluation of Vegetation Indices and a Modified Simple Ratio
+    for Boreal Applications
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/07038992.1996.10855178"
+  volume: 22
+- id: goel1994
+  author:
+  - family: Goel
+    given: Narendra S.
+  - family: Qin
+    given: Wenhan
+  container-title: Remote Sensing Reviews
+  container-title-short: Remote Sensing Reviews
+  DOI: 10.1080/02757259409532252
+  is-referenced-by-count: 236
+  ISSN: 0275-7257
+  issue: 4
+  issued: 1994-10
+  language: en
+  member: 301
+  page: 309-347
+  prefix: 10.1080
+  providerKey: doi
+  publisher: Informa UK Limited
+  reference-count: 23
+  references-count: 23
+  score: 1
+  source: Crossref
+  subject: Instrumentation
+  title: "Influences of canopy architecture on relationships between
+    various vegetation indices and LAI and Fpar: A computer simulation"
+  type: article-journal
+  URL: "http://dx.doi.org/10.1080/02757259409532252"
+  volume: 10
+- id: rondeaux1996
+  accessed: "14:44:47"
+  author:
+  - family: Rondeaux
+    given: Geneviève
+  - family: Steven
+    given: Michael
+  - family: Baret
+    given: Frédéric
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(95)00186-7
+  ISSN: 0034-4257
+  issue: 2
+  issued: 1996-02-01
+  key: KRS3UJXY
+  libraryID: 1
+  page: 95-107
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Optimization of soil-adjusted vegetation indices
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/0034425795001867"
+  volume: 55
+- id: roujean1995
+  accessed: "14:48:07"
+  author:
+  - family: Roujean
+    given: Jean-Louis
+  - family: Breon
+    given: François-Marie
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/0034-4257(94)00114-3
+  ISSN: 0034-4257
+  issue: 3
+  issued: 1995-03-01
+  key: Z3AK4G7I
+  libraryID: 1
+  page: 375-384
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Estimating PAR absorbed by vegetation from bidirectional
+    reflectance measurements
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/0034425794001143"
+  volume: 51
+- id: bannari2002
+  accessed: "14:52:41"
+  author:
+  - family: Bannari
+    given: A.
+  - family: Asalhi
+    given: H.
+  - family: Teillet
+    given: P.M.
+  container-title: IEEE International Geoscience and Remote Sensing
+    Symposium
+  DOI: 10.1109/IGARSS.2002.1026867
+  event: IEEE International Geoscience and Remote Sensing Symposium
+  issued: 2002-06
+  key: 5IQFWA28
+  libraryID: 1
+  page: 3053-3055 vol.5
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: IEEE Xplore
+  title: Transformed difference vegetation index (TDVI) for vegetation
+    cover mapping
+  type: paper-conference
+  URL: "https://ieeexplore.ieee.org/document/1026867"
+  volume: 5
+- id: gitelson2004
+  author:
+  - family: Gitelson
+    given: Anatoly A.
+  container-title: Journal of Plant Physiology
+  container-title-short: J Plant Physiol
+  DOI: 10.1078/0176-1617-01176
+  ISSN: 0176-1617
+  issue: 2
+  issued: 2004-02
+  key: XIXNBNL3
+  language: eng
+  libraryID: 1
+  page: 165-173
+  PMID: 15022830
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: PubMed
+  title: Wide Dynamic Range Vegetation Index for remote quantification
+    of biophysical characteristics of vegetation
+  type: article-journal
+  volume: 161
+- id: gitelson2001
+  author:
+  - family: Gitelson
+    given: A. A.
+  - family: Merzlyak
+    given: M. N.
+  - family: Chivkunova
+    given: O. B.
+  container-title: Photochemistry and Photobiology
+  container-title-short: Photochem Photobiol
+  DOI: "10.1562/0031-8655(2001)074\\<0038:opaneo\\>2.0.co;2"
+  ISSN: 0031-8655
+  issue: 1
+  issued: 2001-07
+  key: T9GC9YTA
+  language: eng
+  libraryID: 1
+  page: 38-45
+  PMID: 11460535
+  providerKey: 2509FBBE-5BB0-44C4-B119-6083A81ED673
+  source: PubMed
+  title: Optical properties and nondestructive estimation of anthocyanin
+    content in plant leaves
+  type: article-journal
+  volume: 74
+- id: karcher2003
+  author:
+  - family: Karcher
+    given: Douglas E.
+  - family: Richardson
+    given: Michael D.
+  container-title: Crop Science
+  container-title-short: Crop Science
+  DOI: 10.2135/cropsci2003.9430
+  is-referenced-by-count: 235
+  ISSN: 0011-183X
+  issue: 3
+  issued: 2003-05
+  language: en
+  member: 311
+  page: 943-951
+  prefix: 10.1002
+  publisher: Wiley
+  reference-count: 22
+  references-count: 22
+  score: 1
+  source: Crossref
+  subject: Agronomy and Crop Science
+  title: Quantifying Turfgrass Color Using Digital Image Analysis
+  type: article-journal
+  update-policy: "http://dx.doi.org/10.1002/crossmark_policy"
+  URL: "http://dx.doi.org/10.2135/cropsci2003.9430"
+  volume: 43
+...

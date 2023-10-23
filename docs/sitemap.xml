@@ -10,6 +10,9 @@
     <loc>https://tiagoolivoto.github.io/pliman/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://tiagoolivoto.github.io/pliman/articles/indexes.html</loc>
+  </url>
+  <url>
     <loc>https://tiagoolivoto.github.io/pliman/articles/leaf_area.html</loc>
   </url>
   <url>
@@ -308,6 +311,9 @@
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/utils_image.html</loc>
+  </url>
+  <url>
+    <loc>https://tiagoolivoto.github.io/pliman/reference/utils_indexes.html</loc>
   </url>
   <url>
     <loc>https://tiagoolivoto.github.io/pliman/reference/utils_measures.html</loc>

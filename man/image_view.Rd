@@ -10,6 +10,7 @@ image_view(
   r = 1,
   g = 2,
   b = 3,
+  edit = FALSE,
   alpha = 0.7,
   attribute = "area",
   title = "Edit the image",
@@ -33,6 +34,8 @@ contour of the analyzed objects, with a color gradient defined by
 
 \item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
 Defaults to \code{1}, \code{2}, and \code{3}.}
+
+\item{edit}{If \code{TRUE} enable editing options using \code{\link[mapedit:editMap]{mapedit::editMap()}}.}
 
 \item{alpha}{The transparency level of the rectangles' color (between 0 and 1).}
 

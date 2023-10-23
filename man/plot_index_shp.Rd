@@ -8,6 +8,9 @@ image}
 plot_index_shp(
   object,
   attribute = "coverage",
+  r = 1,
+  g = 2,
+  b = 3,
   color = c("red", "green"),
   viewer = c("mapview", "base"),
   max_pixels = 5e+05,
@@ -26,6 +29,9 @@ plot_index_shp(
 
 \item{attribute}{The name of the quantitative variable in the
 \code{object_index} to be used for coloring the rectangles.}
+
+\item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
+Defaults to \code{1}, \code{2}, and \code{3}.}
 
 \item{color}{A vector of two colors to be used for the color scale.}
 

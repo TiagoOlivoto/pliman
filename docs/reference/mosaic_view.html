@@ -34,6 +34,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -114,11 +115,12 @@
 <span>  b <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  re <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  nir <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  edit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  viewer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mapview"</span>, <span class="st">"base"</span><span class="op">)</span>,</span>
 <span>  show <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rgb"</span>, <span class="st">"index"</span><span class="op">)</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"B"</span>,</span>
-<span>  max_pixels <span class="op">=</span> <span class="fl">5e+05</span>,</span>
+<span>  max_pixels <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  downsample <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -154,6 +156,10 @@
 
 <dt>nir</dt>
 <dd><p>The layer for the Near-infrared band(default: 5).</p></dd>
+
+
+<dt>edit</dt>
+<dd><p>If <code>TRUE</code> enable editing options using <code><a href="https://rdrr.io/pkg/mapedit/man/editMap.html" class="external-link">mapedit::editMap()</a></code>.</p></dd>
 
 
 <dt>title</dt>

@@ -93,59 +93,13 @@ number of indexes used.
 A \code{NULL} object
 }
 \description{
-\code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and NIR bands.
+\code{image_index()} Builds image indexes using Red, Green, Blue, Red-Edge, and
+NIR bands. See xxx for a detailed list of available indexes
 
-Generates a raster or density plot of the index values computed with
-\code{image_index()}.
+The S3 method \code{plot()} can be used to generate a raster or density plot of
+the index values computed with \code{image_index()}
 }
 \details{
-The following indexes are available in pliman.
-\itemize{
-\item RGB color space
-}
-\itemize{
-\item \code{R} red
-\item \code{G} green
-\item \code{B} blue
-\item \code{NR} normalized red \code{R/(R+G+B)}.
-\item \code{NG} normalized green \code{G/(R+G+B)}
-\item \code{NB} normalized blue \code{B/(R+G+B)}
-\item \code{GB} green blue ratio \code{G/B}
-\item \code{RB} red blue ratio \code{R/B}
-\item \code{GR} green red ratio \code{G/R}
-\item \code{BI} brightness Index \code{sqrt((R^2+G^2+B^2)/3)}
-\item \code{BIM} brightness Index 2 \code{sqrt((R*2+G*2+B*2)/3)}
-\item \code{SCI} Soil Colour Index \code{(R-G)/(R+G)}
-\item \code{GLI} Green leaf index Vis Louhaichi et al. (2001) \code{(2*G-R-B)/(2*G+R+B)}
-\item \code{HI} Primary colours Hue Index    (2*R-G-B)/(G-B)
-\item \code{NDGRI} Normalized green red difference index (Tucker, 1979) \code{(G-R)/(G+R)}
-\item \code{NDGBI} Normalized green blue difference index \code{(G-B)/(G+B)}
-\item \code{NDRBI} Normalized red blue difference index \code{(R-B)/(R+B)}
-\item \code{I}     R+G+B
-\item \code{S}     \code{((R+G+B)-3*B)/(R+G+B)}
-\item \code{L}     R+G+B/3
-\item \code{VARI} A Visible Atmospherically Resistant Index \code{(G-R)/(G+R-B)}
-\item \code{HUE} Overall Hue Index \code{atan(2*(B-G-R)/30.5*(G-R))}
-\item \code{HUE2}  atan(2*(R-G-R)/30.5*(G-B))
-\item \code{BGI}   B/G
-\item \code{GRAY}	\code{0.299*R + 0.587*G + 0.114*B}
-\item \code{GRAY2} \code{((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2}
-\item \code{GLAI} \code{(25*(G-R)/(G+R-B)+1.25)}
-\item \code{CI} Coloration Index \code{(R-B)/R}
-\item \code{SAT} Overhall Saturation Index \code{(max(R,G,B) - min(R,G,B)) / max(R,G,B)}
-\item \code{SHP} Shape Index \code{2*(R-G-B)/(G-B)}
-\item \code{RI} Redness Index \code{R**2/(B*G**3)}
-}
-\itemize{
-\item HSB color space
-\item \code{DGCI} Dark Green Color Index, based on HSB color space \verb{60\\*((G - B) / (max(R, G, B) - min(R, G, B)))}
-\item CIE-Lab color space
-}
-\itemize{
-\item \verb{L*}: relative luminance \code{(0.2126 * R + 0.7152 * G + 0.0722 * B)}
-\item \verb{a*}: \code{0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126))}
-}
-
 When \code{type = "raster"} (default), the function calls \code{\link[=plot_index]{plot_index()}}
 to create a raster plot for each index present in \code{x}. If \code{type = "density"},
 a for loop is used to create a density plot for each index. Both types of
@@ -171,6 +125,14 @@ plot(ind, type = "density")
 Nobuyuki Otsu, "A threshold selection method from gray-level
 histograms". IEEE Trans. Sys., Man., Cyber. 9 (1): 62-66. 1979.
 \doi{10.1109/TSMC.1979.4310076}
+
+Karcher, D.E., and M.D. Richardson. 2003. Quantifying Turfgrass Color Using
+Digital Image Analysis. Crop Science 43(3): 943–951.
+\doi{10.2135/cropsci2003.9430}
+
+Bannari, A., D. Morin, F. Bonn, and A.R. Huete. 1995. A review of vegetation
+indices. Remote Sensing Reviews 13(1–2): 95–120.
+\doi{10.1080/02757259509532298}
 }
 \author{
 Tiago Olivoto \email{tiagoolivoto@gmail.com}

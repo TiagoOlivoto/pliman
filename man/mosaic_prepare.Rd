@@ -11,7 +11,7 @@ mosaic_prepare(
   b = 1,
   re = 4,
   nir = 5,
-  crop_mosaic = FALSE,
+  crop_mosaic = TRUE,
   align = TRUE,
   crop_aligned = TRUE,
   rescale = TRUE,

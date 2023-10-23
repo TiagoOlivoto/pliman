@@ -58,6 +58,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-examples">Examples</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-examples">
+    <a class="dropdown-item" href="../articles/indexes.html">Image indexes</a>
     <a class="dropdown-item" href="../articles/manipulation.html">Image manipulation</a>
     <a class="dropdown-item" href="../articles/segmentation.html">Image segmentation</a>
     <a class="dropdown-item" href="../articles/polygons.html">Polygons</a>
@@ -132,7 +133,7 @@
                         <h4 data-toc-skip class="author">Tiago
 Olivoto</h4>
             
-            <h4 data-toc-skip class="date">2023-10-14</h4>
+            <h4 data-toc-skip class="date">2023-10-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/TiagoOlivoto/pliman/blob/HEAD/vignettes/analyze_objects.Rmd" class="external-link"><code>vignettes/analyze_objects.Rmd</code></a></small>
       <div class="d-none name"><code>analyze_objects.Rmd</code></div>
@@ -151,17 +152,11 @@ function <code><a href="../reference/utils_image.html">image_pliman()</a></code>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/TiagoOlivoto/pliman" class="external-link">pliman</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
-<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 2.0.1)            |</span></span>
+<span><span class="co">#&gt; | Tools for Plant Image Analysis (pliman 2.1.0)            |</span></span>
 <span><span class="co">#&gt; | Author: Tiago Olivoto                                    |</span></span>
 <span><span class="co">#&gt; | Type `citation('pliman')` to know how to cite pliman     |</span></span>
 <span><span class="co">#&gt; | Visit 'http://bit.ly/pkg_pliman' for a complete tutorial |</span></span>
 <span><span class="co">#&gt; |==========================================================|</span></span>
-<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">#&gt; which was just loaded, were retired in October 2023.</span></span>
-<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
-<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
 <span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils_image.html">image_pliman</a></span><span class="op">(</span><span class="st">"objects_300dpi.jpg"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="analyze_objects_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
 <p>The above image was produced with Microsoft PowerPoint. It has a

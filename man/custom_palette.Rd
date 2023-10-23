@@ -5,7 +5,7 @@
 \title{Generate Custom Color Palette}
 \usage{
 custom_palette(
-  colors = c("#4B0055", "#00588B", "#009B95", "#53CC67", "yellow"),
+  colors = c("yellow", "#53CC67", "#009B95", "#00588B", "#4B0055"),
   n = 100
 )
 }

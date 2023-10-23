@@ -189,24 +189,6 @@ manipulate_files <- function(pattern,
   }
 }
 
-#' @name utils_file
-#' @export
-pliman_indexes <- function(){
-  read.csv(file = system.file("indexes.csv",
-                              package = "pliman",
-                              mustWork = TRUE),
-           header = T, sep = ";")$Index
-}
-#' @name utils_file
-#' @export
-pliman_indexes_eq <- function(){
-  read.csv(file = system.file("indexes.csv",
-                              package = "pliman",
-                              mustWork = TRUE),
-           header = T, sep = ";")$Equation
-}
-
-
 #' Add leading zeros to a numeric sequence
 #'
 #' Add `n` leading zeros to a numeric sequence. This is useful to create a
