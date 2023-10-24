@@ -12,7 +12,7 @@ plot_index(
   viewer = get_pliman_viewer(),
   all_layers = TRUE,
   layer = 1,
-  max_pixels = 5e+05,
+  max_pixels = 1e+06,
   downsample = NULL,
   downsample_fun = NULL,
   color_regions = custom_palette(),
@@ -26,8 +26,8 @@ plot_index(
 \code{\link[=image_index]{image_index()}}. If \code{object} is provided, then the input image is obtained
 internally.}
 
-\item{object}{An object computed with \code{\link[=analyze_objects_shp]{analyze_objects_shp()}}. By using this
-object you can ignore \code{img}.}
+\item{object}{An object computed with \code{\link[=analyze_objects]{analyze_objects()}} using the argument
+\code{return_mask = TRUE}.}
 
 \item{index}{The index to plot. Defaults to the index computed from the
 \code{object} if provided. Otherwise, the \code{B} index is computed. See

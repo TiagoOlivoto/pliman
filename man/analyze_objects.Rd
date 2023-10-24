@@ -3,6 +3,7 @@
 \name{analyze_objects}
 \alias{analyze_objects}
 \alias{plot.anal_obj}
+\alias{plot.anal_obj_ls}
 \alias{analyze_objects_iter}
 \title{Analyzes objects in an image}
 \usage{
@@ -90,6 +91,14 @@ analyze_objects(
 )
 
 \method{plot}{anal_obj}(
+  x,
+  which = "measure",
+  measure = "area",
+  type = c("density", "histogram"),
+  ...
+)
+
+\method{plot}{anal_obj_ls}(
   x,
   which = "measure",
   measure = "area",

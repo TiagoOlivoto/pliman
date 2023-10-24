@@ -100,7 +100,7 @@ apply_fun_to_imgs <- function(pattern,
     `%dopar%` <- foreach::`%dopar%`
 
     if(verbose == TRUE){
-      message("Image processing using multiple sessions (",workers, "). Please wait.")
+      message("Processing ", length(imgs), " images in multiple sessions (",workers, "). Please, wait.")
     }
 
     results <-
