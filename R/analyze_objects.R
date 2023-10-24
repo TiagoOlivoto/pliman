@@ -1134,9 +1134,9 @@ analyze_objects <- function(img,
       # check if angles should be computed
       if(isTRUE(ab_angles)){
         angles <- poly_apex_base_angle(object_contour, ab_angles_percentiles)
-    } else{
-      angles <- NULL
-    }
+      } else{
+        angles <- NULL
+      }
 
       # check if width at should be computed
       if(isTRUE(width_at)){
@@ -1167,6 +1167,7 @@ analyze_objects <- function(img,
       }
 
       if(!is.null(object_index)){
+        object_index_used <- object_index[1]
         if(!is.character(object_index)){
           stop("`object_index` must be a character.", call. = FALSE)
         }
@@ -1210,6 +1211,7 @@ analyze_objects <- function(img,
       } else{
         obj_rgb <- NULL
         indexes <- NULL
+        object_index_used <- NULL
       }
       if(isTRUE(return_mask)){
         mask <- nmask
@@ -1240,7 +1242,7 @@ analyze_objects <- function(img,
                       mask = mask,
                       pcv = pcv,
                       contours = object_contour,
-                      parms = list(index = index))
+                      parms = list(index = index, object_index = object_index_used))
       class(results) <- "anal_obj"
       if(plot == TRUE | save_image == TRUE){
         backg <- !is.null(col_background)
@@ -1394,7 +1396,7 @@ analyze_objects <- function(img,
         }
       }
       invisible(results)
-}
+    }
 
   if(missing(pattern)){
     help_count(img, foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
@@ -1422,7 +1424,6 @@ analyze_objects <- function(img,
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
       cl <- parallel::makePSOCKcluster(nworkers)
       doParallel::registerDoParallel(cl)
-      on.exit(stopCluster(cl))
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
@@ -1662,7 +1663,7 @@ analyze_objects <- function(img,
       )
     )
   }
-  }
+}
 
 
 #' @name analyze_objects
@@ -1702,6 +1703,56 @@ plot.anal_obj <- function(x,
                           measure = "area",
                           type = c("density", "histogram"),
                           ...){
+  if(!which %in% c("measure", "index")){
+    stop("'which' must be one of 'measure' or 'index'", call. = FALSE)
+  }
+  if(which == "measure"){
+    nam <- colnames(x$results)
+    if(!measure %in% nam){
+      stop("Measure '", measure, "' not available in 'x'. Try one of the '",
+           paste0(nam, collapse = ", "), call. = FALSE)
+    }
+    temp <- x$results[[measure]]
+    types <- c("density", "histogram")
+    matches <- grepl(type[1], types)
+    type <- types[matches]
+    if(type == "histogram"){
+      hist(temp,  xlab = paste(measure), main = NA, col = "cyan")
+    } else{
+      density_data <- density(temp)  # Calculate the density for the column
+      plot(density_data, col = "red", main = NA, lwd = 2, xlab = paste(measure), ylab = "Density")  # Create the density plot
+      points(x = temp, y = rep(0, length(temp)), col = "red")
+    }
+  } else{
+    rgb <- x$object_rgb
+    if(is.null(rgb)){
+      stop("RGB values not found. Use `object_index` in the function `analyze_objects()`.\nHave you accidentally missed the argument `pixel_level_index = TRUE`?", call. = FALSE)
+    }
+    plot(density(rgb$R),
+         main = NA,
+         col = "red",
+         lwd = 2,
+         xlim = c(min(rgb$R, rgb$G, rgb$B), max(rgb$R, rgb$G, rgb$B)),
+         ylim = c(0, max(density(rgb$R)$y, density(rgb$G)$y, density(rgb$B)$y)),
+         xlab = "Pixel value",
+         ylab = "Density")
+
+    # Add the density curves for G and B
+    lines(density(rgb$G), col = "green", lwd = 2)
+    lines(density(rgb$B), col = "blue", lwd = 2)
+    # Add a legend
+    legend("topright", legend = c("R", "G", "B"), col = c("red", "green", "blue"), lty = 1,
+           lwd = 2)
+
+  }
+}
+#' @name analyze_objects
+#' @export
+plot.anal_obj_ls <- function(x,
+                             which = "measure",
+                             measure = "area",
+                             type = c("density", "histogram"),
+                             ...){
   if(!which %in% c("measure", "index")){
     stop("'which' must be one of 'measure' or 'index'", call. = FALSE)
   }

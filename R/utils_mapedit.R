@@ -247,8 +247,8 @@ custom_palette <- function(colors = c("yellow", "#53CC67", "#009B95", "#00588B",
 #' @param img An optional `Image` object or an object computed with
 #'   [image_index()]. If `object` is provided, then the input image is obtained
 #'   internally.
-#' @param object An object computed with [analyze_objects_shp()]. By using this
-#'   object you can ignore `img`.
+#' @param object An object computed with [analyze_objects()] using the argument
+#'   `return_mask = TRUE`.
 #' @param index The index to plot. Defaults to the index computed from the
 #'   `object` if provided. Otherwise, the `B` index is computed. See
 #'   [image_index()] for more details.
@@ -300,7 +300,7 @@ plot_index <- function(img = NULL,
                        viewer = get_pliman_viewer(),
                        all_layers = TRUE,
                        layer = 1,
-                       max_pixels = 500000,
+                       max_pixels = 1000000,
                        downsample = NULL,
                        downsample_fun = NULL,
                        color_regions = custom_palette(),
@@ -466,15 +466,15 @@ plot_index <- function(img = NULL,
     }
   } else{
     if(!is.null(object)){
-      img <- object$final_image
+      if(is.null(object$mask)){
+        stop("Use `return_mask = TRUE` in `analyze_objects()` to plot the image index.")
+      }
       mask <- object$mask
-    } else if(is.null(img)){
-      stop("One of 'img' or 'object' must be informed.", call. = FALSE)
     }
     if(!is.null(index)){
       index <- index
-    } else if(!missing(object) & !is.null(object$object_index_computed)){
-      index <- object$object_index_computed[[1]]
+    } else if(!missing(object) & !is.null(object$parms$object_index)){
+      index <- object$parms$object_index[[1]]
     } else{
       index <- "B"
     }
@@ -482,12 +482,12 @@ plot_index <- function(img = NULL,
     if(!is.null(object)){
       if(isTRUE(remove_bg)){
         ind@.Data[which(mask@.Data == 0)] <- NA
-        ras <- terra::rast(t(ind@.Data))
+        ras <- terra::rast(EBImage::transpose(ind)@.Data)
       } else{
-        ras <- terra::rast(t(ind@.Data))
+        ras <- terra::rast(EBImage::transpose(ind)@.Data)
       }
     } else{
-      ras <- terra::rast(t(ind@.Data))
+      ras <-terra::rast(EBImage::transpose(ind)@.Data)
     }
     sto <-  ras |> stars::st_as_stars(proxy = FALSE)
     dimsto <- dim(sto)
@@ -535,7 +535,6 @@ plot_index <- function(img = NULL,
     }
   }
 }
-
 
 
 #' Prepare an image
