@@ -937,7 +937,7 @@ measure_disease_iter <- function(img,
                          title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
                          col = "blue")
     if(viewopt != "base"){
-      image_view(img[1:10,1:10,])
+      image_view(img[1:10,1:10,], edit = TRUE)
     }
   } else{
     back <- NULL
@@ -957,7 +957,7 @@ measure_disease_iter <- function(img,
                        title = "Use the first mouse button to pick up LEAF colors. Click 'Done' to finish",
                        col = "black")
   if(viewopt != "base"){
-    image_view(img[1:10,1:10,])
+    image_view(img[1:10,1:10,], edit = TRUE)
   }
 
   # Call pick_disease function

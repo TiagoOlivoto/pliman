@@ -120,7 +120,7 @@ image_view <- function(img,
         colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
         mapview::mapview(sf_df,
                          map.types = "OpenStreetMap",
-                         col.regions = color_regions,
+                         # col.regions = color_regions,
                          zcol = attribute,
                          legend = TRUE,
                          alpha.regions = alpha,

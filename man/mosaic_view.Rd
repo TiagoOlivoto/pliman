@@ -20,7 +20,6 @@ mosaic_view(
   downsample = NULL,
   alpha = 1,
   quantiles = c(0, 1),
-  domain = NULL,
   color_regions = custom_palette(),
   axes = FALSE,
   ...
@@ -70,12 +69,7 @@ automatically chosen so that the number of plotted pixels approximates the
 
 \item{alpha}{opacity of the fill color of the raster layer(s).}
 
-\item{quantiles}{the upper and lower quantiles used for color stretching. If
-set to \code{NULL}, stretching is performed basing on 'domain' argument.}
-
-\item{domain}{the upper and lower values used for color stretching. This is
-used only if \code{'quantiles'} is \code{NULL}. If both '\verb{domain'} and \code{'quantiles'} are
-set to \code{NULL}, stretching is applied based on min-max values.}
+\item{quantiles}{the upper and lower quantiles used for color stretching.}
 
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}

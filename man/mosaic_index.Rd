@@ -49,6 +49,6 @@ terra::crs(confusion) <- terra::crs(mosaic)
 names(confusion) <- "confusion"
 two_layers <- c(mosaic, confusion)
 final <- mosaic_index(two_layers, "B+R", b = 1, r = 2)
-mosaic_view(mosaic_input(final), viewer = "base")
+mosaic_view(final, viewer = "base")
 
 }

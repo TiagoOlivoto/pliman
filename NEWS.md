@@ -1,3 +1,9 @@
+# pliman 2.2.0
+## New functions
+* `mosaic_analyze()` to analyze orthomosaics.
+
+## Minor improvements
+* Imports the [poorman](https://github.com/nathaneastwood/poorman) package for data manipulation.
 # pliman 2.1.0
 ## New functions
 * A new `mosaic_*()` family of functions to handle orthomosaics from RGB and multispectral images.

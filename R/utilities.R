@@ -622,7 +622,7 @@ separate_col <- function(.data, col, into, sep = "[^[:alnum:]]+"){
   df <- strsplit(.data[[var]], split = sep)
   df <-
     do.call(rbind,
-            lapply(df, function(x)x)) %>%
+            lapply(df, function(x)x)) |>
     as.data.frame()
   .data[[var]] <- NULL
   names(df) <- into
@@ -788,6 +788,4 @@ open_wd <- function(path = getwd()){
     utils::browseURL(url = path)
   }
 }
-
-
 

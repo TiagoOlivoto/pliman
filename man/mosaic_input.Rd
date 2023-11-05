@@ -5,7 +5,7 @@
 \alias{mosaic_export}
 \title{Create and Export mosaics}
 \usage{
-mosaic_input(mosaic, ...)
+mosaic_input(mosaic, info = TRUE, ...)
 
 mosaic_export(mosaic, filename, overwrite = FALSE, ...)
 }
@@ -15,6 +15,8 @@ mosaic_export(mosaic, filename, overwrite = FALSE, ...)
 array or a list of \code{SpatRaster} objects.
 \item For \code{mosaic_export()}, an \code{SpatRaster} object.
 }}
+
+\item{info}{Print the mosaic informations (eg., CRS, extend). Defaults to \code{TRUE}}
 
 \item{...}{Additional arguments passed to \code{\link[terra:rast]{terra::rast()}} (\code{mosaic_input()})
 or  \code{\link[terra:writeRaster]{terra::writeRaster()}} (\code{mosaic_output()})}

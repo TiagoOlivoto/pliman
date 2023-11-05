@@ -1424,6 +1424,7 @@ analyze_objects <- function(img,
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
       cl <- parallel::makePSOCKcluster(nworkers)
       doParallel::registerDoParallel(cl)
+      on.exit(parallel::stopCluster(cl))
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")

@@ -20,7 +20,10 @@ Depends:
     R (>= 4.1)
 Imports: 
     doParallel,
+    exactextractr,
     foreach,
+    methods,
+    poorman,
     Rcpp,
     sf,
     stars,

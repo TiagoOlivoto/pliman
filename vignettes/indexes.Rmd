@@ -29,7 +29,7 @@ The RGB (Red, Green, Blue) color space is a widely used color representation in 
 ## Indexes in the RGB Color Space
 
 | Abbreviation | Name                                    | Formula                                                                       | Reference         |
-|--------------|-----------------------------------------|-------------------------------------------------------------------------------|-------------------|
+|-------------|---------------|-------------------------------|-------------|
 | R            | Red (650 nm)                            | `R`                                                                           |                   |
 | G            | Green (545 nm)                          | `G`                                                                           |                   |
 | B            | Blue (445 nm)                           | `B`                                                                           |                   |
@@ -68,7 +68,7 @@ The RGB (Red, Green, Blue) color space is a widely used color representation in 
 {pliman} provides tools to analyze up to 5 bands , which are generally B, G, R, RE (red-edge) and NIR (near-infrared). The following build-in indexes are available.
 
 | Abbreviation | Name                                               | Formula                                                                                                              | Reference          |
-|--------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|--------------------|
+|-------------|-------------|-----------------------------------|-------------|
 | NDVI         | Normalized Diference Vegetation Index              | `(NIR - R) / (NIR + R)`                                                                                              | @j1969             |
 | PSRI         | Plant Senescence Reflectance Index                 | `(R-G)/RE`                                                                                                           | @merzlyak1999      |
 | GNDVI        | Normalized Difference NIR/G                        | `(NIR - G) / (NIR + G)`                                                                                              | @gitelson1996      |
@@ -109,6 +109,7 @@ The RGB (Red, Green, Blue) color space is a widely used color representation in 
 | RDVI         | Renormalized Difference Vegetation Index           | `(NIR - R) / (sqrt(NIR + R))`                                                                                        | @roujean1995       |
 | TDVI         | Transformed Difference Vegetation Index            | `1.5 * ((NIR - R) / (sqrt(NIR ^2 + R + 0.5)))`                                                                       | @bannari2002       |
 | WDRVI        | Wide Dynamic Range Vegetation Index                | `(0.2 * NIR - R) / (0.2 * NIR + R)`                                                                                  | @gitelson2004      |
+| BWDRVI       | Blue-Wide Dynamic Range Vegetation Index           | `(0.1*NIR-B)/(0.1*NIR+B)`                                                                                            | @gitelson2004      |
 | ARI          | Anthocyanin Reflectance Index                      | `(1 / G) - (1 / RE)`                                                                                                 | @gitelson2001      |
 
 **Usefull references**
@@ -139,7 +140,7 @@ The `rgb_to_hsb()` function can be used to convert RGB to HSB color space. The c
 ## Indexes in the HSB Color Space
 
 | Abbreviation | Name                  | Formula                                           | Reference    |
-|--------------|-----------------------|---------------------------------------------------|--------------|
+|--------------|--------------|-------------------------------|--------------|
 | DGCI         | Dark Green Color Inde | `((H - 60) / 60 + (1 - S/100) + (1 - B/100)) / 3` | @karcher2003 |
 
 # CIE-Lab Color Space
