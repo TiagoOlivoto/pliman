@@ -85,7 +85,6 @@ add_rgb <- function(
 
 }
 
-
 create_buffer <- function(coords, buffer_col, buffer_row) {
   # Calculate the new x-min, x-max, y-min, and y-max after adjustment
   x_min <- min(coords[, 1])
@@ -159,6 +158,19 @@ compute_downsample <- function(nr, nc, n) {
   }
 }
 
+downsample_rows_cols <- function(nr, nc, n) {
+  if (n == 0) {
+    return(list(rows = 1:nr, cols = 1:nc))
+  } else if (n == 1) {
+    return(list(rows = seq(1, nr, by = 2), cols = seq(1, nc, by = 2)))
+  } else if (n > 1) {
+    return(list(rows = seq(1, nr, by = n + 1), cols = seq(1, nc, by = n + 1)))
+  } else {
+    stop("Invalid downsampling factor. n must be a non-negative integer.")
+  }
+}
+
+
 compute_measures_mosaic <- function(contour){
   lw <- help_lw(contour)
   cdist <- help_centdist(contour)
@@ -170,6 +182,192 @@ compute_measures_mosaic <- function(contour){
              diam_mean = mean(cdist),
              diam_max = max(cdist))
 
+}
+
+
+
+
+#' Build a shapefile from a mosaic raster
+#'
+#' This function takes a mosaic raster to create a shapefile containing polygons
+#' for the specified regions. Users can drawn Areas of Interest (AOIs) that can
+#' be either a polygon with n sides, or a grid, defined by `nrow`, and `ncol`
+#' arguments.
+#' @details
+#' Since multiple blocks can be created, the length of arguments `grid`, `nrow`,
+#' `ncol`, `buffer_edge`, `buffer_col`, and `buffer_row` can be either an scalar
+#' (the same argument applied to all the drawn blocks), or a vector with the
+#' same length as the number of drawn blocks. In the last, shapefiles in each
+#' block can be created with different dimensions.
+#'
+#' @inheritParams mosaic_analyze
+#' @export
+#'
+shapefile_build <- function(mosaic,
+                            r = 1,
+                            g = 2,
+                            b = 3,
+                            re = 4,
+                            nir = 5,
+                            grid = TRUE,
+                            nrow = 1,
+                            ncol = 1,
+                            build_shapefile = TRUE,
+                            check_shapefile = FALSE,
+                            buffer_edge = 5,
+                            buffer_col = 0,
+                            buffer_row = 0,
+                            as_sf = TRUE,
+                            verbose = TRUE,
+                            max_pixels = 1000000,
+                            downsample = NULL,
+                            quantiles =  c(0, 1)){
+  if(terra::crs(mosaic) == ""){
+    terra::crs(mosaic) <- terra::crs("EPSG:3857")
+  }
+  nlyrs <- terra::nlyr(mosaic)
+  if(verbose){
+    cat("\014","\nBuilding the mosaic...\n")
+  }
+  if(build_shapefile){
+    points <- mosaic_view(mosaic,
+                          r = r,
+                          g = g,
+                          b = b,
+                          re = re,
+                          nir = nir,
+                          max_pixels = max_pixels,
+                          downsample = downsample,
+                          quantiles = quantiles,
+                          edit = TRUE)
+    cpoints <- points$finished
+  } else{
+    extm <- terra::ext(mosaic)
+    xmin <- extm[1]
+    xmax <- extm[2]
+    ymin <- extm[3]
+    ymax <- extm[4]
+    coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
+    # Create a Polygon object
+    polygon <- sf::st_polygon(list(coords))
+    # Create an sf object with a data frame that includes the 'geometry' column
+    cpoints <- sf::st_sf(data.frame(id = 1),
+                         geometry = sf::st_sfc(polygon),
+                         crs = sf::st_crs(mosaic))
+  }
+
+  # crop to the analyzed area
+  poly_ext <-
+    cpoints |>
+    sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+    terra::vect() |>
+    terra::buffer(buffer_edge) |>
+    terra::ext()
+  mosaiccr <- terra::crop(mosaic, poly_ext)
+  mosaiccr[mosaiccr == 65535] <- NA
+
+  # check the parameters
+  if(length(nrow) == 1 & nrow(cpoints) != 1){
+    nrow <- rep(nrow, nrow(cpoints))
+  }
+  if(length(nrow) != nrow(cpoints)){
+    warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+  if(length(ncol) == 1 & nrow(cpoints) != 1){
+    ncol <- rep(ncol, nrow(cpoints))
+  }
+  if(length(ncol) != nrow(cpoints)){
+    warning(paste0("`ncol` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+  if(length(buffer_col) == 1 & nrow(cpoints) != 1){
+    buffer_col <- rep(buffer_col, nrow(cpoints))
+  }
+  if(length(buffer_col) != nrow(cpoints)){
+    warning(paste0("`buffer_col` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+  if(length(buffer_row) == 1 & nrow(cpoints) != 1){
+    buffer_row <- rep(buffer_row, nrow(cpoints))
+  }
+  if(length(buffer_row) != nrow(cpoints)){
+    warning(paste0("`buffer_row` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+  if(length(grid) == 1 & nrow(cpoints) != 1){
+    grid <- rep(grid, nrow(cpoints))
+  }
+  if(length(grid) != nrow(cpoints)){
+    warning(paste0("`grid` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+
+  # check the created shapes?
+  if(verbose){
+    cat("\014","\nCreating the shapes...\n")
+  }
+  # cpoints <- re$shapefile$finished
+  created_shapes <- list()
+  for(k in 1:nrow(cpoints)){
+    if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
+      plot_grid <-
+        make_grid(cpoints[k, ],
+                  nrow = nrow[k],
+                  ncol = ncol[k],
+                  buffer_col = buffer_col[k],
+                  buffer_row = buffer_row[k])
+    } else{
+      plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> poorman::select(geometry)
+    }
+    created_shapes[[k]] <- plot_grid
+
+  }
+  if(check_shapefile){
+    if(verbose){
+      cat("\014","\nChecking the build shapefile...\n")
+    }
+    lengths <- sapply(created_shapes, nrow)
+    pg_edit <-
+      do.call(rbind, lapply(seq_along(created_shapes), function(i){
+        created_shapes[[i]] |>
+          poorman::mutate(`_leaflet_id` = 1:nrow(created_shapes[[i]]),
+                          feature_type = "polygon",
+                          block = i) |>
+          poorman::relocate(geometry, .after = 3) |>
+          sf::st_transform(crs = 4326)
+      }))
+
+    if(nlyrs > 2){
+      map <-
+        mapview::mapview() %>%
+        add_rgb(x = as(mosaiccr, "Raster"),
+                r = 1,
+                g = 2,
+                b = 3,
+                na.color = "#00000000",
+                quantiles = quantiles)
+    } else{
+      map <-
+        mapview::mapview() %>%
+        leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
+                             colorOptions = leafem:::colorOptions(palette = color_regions,
+                                                                  na.color = "transparent"))
+    }
+    if(build_shapefile){
+      mapview::mapview() |> mapedit::editMap()
+    }
+    edited <-
+      mapedit::editFeatures(pg_edit, map) |>
+      poorman::select(geometry, block) |>
+      sf::st_transform(sf::st_crs(mosaic))
+    sfeat <- sf::st_as_sf(edited$geometry)
+    sf::st_geometry(sfeat) <- "geometry"
+    created_shapes <- split(sfeat, edited$block)
+  }
+  if(verbose){
+    cat("\014","\nShapefile finished...\n")
+  }
+  if(!as_sf){
+    return(shapefile_input(created_shapes, info = FALSE, as_sf = FALSE))
+  } else{
+    return(created_shapes)
+  }
 }
 
 
@@ -212,6 +410,18 @@ compute_measures_mosaic <- function(contour){
 #'   within plots (default: FALSE). If `TRUE`, the `segment_index` will be
 #'   computed and pixels with values below the `threshold` will be selected and
 #'   a watershed-based segmentation will be performed.
+#' @param watershed 	If `TRUE` (default) performs watershed-based object
+#'   detection. This will detect objects even when they are touching one other.
+#'   If FALSE, all pixels for each connected set of foreground pixels are set to
+#'   a unique object. This is faster but is not able to segment touching
+#'   objects.
+#' @param tolerance The minimum height of the object in the units of image
+#'   intensity between its highest point (seed) and the point where it contacts
+#'   another object (checked for every contact pixel). If the height is smaller
+#'   than the tolerance, the object will be combined with one of its neighbors,
+#'   which is the highest.
+#' @param extension Radius of the neighborhood in pixels for the detection of
+#'   neighboring objects. Higher value smooths out small objects.
 #' @param include_if Character vector specifying the type of intersection
 #'   defaults to "centroid" (individuals in with the centroid is included within
 #'   the drawn plot will be included in such plot). Other possible values
@@ -271,19 +481,22 @@ mosaic_analyze <- function(mosaic,
                            buffer_row = 0,
                            segment_plot = FALSE,
                            segment_individuals = FALSE,
+                           watershed = TRUE,
+                           tolerance = 1,
+                           extension = 1,
                            include_if = "centroid",
                            plot_index = "GLAI",
                            segment_index = "GLAI",
                            threshold = "Otsu",
                            filter = FALSE,
                            summarize_fun = "mean",
-                           attribute = "GLAI",
+                           attribute = "mean.GLAI",
                            invert = FALSE,
                            color_regions = rev(grDevices::terrain.colors(50)),
                            alpha = 1,
-                           max_pixels = 1000000,
+                           max_pixels = 2000000,
                            downsample = NULL,
-                           quantiles = c(0, 0.98),
+                           quantiles = c(0, 1),
                            plot = TRUE,
                            verbose = TRUE){
   includeopt <- c("intersect", "covered", "overlap", "centroid")
@@ -296,180 +509,203 @@ mosaic_analyze <- function(mosaic,
   }
   nlyrs <- terra::nlyr(mosaic)
   if(verbose){
-    cat("\014","\n\nBuilding the mosaic...\n")
+    cat("\014","\nBuilding the mosaic...\n")
   }
   if(is.null(shapefile)){
-    if(build_shapefile){
-      points <- mosaic_view(mosaic,
-                            r = r,
-                            g = g,
-                            b = b,
-                            re = re,
-                            nir = nir,
-                            max_pixels = max_pixels,
-                            downsample = downsample,
-                            quantiles = quantiles,
-                            edit = TRUE)
-      cpoints <- points$finished
-    } else{
-      extm <- terra::ext(mosaic)
-      xmin <- extm[1]
-      xmax <- extm[2]
-      ymin <- extm[3]
-      ymax <- extm[4]
-      coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
-      # Create a Polygon object
-      polygon <- sf::st_polygon(list(coords))
-      # Create an sf object with a data frame that includes the 'geometry' column
-      cpoints <- sf::st_sf(data.frame(id = 1),
-                           geometry = sf::st_sfc(polygon),
-                           crs = sf::st_crs(mosaic))
-    }
+
+    created_shapes <- shapefile_build(mosaic,
+                                      r = r,
+                                      g = g,
+                                      b = b,
+                                      re = re,
+                                      nir = nir,
+                                      grid = grid,
+                                      nrow = nrow,
+                                      ncol = ncol,
+                                      build_shapefile = build_shapefile,
+                                      check_shapefile = check_shapefile,
+                                      buffer_edge = buffer_edge,
+                                      buffer_col = buffer_col,
+                                      buffer_row = buffer_row,
+                                      max_pixels = max_pixels,
+                                      verbose = verbose,
+                                      downsample = downsample,
+                                      quantiles = quantiles)
+
+
+    # if(build_shapefile){
+    #   points <- mosaic_view(mosaic,
+    #                         r = r,
+    #                         g = g,
+    #                         b = b,
+    #                         re = re,
+    #                         nir = nir,
+    #                         max_pixels = max_pixels,
+    #                         downsample = downsample,
+    #                         quantiles = quantiles,
+    #                         edit = TRUE)
+    #   cpoints <- points$finished
+    # } else{
+    #   extm <- terra::ext(mosaic)
+    #   xmin <- extm[1]
+    #   xmax <- extm[2]
+    #   ymin <- extm[3]
+    #   ymax <- extm[4]
+    #   coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
+    #   # Create a Polygon object
+    #   polygon <- sf::st_polygon(list(coords))
+    #   # Create an sf object with a data frame that includes the 'geometry' column
+    #   cpoints <- sf::st_sf(data.frame(id = 1),
+    #                        geometry = sf::st_sfc(polygon),
+    #                        crs = sf::st_crs(mosaic))
+    # }
+
 
     # crop to the analyzed area
     poly_ext <-
-      cpoints |>
+      do.call(rbind, lapply(created_shapes, function(x){
+        x
+      })) |>
       sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
       terra::vect() |>
-      terra::buffer(20) |>
+      terra::buffer(buffer_edge) |>
       terra::ext()
+
     mosaiccr <- terra::crop(mosaic, poly_ext)
     mosaiccr[mosaiccr == 65535] <- NA
 
-    # check the parameters
-    if(length(nrow) == 1 & nrow(cpoints) != 1){
-      nrow <- rep(nrow, nrow(cpoints))
+    # # check the parameters
+    # if(length(nrow) == 1 & nrow(cpoints) != 1){
+    #   nrow <- rep(nrow, nrow(cpoints))
+    # }
+    # if(length(nrow) != nrow(cpoints)){
+    #   warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    # }
+    # if(length(ncol) == 1 & nrow(cpoints) != 1){
+    #   ncol <- rep(ncol, nrow(cpoints))
+    # }
+    # if(length(ncol) != nrow(cpoints)){
+    #   warning(paste0("`ncol` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    # }
+    # if(length(buffer_col) == 1 & nrow(cpoints) != 1){
+    #   buffer_col <- rep(buffer_col, nrow(cpoints))
+    # }
+    # if(length(buffer_col) != nrow(cpoints)){
+    #   warning(paste0("`buffer_col` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    # }
+    # if(length(buffer_row) == 1 & nrow(cpoints) != 1){
+    #   buffer_row <- rep(buffer_row, nrow(cpoints))
+    # }
+    # if(length(buffer_row) != nrow(cpoints)){
+    #   warning(paste0("`buffer_row` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    # }
+    # if(length(grid) == 1 & nrow(cpoints) != 1){
+    #   grid <- rep(grid, nrow(cpoints))
+    # }
+    # if(length(grid) != nrow(cpoints)){
+    #   warning(paste0("`grid` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    # }
+    if(length(segment_plot) == 1 & length(created_shapes) != 1){
+      segment_plot <- rep(segment_plot, length(created_shapes))
     }
-    if(length(nrow) != nrow(cpoints)){
-      warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(segment_plot) != length(created_shapes)){
+      warning(paste0("`segment_plot` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(ncol) == 1 & nrow(cpoints) != 1){
-      ncol <- rep(ncol, nrow(cpoints))
+    if(length(segment_individuals) == 1 & length(created_shapes) != 1){
+      segment_individuals <- rep(segment_individuals, length(created_shapes))
     }
-    if(length(ncol) != nrow(cpoints)){
-      warning(paste0("`ncol` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(segment_individuals) != length(created_shapes)){
+      warning(paste0("`segment_individuals` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(buffer_col) == 1 & nrow(cpoints) != 1){
-      buffer_col <- rep(buffer_col, nrow(cpoints))
+    if(length(threshold) == 1 & length(created_shapes) != 1){
+      threshold <- rep(threshold, length(created_shapes))
     }
-    if(length(buffer_col) != nrow(cpoints)){
-      warning(paste0("`buffer_col` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(threshold) != length(created_shapes)){
+      warning(paste0("`threshold` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(buffer_row) == 1 & nrow(cpoints) != 1){
-      buffer_row <- rep(buffer_row, nrow(cpoints))
+    if(length(segment_index) == 1 & length(created_shapes) != 1){
+      segment_index <- rep(segment_index, length(created_shapes))
     }
-    if(length(buffer_row) != nrow(cpoints)){
-      warning(paste0("`buffer_row` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(segment_index) != length(created_shapes)){
+      warning(paste0("`segment_index` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(grid) == 1 & nrow(cpoints) != 1){
-      grid <- rep(grid, nrow(cpoints))
+    if(length(invert) == 1 & length(created_shapes) != 1){
+      invert <- rep(invert, length(created_shapes))
     }
-    print(grid)
-    if(length(grid) != nrow(cpoints)){
-      warning(paste0("`grid` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(invert) != length(created_shapes)){
+      warning(paste0("`invert` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(segment_plot) == 1 & nrow(cpoints) != 1){
-      segment_plot <- rep(segment_plot, nrow(cpoints))
+    if(length(includeopt) == 1 & length(created_shapes) != 1){
+      includeopt <- rep(includeopt, length(created_shapes))
     }
-    if(length(segment_plot) != nrow(cpoints)){
-      warning(paste0("`segment_plot` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(includeopt) != length(created_shapes)){
+      warning(paste0("`includeopt` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(segment_individuals) == 1 & nrow(cpoints) != 1){
-      segment_individuals <- rep(segment_individuals, nrow(cpoints))
+    if(length(filter) == 1 & length(created_shapes) != 1){
+      filter <- rep(filter, length(created_shapes))
     }
-    if(length(segment_individuals) != nrow(cpoints)){
-      warning(paste0("`segment_individuals` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(filter) != length(created_shapes)){
+      warning(paste0("`filter` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(threshold) == 1 & nrow(cpoints) != 1){
-      threshold <- rep(threshold, nrow(cpoints))
+    if(length(grid) == 1 & length(created_shapes) != 1){
+      grid <- rep(grid, length(created_shapes))
     }
-    if(length(threshold) != nrow(cpoints)){
-      warning(paste0("`threshold` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+    if(length(grid) != length(created_shapes)){
+      warning(paste0("`grid` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    if(length(segment_index) == 1 & nrow(cpoints) != 1){
-      segment_index <- rep(segment_index, nrow(cpoints))
-    }
-    if(length(segment_index) != nrow(cpoints)){
-      warning(paste0("`segment_index` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    }
-    if(length(invert) == 1 & nrow(cpoints) != 1){
-      invert <- rep(invert, nrow(cpoints))
-    }
-    if(length(invert) != nrow(cpoints)){
-      warning(paste0("`invert` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    }
-    if(length(includeopt) == 1 & nrow(cpoints) != 1){
-      includeopt <- rep(includeopt, nrow(cpoints))
-    }
-    if(length(includeopt) != nrow(cpoints)){
-      warning(paste0("`includeopt` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    }
-    if(length(filter) == 1 & nrow(cpoints) != 1){
-      filter <- rep(filter, nrow(cpoints))
-    }
-    if(length(filter) != nrow(cpoints)){
-      warning(paste0("`filter` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    }
-
-    # check the created shapes?
-    if(verbose){
-      cat("\014","\n\nCreating the shapes...\n")
-    }
+    # # check the created shapes?
+    # if(verbose){
+    #   cat("\014","\nCreating the shapes...\n")
+    # }
     # cpoints <- re$shapefile$finished
-    created_shapes <- list()
-    created_sf <- list()
-    for(k in 1:nrow(cpoints)){
-      if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
-        plot_grid <-
-          make_grid(cpoints[k, ],
-                    nrow = nrow[k],
-                    ncol = ncol[k],
-                    buffer_col = buffer_col[k],
-                    buffer_row = buffer_row[k])
-      } else{
-        plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> poorman::select(geometry)
-      }
-      if(check_shapefile){
-        pg_edit <-
-          plot_grid |>
-          poorman::mutate(`_leaflet_id` = 1:nrow(plot_grid), feature_type = "polygon") |>
-          poorman::relocate(geometry, .after = 3) |>
-          sf::st_transform(crs = 4326)
-        if(nlyrs > 2){
-          map <-
-            mapview::mapview() %>%
-            add_rgb(x = as(mosaiccr, "Raster"),
-                    r = r,
-                    g = g,
-                    b = b,
-                    na.color = "#00000000",
-                    quantiles = quantiles)
-        } else{
-          map <-
-            mapview::mapview() %>%
-            leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
-                                 colorOptions = leafem:::colorOptions(palette = color_regions,
-                                                                      na.color = "transparent"))
-        }
-        if(build_shapefile){
-          mapview::mapview() |> mapedit::editMap()
-        }
-        edited <-
-          mapedit::editFeatures(pg_edit, map) |>
-          poorman::select(geometry) |>
-          sf::st_transform(sf::st_crs(mosaic))
-        created_shapes[k] <- edited
-      } else{
-        created_shapes[k] <- plot_grid
-      }
-    }
+    # created_shapes <- list()
+    # for(k in 1:nrow(cpoints)){
+    #   if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
+    #     plot_grid <-
+    #       make_grid(cpoints[k, ],
+    #                 nrow = nrow[k],
+    #                 ncol = ncol[k],
+    #                 buffer_col = buffer_col[k],
+    #                 buffer_row = buffer_row[k])
+    #   } else{
+    #     plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> poorman::select(geometry)
+    #   }
+    #   if(check_shapefile){
+    #     pg_edit <-
+    #       plot_grid |>
+    #       poorman::mutate(`_leaflet_id` = 1:nrow(plot_grid), feature_type = "polygon") |>
+    #       poorman::relocate(geometry, .after = 3) |>
+    #       sf::st_transform(crs = 4326)
+    #     if(nlyrs > 2){
+    #       map <-
+    #         mapview::mapview() %>%
+    #         add_rgb(x = as(mosaiccr, "Raster"),
+    #                 r = r,
+    #                 g = g,
+    #                 b = b,
+    #                 na.color = "#00000000",
+    #                 quantiles = quantiles)
+    #     } else{
+    #       map <-
+    #         mapview::mapview() %>%
+    #         leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
+    #                              colorOptions = leafem:::colorOptions(palette = color_regions,
+    #                                                                   na.color = "transparent"))
+    #     }
+    #     if(build_shapefile){
+    #       mapview::mapview() |> mapedit::editMap()
+    #     }
+    #     edited <-
+    #       mapedit::editFeatures(pg_edit, map) |>
+    #       poorman::select(geometry) |>
+    #       sf::st_transform(sf::st_crs(mosaic))
+    #     created_shapes[k] <- edited
+    #   } else{
+    #     created_shapes[k] <- plot_grid
+    #   }
+    # }
 
   } else{
-    # if(terra::crs(shapefile) != terra::crs(mosaic)){
-    #   shpt <- terra::vect(shpin)
-    #   terra::crs(shpt) <- terra::crs(mosaic)
-    #   shapefile <- sf::st_as_sf(shpt)
-    # }
     extm <- terra::ext(shapefile)
     xmin <- extm[1]
     xmax <- extm[2]
@@ -477,27 +713,30 @@ mosaic_analyze <- function(mosaic,
     ymax <- extm[4]
     coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
     # Create a Polygon object
-    polygon <- sf::st_polygon(list(coords))
+    # polygon <- sf::st_polygon(list(coords))
     # Create an sf object with a data frame that includes the 'geometry' column
-    cpoints <- sf::st_sf(data.frame(id = 1),
-                         geometry = sf::st_sfc(polygon),
-                         crs = sf::st_crs(mosaic))
-    created_shapes <- list(shapefile$geometry)
+    # cpoints <- sf::st_sf(data.frame(id = 1),
+    #                      geometry = sf::st_sfc(polygon),
+    #                      crs = sf::st_crs(mosaic))
+    geoms <- sf::st_as_sf(shapefile$geometry)
+    sf::st_geometry(geoms) <- "geometry"
+    created_shapes <- list(geoms)
 
     # crop to the analyzed area
     poly_ext <-
-      cpoints |>
+      created_shapes[[1]] |>
       sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
       terra::vect() |>
-      terra::buffer(20) |>
+      terra::buffer(buffer_edge) |>
       terra::ext()
     mosaiccr <- terra::crop(mosaic, poly_ext)
     mosaiccr[mosaiccr == 65535] <- NA
   }
 
+  # return(created_shapes)
   # compute the indexes
   if(verbose){
-    cat("\014","\n\nComputing the indexes...\n")
+    cat("\014","\nComputing the indexes...\n")
   }
   if(nlyrs > 1){
     mind <- terra::rast(
@@ -521,21 +760,23 @@ mosaic_analyze <- function(mosaic,
   results <- list()
   result_indiv <- list()
   extends <- terra::ext(mosaiccr)
-
-  for(j in 1:nrow(cpoints)){
+  # return(created_shapes)
+  # return(created_shapes)
+  for(j in seq_along(created_shapes)){
     if(segment_plot[j] & segment_individuals[j]){
       stop("Only `segment_plot` OR `segment_individuals` can be used", call. = FALSE)
     }
     if(verbose){
-      cat("\014","\n\nExtracting data from block", j, "\n")
+      cat("\014","\nExtracting data from block", j, "\n")
     }
-    if(inherits(cpoints[j, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[j, ])) == 5 & grid[[j]]){
+    if(inherits(created_shapes[[j]]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(created_shapes[[j]][[1]][[1]])) == 5 & grid[[j]]){
       plot_grid <- created_shapes[[j]]
+      sf::st_geometry(plot_grid) <- "geometry"
       ext_anal <-
-        cpoints[j, ] |>
+        plot_grid |>
         sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
         terra::vect() |>
-        terra::buffer(20) |>
+        terra::buffer(buffer_edge) |>
         terra::ext()
       mind_temp <- terra::crop(mind, terra::ext(ext_anal))
       extends <- terra::ext(mind_temp)
@@ -564,7 +805,11 @@ mosaic_analyze <- function(mosaic,
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
-        dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = 1, ext = 1)
+        if(watershed){
+          dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = tolerance, ext = extension)
+        } else{
+          dmask <- EBImage::bwlabel(dmask)
+        }
         resx <- terra::res(mosaiccr)[1]
         resy <- terra::res(mosaiccr)[1]
         conts <- EBImage::ocontour(matrix(dmask, ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
@@ -647,6 +892,7 @@ mosaic_analyze <- function(mosaic,
       ####### ANY TYPE OF POLYGON ########
       # check if segmentation is performed
       plot_grid <- created_shapes[[j]]
+      sf::st_geometry(plot_grid) <- "geometry"
       ext_anal <-
         plot_grid |>
         terra::vect() |>
@@ -680,7 +926,11 @@ mosaic_analyze <- function(mosaic,
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
-        dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = 1, ext = 1)
+        if(watershed){
+          dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = tolerance, ext = extension)
+        } else{
+          dmask <- EBImage::bwlabel(dmask)
+        }
         conts <- EBImage::ocontour(dmask)
         conts <- conts[sapply(conts, nrow) > 2]
         resx <- terra::res(mosaiccr)[1]
@@ -822,12 +1072,14 @@ mosaic_analyze <- function(mosaic,
     result_plot_summ <-
       do.call(rbind, lapply(summres, function(x){x})) |>
       poorman::left_join(plot_area, by = c("block", "plot_id")) |>
-      poorman::mutate(coverage = as.numeric(area_sum / plot_area), .after = area)
+      poorman::mutate(coverage = as.numeric(area_sum / plot_area), .after = area) |>
+      poorman::left_join(results |>   poorman::select(block, plot_id, geometry), by = c("block", "plot_id")) |>
+      sf::st_as_sf()
+
   } else{
     result_plot_summ <- NULL
     result_indiv <- NULL
   }
-
 
   ext_plot <-
     poly_ext |>
@@ -844,14 +1096,15 @@ mosaic_analyze <- function(mosaic,
   mosaicplot <- terra::crop(mosaic, ext_plot)
   if(!is.null(summarize_fun) & isTRUE(plot)){
     if(verbose){
-      cat("\014","\n\nPreparing to plot...\n")
+      cat("\014","\nPreparing to plot...\n")
     }
 
     possible_downsamples <- 0:15
     possible_npix <- sapply(possible_downsamples, function(x){
       compute_downsample(nrow(mosaicplot), ncol(mosaicplot), x)
     })
-    downsample <- which.min(abs(possible_npix - max_pixels)) - 1
+    downsample <- which.min(abs(possible_npix - max_pixels))
+    downsample <- ifelse(downsample == 1, 0, downsample)
     if(downsample > 0){
       mosaicplot <- terra::aggregate(mosaicplot, fact = downsample)
     }
@@ -860,8 +1113,8 @@ mosaic_analyze <- function(mosaic,
         mapview::mapview(results,
                          zcol = attribute,
                          layer.name = attribute,
-                         col.regions = color_regions,
-                         alpha.regions = 0.3,
+                         col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
+                         alpha.regions = 1,
                          na.color = "#00000000",
                          maxBytes = 64 * 1024 * 1024,
                          verbose = FALSE)
@@ -889,9 +1142,8 @@ mosaic_analyze <- function(mosaic,
                            verbose = FALSE) +
             mapview::mapview(results,
                              legend = FALSE,
-                             alpha.regions = 0.3,
+                             alpha.regions = 0.4,
                              zcol = "block",
-                             col.regions = custom_palette(),
                              map.types = "OpenStreetMap") )|>
         add_rgb(as(mosaicplot, "Raster"),
                 r = r,
@@ -917,6 +1169,7 @@ mosaic_analyze <- function(mosaic,
               map_indiv = mapindivid,
               shapefile = created_shapes))
 }
+
 
 
 #' Mosaic View
@@ -958,7 +1211,7 @@ mosaic_analyze <- function(mosaic,
 #' @importFrom stars st_downsample st_as_stars
 #' @importFrom poorman summarise across mutate arrange left_join bind_cols
 #'   bind_rows contains ends_with everything between pivot_longer pivot_wider
-#'   where select filter relocate
+#'   where select filter relocate rename
 #' @examples
 #' if(interactive()){
 #' library(pliman)
@@ -994,9 +1247,10 @@ mosaic_view <- function(mosaic,
                         ...){
   terra::terraOptions(progress = 0)
   on.exit(terra::terraOptions(progress = 1))
-  mosaic[mosaic == 65535] <- NA
+  # mosaic[mosaic == 65535] <- NA
+  # mosaic <- terra::subst(mosaic, 65535, NA)
   # check_mapview()
-  mapview::mapviewOptions(layers.control.pos = "topright")
+  mapview::mapviewOptions(layers.control.pos = "topright", raster.size = 64 * 1024 * 1024)
   on.exit(mapview::mapviewOptions(default = TRUE))
   viewopt <- c("rgb", "index")
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
@@ -1016,17 +1270,17 @@ mosaic_view <- function(mosaic,
   dimsto <- dim(mosaic)
   nr <- dimsto[1]
   nc <- dimsto[2]
-  # npix <- nc * nr
 
-  if(max_pixels > 1000000){
+  if(max_pixels > 2000000){
     message("The number of pixels is too high, which might slow the rendering process.")
   }
-  possible_downsamples <- 1:50
+  possible_downsamples <- 0:50
   possible_npix <- sapply(possible_downsamples, function(x){
     compute_downsample(nr, nc, x)
   })
   if(is.null(downsample)){
-    downsample <- which.min(abs(possible_npix - max_pixels)) - 1
+    downsample <- which.min(abs(possible_npix - max_pixels))
+    downsample <- ifelse(downsample == 1, 0, downsample)
   }
   if(downsample > 0){
     message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
@@ -1044,7 +1298,7 @@ mosaic_view <- function(mosaic,
                          r = r,
                          g = g,
                          b = b,
-                         maxpixels = 10000000,
+                         maxpixels = 60000000,
                          quantiles = quantiles)
       if(edit){
         map <-
@@ -1137,7 +1391,6 @@ mosaic_view <- function(mosaic,
     }
   }
 }
-
 
 #' Create and Export mosaics
 #' @details

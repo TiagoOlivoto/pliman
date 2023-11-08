@@ -22,19 +22,22 @@ mosaic_analyze(
   buffer_row = 0,
   segment_plot = FALSE,
   segment_individuals = FALSE,
+  watershed = TRUE,
+  tolerance = 1,
+  extension = 1,
   include_if = "centroid",
   plot_index = "GLAI",
   segment_index = "GLAI",
   threshold = "Otsu",
   filter = FALSE,
   summarize_fun = "mean",
-  attribute = "GLAI",
+  attribute = "mean.GLAI",
   invert = FALSE,
   color_regions = rev(grDevices::terrain.colors(50)),
   alpha = 1,
-  max_pixels = 1e+06,
+  max_pixels = 2e+06,
   downsample = NULL,
-  quantiles = c(0, 0.98),
+  quantiles = c(0, 1),
   plot = TRUE,
   verbose = TRUE
 )
@@ -85,6 +88,21 @@ values below the \code{threshold} will be selected.}
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
 computed and pixels with values below the \code{threshold} will be selected and
 a watershed-based segmentation will be performed.}
+
+\item{watershed}{If \code{TRUE} (default) performs watershed-based object
+detection. This will detect objects even when they are touching one other.
+If FALSE, all pixels for each connected set of foreground pixels are set to
+a unique object. This is faster but is not able to segment touching
+objects.}
+
+\item{tolerance}{The minimum height of the object in the units of image
+intensity between its highest point (seed) and the point where it contacts
+another object (checked for every contact pixel). If the height is smaller
+than the tolerance, the object will be combined with one of its neighbors,
+which is the highest.}
+
+\item{extension}{Radius of the neighborhood in pixels for the detection of
+neighboring objects. Higher value smooths out small objects.}
 
 \item{include_if}{Character vector specifying the type of intersection
 defaults to "centroid" (individuals in with the centroid is included within
