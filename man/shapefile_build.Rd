@@ -61,6 +61,9 @@ respectively, of each individual plot's side. A value between 0 and 0.5
 where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 value of 0.25 will buffer the plot by 25\% on each side.}
 
+\item{as_sf}{Logical value indicating whether to convert the imported
+shapefile to an \code{sf} object (default is \code{TRUE}).}
+
 \item{verbose}{Logical, indicating whether to display verbose output
 (default: TRUE).}
 

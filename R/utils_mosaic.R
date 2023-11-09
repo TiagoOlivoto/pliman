@@ -1,4 +1,5 @@
 # gathered from https://github.com/r-spatial/leafem/blob/6d6831352038b8f7462ff7afa698050c4e46fb5e/R/addRasterRGB.R#L143
+
 rscl = function(x,
                 from = range(x, na.rm = TRUE, finite = TRUE),
                 to = c(0, 1),
@@ -82,7 +83,6 @@ add_rgb <- function(
     , rgb = TRUE
     , pixelValuesToColorFn = rgbPixelfun
   )
-
 }
 
 create_buffer <- function(coords, buffer_col, buffer_row) {
@@ -201,6 +201,7 @@ compute_measures_mosaic <- function(contour){
 #' block can be created with different dimensions.
 #'
 #' @inheritParams mosaic_analyze
+#' @inheritParams utils_shapefile
 #' @export
 #'
 shapefile_build <- function(mosaic,
@@ -337,16 +338,16 @@ shapefile_build <- function(mosaic,
       map <-
         mapview::mapview() %>%
         add_rgb(x = as(mosaiccr, "Raster"),
-                r = 1,
-                g = 2,
-                b = 3,
+                r = r,
+                g = g,
+                b = b,
                 na.color = "#00000000",
                 quantiles = quantiles)
     } else{
       map <-
         mapview::mapview() %>%
         leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
-                             colorOptions = leafem:::colorOptions(palette = color_regions,
+                             colorOptions = leafem::colorOptions(palette = custom_palette(),
                                                                   na.color = "transparent"))
     }
     if(build_shapefile){
@@ -744,11 +745,11 @@ mosaic_analyze <- function(mosaic,
           lapply(seq_along(plot_index), function(i){
             mosaic_index(mosaiccr,
                          index = plot_index[[i]],
-                         r = 1,
-                         g = 2,
-                         b = 3,
-                         re = 4,
-                         nir = 5)
+                         r = r,
+                         g = g,
+                         b = b,
+                         re = re,
+                         nir = nir)
           })
       )
     )
@@ -1114,7 +1115,7 @@ mosaic_analyze <- function(mosaic,
                          zcol = attribute,
                          layer.name = attribute,
                          col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
-                         alpha.regions = 1,
+                         alpha.regions = 0.8,
                          na.color = "#00000000",
                          maxBytes = 64 * 1024 * 1024,
                          verbose = FALSE)
@@ -1212,6 +1213,7 @@ mosaic_analyze <- function(mosaic,
 #' @importFrom poorman summarise across mutate arrange left_join bind_cols
 #'   bind_rows contains ends_with everything between pivot_longer pivot_wider
 #'   where select filter relocate rename
+#' @importFrom htmlwidgets JS
 #' @examples
 #' if(interactive()){
 #' library(pliman)

@@ -22,6 +22,7 @@ Imports:
     doParallel,
     exactextractr,
     foreach,
+    htmlwidgets,
     methods,
     poorman,
     Rcpp,
