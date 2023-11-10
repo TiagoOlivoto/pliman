@@ -158,18 +158,6 @@ compute_downsample <- function(nr, nc, n) {
   }
 }
 
-downsample_rows_cols <- function(nr, nc, n) {
-  if (n == 0) {
-    return(list(rows = 1:nr, cols = 1:nc))
-  } else if (n == 1) {
-    return(list(rows = seq(1, nr, by = 2), cols = seq(1, nc, by = 2)))
-  } else if (n > 1) {
-    return(list(rows = seq(1, nr, by = n + 1), cols = seq(1, nc, by = n + 1)))
-  } else {
-    stop("Invalid downsampling factor. n must be a non-negative integer.")
-  }
-}
-
 
 compute_measures_mosaic <- function(contour){
   lw <- help_lw(contour)
@@ -503,7 +491,7 @@ mosaic_analyze <- function(mosaic,
   includeopt <- c("intersect", "covered", "overlap", "centroid")
   includeopt <- includeopt[sapply(include_if, function(x){pmatch(x, includeopt)})]
   if(any(segment_individuals) & !segment_index %in% plot_index){
-    stop("`segment_index` must be contained in `plot_index` list.", call. = FALSE)
+    plot_index <- unique(append(plot_index, segment_index))
   }
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
@@ -786,6 +774,7 @@ mosaic_analyze <- function(mosaic,
           stop("`segment_index` must be one of used in `plot_index`.")
         }
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
+        print(thresh)
         if(invert[j]){
           mask <- mind_temp[[segment_index[j]]] > thresh
         } else{
