@@ -279,7 +279,7 @@
 #'@param lower_size,upper_size Lower and upper limits for size for the image
 #'  analysis. Plant images often contain dirt and dust.  Upper limit is set to
 #'  `NULL`, i.e., no upper limit used. One can set a known area or use
-#'  `lower_limit = 0` to select all objects (not advised). Objects that matches
+#'  `lower_size = 0` to select all objects (not advised). Objects that matches
 #'  the size of a given range of sizes can be selected by setting up the two
 #'  arguments. For example, if `lower_size = 120` and `upper_size = 140`,
 #'  objects with size greater than or equal 120 and less than or equal 140 will

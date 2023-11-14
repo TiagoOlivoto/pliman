@@ -193,9 +193,9 @@ compute_measures_mosaic <- function(contour){
 #' @export
 #'
 shapefile_build <- function(mosaic,
-                            r = 1,
+                            r = 3,
                             g = 2,
-                            b = 3,
+                            b = 1,
                             re = 4,
                             nir = 5,
                             grid = TRUE,
@@ -291,7 +291,6 @@ shapefile_build <- function(mosaic,
   if(verbose){
     cat("\014","\nCreating the shapes...\n")
   }
-  # cpoints <- re$shapefile$finished
   created_shapes <- list()
   for(k in 1:nrow(cpoints)){
     if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
@@ -309,7 +308,7 @@ shapefile_build <- function(mosaic,
   }
   if(check_shapefile){
     if(verbose){
-      cat("\014","\nChecking the build shapefile...\n")
+      cat("\014","\nChecking the built shapefile...\n")
     }
     lengths <- sapply(created_shapes, nrow)
     pg_edit <-
@@ -336,7 +335,7 @@ shapefile_build <- function(mosaic,
         mapview::mapview() %>%
         leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
                              colorOptions = leafem::colorOptions(palette = custom_palette(),
-                                                                  na.color = "transparent"))
+                                                                 na.color = "transparent"))
     }
     if(build_shapefile){
       mapview::mapview() |> mapedit::editMap()
@@ -362,10 +361,12 @@ shapefile_build <- function(mosaic,
 
 #' Analyze a mosaic of remote sensing data
 #'
-#' This function analyzes a mosaic of remote sensing data, extracting information
-#' from specified regions of interest (ROIs) defined in a shapefile or interactively
-#' drawn on the mosaic. It computes various vegetation indices and statistical
-#' summaries for segmentation-based analysis of the ROIs.
+#' This function analyzes a mosaic of remote sensing data (UVAs or satellite
+#' imagery), extracting information from specified regions of interest (ROIs)
+#' defined in a shapefile or interactively drawn on the mosaic. It allows
+#' counting and measuring individuals (eg., plants), computing canopy coverage,
+#' and statistical summaries (eg., mean, coefficient of variation) for
+#' vegetation indices (eg, NDVI) at a block, plot, or individual level.
 #'
 #' @details
 #' Since multiple blocks can be analyzed, the length of arguments `grid`,
@@ -376,6 +377,7 @@ shapefile_build <- function(mosaic,
 #' the last, each block can be analyzed with different arguments.
 #'
 #' @inheritParams mosaic_view
+#' @inheritParams analyze_objects
 #' @param grid Logical, indicating whether to use a grid for segmentation
 #'   (default: TRUE).
 #' @param nrow Number of rows for the grid (default: 1).
@@ -454,9 +456,9 @@ shapefile_build <- function(mosaic,
 #' @examples
 #' library(pliman)
 mosaic_analyze <- function(mosaic,
-                           r = 1,
+                           r = 3,
                            g = 2,
-                           b = 3,
+                           b = 1,
                            re = 4,
                            nir = 5,
                            grid = TRUE,
@@ -474,12 +476,17 @@ mosaic_analyze <- function(mosaic,
                            tolerance = 1,
                            extension = 1,
                            include_if = "centroid",
-                           plot_index = "GLAI",
+                           plot_index = NULL,
                            segment_index = "GLAI",
                            threshold = "Otsu",
                            filter = FALSE,
+                           lower_noise = 0.05,
+                           lower_size = NULL,
+                           upper_size = NULL,
+                           topn_lower = NULL,
+                           topn_upper = NULL,
                            summarize_fun = "mean",
-                           attribute = "mean.GLAI",
+                           attribute = paste(summarize_fun, segment_index, sep = "."),
                            invert = FALSE,
                            color_regions = rev(grDevices::terrain.colors(50)),
                            alpha = 1,
@@ -522,33 +529,6 @@ mosaic_analyze <- function(mosaic,
                                       quantiles = quantiles)
 
 
-    # if(build_shapefile){
-    #   points <- mosaic_view(mosaic,
-    #                         r = r,
-    #                         g = g,
-    #                         b = b,
-    #                         re = re,
-    #                         nir = nir,
-    #                         max_pixels = max_pixels,
-    #                         downsample = downsample,
-    #                         quantiles = quantiles,
-    #                         edit = TRUE)
-    #   cpoints <- points$finished
-    # } else{
-    #   extm <- terra::ext(mosaic)
-    #   xmin <- extm[1]
-    #   xmax <- extm[2]
-    #   ymin <- extm[3]
-    #   ymax <- extm[4]
-    #   coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
-    #   # Create a Polygon object
-    #   polygon <- sf::st_polygon(list(coords))
-    #   # Create an sf object with a data frame that includes the 'geometry' column
-    #   cpoints <- sf::st_sf(data.frame(id = 1),
-    #                        geometry = sf::st_sfc(polygon),
-    #                        crs = sf::st_crs(mosaic))
-    # }
-
 
     # crop to the analyzed area
     poly_ext <-
@@ -563,37 +543,7 @@ mosaic_analyze <- function(mosaic,
     mosaiccr <- terra::crop(mosaic, poly_ext)
     mosaiccr[mosaiccr == 65535] <- NA
 
-    # # check the parameters
-    # if(length(nrow) == 1 & nrow(cpoints) != 1){
-    #   nrow <- rep(nrow, nrow(cpoints))
-    # }
-    # if(length(nrow) != nrow(cpoints)){
-    #   warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    # }
-    # if(length(ncol) == 1 & nrow(cpoints) != 1){
-    #   ncol <- rep(ncol, nrow(cpoints))
-    # }
-    # if(length(ncol) != nrow(cpoints)){
-    #   warning(paste0("`ncol` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    # }
-    # if(length(buffer_col) == 1 & nrow(cpoints) != 1){
-    #   buffer_col <- rep(buffer_col, nrow(cpoints))
-    # }
-    # if(length(buffer_col) != nrow(cpoints)){
-    #   warning(paste0("`buffer_col` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    # }
-    # if(length(buffer_row) == 1 & nrow(cpoints) != 1){
-    #   buffer_row <- rep(buffer_row, nrow(cpoints))
-    # }
-    # if(length(buffer_row) != nrow(cpoints)){
-    #   warning(paste0("`buffer_row` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    # }
-    # if(length(grid) == 1 & nrow(cpoints) != 1){
-    #   grid <- rep(grid, nrow(cpoints))
-    # }
-    # if(length(grid) != nrow(cpoints)){
-    #   warning(paste0("`grid` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-    # }
+
     if(length(segment_plot) == 1 & length(created_shapes) != 1){
       segment_plot <- rep(segment_plot, length(created_shapes))
     }
@@ -642,57 +592,37 @@ mosaic_analyze <- function(mosaic,
     if(length(grid) != length(created_shapes)){
       warning(paste0("`grid` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-    # # check the created shapes?
-    # if(verbose){
-    #   cat("\014","\nCreating the shapes...\n")
-    # }
-    # cpoints <- re$shapefile$finished
-    # created_shapes <- list()
-    # for(k in 1:nrow(cpoints)){
-    #   if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
-    #     plot_grid <-
-    #       make_grid(cpoints[k, ],
-    #                 nrow = nrow[k],
-    #                 ncol = ncol[k],
-    #                 buffer_col = buffer_col[k],
-    #                 buffer_row = buffer_row[k])
-    #   } else{
-    #     plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> poorman::select(geometry)
-    #   }
-    #   if(check_shapefile){
-    #     pg_edit <-
-    #       plot_grid |>
-    #       poorman::mutate(`_leaflet_id` = 1:nrow(plot_grid), feature_type = "polygon") |>
-    #       poorman::relocate(geometry, .after = 3) |>
-    #       sf::st_transform(crs = 4326)
-    #     if(nlyrs > 2){
-    #       map <-
-    #         mapview::mapview() %>%
-    #         add_rgb(x = as(mosaiccr, "Raster"),
-    #                 r = r,
-    #                 g = g,
-    #                 b = b,
-    #                 na.color = "#00000000",
-    #                 quantiles = quantiles)
-    #     } else{
-    #       map <-
-    #         mapview::mapview() %>%
-    #         leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
-    #                              colorOptions = leafem:::colorOptions(palette = color_regions,
-    #                                                                   na.color = "transparent"))
-    #     }
-    #     if(build_shapefile){
-    #       mapview::mapview() |> mapedit::editMap()
-    #     }
-    #     edited <-
-    #       mapedit::editFeatures(pg_edit, map) |>
-    #       poorman::select(geometry) |>
-    #       sf::st_transform(sf::st_crs(mosaic))
-    #     created_shapes[k] <- edited
-    #   } else{
-    #     created_shapes[k] <- plot_grid
-    #   }
-    # }
+    if(length(lower_noise) == 1 & length(created_shapes) != 1){
+      lower_noise <- rep(lower_noise, length(created_shapes))
+    }
+    if(length(lower_noise) != length(created_shapes)){
+      warning(paste0("`lower_noise` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
+    if(is.null(lower_size) | length(lower_size) == 1 & length(created_shapes) != 1){
+      lower_size <- rep(lower_size, length(created_shapes))
+    }
+    if(!is.null(lower_size) & length(lower_size) != length(created_shapes)){
+      warning(paste0("`lower_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
+    if(is.null(upper_size) | length(upper_size) == 1 & length(created_shapes) != 1){
+      upper_size <- rep(upper_size, length(created_shapes))
+    }
+    if(!is.null(upper_size) & length(upper_size) != length(created_shapes)){
+      warning(paste0("`upper_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
+    if(is.null(topn_lower) | length(topn_lower) == 1 & length(created_shapes) != 1){
+      topn_lower <- rep(topn_lower, length(created_shapes))
+    }
+    if(!is.null(topn_lower) & length(topn_lower) != length(created_shapes)){
+      warning(paste0("`topn_lower` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
+    if(is.null(topn_upper) | length(topn_upper) == 1 & length(created_shapes) != 1){
+      topn_upper <- rep(topn_upper, length(created_shapes))
+    }
+    if(!is.null(topn_upper) & length(topn_upper) != length(created_shapes)){
+      warning(paste0("`topn_upper` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
+
 
   } else{
     extm <- terra::ext(shapefile)
@@ -701,12 +631,7 @@ mosaic_analyze <- function(mosaic,
     ymin <- extm[3]
     ymax <- extm[4]
     coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
-    # Create a Polygon object
-    # polygon <- sf::st_polygon(list(coords))
-    # Create an sf object with a data frame that includes the 'geometry' column
-    # cpoints <- sf::st_sf(data.frame(id = 1),
-    #                      geometry = sf::st_sfc(polygon),
-    #                      crs = sf::st_crs(mosaic))
+
     geoms <- sf::st_as_sf(shapefile$geometry)
     sf::st_geometry(geoms) <- "geometry"
     created_shapes <- list(geoms)
@@ -741,6 +666,7 @@ mosaic_analyze <- function(mosaic,
           })
       )
     )
+
   } else{
     plot_index <- names(mosaiccr)
     mind <- mosaiccr
@@ -795,7 +721,7 @@ mosaic_analyze <- function(mosaic,
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
-        if(watershed){
+        if(watershed[j]){
           dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = tolerance, ext = extension)
         } else{
           dmask <- EBImage::bwlabel(dmask)
@@ -814,6 +740,7 @@ mosaic_analyze <- function(mosaic,
           data = data.frame(individual = paste0(1:length(conts))),
           crs = terra::crs(mosaic)
         )
+
         centroids <- suppressWarnings(sf::st_centroid(sf_df))
         intersects <-
           switch (includeopt[j],
@@ -833,6 +760,22 @@ mosaic_analyze <- function(mosaic,
                     compute_measures_mosaic(as.matrix(sf_df$geometry[[i]]))
                   }))
         gridindiv <- cbind(sf_df, plot_id, addmeasures)[c(2, 1, 3:10)]
+        # control noise removing
+        if(!is.null(lower_size[j]) & !is.null(topn_lower[j]) | !is.null(upper_size[j]) & !is.null(topn_upper[j])){
+          stop("Only one of 'lower_*' or 'topn_*' can be used.")
+        }
+        ifelse(!is.null(lower_size[j]),
+               gridindiv <- gridindiv[gridindiv$area > lower_size[j], ],
+               gridindiv <- gridindiv[gridindiv$area > mean(gridindiv$area) * lower_noise[j], ])
+        if(!is.null(upper_size[j])){
+          gridindiv <- gridindiv[gridindiv$area < upper_size[j], ]
+        }
+        if(!is.null(topn_lower[j])){
+          gridindiv <- gridindiv[order(gridindiv$area),][1:topn_lower[j],]
+        }
+        if(!is.null(topn_upper[j])){
+          gridindiv <- gridindiv[order(gridindiv$area, decreasing = TRUE),][1:topn_upper[j],]
+        }
 
         valindiv <-
           exactextractr::exact_extract(x = mind_temp,
@@ -858,9 +801,9 @@ mosaic_analyze <- function(mosaic,
         if(ncol(valindiv) == 1 & length(plot_index) == 1){
           colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
         }
+        # return(list(valindiv, gridindiv))
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", j), gridindiv, valindiv)
-          # valindiv <- valindiv[valindiv$plot_id != "integer(0)", ]
+          valindiv <- cbind(block = paste0("B", j), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         } else{
           result_indiv[[j]] <- valindiv
@@ -953,6 +896,23 @@ mosaic_analyze <- function(mosaic,
                   }))
         gridindiv <- cbind(sf_df, addmeasures)
 
+        # control noise removing
+        if(!is.null(lower_size[j]) & !is.null(topn_lower[j]) | !is.null(upper_size[j]) & !is.null(topn_upper[j])){
+          stop("Only one of 'lower_*' or 'topn_*' can be used.")
+        }
+        ifelse(!is.null(lower_size[j]),
+               gridindiv <- gridindiv[gridindiv$area > lower_size[j], ],
+               gridindiv <- gridindiv[gridindiv$area > mean(gridindiv$area) * lower_noise[j], ])
+        if(!is.null(upper_size[j])){
+          gridindiv <- gridindiv[gridindiv$area < upper_size[j], ]
+        }
+        if(!is.null(topn_lower[j])){
+          gridindiv <- gridindiv[order(gridindiv$area),][1:topn_lower[j],]
+        }
+        if(!is.null(topn_upper[j])){
+          gridindiv <- gridindiv[order(gridindiv$area, decreasing = TRUE),][1:topn_upper[j],]
+        }
+
         valindiv <-
           exactextractr::exact_extract(x = mind_temp,
                                        y = gridindiv,
@@ -978,7 +938,7 @@ mosaic_analyze <- function(mosaic,
         }
 
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", j), plot_id = 1, gridindiv, valindiv)
+          valindiv <- cbind(block = paste0("B", j), plot_id = 1, gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv
         } else{
           result_indiv[[j]] <- valindiv
@@ -1021,7 +981,7 @@ mosaic_analyze <- function(mosaic,
       vals <- vals[, c(ncol(vals), ncol(vals) - 1, 1:(ncol(vals) - 2))]
     }
     if(!is.null(summarize_fun)){
-      results[[j]] <- cbind(plot_grid, vals)
+      results[[j]] <- cbind(plot_grid, vals, check.names = FALSE)
     } else{
       results[[j]] <- vals
     }
@@ -1029,7 +989,7 @@ mosaic_analyze <- function(mosaic,
   }
 
 
-
+  # return(results)
   # bind the results  ## at a level plot
   results <- do.call(rbind, lapply(results, function(x){x})) |> sf::st_sf()
 
@@ -1056,7 +1016,7 @@ mosaic_analyze <- function(mosaic,
     plot_area <-
       results |>
       poorman::mutate(plot_area = sf::st_area(geometry)) |>
-      as.data.frame() |>
+      as.data.frame(check.names = FALSE) |>
       poorman::select(block, plot_id, plot_area)
     # compute coverage area
     result_plot_summ <-
@@ -1065,6 +1025,7 @@ mosaic_analyze <- function(mosaic,
       poorman::mutate(coverage = as.numeric(area_sum / plot_area), .after = area) |>
       poorman::left_join(results |>   poorman::select(block, plot_id, geometry), by = c("block", "plot_id")) |>
       sf::st_as_sf()
+    colnames(result_plot_summ)[12:(ncol(result_plot_summ) - 3)] <- colnames(result_indiv)[11:(ncol(result_indiv) - 1)]
 
   } else{
     result_plot_summ <- NULL
@@ -1098,13 +1059,18 @@ mosaic_analyze <- function(mosaic,
     if(downsample > 0){
       mosaicplot <- terra::aggregate(mosaicplot, fact = downsample)
     }
+    if(segment_individuals){
+      dfplot <- result_plot_summ
+    } else{
+      dfplot <- results
+    }
     map <-
       suppressWarnings(
-        mapview::mapview(results,
+        mapview::mapview(dfplot,
                          zcol = attribute,
                          layer.name = attribute,
                          col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
-                         alpha.regions = 0.8,
+                         alpha.regions = 0.75,
                          na.color = "#00000000",
                          maxBytes = 64 * 1024 * 1024,
                          verbose = FALSE)
@@ -1120,6 +1086,7 @@ mosaic_analyze <- function(mosaic,
               quantiles = quantiles)
 
     if(any(segment_individuals)){
+      attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
       mapindivid <-
         suppressWarnings(
           mapview::mapview(result_indiv,
@@ -1148,7 +1115,6 @@ mosaic_analyze <- function(mosaic,
     map <- NULL
     mapindivid <- NULL
   }
-
   if(verbose){
     cat("\014","Done!\n")
   }
@@ -1504,11 +1470,11 @@ shapefile_input <- function(shapefile,
   }
 
   if(inherits(shapefile, "list")){
-    do.call(rbind, lapply(shapefile, create_shp, info, as_sf, ...))
+    shapes <- do.call(rbind, lapply(shapefile, function(x){x}))
+    create_shp(shapes, info, as_sf, ...)
   } else{
     create_shp(shapefile, info, as_sf, ...)
   }
-
 }
 #' @name utils_shapefile
 #' @export
@@ -1561,6 +1527,7 @@ mosaic_crop <- function(mosaic,
                         b = 1,
                         re = 4,
                         nir = 5,
+                        shapefile = NULL,
                         show = c("rgb", "index"),
                         index = "R",
                         max_pixels = 500000,

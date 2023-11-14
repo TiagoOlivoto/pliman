@@ -11,6 +11,7 @@ mosaic_crop(
   b = 1,
   re = 4,
   nir = 5,
+  shapefile = NULL,
   show = c("rgb", "index"),
   index = "R",
   max_pixels = 5e+05,

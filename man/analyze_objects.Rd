@@ -331,7 +331,7 @@ lower or upper size, use the \code{lower_size} and \code{upper_size} arguments.}
 \item{lower_size, upper_size}{Lower and upper limits for size for the image
 analysis. Plant images often contain dirt and dust.  Upper limit is set to
 \code{NULL}, i.e., no upper limit used. One can set a known area or use
-\code{lower_limit = 0} to select all objects (not advised). Objects that matches
+\code{lower_size = 0} to select all objects (not advised). Objects that matches
 the size of a given range of sizes can be selected by setting up the two
 arguments. For example, if \code{lower_size = 120} and \code{upper_size = 140},
 objects with size greater than or equal 120 and less than or equal 140 will

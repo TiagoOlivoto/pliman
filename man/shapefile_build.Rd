@@ -6,9 +6,9 @@
 \usage{
 shapefile_build(
   mosaic,
-  r = 1,
+  r = 3,
   g = 2,
-  b = 3,
+  b = 1,
   re = 4,
   nir = 5,
   grid = TRUE,

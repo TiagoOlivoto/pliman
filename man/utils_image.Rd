@@ -4,6 +4,7 @@
 \alias{utils_image}
 \alias{image_import}
 \alias{image_export}
+\alias{image_input}
 \alias{image_pliman}
 \title{Import and export images}
 \usage{
@@ -21,18 +22,25 @@ image_import(
 
 image_export(img, name, prefix = "", extension = NULL, subfolder = NULL, ...)
 
+image_input(img, ...)
+
 image_pliman(img, plot = FALSE)
 }
 \arguments{
 \item{img}{\itemize{
 \item For \code{image_import()}, a character vector of file names or URLs.
+\item For \code{image_input()}, a character vector of file names or URLs or an array
+containing the pixel intensities of an image.
 \item For \code{image_export()}, an Image object, an array or a list of images.
 \item For \code{image_pliman()}, a charactere value specifying the image example. See
 \code{?pliman_images} for more details.
 }}
 
-\item{...}{Alternative arguments passed to the corresponding functions from
-the \code{jpeg}, \code{png}, and \code{tiff} packages.}
+\item{...}{\itemize{
+\item For \code{image_import()} alternative arguments passed to the corresponding
+functions from the \code{jpeg}, \code{png}, and \code{tiff} packages.
+\item For \code{image_input()} further arguments passed on to \code{\link[EBImage:Image]{EBImage::Image()}}.
+}}
 
 \item{which}{logical scalar or integer vector to indicate which image are
 imported if a TIFF files is informed. Defaults to \code{1} (the first image is

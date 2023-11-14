@@ -6,9 +6,9 @@
 \usage{
 mosaic_analyze(
   mosaic,
-  r = 1,
+  r = 3,
   g = 2,
-  b = 3,
+  b = 1,
   re = 4,
   nir = 5,
   grid = TRUE,
@@ -26,10 +26,15 @@ mosaic_analyze(
   tolerance = 1,
   extension = 1,
   include_if = "centroid",
-  plot_index = "GLAI",
+  plot_index = NULL,
   segment_index = "GLAI",
   threshold = "Otsu",
   filter = FALSE,
+  lower_noise = 0.1,
+  lower_size = NULL,
+  upper_size = NULL,
+  topn_lower = NULL,
+  topn_upper = NULL,
   summarize_fun = "mean",
   attribute = "mean.GLAI",
   invert = FALSE,
@@ -128,6 +133,25 @@ image_filter(). Defaults to FALSE. Use a positive integer to define the
 size of the median filtering. Larger values are effective at removing
 noise, but adversely affect edges.}
 
+\item{lower_noise}{To prevent noise from affecting the image analysis, objects
+with lesser than 10\% of the mean area of all objects are removed
+(\code{lower_noise = 0.1}). Increasing this value will remove larger noises (such
+as dust points), but can remove desired objects too. To define an explicit
+lower or upper size, use the \code{lower_size} and \code{upper_size} arguments.}
+
+\item{lower_size, upper_size}{Lower and upper limits for size for the image
+analysis. Plant images often contain dirt and dust.  Upper limit is set to
+\code{NULL}, i.e., no upper limit used. One can set a known area or use
+\code{lower_size = 0} to select all objects (not advised). Objects that matches
+the size of a given range of sizes can be selected by setting up the two
+arguments. For example, if \code{lower_size = 120} and \code{upper_size = 140},
+objects with size greater than or equal 120 and less than or equal 140 will
+be considered.}
+
+\item{topn_lower, topn_upper}{Select the top \code{n} objects based on its area.
+\code{topn_lower} selects the \code{n} elements with the smallest area whereas
+\code{topn_upper} selects the \code{n} objects with the largest area.}
+
 \item{summarize_fun}{The function to compute summaries for the pixel values.
 Defaults to "mean", ie., the mean value of the pixels (either at a plot- or
 individual-level) is returned.}
@@ -170,10 +194,12 @@ A list containing the following objects:
 }
 }
 \description{
-This function analyzes a mosaic of remote sensing data, extracting information
-from specified regions of interest (ROIs) defined in a shapefile or interactively
-drawn on the mosaic. It computes various vegetation indices and statistical
-summaries for segmentation-based analysis of the ROIs.
+This function analyzes a mosaic of remote sensing data (UVAs or satellite
+imagery), extracting information from specified regions of interest (ROIs)
+defined in a shapefile or interactively drawn on the mosaic. It allows
+counting and measuring individuals (eg., plants), computing canopy coverage,
+and statistical summaries (eg., mean, coefficient of variation) for
+vegetation indices (eg, NDVI) at a block, plot, or individual level.
 }
 \details{
 Since multiple blocks can be analyzed, the length of arguments \code{grid},

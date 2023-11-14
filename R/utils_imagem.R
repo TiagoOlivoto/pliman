@@ -73,6 +73,8 @@ image_combine <- function(...,
 #' @name utils_image
 #' @param img
 #' * For `image_import()`, a character vector of file names or URLs.
+#' * For `image_input()`, a character vector of file names or URLs or an array
+#' containing the pixel intensities of an image.
 #' * For `image_export()`, an Image object, an array or a list of images.
 #' * For `image_pliman()`, a charactere value specifying the image example. See
 #' `?pliman_images` for more details.
@@ -107,8 +109,10 @@ image_combine <- function(...,
 #' @param plot Plots the image after importing? Defaults to `FALSE`.
 #' @param nrow,ncol Passed on to [image_combine()]. The number of rows and
 #'   columns to use in the composite image when `plot = TRUE`.
-#' @param ... Alternative arguments passed to the corresponding functions from
-#'   the `jpeg`, `png`, and `tiff` packages.
+#' @param ...
+#'  * For `image_import()` alternative arguments passed to the corresponding
+#'  functions from the `jpeg`, `png`, and `tiff` packages.
+#'  * For `image_input()` further arguments passed on to [EBImage::Image()].
 #' @md
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
@@ -291,6 +295,22 @@ image_export <- function(img,
     EBImage::writeImage(img, name)
   }
 }
+
+#' @export
+#' @name utils_image
+image_input <- function(img, ...){
+  if(inherits(img, "character")){
+    image_import(img, ...)
+  } else if(inherits(img, "array")){
+    range <- apply(img, 3, max)
+    if(any(range > 1)){
+      EBImage::Image(img / 255, colormode = "color")
+    } else{
+      EBImage::Image(img, colormode = "color")
+    }
+  }
+}
+
 #' @export
 #' @name utils_image
 image_pliman <- function(img, plot = FALSE){
