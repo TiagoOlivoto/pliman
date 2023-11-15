@@ -22,6 +22,8 @@ mosaic_analyze(
   buffer_row = 0,
   segment_plot = FALSE,
   segment_individuals = FALSE,
+  map_individuals = FALSE,
+  map_direction = c("horizontal", "vertical"),
   watershed = TRUE,
   tolerance = 1,
   extension = 1,
@@ -30,13 +32,13 @@ mosaic_analyze(
   segment_index = "GLAI",
   threshold = "Otsu",
   filter = FALSE,
-  lower_noise = 0.1,
+  lower_noise = 0.05,
   lower_size = NULL,
   upper_size = NULL,
   topn_lower = NULL,
   topn_upper = NULL,
   summarize_fun = "mean",
-  attribute = "mean.GLAI",
+  attribute = paste(summarize_fun, segment_index, sep = "."),
   invert = FALSE,
   color_regions = rev(grDevices::terrain.colors(50)),
   alpha = 1,
@@ -93,6 +95,14 @@ values below the \code{threshold} will be selected.}
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
 computed and pixels with values below the \code{threshold} will be selected and
 a watershed-based segmentation will be performed.}
+
+\item{map_individuals}{If \code{TRUE}, the distance between objects within plots
+are computed. The distance can be mapped either on horizontal or vertical
+direction. The distances, coefficient of variation (CV), and mean of
+distances are then returned.}
+
+\item{map_direction}{The direction for mapping individuals within plots.
+Should be one of \code{"horizontal"} or \code{"vertical"} (default).}
 
 \item{watershed}{If \code{TRUE} (default) performs watershed-based object
 detection. This will detect objects even when they are touching one other.

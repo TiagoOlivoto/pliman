@@ -171,8 +171,40 @@ compute_measures_mosaic <- function(contour){
              diam_max = max(cdist))
 
 }
-
-
+map_individuals <- function(object,
+                       by_column = "plot_id",
+                       direction = c("horizontal", "vertical")) {
+  optdirec <- c("horizontal", "vertical")
+  optdirec <- pmatch(direction[[1]], optdirec)
+  object <- as.data.frame(object)
+  unique_values <- unique(object[, by_column] )
+  distances <- vector("list", length(unique_values))
+  for (i in 1:length(unique_values)) {
+    subset_coords <- object[object[, by_column] == unique_values[i], 4:5]
+    n <- nrow(subset_coords)
+    nearest <- order(subset_coords[, optdirec])
+    subset_distances <- numeric(n - 1)
+    for (j in 1:(n - 1)) {
+      x1 <- subset_coords[nearest[j], 1]
+      y1 <- subset_coords[nearest[j], 2]
+      x2 <- subset_coords[nearest[j+1], 1]
+      y2 <- subset_coords[nearest[j+1], 2]
+      distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+      subset_distances[j] <- distance
+    }
+    distances[[i]] <- subset_distances
+  }
+  if(optdirec == 1){
+    names(distances) <- paste0("row", 1:length(distances))
+  } else{
+    names(distances) <- paste0("column", 1:length(distances))
+  }
+  cvs <- sapply(distances, function(x){
+    (sd(x) / mean(x)) * 100
+  })
+  means <- sapply(distances, mean)
+  invisible(list(distances = distances, cvs = cvs, means = means))
+}
 
 
 #' Build a shapefile from a mosaic raster
@@ -401,6 +433,12 @@ shapefile_build <- function(mosaic,
 #'   within plots (default: FALSE). If `TRUE`, the `segment_index` will be
 #'   computed and pixels with values below the `threshold` will be selected and
 #'   a watershed-based segmentation will be performed.
+#' @param map_individuals If `TRUE`, the distance between objects within plots
+#'   are computed. The distance can be mapped either on horizontal or vertical
+#'   direction. The distances, coefficient of variation (CV), and mean of
+#'   distances are then returned.
+#' @param map_direction The direction for mapping individuals within plots.
+#'   Should be one of `"horizontal"` or `"vertical"` (default).
 #' @param watershed 	If `TRUE` (default) performs watershed-based object
 #'   detection. This will detect objects even when they are touching one other.
 #'   If FALSE, all pixels for each connected set of foreground pixels are set to
@@ -472,6 +510,8 @@ mosaic_analyze <- function(mosaic,
                            buffer_row = 0,
                            segment_plot = FALSE,
                            segment_individuals = FALSE,
+                           map_individuals = FALSE,
+                           map_direction = c("horizontal", "vertical"),
                            watershed = TRUE,
                            tolerance = 1,
                            extension = 1,
@@ -1027,9 +1067,31 @@ mosaic_analyze <- function(mosaic,
       sf::st_as_sf()
     colnames(result_plot_summ)[12:(ncol(result_plot_summ) - 3)] <- colnames(result_indiv)[11:(ncol(result_indiv) - 1)]
 
+    centroid <-
+      suppressWarnings(sf::st_centroid(result_indiv) |>
+                         sf::st_coordinates() |>
+                         as.data.frame() |>
+                         setNames(c("x", "y")))
+    result_indiv <-
+      poorman::bind_cols(result_indiv, centroid) |>
+      poorman::relocate(x, y, .after = individual)
+
+
+    if(map_individuals){
+      result_individ_map <- map_individuals(result_indiv, direction = map_direction)
+
+      result_plot_summ <-
+        result_plot_summ |>
+        poorman::mutate(mean_distance = result_individ_map$means,
+                        cv = result_individ_map$cvs,
+                        .before = n)
+    }
+
+
   } else{
     result_plot_summ <- NULL
     result_indiv <- NULL
+    result_individ_map <- NULL
   }
 
   ext_plot <-
@@ -1121,6 +1183,7 @@ mosaic_analyze <- function(mosaic,
   return(list(result_plot = results,
               result_plot_summ = result_plot_summ,
               result_indiv = result_indiv,
+              result_individ_map = result_individ_map,
               map_plot = map,
               map_indiv = mapindivid,
               shapefile = created_shapes))
