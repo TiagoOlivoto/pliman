@@ -9,11 +9,13 @@ rscl = function(x,
 add_rgb <- function(
     map,
     x,
-    r = 3, g = 2, b = 1,
+    r = 3,
+    g = 2,
+    b = 1,
     group = NULL,
     layerId = NULL,
     resolution = 96,
-    opacity = 0.8,
+    opacity = 1,
     options = leaflet::tileOptions(),
     colorOptions = NULL,
     project = TRUE,
@@ -49,22 +51,24 @@ add_rgb <- function(
   rgbPixelfun = htmlwidgets::JS(
     sprintf(
       "
-        pixelValuesToColorFn = values => {
-        // debugger;
-          if (isNaN(values[0])) return '%s';
-          return rgbToHex(
-            Math.ceil(values[%s])
-            , Math.ceil(values[%s])
-            , Math.ceil(values[%s])
-          );
-        };
-      "
-      , colorOptions[["naColor"]]
-      , r - minband
-      , g - minband
-      , b - minband
+      pixelValuesToColorFn = values => {
+      // debugger;
+        if (isNaN(values[0])) return '%s';
+        return rgbToHex(
+          Math.ceil(values[%s])
+          , Math.ceil(values[%s])
+          , Math.ceil(values[%s])
+        );
+      };
+    "
+    , NULL
+    , r - minband
+    , g - minband
+    , b - minband
     )
   )
+
+
 
   # todo: streching via quantiles and domain...
 
@@ -79,7 +83,7 @@ add_rgb <- function(
     , arith = NULL
     , opacity = opacity
     , options = options
-    , colorOptions = colorOptions
+    , colorOptions = list(na.color = "#00000000")
     , rgb = TRUE
     , pixelValuesToColorFn = rgbPixelfun
   )
@@ -111,6 +115,7 @@ make_grid <- function(points,
                       ncol,
                       buffer_col = 0,
                       buffer_row = 0){
+
   grids <-
     sf::st_make_grid(points, n = c(nrow, ncol)) |>
     sf::st_transform(sf::st_crs(mosaic))
@@ -124,10 +129,10 @@ make_grid <- function(points,
 
   sxy <-
     points |>
-    sf::st_transform(sf::st_crs(mosaic)) |>
     sf::st_make_grid(n = c(1, 1)) |>
     sf::st_cast("POINT") |>
     rev() |>
+    sf::st_transform(sf::st_crs(mosaic)) |>
     sf::st_coordinates()
 
   txy <-
@@ -740,7 +745,6 @@ mosaic_analyze <- function(mosaic,
           stop("`segment_index` must be one of used in `plot_index`.")
         }
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
-        print(thresh)
         if(invert[j]){
           mask <- mind_temp[[segment_index[j]]] > thresh
         } else{
@@ -1145,7 +1149,8 @@ mosaic_analyze <- function(mosaic,
               g = g,
               b = b,
               na.color = "#00000000",
-              quantiles = quantiles)
+              quantiles = quantiles,
+              resolution = 128)
 
     if(any(segment_individuals)){
       attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
@@ -1169,7 +1174,8 @@ mosaic_analyze <- function(mosaic,
                 g = g,
                 b = b,
                 na.color = "#00000000",
-                quantiles = quantiles)
+                quantiles = quantiles,
+                resolution = 128)
     } else{
       mapindivid <- NULL
     }
