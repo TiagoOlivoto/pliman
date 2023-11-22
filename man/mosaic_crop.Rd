@@ -33,6 +33,10 @@ mosaic_crop(
 
 \item{nir}{The layer for the Near-infrared band(default: 5).}
 
+\item{shapefile}{An optional shapefile of class \code{sf} to be plotted over the
+mosaic. It can be, for example, a plot-level result returned by
+\code{\link[=mosaic_analyze]{mosaic_analyze()}}.}
+
 \item{show}{The display option for the map view. Options are "rgb" for RGB
 view and "index" for index view.}
 

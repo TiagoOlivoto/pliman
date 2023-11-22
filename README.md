@@ -140,6 +140,15 @@ plot_index_shp(res, attribute = "coverage", viewer = "base")
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
+# Analyzing orthomosaics
+
+``` r
+library(pliman)
+```
+
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7130584937077899265?compact=1" height="399" width="710" frameborder="0" allowfullscreen title="Publicação incorporada">
+</iframe>
+
 # Disease severity
 
 ## Using image indexes
@@ -169,7 +178,7 @@ measure_disease(img = img,
                 plot = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 ``` r
 sev$severity

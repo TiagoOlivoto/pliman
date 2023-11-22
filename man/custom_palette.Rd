@@ -6,7 +6,7 @@
 \usage{
 custom_palette(
   colors = c("yellow", "#53CC67", "#009B95", "#00588B", "#4B0055"),
-  n = 100
+  n = 5
 )
 }
 \arguments{

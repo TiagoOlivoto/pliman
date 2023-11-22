@@ -13,6 +13,8 @@ mosaic_view(
   nir = 5,
   edit = FALSE,
   title = "",
+  shapefile = NULL,
+  attribute = NULL,
   viewer = c("mapview", "base"),
   show = c("rgb", "index"),
   index = "B",
@@ -42,6 +44,13 @@ mosaic_view(
 \item{edit}{If \code{TRUE} enable editing options using \code{\link[mapedit:editMap]{mapedit::editMap()}}.}
 
 \item{title}{A title for the generated map or plot (default: "").}
+
+\item{shapefile}{An optional shapefile of class \code{sf} to be plotted over the
+mosaic. It can be, for example, a plot-level result returned by
+\code{\link[=mosaic_analyze]{mosaic_analyze()}}.}
+
+\item{attribute}{The attribute name(s) or column number(s) in shapefile table
+of the column(s) to be rendered.}
 
 \item{viewer}{The viewer option. If not provided, the value is retrieved
 using \code{\link[=get_pliman_viewer]{get_pliman_viewer()}}. This option controls the type of viewer to use

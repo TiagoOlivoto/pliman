@@ -16,7 +16,7 @@ mosaic_analyze(
   ncol = 1,
   shapefile = NULL,
   build_shapefile = TRUE,
-  check_shapefile = FALSE,
+  check_shapefile = TRUE,
   buffer_edge = 5,
   buffer_col = 0,
   buffer_row = 0,
@@ -77,7 +77,7 @@ for analysis.}
 if shapefile is \code{NULL} (default: TRUE).}
 
 \item{check_shapefile}{Logical, indicating whether to validate the shapefile
-with an interactive map view (default: FALSE). If \code{TRUE}, one can edit the
+with an interactive map view (default: TRUE). This enable live editing the
 drawn shapefile by deleting or changing the drawn grids.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}
@@ -169,7 +169,9 @@ individual-level) is returned.}
 \item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}
 (default: "GLAI").}
 
-\item{invert}{Logical, indicating whether to invert the mask (default: FALSE).}
+\item{invert}{Logical, indicating whether to invert the mask. Defaults to
+\code{FALSE}, ie., pixels with intensity greater than the threshold values are
+selected.}
 
 \item{color_regions}{The color palette for regions (default:
 rev(grDevices::terrain.colors(50)).}

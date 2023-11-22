@@ -15,7 +15,7 @@ shapefile_build(
   nrow = 1,
   ncol = 1,
   build_shapefile = TRUE,
-  check_shapefile = FALSE,
+  check_shapefile = TRUE,
   buffer_edge = 5,
   buffer_col = 0,
   buffer_row = 0,
@@ -51,7 +51,7 @@ shapefile_build(
 if shapefile is \code{NULL} (default: TRUE).}
 
 \item{check_shapefile}{Logical, indicating whether to validate the shapefile
-with an interactive map view (default: FALSE). If \code{TRUE}, one can edit the
+with an interactive map view (default: TRUE). This enable live editing the
 drawn shapefile by deleting or changing the drawn grids.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}

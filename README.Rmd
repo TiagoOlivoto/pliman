@@ -100,6 +100,15 @@ plot_index_shp(res, attribute = "coverage", viewer = "base")
 ```
 
 
+# Analyzing orthomosaics
+## Canopy coverage
+```{r eval=FALSE}
+library(pliman)
+```
+
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7130584937077899265?compact=1" height="399" width="710" frameborder="0" allowfullscreen="" title="Publicação incorporada"></iframe>
+
+
 # Disease severity
 
 ## Using image indexes

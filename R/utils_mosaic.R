@@ -177,8 +177,8 @@ compute_measures_mosaic <- function(contour){
 
 }
 map_individuals <- function(object,
-                       by_column = "plot_id",
-                       direction = c("horizontal", "vertical")) {
+                            by_column = "plot_id",
+                            direction = c("horizontal", "vertical")) {
   optdirec <- c("horizontal", "vertical")
   optdirec <- pmatch(direction[[1]], optdirec)
   object <- as.data.frame(object)
@@ -239,7 +239,7 @@ shapefile_build <- function(mosaic,
                             nrow = 1,
                             ncol = 1,
                             build_shapefile = TRUE,
-                            check_shapefile = FALSE,
+                            check_shapefile = TRUE,
                             buffer_edge = 5,
                             buffer_col = 0,
                             buffer_row = 0,
@@ -360,13 +360,15 @@ shapefile_build <- function(mosaic,
 
     if(nlyrs > 2){
       map <-
-        mapview::mapview() %>%
-        add_rgb(x = as(mosaiccr, "Raster"),
-                r = r,
-                g = g,
-                b = b,
-                na.color = "#00000000",
-                quantiles = quantiles)
+        mapview::viewRGB(
+          x = as(mosaic, "Raster"),
+          r = r,
+          g = g,
+          b = b,
+          na.color = "#00000000",
+          maxpixels = 6000000,
+          quantiles = quantiles
+        )
     } else{
       map <-
         mapview::mapview() %>%
@@ -424,7 +426,7 @@ shapefile_build <- function(mosaic,
 #' @param build_shapefile Logical, indicating whether to interactively draw ROIs
 #'   if shapefile is `NULL` (default: TRUE).
 #' @param check_shapefile Logical, indicating whether to validate the shapefile
-#'   with an interactive map view (default: FALSE). If `TRUE`, one can edit the
+#'   with an interactive map view (default: TRUE). This enable live editing the
 #'   drawn shapefile by deleting or changing the drawn grids.
 #' @param buffer_edge Width of the buffer around the shapefile (default: 5).
 #' @param buffer_col,buffer_row Buffering factor for the columns and rows,
@@ -480,7 +482,9 @@ shapefile_build <- function(mosaic,
 #'   individual-level) is returned.
 #' @param attribute The attribute to be shown at the plot when `plot` is `TRUE`
 #'   (default: "GLAI").
-#' @param invert Logical, indicating whether to invert the mask (default: FALSE).
+#' @param invert Logical, indicating whether to invert the mask. Defaults to
+#'   `FALSE`, ie., pixels with intensity greater than the threshold values are
+#'   selected.
 #' @param color_regions The color palette for regions (default:
 #'   rev(grDevices::terrain.colors(50)).
 #' @param plot Logical, indicating whether to generate plots (default: TRUE).
@@ -509,7 +513,7 @@ mosaic_analyze <- function(mosaic,
                            ncol = 1,
                            shapefile = NULL,
                            build_shapefile = TRUE,
-                           check_shapefile = FALSE,
+                           check_shapefile = TRUE,
                            buffer_edge = 5,
                            buffer_col = 0,
                            buffer_row = 0,
@@ -542,8 +546,11 @@ mosaic_analyze <- function(mosaic,
                            verbose = TRUE){
   includeopt <- c("intersect", "covered", "overlap", "centroid")
   includeopt <- includeopt[sapply(include_if, function(x){pmatch(x, includeopt)})]
-  if(any(segment_individuals) & !segment_index %in% plot_index){
+  if(any(segment_individuals) | any(segment_plot) & !is.null(plot_index) & !segment_index %in% plot_index){
     plot_index <- unique(append(plot_index, segment_index))
+  }
+  if(is.null(plot_index) & !is.null(segment_index)){
+    plot_index <- segment_index
   }
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
@@ -720,8 +727,6 @@ mosaic_analyze <- function(mosaic,
   results <- list()
   result_indiv <- list()
   extends <- terra::ext(mosaiccr)
-  # return(created_shapes)
-  # return(created_shapes)
   for(j in seq_along(created_shapes)){
     if(segment_plot[j] & segment_individuals[j]){
       stop("Only `segment_plot` OR `segment_individuals` can be used", call. = FALSE)
@@ -746,19 +751,56 @@ mosaic_analyze <- function(mosaic,
         }
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
         if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] > thresh
-        } else{
           mask <- mind_temp[[segment_index[j]]] < thresh
+        } else{
+          mask <- mind_temp[[segment_index[j]]] > thresh
         }
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
+        # compute plot coverage
+        dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
+        dmask[is.na(dmask) == TRUE] <- 1
+        if(!isFALSE(filter[j]) & filter[j] > 1){
+          dmask <- EBImage::medianFilter(dmask, filter[j])
+        }
+        dmask <- EBImage::bwlabel(dmask)
+        conts <- EBImage::ocontour(dmask)
+        conts <- conts[sapply(conts, nrow) > 2]
+        resx <- terra::res(mosaiccr)[1]
+        resy <- terra::res(mosaiccr)[1]
+        sf_plt <- sf::st_sf(
+          geometry = lapply(conts, function(x) {
+            tmp <- x
+            tmp[, 2] <-  extends[3] + (nrow(mask) - tmp[, 2]) * resy
+            tmp[, 1] <- extends[1] + tmp[, 1] * resy
+            geometry = sf::st_polygon(list(as.matrix(tmp |> poly_close())))
+          }),
+          data = data.frame(individual = paste0(1:length(conts))),
+          crs = terra::crs(mosaic)
+        ) |>
+          sf::st_make_valid()
+        covered_area <-
+          suppressWarnings(
+            sapply(1:nrow(plot_grid), function(i){
+              plot_grid[i, ] |>
+                sf::st_intersection(sf_plt) |>
+                sf::st_area() |>
+                sum()
+            })
+          )
+        plot_grid <-
+          plot_grid |>
+          poorman::mutate(covered_area = as.numeric(covered_area),
+                          plot_area = as.numeric(sf::st_area(geometry)),
+                          coverage = covered_area / plot_area)
+
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
       # check if segmentation is performed (analyze individuals)
       if(segment_individuals[j]){
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
         if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] > thresh
-        } else{
           mask <- mind_temp[[segment_index[j]]] < thresh
+        } else{
+          mask <- mind_temp[[segment_index[j]]] > thresh
         }
         dmask <- EBImage::Image(matrix(mask, ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
         dmask[is.na(dmask) == TRUE] <- 1
@@ -842,7 +884,7 @@ mosaic_analyze <- function(mosaic,
             valindiv$coverage_fraction <- NULL
           }
         }
-        if(ncol(valindiv) == 1 & length(plot_index) == 1){
+        if(length(plot_index) == 1){
           colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
         }
         # return(list(valindiv, gridindiv))
@@ -883,20 +925,57 @@ mosaic_analyze <- function(mosaic,
         }
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
         if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] > thresh
-        } else{
           mask <- mind_temp[[segment_index[j]]] < thresh
+        } else{
+          mask <- mind_temp[[segment_index[j]]] > thresh
         }
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
+        # compute plot coverage
+        dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
+        dmask[is.na(dmask) == TRUE] <- 1
+        if(!isFALSE(filter[j]) & filter[j] > 1){
+          dmask <- EBImage::medianFilter(dmask, filter[j])
+        }
+        dmask <- EBImage::bwlabel(dmask)
+        conts <- EBImage::ocontour(dmask)
+        conts <- conts[sapply(conts, nrow) > 2]
+        resx <- terra::res(mosaiccr)[1]
+        resy <- terra::res(mosaiccr)[1]
+        sf_plt <- sf::st_sf(
+          geometry = lapply(conts, function(x) {
+            tmp <- x
+            tmp[, 2] <-  extends[3] + (nrow(mask) - tmp[, 2]) * resy
+            tmp[, 1] <- extends[1] + tmp[, 1] * resy
+            geometry = sf::st_polygon(list(as.matrix(tmp |> poly_close())))
+          }),
+          data = data.frame(individual = paste0(1:length(conts))),
+          crs = terra::crs(mosaic)
+        ) |>
+          sf::st_make_valid()
+        covered_area <-
+          suppressWarnings(
+            sapply(1:nrow(plot_grid), function(i){
+              plot_grid[i, ] |>
+                sf::st_intersection(sf_plt) |>
+                sf::st_area() |>
+                sum()
+            })
+          )
+        plot_grid <-
+          plot_grid |>
+          poorman::mutate(covered_area = as.numeric(covered_area),
+                          plot_area = as.numeric(sf::st_area(geometry)),
+                          coverage = covered_area / plot_area)
+
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
 
       if(segment_individuals[j]){
         thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
         extends <- terra::ext(mind_temp)
         if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] > thresh
-        } else{
           mask <- mind_temp[[segment_index[j]]] < thresh
+        } else{
+          mask <- mind_temp[[segment_index[j]]] > thresh
         }
         dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
         dmask[is.na(dmask) == TRUE] <- 1
@@ -977,7 +1056,7 @@ mosaic_analyze <- function(mosaic,
             valindiv$coverage_fraction <- NULL
           }
         }
-        if(ncol(valindiv) == 1 & length(plot_index) == 1){
+        if(length(plot_index) == 1){
           colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
         }
 
@@ -1012,11 +1091,11 @@ mosaic_analyze <- function(mosaic,
       if("coverage_fraction" %in% colnames(vals)){
         vals$coverage_fraction <- NULL
       }
-      if(ncol(vals) == 1 & length(plot_index) == 1){
+      if(length(plot_index) == 1){
         colnames(vals) <- paste0(colnames(vals), ".", plot_index)
       }
     } else{
-      if(ncol(vals) == 1 & length(plot_index) == 1){
+      if(length(plot_index) == 1){
         colnames(vals) <- paste0(colnames(vals), ".", plot_index)
       }
       vals <- transform(vals,
@@ -1035,7 +1114,10 @@ mosaic_analyze <- function(mosaic,
 
   # return(results)
   # bind the results  ## at a level plot
-  results <- do.call(rbind, lapply(results, function(x){x})) |> sf::st_sf()
+  results <- do.call(rbind, lapply(results, function(x){x})) |>
+    sf::st_sf() |>
+    poorman::relocate(plot_id, block, .before = 1)
+
 
   if(any(segment_individuals)){
 
@@ -1089,6 +1171,8 @@ mosaic_analyze <- function(mosaic,
         poorman::mutate(mean_distance = result_individ_map$means,
                         cv = result_individ_map$cvs,
                         .before = n)
+    } else{
+      result_individ_map <- NULL
     }
 
 
@@ -1096,6 +1180,7 @@ mosaic_analyze <- function(mosaic,
     result_plot_summ <- NULL
     result_indiv <- NULL
     result_individ_map <- NULL
+
   }
 
   ext_plot <-
@@ -1125,12 +1210,21 @@ mosaic_analyze <- function(mosaic,
     if(downsample > 0){
       mosaicplot <- terra::aggregate(mosaicplot, fact = downsample)
     }
-    if(segment_individuals){
+    if(any(segment_individuals)){
       dfplot <- result_plot_summ
     } else{
       dfplot <- results
     }
     map <-
+      mapview::viewRGB(
+        as(mosaicplot, "Raster"),
+        r = r,
+        g = g,
+        b = b,
+        na.color = "#00000000",
+        maxpixels = 60000000,
+        quantiles = quantiles
+      ) +
       suppressWarnings(
         mapview::mapview(dfplot,
                          zcol = attribute,
@@ -1142,19 +1236,18 @@ mosaic_analyze <- function(mosaic,
                          verbose = FALSE)
       )
 
-    map <-
-      add_rgb(map,
-              as(mosaicplot, "Raster"),
-              r = r,
-              g = g,
-              b = b,
-              na.color = "#00000000",
-              quantiles = quantiles,
-              resolution = 128)
-
     if(any(segment_individuals)){
       attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
       mapindivid <-
+        mapview::viewRGB(
+          as(mosaicplot, "Raster"),
+          r = r,
+          g = g,
+          b = b,
+          na.color = "#00000000",
+          maxpixels = 60000000,
+          quantiles = quantiles,
+        ) +
         suppressWarnings(
           mapview::mapview(result_indiv,
                            zcol = attribute,
@@ -1168,14 +1261,7 @@ mosaic_analyze <- function(mosaic,
                              legend = FALSE,
                              alpha.regions = 0.4,
                              zcol = "block",
-                             map.types = "OpenStreetMap") )|>
-        add_rgb(as(mosaicplot, "Raster"),
-                r = r,
-                g = g,
-                b = b,
-                na.color = "#00000000",
-                quantiles = quantiles,
-                resolution = 128)
+                             map.types = "OpenStreetMap") )
     } else{
       mapindivid <- NULL
     }
@@ -1216,6 +1302,11 @@ mosaic_analyze <- function(mosaic,
 #' @param nir The layer for the Near-infrared band(default: 5).
 #' @param edit If `TRUE` enable editing options using [mapedit::editMap()].
 #' @param title A title for the generated map or plot (default: "").
+#' @param shapefile An optional shapefile of class `sf` to be plotted over the
+#'   mosaic. It can be, for example, a plot-level result returned by
+#'   [mosaic_analyze()].
+#' @param attribute The attribute name(s) or column number(s) in shapefile table
+#'   of the column(s) to be rendered.
 #' @param max_pixels Maximum number of pixels to render in the map or plot
 #'   (default: 500000).
 #' @param downsample Downsampling factor to reduce the number of pixels
@@ -1232,7 +1323,7 @@ mosaic_analyze <- function(mosaic,
 #'
 #' @importFrom terra rast crs nlyr terraOptions
 #' @importFrom methods as
-#' @importFrom sf st_crs st_transform st_make_grid
+#' @importFrom sf st_crs st_transform st_make_grid st_intersection st_make_valid
 #' @importFrom stars st_downsample st_as_stars
 #' @importFrom poorman summarise across mutate arrange left_join bind_cols
 #'   bind_rows contains ends_with everything between pivot_longer pivot_wider
@@ -1261,6 +1352,8 @@ mosaic_view <- function(mosaic,
                         nir = 5,
                         edit = FALSE,
                         title = "",
+                        shapefile = NULL,
+                        attribute = NULL,
                         viewer = c("mapview", "base"),
                         show = c("rgb", "index"),
                         index = "B",
@@ -1317,7 +1410,24 @@ mosaic_view <- function(mosaic,
   }
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
-      map <-
+      if(is.null(shapefile)){
+        map <-
+          mapview::viewRGB(as(mosaic, "Raster"),
+                           na.color = "#00000000",
+                           layer.name = "T",
+                           r = r,
+                           g = g,
+                           b = b,
+                           maxpixels = 60000000,
+                           quantiles = quantiles)
+        if(edit){
+          map <-
+            mapedit::editMap(map,
+                             editor = "leafpm",
+                             title = title)
+        }
+        map
+      } else{
         mapview::viewRGB(as(mosaic, "Raster"),
                          na.color = "#00000000",
                          layer.name = "T",
@@ -1325,14 +1435,17 @@ mosaic_view <- function(mosaic,
                          g = g,
                          b = b,
                          maxpixels = 60000000,
-                         quantiles = quantiles)
-      if(edit){
-        map <-
-          mapedit::editMap(map,
-                           editor = "leafpm",
-                           title = title)
+                         quantiles = quantiles) +
+          suppressWarnings(
+            mapview::mapview(shapefile,
+                             zcol = attribute,
+                             layer.name = attribute,
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE))
       }
-      map
 
     } else{
       if(vieweropt == "base"){
@@ -2125,7 +2238,7 @@ mosaic_draw <- function(mosaic,
       suppressWarnings(
         exactextractr::exact_extract(x = mind,
                                      y = polygons,
-                                     fun = "mean",
+                                     fun = summarize_fun,
                                      progress = FALSE,
                                      force_df = TRUE)
       )

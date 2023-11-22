@@ -235,7 +235,7 @@ image_view <- function(img,
 #' library(pliman)
 #' custom_palette(n = 5)
 #'
-custom_palette <- function(colors = c("yellow", "#53CC67", "#009B95", "#00588B","#4B0055"), n = 100){
+custom_palette <- function(colors = c("yellow", "#53CC67", "#009B95", "#00588B","#4B0055"), n = 5){
   grDevices::colorRampPalette(colors)(n)
 }
 
