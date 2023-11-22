@@ -19,20 +19,13 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman)
-[![Lifecycle: stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
-![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/doi/10.5281/zenodo.4757333)
+[![CRAN status](https://www.r-pkg.org/badges/version-ago/pliman)](https://CRAN.R-project.org/package=pliman) [![Lifecycle: stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) ![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-month/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-week/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-day/pliman?color=orange)](https://r-pkg.org/pkg/pliman) [![DOI](https://zenodo.org/badge/352844585.svg)](https://zenodo.org/doi/10.5281/zenodo.4757333)
 
 <!-- badges: end -->
 
 The pliman (**pl**ant **im**age **an**alysis) package is designed to analyze plant images, particularly for leaf and seed analysis. It offers a range of functionalities to assist with various tasks such as measuring disease severity, counting lesions, obtaining lesion shapes, counting objects in an image, extracting object characteristics, performing Fourier Analysis, obtaining RGB values, extracting object coordinates and outlines, isolating objects, and plotting object measurements.
 
 `pliman` also provides useful functions for image transformation, binarization, segmentation, and resolution. Please visit the [Examples](https://tiagoolivoto.github.io/pliman/reference/index.html) page on the `pliman` website for detailed documentation of each function.
-
-
 
 # Installation
 
@@ -57,10 +50,10 @@ devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
 
 # Analyze objects
 
-The function `analyze_objects()` can be used to analyze objects such as leaves, grains, pods, and pollen in an image. By default, all measures are returned in pixel units. Users can [adjust the object measures](https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html#adjusting-object-measures) with `get_measures()` provided that the image resolution (Dots Per Inch) is known. Another option is to use a reference object in the image. In this last case, the argument `reference` must be set to `TRUE`. There are two options to identify the reference object:   
+The function `analyze_objects()` can be used to analyze objects such as leaves, grains, pods, and pollen in an image. By default, all measures are returned in pixel units. Users can [adjust the object measures](https://tiagoolivoto.github.io/pliman/articles/analyze_objects.html#adjusting-object-measures) with `get_measures()` provided that the image resolution (Dots Per Inch) is known. Another option is to use a reference object in the image. In this last case, the argument `reference` must be set to `TRUE`. There are two options to identify the reference object:
 
-  1. By its color, using the arguments `back_fore_index` and `fore_ref_index`  
-  2. By its size, using the arguments `reference_larger` or `reference_smaller` 
+1.  By its color, using the arguments `back_fore_index` and `fore_ref_index`\
+2.  By its size, using the arguments `reference_larger` or `reference_smaller`
 
 In both cases, the `reference_area` must be declared. Let's see how to analyze an image with flax grains containing a reference object (rectangle with 2x3 cm). Here, we'll identify the reference object by its size; so, the final results in this case will be in metric units (cm).
 
@@ -85,6 +78,7 @@ plot(flax, measure = "length")
 ```
 
 # Analyzing shapefiles
+
 The `analyze_objects_shp()` function performs object analysis based on shapefiles (rows and columns). Possible applications include computing canopy coverage and vegetation indexes useful for high-throughput phenotyping. By default `analyze_objects_shp()` calls `image_prepare_mv()` internally, allowing alignment and crop the image before processing. In the following example, we compute the canopy coverage and the Normalized Green Red Difference Index (NGRDI) for each one of the 12 soybean plots.
 
 ```{r}
@@ -99,15 +93,44 @@ res <-
 plot_index_shp(res, attribute = "coverage", viewer = "base")
 ```
 
-
 # Analyzing orthomosaics
-## Canopy coverage
+
+## Canopy coverage and multispectral indexes
+In this example, a multispectral orthomosaic originally available [here](https://github.com/diegojgris/draw-plots-qgis/blob/main/sampledata/MicaSenseMXRed_5bands.tif) is used to show how `mosaic_analyze()` can be used to compute the plot coverage and statistics such as min, mean, and max values of three multispectral indexes (NDVI, EVI, and NDRE) using a design that includes 6 rows and 15 plots per row. Note how two plots were removed during the live editing step.
+
 ```{r eval=FALSE}
 library(pliman)
+url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif"
+mosaic <- mosaic_input(url)
+
+url_shp <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu_shp.shp"
+shapefile <- shapefile_input(url_shp)
+
+res <- 
+  mosaic_analyze(mosaic,
+                 shapefile = shapefile,
+                 # the following arguments can be ignored when a shapefile is provided
+                 # nrow = 3,  # use 6 if you want to analyze in a single block
+                 # ncol = 15,
+                 # buffer_row = -0.15,
+                 # buffer_col = -0.05,
+                 segment_plot = TRUE,
+                 segment_index = "NDVI", 
+                 plot_index = c("NDVI", "EVI", "NDRE"), 
+                 summarize_fun = c("min", "mean", "max"),
+                 attribute = "coverage")
+res$map_plot
+
+
 ```
 
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7130584937077899265?compact=1" height="399" width="710" frameborder="0" allowfullscreen="" title="Publicação incorporada"></iframe>
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/coverage.png?raw=true)
 
+See how this plot was produced in the video below.
+
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7133194919485091840?compact=1" height="399" width="710" frameborder="0" allowfullscreen title="Publicação incorporada">
+
+</iframe>
 
 # Disease severity
 
@@ -141,8 +164,6 @@ img <- image_pliman("sev_leaf.jpg", plot = TRUE)
 # works only in an interactive section
 measure_disease_iter(img, viewer = "mapview")
 ```
-
-
 
 # Citation
 

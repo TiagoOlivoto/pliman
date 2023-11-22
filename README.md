@@ -142,11 +142,45 @@ plot_index_shp(res, attribute = "coverage", viewer = "base")
 
 # Analyzing orthomosaics
 
+## Canopy coverage and multispectral indexes
+
+In this example, a multispectral orthomosaic originally available
+[here](https://github.com/diegojgris/draw-plots-qgis/blob/main/sampledata/MicaSenseMXRed_5bands.tif)
+is used to show how `mosaic_analyze()` can be used to compute the plot
+coverage and statistics such as min, mean, and max values of three
+multispectral indexes (NDVI, EVI, and NDRE) using a design that includes
+6 rows and 15 plots per row. Note how two plots were removed during the
+live editing step.
+
 ``` r
 library(pliman)
+url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif"
+mosaic <- mosaic_input(url)
+
+url_shp <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu_shp.shp"
+shapefile <- shapefile_input(url_shp)
+
+res <- 
+  mosaic_analyze(mosaic,
+                 shapefile = shapefile,
+                 # the following arguments can be ignored when a shapefile is provided
+                 # nrow = 3,  # use 6 if you want to analyze in a single block
+                 # ncol = 15,
+                 # buffer_row = -0.15,
+                 # buffer_col = -0.05,
+                 segment_plot = TRUE,
+                 segment_index = "NDVI", 
+                 plot_index = c("NDVI", "EVI", "NDRE"), 
+                 summarize_fun = c("min", "mean", "max"),
+                 attribute = "coverage")
+res$map_plot
 ```
 
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7130584937077899265?compact=1" height="399" width="710" frameborder="0" allowfullscreen title="Publicação incorporada">
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/coverage.png?raw=true)
+
+See how this plot was produced in the video below.
+
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7133194919485091840?compact=1" height="399" width="710" frameborder="0" allowfullscreen title="Publicação incorporada">
 </iframe>
 
 # Disease severity
