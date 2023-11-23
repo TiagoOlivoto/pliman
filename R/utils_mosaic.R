@@ -113,6 +113,7 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
 make_grid <- function(points,
                       nrow,
                       ncol,
+                      mosaic,
                       buffer_col = 0,
                       buffer_row = 0){
 
@@ -335,6 +336,7 @@ shapefile_build <- function(mosaic,
         make_grid(cpoints[k, ],
                   nrow = nrow[k],
                   ncol = ncol[k],
+                  mosaic = mosaic,
                   buffer_col = buffer_col[k],
                   buffer_row = buffer_row[k])
     } else{
