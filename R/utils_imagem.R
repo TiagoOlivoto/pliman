@@ -1702,7 +1702,7 @@ image_binary <- function(img,
             threshold <- threshold
           } else{
             pixels <- terra::rast(t(imgs@.Data))
-            terra::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+            terra::plot(pixels, col = custom_palette(n = 100),  axes = FALSE, asp = NA)
             threshold <- readline("Selected threshold: ")
           }
         }
@@ -3463,7 +3463,7 @@ help_binary <- function(img,
           threshold <- threshold
         } else{
           pixels <- terra::rast(EBImage::transpose(imgs)@.Data)
-          terra::plot(pixels, col = custom_palette(),  axes = FALSE, asp = NA)
+          terra::plot(pixels, col = custom_palette(n = 100),  axes = FALSE, asp = NA)
           threshold <- readline("Selected threshold: ")
         }
       }

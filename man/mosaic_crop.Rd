@@ -33,9 +33,8 @@ mosaic_crop(
 
 \item{nir}{The layer for the Near-infrared band(default: 5).}
 
-\item{shapefile}{An optional shapefile of class \code{sf} to be plotted over the
-mosaic. It can be, for example, a plot-level result returned by
-\code{\link[=mosaic_analyze]{mosaic_analyze()}}.}
+\item{shapefile}{An optional \code{SpatVector}, that can be created with
+\code{\link[=shapefile_input]{shapefile_input()}}.}
 
 \item{show}{The display option for the map view. Options are "rgb" for RGB
 view and "index" for index view.}
@@ -64,7 +63,9 @@ interactive map or plot.
 This function uses the \code{mosaic_view} function to display an
 interactive map or plot of the mosaic raster, allowing users to draw a
 rectangle to select the cropping area. The selected area is then cropped
-from the input mosaic and returned as a new \code{SpatRaster} object.
+from the input mosaic and returned as a new \code{SpatRaster} object. If
+\code{shapefile} is declared, the mosaic will be cropped to the extent of
+\code{shapefile}.
 }
 \examples{
 if(interactive()){

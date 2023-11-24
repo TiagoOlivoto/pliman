@@ -1,93 +1,3 @@
-# gathered from https://github.com/r-spatial/leafem/blob/6d6831352038b8f7462ff7afa698050c4e46fb5e/R/addRasterRGB.R#L143
-
-rscl = function(x,
-                from = range(x, na.rm = TRUE, finite = TRUE),
-                to = c(0, 1),
-                ...) {
-  (x - from[1]) / diff(from) * diff(to) + to[1]
-}
-add_rgb <- function(
-    map,
-    x,
-    r = 3,
-    g = 2,
-    b = 1,
-    group = NULL,
-    layerId = NULL,
-    resolution = 96,
-    opacity = 1,
-    options = leaflet::tileOptions(),
-    colorOptions = NULL,
-    project = TRUE,
-    pixelValuesToColorFn = NULL,
-    ...
-) {
-
-  if (inherits(x, "Raster")) {
-    x = stars::st_as_stars(x)
-  }
-
-  if (project & !sf::st_is_longlat(x)) {
-    x = stars::st_warp(x, crs = 4326)
-  }
-
-  if (is.null(colorOptions)) {
-    colorOptions = leafem::colorOptions()
-  }
-
-  fl = tempfile(fileext = ".tif")
-
-  if (inherits(x, "stars_proxy")) {
-    # file.copy(x[[1]], fl)
-    fl = x[[1]]
-  }
-
-  if (!inherits(x, "stars_proxy")) {
-    stars::write_stars(x, dsn = fl)
-  }
-
-  minband = min(r, g, b)
-
-  rgbPixelfun = htmlwidgets::JS(
-    sprintf(
-      "
-      pixelValuesToColorFn = values => {
-      // debugger;
-        if (isNaN(values[0])) return '%s';
-        return rgbToHex(
-          Math.ceil(values[%s])
-          , Math.ceil(values[%s])
-          , Math.ceil(values[%s])
-        );
-      };
-    "
-    , NULL
-    , r - minband
-    , g - minband
-    , b - minband
-    )
-  )
-
-
-
-  # todo: streching via quantiles and domain...
-
-  leafem::addGeotiff(
-    map
-    , file = fl
-    , url = NULL
-    , group = group
-    , layerId = layerId
-    , resolution = resolution
-    , bands = c(r, g, b)
-    , arith = NULL
-    , opacity = opacity
-    , options = options
-    , colorOptions = list(na.color = "#00000000")
-    , rgb = TRUE
-    , pixelValuesToColorFn = rgbPixelfun
-  )
-}
 
 create_buffer <- function(coords, buffer_col, buffer_row) {
   # Calculate the new x-min, x-max, y-min, and y-max after adjustment
@@ -359,11 +269,20 @@ shapefile_build <- function(mosaic,
           poorman::relocate(geometry, .after = 3) |>
           sf::st_transform(crs = 4326)
       }))
+    possible_downsamples <- 0:15
+    possible_npix <- sapply(possible_downsamples, function(x){
+      compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
+    })
+    downsample <- which.min(abs(possible_npix - max_pixels))
+    downsample <- ifelse(downsample == 1, 0, downsample)
+    if(downsample > 0){
+      mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
+    }
 
     if(nlyrs > 2){
       map <-
         mapview::viewRGB(
-          x = as(mosaic, "Raster"),
+          x = as(mosaiccr, "Raster"),
           r = r,
           g = g,
           b = b,
@@ -374,7 +293,7 @@ shapefile_build <- function(mosaic,
     } else{
       map <-
         mapview::mapview() %>%
-        leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
+        leafem::addGeoRaster(x = as(mosaiccr[[1]], "Raster"),
                              colorOptions = leafem::colorOptions(palette = custom_palette(),
                                                                  na.color = "transparent"))
     }
@@ -1456,25 +1375,42 @@ mosaic_view <- function(mosaic,
                     colNA = "white",
                     ...)
       } else{
-        index <- gsub("[/\\\\]", "_", index, perl = TRUE)
-        map <-
-          mapview::mapview(mosaic,
-                           map.types = mapview::mapviewGetOption("basemaps"),
-                           layer.name = index,
-                           maxpixels =  max_pixels,
-                           col.regions = color_regions,
-                           alpha.regions = alpha,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE)
-
-        if(edit){
+        if(is.null(shapefile)){
+          index <- gsub("[/\\\\]", "_", index, perl = TRUE)
           map <-
-            map |>
-            mapedit::editMap(editor = "leafpm",
-                             title = title)
+            mapview::mapview(mosaic,
+                             map.types = mapview::mapviewGetOption("basemaps"),
+                             layer.name = index,
+                             maxpixels =  max_pixels,
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE)
+
+          if(edit){
+            map <-
+              map |>
+              mapedit::editMap(editor = "leafpm",
+                               title = title)
+          }
+          map
+        } else{
+          mapview::mapview(as(mosaic, "Raster"),
+                           na.color = "#00000000",
+                           layer.name = "",
+                           maxpixels = 60000000) +
+            suppressWarnings(
+              mapview::mapview(shapefile,
+                               zcol = attribute,
+                               layer.name = attribute,
+                               col.regions = color_regions,
+                               alpha.regions = alpha,
+                               na.color = "#00000000",
+                               maxBytes = 64 * 1024 * 1024,
+                               verbose = FALSE))
+
         }
-        map
       }
     }
   } else{
@@ -1592,6 +1528,106 @@ mosaic_export <- function(mosaic,
 }
 
 
+#' A wrapper around terra::resample()
+#'
+#' Transfers values between SpatRaster objects that do not align (have a
+#' different origin and/or resolution). See [terra::resample()] for more details
+#'
+#' @param mosaic SpatRaster to be resampled
+#' @param y SpatRaster with the geometry that x should be resampled to
+#' @param ... Further arguments passed on to [terra::resample()].
+#'
+#' @return SpatRaster
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' library(terra)
+#' r <- rast(nrows=3, ncols=3, xmin=0, xmax=10, ymin=0, ymax=10)
+#' values(r) <- 1:ncell(r)
+#' s <- rast(nrows=25, ncols=30, xmin=1, xmax=11, ymin=-1, ymax=11)
+#' x <- mosaic_resample(r, s, method="bilinear")
+#' opar <- par(no.readonly =TRUE)
+#' par(mfrow=c(1,2))
+#' plot(r)
+#' plot(x)
+#' par(opar)
+mosaic_resample <- function(mosaic, y, ...){
+  terra::resample(mosaic, y, ...)
+}
+
+
+#' A wrapper around terra::aggregate()
+#'
+#' Aggregate a SpatRaster to create a new SpatRaster with a lower resolution
+#' (larger cells). See [terra::aggregate()] for more details
+#'
+#' @param mosaic SpatRaster
+#' @param y SpatRaster with the geometry that x should be resampled to
+#' @param ... Further arguments passed on to [terra::aggregate()].
+#'
+#' @return SpatRaster
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' library(terra)
+#' r <- rast()
+#' values(r) <- 1:ncell(r)
+#' r2 <- mosaic_aggregate(r, fact = 10)
+#' par(mfrow=c(1,2))
+#' mosaic_plot(r)
+#' mosaic_plot(r2)
+#' par(opar)
+mosaic_aggregate <- function(mosaic, fact = 2, ...){
+  terra::aggregate(mosaic, fact, ...)
+}
+
+
+#' A wrapper around terra::plot()
+#'
+#' Plot the values of a SpatRaster
+#'
+#' @param mosaic SpatRaster
+#' @param ... Further arguments passed on to [terra::plot()].
+#'
+#' @return A `NULL` object
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' r <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#' mosaic_plot(r)
+mosaic_plot <- function(mosaic, ...){
+  if(!inherits(mosaic, "SpatRaster")){
+    stop("'mosaic' must be an object of class 'SpatRaster'")
+  }
+  terra::plot(mosaic, ...)
+}
+
+
+#' A wrapper around terra::plot()
+#'
+#' Plot the values of a SpatVector
+#'
+#' @param mosaic SpatVector
+#' @param ... Further arguments passed on to [terra::plot()].
+#'
+#' @return A `NULL` object
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' r <- shapefile_input(system.file("ex/lux.shp", package="terra"), as_sf = FALSE)
+#' shapefile_plot(r)
+shapefile_plot <- function(shapefile, ...){
+  if(!inherits(shapefile, "SpatVector")){
+    stop("'mosaic' must be an object of class 'SpatVector'")
+  }
+  terra::plot(shapefile, ...)
+}
+
+
 #' Import/export shapefiles.
 #' @description
 #'
@@ -1678,6 +1714,10 @@ shapefile_view <- function(shapefile, ...){
   mapview::mapview(shapefile, ...)
 }
 
+
+
+
+
 #' Crop a mosaic
 #'
 #' Crop a `SpatRaster` object based on user-defined selection using an
@@ -1686,9 +1726,13 @@ shapefile_view <- function(shapefile, ...){
 #' @details This function uses the `mosaic_view` function to display an
 #'   interactive map or plot of the mosaic raster, allowing users to draw a
 #'   rectangle to select the cropping area. The selected area is then cropped
-#'   from the input mosaic and returned as a new `SpatRaster` object.
+#'   from the input mosaic and returned as a new `SpatRaster` object. If
+#'   `shapefile` is declared, the mosaic will be cropped to the extent of
+#'   `shapefile`.
 #' @importFrom terra crs
 #' @inheritParams mosaic_view
+#' @param shapefile An optional `SpatVector`, that can be created with
+#'   [shapefile_input()].
 #' @param ... Additional arguments passed to [mosaic_view()].
 #'
 #' @return A cropped version of `mosaic` based on the user-defined selection.
@@ -1717,33 +1761,38 @@ mosaic_crop <- function(mosaic,
                         max_pixels = 500000,
                         downsample = NULL,
                         ...){
-  showopt <- c("rgb", "index")
-  showopt <- showopt[pmatch(show[[1]], showopt)]
-  controls <- mosaic_view(mosaic,
-                          show = showopt,
-                          index = index,
-                          r = r,
-                          g = g,
-                          b = b,
-                          nir = nir,
-                          re = re,
-                          max_pixels = max_pixels,
-                          downsample = downsample,
-                          edit = TRUE,
-                          title = "Use the 'Draw rectangle' tool to select the cropping area.",
-                          ...)
-  if(!is.na(sf::st_crs(mosaic))){
-    grids <-
-      sf::st_make_grid(controls$finished, n = c(1, 1)) |>
-      sf::st_transform(sf::st_crs(mosaic))
+  if(is.null(shapefile)){
+    showopt <- c("rgb", "index")
+    showopt <- showopt[pmatch(show[[1]], showopt)]
+    controls <- mosaic_view(mosaic,
+                            show = showopt,
+                            index = index,
+                            r = r,
+                            g = g,
+                            b = b,
+                            nir = nir,
+                            re = re,
+                            max_pixels = max_pixels,
+                            downsample = downsample,
+                            edit = TRUE,
+                            title = "Use the 'Draw rectangle' tool to select the cropping area.",
+                            ...)
+    if(!is.na(sf::st_crs(mosaic))){
+      grids <-
+        sf::st_make_grid(controls$finished, n = c(1, 1)) |>
+        sf::st_transform(sf::st_crs(mosaic))
+    } else{
+      terra::crs(mosaic) <- terra::crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
+      grids <-
+        sf::st_make_grid(controls$finished, n = c(1, 1)) |>
+        sf::st_transform(sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
+    }
+    cropped <- terra::crop(mosaic, grids)
   } else{
-    terra::crs(mosaic) <- terra::crs("+proj=utm +zone=32 +datum=WGS84 +units=m")
-    grids <-
-      sf::st_make_grid(controls$finished, n = c(1, 1)) |>
-      sf::st_transform(sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
+    cropped <- terra::crop(mosaic, shapefile)
   }
-  cropped <- terra::crop(mosaic, grids)
   invisible(cropped)
+
 }
 
 
@@ -2170,7 +2219,7 @@ mosaic_draw <- function(mosaic,
                        r = r,
                        g = g,
                        b = b,
-                       scale = ifelse(scl < 255, 255, scl * 0.7),
+                       scale = ifelse(scl < 255, 255, scl),
                        colNA = "#00000000",
                        mar = c(2, 2, 2, 2),
                        axes = FALSE)
