@@ -760,7 +760,7 @@ mosaic_analyze <- function(mosaic,
         plot_id <- data.frame(plot_id = paste0(intersects))
         valid_rows <- plot_id$plot_id != "integer(0)"
         sf_df <- sf_df[valid_rows, ]
-        plot_id <- plot_id[valid_rows, ]
+        plot_id <- leading_zeros(as.numeric(plot_id[valid_rows, ]), n = 4)
         addmeasures <-
           do.call(rbind,
                   lapply(1:nrow(sf_df), function(i){
@@ -796,7 +796,7 @@ mosaic_analyze <- function(mosaic,
             do.call(rbind, lapply(1:length(valindiv), function(i){
               tmp <- transform(valindiv[[i]],
                                individual = paste0(i),
-                               block = paste0("B", j))
+                               block = paste0("B", leading_zeros(j, n = 2)))
               tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
 
             }
@@ -810,7 +810,7 @@ mosaic_analyze <- function(mosaic,
         }
         # return(list(valindiv, gridindiv))
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", j), gridindiv, valindiv, check.names = FALSE)
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         } else{
           result_indiv[[j]] <- valindiv
@@ -969,7 +969,7 @@ mosaic_analyze <- function(mosaic,
             do.call(rbind, lapply(1:length(valindiv), function(i){
               tmp <- transform(valindiv[[i]],
                                individual = paste0(i),
-                               block = paste0("B", j))
+                               block = paste0("B", leading_zeros(j, n = 2)))
               tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
             }
             ))
@@ -982,7 +982,7 @@ mosaic_analyze <- function(mosaic,
         }
 
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", j), plot_id = 1, gridindiv, valindiv, check.names = FALSE)
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), plot_id = leading_zeros(1, n = 4), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv
         } else{
           result_indiv[[j]] <- valindiv
@@ -1004,8 +1004,8 @@ mosaic_analyze <- function(mosaic,
       vals <-
         do.call(rbind, lapply(1:length(vals), function(i){
           tmp <- transform(vals[[i]],
-                           plot_id = paste0(i),
-                           block = paste0("B", j))
+                           plot_id = paste0(leading_zeros(i, n = 4)),
+                           block = paste0("B", leading_zeros(j, 2)))
           tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
         }
         ))
@@ -1015,13 +1015,18 @@ mosaic_analyze <- function(mosaic,
       if(length(plot_index) == 1){
         colnames(vals) <- paste0(colnames(vals), ".", plot_index)
       }
+      vals <-
+        vals |>
+        poorman::nest_by(block, plot_id) |>
+        poorman::ungroup()
+      vals <- cbind(plot_grid, vals)
     } else{
       if(length(plot_index) == 1){
         colnames(vals) <- paste0(colnames(vals), ".", plot_index)
       }
       vals <- transform(vals,
-                        plot_id = paste0(1:nrow(vals)),
-                        block = paste0("B", j))
+                        plot_id = paste0(leading_zeros(1:nrow(vals), n = 4)),
+                        block = paste0("B", leading_zeros(j, 2)))
       vals <- vals[, c(ncol(vals), ncol(vals) - 1, 1:(ncol(vals) - 2))]
     }
     if(!is.null(summarize_fun)){
@@ -1035,9 +1040,9 @@ mosaic_analyze <- function(mosaic,
 
   # return(results)
   # bind the results  ## at a level plot
-  results <- do.call(rbind, lapply(results, function(x){x})) |>
-    sf::st_sf() |>
-    poorman::relocate(plot_id, block, .before = 1)
+  results <-
+    do.call(rbind, lapply(results, function(x){x})) |>
+    sf::st_sf()
 
 
   if(any(segment_individuals)){
