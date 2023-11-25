@@ -1568,7 +1568,8 @@ mosaic_resample <- function(mosaic, y, ...){
 #' (larger cells). See [terra::aggregate()] for more details
 #'
 #' @param mosaic SpatRaster
-#' @param y SpatRaster with the geometry that x should be resampled to
+#' @param fact Aggregation factor expressed as number of cells in each direction
+#'   (horizontally and vertically). See [terra::aggregate()] for more details.
 #' @param ... Further arguments passed on to [terra::aggregate()].
 #'
 #' @return SpatRaster
@@ -1580,6 +1581,7 @@ mosaic_resample <- function(mosaic, y, ...){
 #' r <- rast()
 #' values(r) <- 1:ncell(r)
 #' r2 <- mosaic_aggregate(r, fact = 10)
+#' opar <- par(no.readonly = TRUE)
 #' par(mfrow=c(1,2))
 #' mosaic_plot(r)
 #' mosaic_plot(r2)
@@ -1615,7 +1617,7 @@ mosaic_plot <- function(mosaic, ...){
 #'
 #' Plot the values of a SpatVector
 #'
-#' @param mosaic SpatVector
+#' @param shapefile SpatVector
 #' @param ... Further arguments passed on to [terra::plot()].
 #'
 #' @return A `NULL` object

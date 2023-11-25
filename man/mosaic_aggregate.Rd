@@ -9,9 +9,10 @@ mosaic_aggregate(mosaic, fact = 2, ...)
 \arguments{
 \item{mosaic}{SpatRaster}
 
-\item{...}{Further arguments passed on to \code{\link[terra:aggregate]{terra::aggregate()}}.}
+\item{fact}{Aggregation factor expressed as number of cells in each direction
+(horizontally and vertically). See \code{\link[terra:aggregate]{terra::aggregate()}} for more details.}
 
-\item{y}{SpatRaster with the geometry that x should be resampled to}
+\item{...}{Further arguments passed on to \code{\link[terra:aggregate]{terra::aggregate()}}.}
 }
 \value{
 SpatRaster
@@ -26,6 +27,7 @@ library(terra)
 r <- rast()
 values(r) <- 1:ncell(r)
 r2 <- mosaic_aggregate(r, fact = 10)
+opar <- par(no.readonly = TRUE)
 par(mfrow=c(1,2))
 mosaic_plot(r)
 mosaic_plot(r2)

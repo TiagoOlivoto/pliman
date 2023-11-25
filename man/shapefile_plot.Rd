@@ -7,9 +7,9 @@
 shapefile_plot(shapefile, ...)
 }
 \arguments{
-\item{...}{Further arguments passed on to \code{\link[terra:plot]{terra::plot()}}.}
+\item{shapefile}{SpatVector}
 
-\item{mosaic}{SpatVector}
+\item{...}{Further arguments passed on to \code{\link[terra:plot]{terra::plot()}}.}
 }
 \value{
 A \code{NULL} object
