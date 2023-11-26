@@ -151,7 +151,7 @@ shapefile_build <- function(mosaic,
                             ncol = 1,
                             build_shapefile = TRUE,
                             check_shapefile = TRUE,
-                            buffer_edge = 5,
+                            buffer_edge = 1,
                             buffer_col = 0,
                             buffer_row = 0,
                             as_sf = TRUE,
@@ -331,10 +331,24 @@ shapefile_build <- function(mosaic,
 #' @details
 #' Since multiple blocks can be analyzed, the length of arguments `grid`,
 #' `nrow`, `ncol`, `buffer_edge`, , `buffer_col`, `buffer_row`, `segment_plot`,
-#' `segment_individuals`, `includ_if`, `threshold`, `segment_index`, `invert`,
-#' and `filter`, can be either an scalar (the same argument applied to all the
-#' drawn blocks), or a vector with the same length as the number of drawn. In
-#' the last, each block can be analyzed with different arguments.
+#' `segment_i, ndividuals`, `includ_if`, `threshold`, `segment_index`, `invert`,
+#' `filter`, `threshold`, `lower_size`, `upper_size`, and `lower_noise`, can be
+#' either an scalar (the same argument applied to all the drawn blocks), or a
+#' vector with the same length as the number of drawn. In the last, each block
+#' can be analyzed with different arguments.
+#'
+#' When `segment_individuals = TRUE` is enabled, individuals are included within
+#' each plot based on the `include_if` argument. The default value
+#' (`'centroid'`) includes an object in a given plot if the centroid of that
+#' object is within the plot. This makes the inclusion mutually exclusive (i.e.,
+#' an individual is included in only one plot). If `'covered'` is selected,
+#' objects are included only if their entire area is covered by the plot. On the
+#' other hand, selecting `overlap` is the complement of `covered`; in other
+#' words, objects that overlap the plot boundary are included. Finally, when
+#' `intersect` is chosen, objects that intersect the plot boundary are included.
+#' This makes the inclusion ambiguous (i.e., an object can be included in more
+#' than one plot).
+
 #'
 #' @inheritParams mosaic_view
 #' @inheritParams analyze_objects
@@ -345,30 +359,30 @@ shapefile_build <- function(mosaic,
 #' @param shapefile An optional shapefile containing regions of interest (ROIs)
 #'   for analysis.
 #' @param build_shapefile Logical, indicating whether to interactively draw ROIs
-#'   if shapefile is `NULL` (default: TRUE).
+#'   if the shapefile is `NULL` (default: TRUE).
 #' @param check_shapefile Logical, indicating whether to validate the shapefile
-#'   with an interactive map view (default: TRUE). This enable live editing the
-#'   drawn shapefile by deleting or changing the drawn grids.
+#'   with an interactive map view (default: TRUE). This enables live editing of
+#'   the drawn shapefile by deleting or changing the drawn grids.
 #' @param buffer_edge Width of the buffer around the shapefile (default: 5).
-#' @param buffer_col,buffer_row Buffering factor for the columns and rows,
+#' @param buffer_col, buffer_row Buffering factor for the columns and rows,
 #'   respectively, of each individual plot's side. A value between 0 and 0.5
 #'   where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 #'   value of 0.25 will buffer the plot by 25% on each side.
 #' @param segment_plot Logical, indicating whether to segment plots (default:
-#'   FALSE). If `TRUE`, the `segment_index` will be computed and pixels with
+#'   FALSE). If `TRUE`, the `segment_index` will be computed, and pixels with
 #'   values below the `threshold` will be selected.
 #' @param segment_individuals Logical, indicating whether to segment individuals
 #'   within plots (default: FALSE). If `TRUE`, the `segment_index` will be
-#'   computed and pixels with values below the `threshold` will be selected and
+#'   computed, and pixels with values below the `threshold` will be selected, and
 #'   a watershed-based segmentation will be performed.
 #' @param map_individuals If `TRUE`, the distance between objects within plots
-#'   are computed. The distance can be mapped either on horizontal or vertical
+#'   is computed. The distance can be mapped either in the horizontal or vertical
 #'   direction. The distances, coefficient of variation (CV), and mean of
 #'   distances are then returned.
 #' @param map_direction The direction for mapping individuals within plots.
 #'   Should be one of `"horizontal"` or `"vertical"` (default).
-#' @param watershed 	If `TRUE` (default) performs watershed-based object
-#'   detection. This will detect objects even when they are touching one other.
+#' @param watershed If `TRUE` (default), performs watershed-based object
+#'   detection. This will detect objects even when they are touching one another.
 #'   If FALSE, all pixels for each connected set of foreground pixels are set to
 #'   a unique object. This is faster but is not able to segment touching
 #'   objects.
@@ -378,47 +392,51 @@ shapefile_build <- function(mosaic,
 #'   than the tolerance, the object will be combined with one of its neighbors,
 #'   which is the highest.
 #' @param extension Radius of the neighborhood in pixels for the detection of
-#'   neighboring objects. Higher value smooths out small objects.
-#' @param include_if Character vector specifying the type of intersection
-#'   defaults to "centroid" (individuals in with the centroid is included within
-#'   the drawn plot will be included in such plot). Other possible values
-#'   includes `"covered"`, `"overlap"`, and `"intersect"`. See Details to a
-#'   detailed explanation about these intersecting controls.
+#'   neighboring objects. A higher value smooths out small objects.
+#' @param include_if Character vector specifying the type of intersection.
+#'   Defaults to "centroid" (individuals in which the centroid is included within
+#'   the drawn plot will be included in that plot). Other possible values include
+#'   `"covered"`, `"overlap"`, and `"intersect"`. See Details for a detailed
+#'   explanation of these intersecting controls.
 #' @param plot_index The index(es) to be computed for the drawn plots. Either a
-#'   single vegetation index (eg., `"GLAI"`), a vector of indexes (eg.,
-#'   `c("GLAI", "NGRDI", "HUE")`, or an own index based on the available bands
-#'   (eg., `"(R-B)/(R+B)"`. See [pliman_indexes()] and [image_index()] for more
-#'   details.
+#'   single vegetation index (e.g., `"GLAI"`), a vector of indexes (e.g.,
+#'   `c("GLAI", "NGRDI", "HUE")`), or a custom index based on the available
+#'   bands (e.g., `"(R-B)/(R+B)"`). See [pliman_indexes()] and [image_index()]
+#'   for more details.
 #' @param segment_index The index used for segmentation. The same rule as
 #'   `plot_index`.
 #' @param threshold By default (threshold = "Otsu"), a threshold value based on
 #'   Otsu's method is used to reduce the grayscale image to a binary image. If a
-#'   numeric value is informed, this value will be used as a threshold.
+#'   numeric value is provided, this value will be used as a threshold.
 #' @param filter Performs median filtering in the binary image? See more at
 #'   image_filter(). Defaults to FALSE. Use a positive integer to define the
 #'   size of the median filtering. Larger values are effective at removing
-#'   noise, but adversely affect edges.
+#'   noise but adversely affect edges.
 #' @param summarize_fun The function to compute summaries for the pixel values.
-#'   Defaults to "mean", ie., the mean value of the pixels (either at a plot- or
+#'   Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 #'   individual-level) is returned.
 #' @param attribute The attribute to be shown at the plot when `plot` is `TRUE`
 #'   (default: "GLAI").
 #' @param invert Logical, indicating whether to invert the mask. Defaults to
-#'   `FALSE`, ie., pixels with intensity greater than the threshold values are
+#'   `FALSE`, i.e., pixels with intensity greater than the threshold values are
 #'   selected.
 #' @param color_regions The color palette for regions (default:
-#'   rev(grDevices::terrain.colors(50)).
+#'   rev(grDevices::terrain.colors(50))).
 #' @param plot Logical, indicating whether to generate plots (default: TRUE).
 #' @param verbose Logical, indicating whether to display verbose output
 #'   (default: TRUE).
 #'
 #' @return A list containing the following objects:
-#' * `result_plot`: The results at a plot level
-#' * `result_plot_summ`: The summary of results at a plot level. When `segment_individuals = TRUE`, the number of individuals, canopy coverage, and mean values of some shape statistics such as perimeter, length, width, and diameter are computed.
+#' * `result_plot`: The results at a plot level.
+#' * `result_plot_summ`: The summary of results at a plot level. When
+#'   * `segment_individuals = TRUE`, the number of individuals, canopy coverage,
+#'   and mean values of some shape statistics such as perimeter, length, width,
+#'   and diameter are computed.
 #' * `result_individ`: The results at an individual level.
 #' * `map_plot`: An object of class `mapview` showing the plot-level results.
-#' * `map_individual`: An object of class `mapview` showing the individual-level results.
-#' * `shapefile`: The generated shapefile, with the drawn grids/blocks
+#' * `map_individual`: An object of class `mapview` showing the individual-level
+#'   results.
+#' * `shapefile`: The generated shapefile, with the drawn grids/blocks.
 #' @export
 #'
 #' @examples
@@ -435,7 +453,7 @@ mosaic_analyze <- function(mosaic,
                            shapefile = NULL,
                            build_shapefile = TRUE,
                            check_shapefile = TRUE,
-                           buffer_edge = 5,
+                           buffer_edge = 1,
                            buffer_col = 0,
                            buffer_row = 0,
                            segment_plot = FALSE,
@@ -1115,13 +1133,13 @@ mosaic_analyze <- function(mosaic,
     terra::buffer(buffer_edge) |>
     terra::ext()
 
-  mosaic_extent <- terra::ext(mosaic)
+  # mosaic_extent <- terra::ext(mosaic)
   # Ensure the extent of ext_plot is constrained within the mosaic_extent
-  ext_plot[1] <- max(ext_plot[1], mosaic_extent[1])
-  ext_plot[2] <- min(ext_plot[2], mosaic_extent[2])
-  ext_plot[3] <- max(ext_plot[3], mosaic_extent[3])
-  ext_plot[4] <- min(ext_plot[4], mosaic_extent[4])
-  mosaicplot <- terra::crop(mosaic, ext_plot)
+  # ext_plot[1] <- max(ext_plot[1], mosaic_extent[1])
+  # ext_plot[2] <- min(ext_plot[2], mosaic_extent[2])
+  # ext_plot[3] <- max(ext_plot[3], mosaic_extent[3])
+  # ext_plot[4] <- min(ext_plot[4], mosaic_extent[4])
+  mosaicplot <- mosaiccr
   if(!is.null(summarize_fun) & isTRUE(plot)){
     if(verbose){
       cat("\014","\nPreparing to plot...\n")
@@ -1175,6 +1193,11 @@ mosaic_analyze <- function(mosaic,
           quantiles = quantiles,
         ) +
         suppressWarnings(
+          mapview::mapview(result_plot_summ,
+                           legend = FALSE,
+                           alpha.regions = 0.4,
+                           zcol = "block",
+                           map.types = "OpenStreetMap") +
           mapview::mapview(result_indiv,
                            zcol = attribute,
                            layer.name = attribute,
@@ -1182,12 +1205,7 @@ mosaic_analyze <- function(mosaic,
                            alpha.regions = alpha,
                            na.color = "#00000000",
                            maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE) +
-            mapview::mapview(results,
-                             legend = FALSE,
-                             alpha.regions = 0.4,
-                             zcol = "block",
-                             map.types = "OpenStreetMap") )
+                           verbose = FALSE))
     } else{
       mapindivid <- NULL
     }
@@ -1617,7 +1635,7 @@ mosaic_plot <- function(mosaic, ...){
 #'
 #' Plot the values of a SpatVector
 #'
-#' @param shapefile SpatVector
+#' @param shapefile An SpatVector of sf object.
 #' @param ... Further arguments passed on to [terra::plot()].
 #'
 #' @return A `NULL` object
@@ -1625,11 +1643,14 @@ mosaic_plot <- function(mosaic, ...){
 #'
 #' @examples
 #' library(pliman)
-#' r <- shapefile_input(system.file("ex/lux.shp", package="terra"), as_sf = FALSE)
+#' r <- shapefile_input(system.file("ex/lux.shp", package="terra"))
 #' shapefile_plot(r)
 shapefile_plot <- function(shapefile, ...){
-  if(!inherits(shapefile, "SpatVector")){
-    stop("'mosaic' must be an object of class 'SpatVector'")
+  if(!inherits(shapefile, "SpatVector") & !inherits(shapefile, "sf") ){
+    stop("'mosaic' must be an object of class 'SpatVector' of 'sf'")
+  }
+  if(inherits(shapefile, "sf")){
+    shapefile <- terra::vect(shapefile)
   }
   terra::plot(shapefile, ...)
 }
