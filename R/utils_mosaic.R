@@ -138,7 +138,25 @@ map_individuals <- function(object,
 #'
 #' @inheritParams mosaic_analyze
 #' @inheritParams utils_shapefile
+#' @return A list with the built shapefile. Each element is an `sf` object with
+#'   the coordinates of the drawn polygons.
 #' @export
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#' shps <-
+#'       shapefile_build(mosaic,
+#'                       nrow = 6,
+#'                       ncol = 3,
+#'                       buffer_row = -0.05,
+#'                       buffer_col = -0.25,
+#'                       check_shapefile = FALSE,
+#'                       build_shapefile = FALSE) ## Use TRUE to interactively build the plots
+#' mosaic_plot(mosaic)
+#' shapefile_plot(shps[[1]], add = TRUE)
+#' }
+#'
 #'
 shapefile_build <- function(mosaic,
                             r = 3,
@@ -326,7 +344,8 @@ shapefile_build <- function(mosaic,
 #' defined in a shapefile or interactively drawn on the mosaic. It allows
 #' counting and measuring individuals (eg., plants), computing canopy coverage,
 #' and statistical summaries (eg., mean, coefficient of variation) for
-#' vegetation indices (eg, NDVI) at a block, plot, or individual level.
+#' vegetation indices (eg, NDVI) at a block, plot, individual levels or even
+#' extract the raw results at pixel level.
 #'
 #' @details
 #' Since multiple blocks can be analyzed, the length of arguments `grid`,
@@ -440,7 +459,23 @@ shapefile_build <- function(mosaic,
 #' @export
 #'
 #' @examples
+#' if(interactive()){
 #' library(pliman)
+#' url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif"
+#' mosaic <- mosaic_input(url)
+#' # Draw a polygon (top left, top right, bottom right, bottom left, top left)
+#' # include 8 rice lines and one column
+#'res <-
+#'  mosaic_analyze(mosaic,
+#'                 r = 1, g = 2, b = 3,
+#'                 segment_individuals = TRUE,     # segment the individuals
+#'                 segment_index = "(G-B)/(G+B-R)",# index for segmentation
+#'                 filter = 4,
+#'                 nrow = 8,
+#'                 map_individuals = TRUE)
+#'# map with individual results
+#'res$map_indiv
+#' }
 mosaic_analyze <- function(mosaic,
                            r = 3,
                            g = 2,

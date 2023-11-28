@@ -17,7 +17,7 @@ mosaic_analyze(
   shapefile = NULL,
   build_shapefile = TRUE,
   check_shapefile = TRUE,
-  buffer_edge = 5,
+  buffer_edge = 1,
   buffer_col = 0,
   buffer_row = 0,
   segment_plot = FALSE,
@@ -74,38 +74,38 @@ mosaic_analyze(
 for analysis.}
 
 \item{build_shapefile}{Logical, indicating whether to interactively draw ROIs
-if shapefile is \code{NULL} (default: TRUE).}
+if the shapefile is \code{NULL} (default: TRUE).}
 
 \item{check_shapefile}{Logical, indicating whether to validate the shapefile
-with an interactive map view (default: TRUE). This enable live editing the
-drawn shapefile by deleting or changing the drawn grids.}
+with an interactive map view (default: TRUE). This enables live editing of
+the drawn shapefile by deleting or changing the drawn grids.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}
 
-\item{buffer_col, buffer_row}{Buffering factor for the columns and rows,
+\item{buffer_col, }{buffer_row Buffering factor for the columns and rows,
 respectively, of each individual plot's side. A value between 0 and 0.5
 where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 value of 0.25 will buffer the plot by 25\% on each side.}
 
 \item{segment_plot}{Logical, indicating whether to segment plots (default:
-FALSE). If \code{TRUE}, the \code{segment_index} will be computed and pixels with
+FALSE). If \code{TRUE}, the \code{segment_index} will be computed, and pixels with
 values below the \code{threshold} will be selected.}
 
 \item{segment_individuals}{Logical, indicating whether to segment individuals
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
-computed and pixels with values below the \code{threshold} will be selected and
+computed, and pixels with values below the \code{threshold} will be selected, and
 a watershed-based segmentation will be performed.}
 
 \item{map_individuals}{If \code{TRUE}, the distance between objects within plots
-are computed. The distance can be mapped either on horizontal or vertical
+is computed. The distance can be mapped either in the horizontal or vertical
 direction. The distances, coefficient of variation (CV), and mean of
 distances are then returned.}
 
 \item{map_direction}{The direction for mapping individuals within plots.
 Should be one of \code{"horizontal"} or \code{"vertical"} (default).}
 
-\item{watershed}{If \code{TRUE} (default) performs watershed-based object
-detection. This will detect objects even when they are touching one other.
+\item{watershed}{If \code{TRUE} (default), performs watershed-based object
+detection. This will detect objects even when they are touching one another.
 If FALSE, all pixels for each connected set of foreground pixels are set to
 a unique object. This is faster but is not able to segment touching
 objects.}
@@ -117,31 +117,31 @@ than the tolerance, the object will be combined with one of its neighbors,
 which is the highest.}
 
 \item{extension}{Radius of the neighborhood in pixels for the detection of
-neighboring objects. Higher value smooths out small objects.}
+neighboring objects. A higher value smooths out small objects.}
 
-\item{include_if}{Character vector specifying the type of intersection
-defaults to "centroid" (individuals in with the centroid is included within
-the drawn plot will be included in such plot). Other possible values
-includes \code{"covered"}, \code{"overlap"}, and \code{"intersect"}. See Details to a
-detailed explanation about these intersecting controls.}
+\item{include_if}{Character vector specifying the type of intersection.
+Defaults to "centroid" (individuals in which the centroid is included within
+the drawn plot will be included in that plot). Other possible values include
+\code{"covered"}, \code{"overlap"}, and \code{"intersect"}. See Details for a detailed
+explanation of these intersecting controls.}
 
 \item{plot_index}{The index(es) to be computed for the drawn plots. Either a
-single vegetation index (eg., \code{"GLAI"}), a vector of indexes (eg.,
-\code{c("GLAI", "NGRDI", "HUE")}, or an own index based on the available bands
-(eg., \code{"(R-B)/(R+B)"}. See \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}} for more
-details.}
+single vegetation index (e.g., \code{"GLAI"}), a vector of indexes (e.g.,
+\code{c("GLAI", "NGRDI", "HUE")}), or a custom index based on the available
+bands (e.g., \code{"(R-B)/(R+B)"}). See \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}}
+for more details.}
 
 \item{segment_index}{The index used for segmentation. The same rule as
 \code{plot_index}.}
 
 \item{threshold}{By default (threshold = "Otsu"), a threshold value based on
 Otsu's method is used to reduce the grayscale image to a binary image. If a
-numeric value is informed, this value will be used as a threshold.}
+numeric value is provided, this value will be used as a threshold.}
 
 \item{filter}{Performs median filtering in the binary image? See more at
 image_filter(). Defaults to FALSE. Use a positive integer to define the
 size of the median filtering. Larger values are effective at removing
-noise, but adversely affect edges.}
+noise but adversely affect edges.}
 
 \item{lower_noise}{To prevent noise from affecting the image analysis, objects
 with lesser than 10\% of the mean area of all objects are removed
@@ -163,18 +163,18 @@ be considered.}
 \code{topn_upper} selects the \code{n} objects with the largest area.}
 
 \item{summarize_fun}{The function to compute summaries for the pixel values.
-Defaults to "mean", ie., the mean value of the pixels (either at a plot- or
+Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 individual-level) is returned.}
 
 \item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}
 (default: "GLAI").}
 
 \item{invert}{Logical, indicating whether to invert the mask. Defaults to
-\code{FALSE}, ie., pixels with intensity greater than the threshold values are
+\code{FALSE}, i.e., pixels with intensity greater than the threshold values are
 selected.}
 
 \item{color_regions}{The color palette for regions (default:
-rev(grDevices::terrain.colors(50)).}
+rev(grDevices::terrain.colors(50))).}
 
 \item{alpha}{opacity of the fill color of the raster layer(s).}
 
@@ -197,12 +197,18 @@ automatically chosen so that the number of plotted pixels approximates the
 \value{
 A list containing the following objects:
 \itemize{
-\item \code{result_plot}: The results at a plot level
-\item \code{result_plot_summ}: The summary of results at a plot level. When \code{segment_individuals = TRUE}, the number of individuals, canopy coverage, and mean values of some shape statistics such as perimeter, length, width, and diameter are computed.
+\item \code{result_plot}: The results at a plot level.
+\item \code{result_plot_summ}: The summary of results at a plot level. When
+\itemize{
+\item \code{segment_individuals = TRUE}, the number of individuals, canopy coverage,
+and mean values of some shape statistics such as perimeter, length, width,
+and diameter are computed.
+}
 \item \code{result_individ}: The results at an individual level.
 \item \code{map_plot}: An object of class \code{mapview} showing the plot-level results.
-\item \code{map_individual}: An object of class \code{mapview} showing the individual-level results.
-\item \code{shapefile}: The generated shapefile, with the drawn grids/blocks
+\item \code{map_individual}: An object of class \code{mapview} showing the individual-level
+results.
+\item \code{shapefile}: The generated shapefile, with the drawn grids/blocks.
 }
 }
 \description{
@@ -211,16 +217,46 @@ imagery), extracting information from specified regions of interest (ROIs)
 defined in a shapefile or interactively drawn on the mosaic. It allows
 counting and measuring individuals (eg., plants), computing canopy coverage,
 and statistical summaries (eg., mean, coefficient of variation) for
-vegetation indices (eg, NDVI) at a block, plot, or individual level.
+vegetation indices (eg, NDVI) at a block, plot, individual levels or even
+extract the raw results at pixel level.
 }
 \details{
 Since multiple blocks can be analyzed, the length of arguments \code{grid},
 \code{nrow}, \code{ncol}, \code{buffer_edge}, , \code{buffer_col}, \code{buffer_row}, \code{segment_plot},
-\code{segment_individuals}, \code{includ_if}, \code{threshold}, \code{segment_index}, \code{invert},
-and \code{filter}, can be either an scalar (the same argument applied to all the
-drawn blocks), or a vector with the same length as the number of drawn. In
-the last, each block can be analyzed with different arguments.
+\verb{segment_i, ndividuals}, \code{includ_if}, \code{threshold}, \code{segment_index}, \code{invert},
+\code{filter}, \code{threshold}, \code{lower_size}, \code{upper_size}, and \code{lower_noise}, can be
+either an scalar (the same argument applied to all the drawn blocks), or a
+vector with the same length as the number of drawn. In the last, each block
+can be analyzed with different arguments.
+
+When \code{segment_individuals = TRUE} is enabled, individuals are included within
+each plot based on the \code{include_if} argument. The default value
+(\code{'centroid'}) includes an object in a given plot if the centroid of that
+object is within the plot. This makes the inclusion mutually exclusive (i.e.,
+an individual is included in only one plot). If \code{'covered'} is selected,
+objects are included only if their entire area is covered by the plot. On the
+other hand, selecting \code{overlap} is the complement of \code{covered}; in other
+words, objects that overlap the plot boundary are included. Finally, when
+\code{intersect} is chosen, objects that intersect the plot boundary are included.
+This makes the inclusion ambiguous (i.e., an object can be included in more
+than one plot).
 }
 \examples{
+if(interactive()){
 library(pliman)
+url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif"
+mosaic <- mosaic_input(url)
+# Draw a polygon (top left, top right, bottom right, bottom left, top left)
+# include 8 rice lines and one column
+res <-
+ mosaic_analyze(mosaic,
+                r = 1, g = 2, b = 3,
+                segment_individuals = TRUE,     # segment the individuals
+                segment_index = "(G-B)/(G+B-R)",# index for segmentation
+                filter = 4,
+                nrow = 8,
+                map_individuals = TRUE)
+# map with individual results
+res$map_indiv
+}
 }

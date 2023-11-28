@@ -7,7 +7,7 @@
 shapefile_plot(shapefile, ...)
 }
 \arguments{
-\item{shapefile}{SpatVector}
+\item{shapefile}{An SpatVector of sf object.}
 
 \item{...}{Further arguments passed on to \code{\link[terra:plot]{terra::plot()}}.}
 }
@@ -19,6 +19,6 @@ Plot the values of a SpatVector
 }
 \examples{
 library(pliman)
-r <- shapefile_input(system.file("ex/lux.shp", package="terra"), as_sf = FALSE)
+r <- shapefile_input(system.file("ex/lux.shp", package="terra"))
 shapefile_plot(r)
 }

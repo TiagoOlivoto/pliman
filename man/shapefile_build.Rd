@@ -16,7 +16,7 @@ shapefile_build(
   ncol = 1,
   build_shapefile = TRUE,
   check_shapefile = TRUE,
-  buffer_edge = 5,
+  buffer_edge = 1,
   buffer_col = 0,
   buffer_row = 0,
   as_sf = TRUE,
@@ -48,15 +48,15 @@ shapefile_build(
 \item{ncol}{Number of columns for the grid (default: 1).}
 
 \item{build_shapefile}{Logical, indicating whether to interactively draw ROIs
-if shapefile is \code{NULL} (default: TRUE).}
+if the shapefile is \code{NULL} (default: TRUE).}
 
 \item{check_shapefile}{Logical, indicating whether to validate the shapefile
-with an interactive map view (default: TRUE). This enable live editing the
-drawn shapefile by deleting or changing the drawn grids.}
+with an interactive map view (default: TRUE). This enables live editing of
+the drawn shapefile by deleting or changing the drawn grids.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}
 
-\item{buffer_col, buffer_row}{Buffering factor for the columns and rows,
+\item{buffer_col}{buffer_row Buffering factor for the columns and rows,
 respectively, of each individual plot's side. A value between 0 and 0.5
 where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 value of 0.25 will buffer the plot by 25\% on each side.}
@@ -78,6 +78,10 @@ automatically chosen so that the number of plotted pixels approximates the
 
 \item{quantiles}{the upper and lower quantiles used for color stretching.}
 }
+\value{
+A list with the built shapefile. Each element is an \code{sf} object with
+the coordinates of the drawn polygons.
+}
 \description{
 This function takes a mosaic raster to create a shapefile containing polygons
 for the specified regions. Users can drawn Areas of Interest (AOIs) that can
@@ -90,4 +94,22 @@ Since multiple blocks can be created, the length of arguments \code{grid}, \code
 (the same argument applied to all the drawn blocks), or a vector with the
 same length as the number of drawn blocks. In the last, shapefiles in each
 block can be created with different dimensions.
+}
+\examples{
+if(interactive()){
+library(pliman)
+mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+shps <-
+      shapefile_build(mosaic,
+                      nrow = 6,
+                      ncol = 3,
+                      buffer_row = -0.05,
+                      buffer_col = -0.25,
+                      check_shapefile = FALSE,
+                      build_shapefile = FALSE) ## Use TRUE to interactively build the plots
+mosaic_plot(mosaic)
+shapefile_plot(shps[[1]], add = TRUE)
+}
+
+
 }
