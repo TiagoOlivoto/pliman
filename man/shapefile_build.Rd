@@ -11,6 +11,7 @@ shapefile_build(
   b = 1,
   re = 4,
   nir = 5,
+  crop_to_shape_ext = TRUE,
   grid = TRUE,
   nrow = 1,
   ncol = 1,
@@ -39,6 +40,11 @@ shapefile_build(
 \item{re}{The layer for the Red-edge band (default: 4).}
 
 \item{nir}{The layer for the Near-infrared band(default: 5).}
+
+\item{crop_to_shape_ext}{Crop the mosaic to the extension of shapefile?
+Defaults to \code{TRUE}. This allows for a faster index computation when the
+region of the built shapefile is much smaller than the entire mosaic
+extension.}
 
 \item{grid}{Logical, indicating whether to use a grid for segmentation
 (default: TRUE).}

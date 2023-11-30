@@ -5,7 +5,7 @@
 \alias{mosaic_export}
 \title{Create and Export mosaics}
 \usage{
-mosaic_input(mosaic, info = TRUE, ...)
+mosaic_input(mosaic, info = TRUE, check_16bits = TRUE, ...)
 
 mosaic_export(mosaic, filename, overwrite = FALSE, ...)
 }
@@ -17,6 +17,9 @@ array or a list of \code{SpatRaster} objects.
 }}
 
 \item{info}{Print the mosaic informations (eg., CRS, extend). Defaults to \code{TRUE}}
+
+\item{check_16bits}{Checks if mosaic has maximum value in the 16-bits format
+(65535), and replaces it by NA. Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments passed to \code{\link[terra:rast]{terra::rast()}} (\code{mosaic_input()})
 or  \code{\link[terra:writeRaster]{terra::writeRaster()}} (\code{mosaic_output()})}

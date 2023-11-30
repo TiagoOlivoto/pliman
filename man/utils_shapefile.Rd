@@ -11,7 +11,12 @@ shapefile_input(shapefile, info = TRUE, as_sf = TRUE, ...)
 
 shapefile_export(shapefile, filename, ...)
 
-shapefile_view(shapefile, ...)
+shapefile_view(
+  shapefile,
+  attribute = NULL,
+  color_regions = custom_palette(c("red", "yellow", "green")),
+  ...
+)
 }
 \arguments{
 \item{shapefile}{For \code{shapefile_input()}, character (filename),  or an object that can be
@@ -32,6 +37,11 @@ shapefile to an \code{sf} object (default is \code{TRUE}).}
 \code{\link[mapview:mapView]{mapview::mapview()}} (\code{shapefile_view()}).}
 
 \item{filename}{The path to the output shapefile.}
+
+\item{attribute}{The attribute to be shown in the color key. It must be a
+variable present in \code{shapefile}.}
+
+\item{color_regions}{The color palette to represent \code{attribute}.}
 }
 \value{
 \itemize{

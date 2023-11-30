@@ -164,6 +164,7 @@ shapefile_build <- function(mosaic,
                             b = 1,
                             re = 4,
                             nir = 5,
+                            crop_to_shape_ext = TRUE,
                             grid = TRUE,
                             nrow = 1,
                             ncol = 1,
@@ -212,14 +213,17 @@ shapefile_build <- function(mosaic,
   }
 
   # crop to the analyzed area
-  poly_ext <-
-    cpoints |>
-    sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-    terra::vect() |>
-    terra::buffer(buffer_edge) |>
-    terra::ext()
-  mosaiccr <- terra::crop(mosaic, poly_ext)
-  mosaiccr[mosaiccr == 65535] <- NA
+  if(crop_to_shape_ext){
+    poly_ext <-
+      cpoints |>
+      sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+      terra::vect() |>
+      terra::buffer(buffer_edge) |>
+      terra::ext()
+    mosaiccr <- terra::crop(mosaic, poly_ext)
+  } else{
+    mosaiccr <- mosaic
+  }
 
   # check the parameters
   if(length(nrow) == 1 & nrow(cpoints) != 1){
@@ -371,6 +375,10 @@ shapefile_build <- function(mosaic,
 #'
 #' @inheritParams mosaic_view
 #' @inheritParams analyze_objects
+#' @param crop_to_shape_ext Crop the mosaic to the extension of shapefile?
+#'   Defaults to `TRUE`. This allows for a faster index computation when the
+#'   region of the built shapefile is much smaller than the entire mosaic
+#'   extension.
 #' @param grid Logical, indicating whether to use a grid for segmentation
 #'   (default: TRUE).
 #' @param nrow Number of rows for the grid (default: 1).
@@ -482,6 +490,7 @@ mosaic_analyze <- function(mosaic,
                            b = 1,
                            re = 4,
                            nir = 5,
+                           crop_to_shape_ext = TRUE,
                            grid = TRUE,
                            nrow = 1,
                            ncol = 1,
@@ -557,18 +566,20 @@ mosaic_analyze <- function(mosaic,
 
 
     # crop to the analyzed area
-    poly_ext <-
-      do.call(rbind, lapply(created_shapes, function(x){
-        x
-      })) |>
-      sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-      terra::vect() |>
-      terra::buffer(buffer_edge) |>
-      terra::ext()
+    if(crop_to_shape_ext){
+      poly_ext <-
+        do.call(rbind, lapply(created_shapes, function(x){
+          x
+        })) |>
+        sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+        terra::vect() |>
+        terra::buffer(buffer_edge) |>
+        terra::ext()
 
-    mosaiccr <- terra::crop(mosaic, poly_ext)
-    mosaiccr[mosaiccr == 65535] <- NA
-
+      mosaiccr <- terra::crop(mosaic, poly_ext)
+    } else{
+      mosaiccr <- mosaic
+    }
 
     if(length(segment_plot) == 1 & length(created_shapes) != 1){
       segment_plot <- rep(segment_plot, length(created_shapes))
@@ -663,14 +674,17 @@ mosaic_analyze <- function(mosaic,
     created_shapes <- list(geoms)
 
     # crop to the analyzed area
-    poly_ext <-
-      created_shapes[[1]] |>
-      sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-      terra::vect() |>
-      terra::buffer(buffer_edge) |>
-      terra::ext()
-    mosaiccr <- terra::crop(mosaic, poly_ext)
-    mosaiccr[mosaiccr == 65535] <- NA
+    if(crop_to_shape_ext){
+      poly_ext <-
+        created_shapes[[1]] |>
+        sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+        terra::vect() |>
+        terra::buffer(buffer_edge) |>
+        terra::ext()
+      mosaiccr <- terra::crop(mosaic, poly_ext)
+    } else{
+      mosaiccr <- mosaic
+    }
   }
 
   # return(created_shapes)
@@ -842,7 +856,8 @@ mosaic_analyze <- function(mosaic,
                                        y = gridindiv,
                                        fun = summarize_fun,
                                        progress = FALSE,
-                                       force_df = TRUE)
+                                       force_df = TRUE,
+                                       summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
 
         if(inherits(valindiv, "list")){
           valindiv <-
@@ -879,7 +894,8 @@ mosaic_analyze <- function(mosaic,
                                      y = plot_grid,
                                      fun = summarize_fun,
                                      progress = FALSE,
-                                     force_df = TRUE)
+                                     force_df = TRUE,
+                                     summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
 
     } else{
       ####### ANY TYPE OF POLYGON ########
@@ -1015,7 +1031,8 @@ mosaic_analyze <- function(mosaic,
                                        y = gridindiv,
                                        fun = summarize_fun,
                                        progress = FALSE,
-                                       force_df = TRUE)
+                                       force_df = TRUE,
+                                       summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
 
         if(inherits(valindiv, "list")){
           valindiv <-
@@ -1049,7 +1066,8 @@ mosaic_analyze <- function(mosaic,
                                      y = plot_grid,
                                      fun = summarize_fun,
                                      progress = FALSE,
-                                     force_df = TRUE)
+                                     force_df = TRUE,
+                                     summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
     }
 
     # bind the results
@@ -1162,19 +1180,6 @@ mosaic_analyze <- function(mosaic,
 
   }
 
-  ext_plot <-
-    poly_ext |>
-    terra::vect() |>
-    terra::buffer(buffer_edge) |>
-    terra::ext()
-
-  # mosaic_extent <- terra::ext(mosaic)
-  # Ensure the extent of ext_plot is constrained within the mosaic_extent
-  # ext_plot[1] <- max(ext_plot[1], mosaic_extent[1])
-  # ext_plot[2] <- min(ext_plot[2], mosaic_extent[2])
-  # ext_plot[3] <- max(ext_plot[3], mosaic_extent[3])
-  # ext_plot[4] <- min(ext_plot[4], mosaic_extent[4])
-  mosaicplot <- mosaiccr
   if(!is.null(summarize_fun) & isTRUE(plot)){
     if(verbose){
       cat("\014","\nPreparing to plot...\n")
@@ -1182,65 +1187,112 @@ mosaic_analyze <- function(mosaic,
 
     possible_downsamples <- 0:15
     possible_npix <- sapply(possible_downsamples, function(x){
-      compute_downsample(nrow(mosaicplot), ncol(mosaicplot), x)
+      compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
     })
     downsample <- which.min(abs(possible_npix - max_pixels))
     downsample <- ifelse(downsample == 1, 0, downsample)
     if(downsample > 0){
-      mosaicplot <- terra::aggregate(mosaicplot, fact = downsample)
+      mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
     if(any(segment_individuals)){
       dfplot <- result_plot_summ
     } else{
       dfplot <- results
     }
-    map <-
-      mapview::viewRGB(
-        as(mosaicplot, "Raster"),
-        r = r,
-        g = g,
-        b = b,
-        na.color = "#00000000",
-        maxpixels = 60000000,
-        quantiles = quantiles
-      ) +
-      suppressWarnings(
-        mapview::mapview(dfplot,
-                         zcol = attribute,
-                         layer.name = attribute,
-                         col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
-                         alpha.regions = 0.75,
-                         na.color = "#00000000",
-                         maxBytes = 64 * 1024 * 1024,
-                         verbose = FALSE)
-      )
-
-    if(any(segment_individuals)){
-      attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
-      mapindivid <-
+    if(nlyrs == 1){
+      map <-
+        mapview::mapview(mosaiccr,
+                         maxpixels = 60000000,
+                         layer.name = names(mosaiccr),
+                         map.types = "CartoDB.Positron",
+                         alpha.regions = 1,
+                         na.color = "transparent",
+                         verbose = FALSE) +
+        suppressWarnings(
+          mapview::mapview(dfplot,
+                           zcol = attribute,
+                           layer.name = attribute,
+                           col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
+                           alpha.regions = 0.75,
+                           na.color = "#00000000",
+                           maxBytes = 64 * 1024 * 1024,
+                           verbose = FALSE)
+        )
+    } else{
+      map <-
         mapview::viewRGB(
-          as(mosaicplot, "Raster"),
+          as(mosaiccr, "Raster"),
           r = r,
           g = g,
           b = b,
           na.color = "#00000000",
           maxpixels = 60000000,
-          quantiles = quantiles,
+          quantiles = quantiles
         ) +
         suppressWarnings(
-          mapview::mapview(result_plot_summ,
-                           legend = FALSE,
-                           alpha.regions = 0.4,
-                           zcol = "block",
-                           map.types = "OpenStreetMap") +
-          mapview::mapview(result_indiv,
+          mapview::mapview(dfplot,
                            zcol = attribute,
                            layer.name = attribute,
-                           col.regions = color_regions,
-                           alpha.regions = alpha,
+                           col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
+                           alpha.regions = 0.75,
                            na.color = "#00000000",
                            maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE))
+                           verbose = FALSE)
+        )
+    }
+
+
+    if(any(segment_individuals)){
+      attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
+      if(nlyrs == 1){
+        mapindivid <-
+          mapview::mapview(mosaiccr,
+                           maxpixels = 60000000,
+                           layer.name = names(mosaiccr),
+                           map.types = "CartoDB.Positron",
+                           alpha.regions = 1,
+                           na.color = "transparent",
+                           verbose = FALSE) +
+          suppressWarnings(
+            mapview::mapview(result_plot_summ,
+                             legend = FALSE,
+                             alpha.regions = 0.4,
+                             zcol = "block",
+                             map.types = "OpenStreetMap") +
+              mapview::mapview(result_indiv,
+                               zcol = attribute,
+                               layer.name = attribute,
+                               col.regions = color_regions,
+                               alpha.regions = alpha,
+                               na.color = "#00000000",
+                               maxBytes = 64 * 1024 * 1024,
+                               verbose = FALSE))
+      } else{
+        mapindivid <-
+          mapview::viewRGB(
+            as(mosaiccr, "Raster"),
+            r = r,
+            g = g,
+            b = b,
+            na.color = "#00000000",
+            maxpixels = 60000000,
+            quantiles = quantiles,
+          ) +
+          suppressWarnings(
+            mapview::mapview(result_plot_summ,
+                             legend = FALSE,
+                             alpha.regions = 0.4,
+                             zcol = "block",
+                             map.types = "OpenStreetMap") +
+              mapview::mapview(result_indiv,
+                               zcol = attribute,
+                               layer.name = attribute,
+                               col.regions = color_regions,
+                               alpha.regions = alpha,
+                               na.color = "#00000000",
+                               maxBytes = 64 * 1024 * 1024,
+                               verbose = FALSE))
+      }
     } else{
       mapindivid <- NULL
     }
@@ -1345,8 +1397,6 @@ mosaic_view <- function(mosaic,
                         ...){
   terra::terraOptions(progress = 0)
   on.exit(terra::terraOptions(progress = 1))
-  # mosaic[mosaic == 65535] <- NA
-  # mosaic <- terra::subst(mosaic, 65535, NA)
   # check_mapview()
   mapview::mapviewOptions(layers.control.pos = "topright", raster.size = 64 * 1024 * 1024)
   on.exit(mapview::mapviewOptions(default = TRUE))
@@ -1540,6 +1590,8 @@ mosaic_view <- function(mosaic,
 #'    array or a list of `SpatRaster` objects.
 #'  * For `mosaic_export()`, an `SpatRaster` object.
 #' @param info Print the mosaic informations (eg., CRS, extend). Defaults to `TRUE`
+#' @param check_16bits Checks if mosaic has maximum value in the 16-bits format
+#'   (65535), and replaces it by NA. Defaults to `TRUE`.
 #' @param filename character. The Output filename.
 #' @param overwrite logical. If `TRUE`, filename is overwritten.
 #' @param ... Additional arguments passed to [terra::rast()] (`mosaic_input()`)
@@ -1562,7 +1614,10 @@ mosaic_view <- function(mosaic,
 #' mosaic_export(rast, f, overwrite=TRUE)
 #' list.files(tempdir())
 #'
-mosaic_input <- function(mosaic, info = TRUE, ...){
+mosaic_input <- function(mosaic,
+                         info = TRUE,
+                         check_16bits = TRUE,
+                         ...){
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
@@ -1571,8 +1626,14 @@ mosaic_input <- function(mosaic, info = TRUE, ...){
   if(info){
     print(mosaic)
   }
+  if(check_16bits){
+    if(max(terra::minmax(mosaic), na.rm = TRUE) == 65535){
+      mosaic[mosaic == 65535] <- NA
+    }
+  }
   return(mosaic)
 }
+
 #' @export
 #' @name mosaic_input
 mosaic_export <- function(mosaic,
@@ -1714,6 +1775,9 @@ shapefile_plot <- function(shapefile, ...){
 #' @param as_sf Logical value indicating whether to convert the imported
 #'   shapefile to an `sf` object (default is `TRUE`).
 #' @param filename The path to the output shapefile.
+#' @param attribute The attribute to be shown in the color key. It must be a
+#'   variable present in `shapefile`.
+#' @param color_regions The color palette to represent `attribute`.
 #' @param ... Additional arguments to be passed to [terra::vect()]
 #'   (`shapefile_input()`), [terra::writeVector()] (`shapefile_export()`) or
 #'   [mapview::mapview()] (`shapefile_view()`).
@@ -1773,10 +1837,15 @@ shapefile_export <- function(shapefile, filename, ...) {
 
 #' @name utils_shapefile
 #' @export
-shapefile_view <- function(shapefile, ...){
-  mapview::mapview(shapefile, ...)
+shapefile_view <- function(shapefile,
+                           attribute = NULL,
+                           color_regions = custom_palette(c("red", "yellow", "green")),
+                           ...){
+  mapview::mapview(shapefile,
+                   zcol = attribute,
+                   col.regions = color_regions,
+                   ...)
 }
-
 
 
 
@@ -1906,18 +1975,35 @@ mosaic_index <- function(mosaic,
     message(paste("Index '", index, "' is not available. Trying to compute your own index.",
                   sep = ""))
   }
-  R <- try(ras[[r]], TRUE)
-  G <- try(ras[[g]], TRUE)
-  B <- try(ras[[b]], TRUE)
-  NIR <- try(ras[[nir]], TRUE)
-  RE <- try(ras[[re]], TRUE)
-  if(index %in% ind$Index){
-    mosaic_gray <-
-      eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+  if(!any(index  %in% ind$Index) & !any(index  %in% c("R", "G", "B", "RE", "NIR"))){
+    # Extract individual layers based on the expression
+    pattern <- "\\b\\w+\\b"
+    layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
+    layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
+
+    layers <-
+      lapply(layers_used, function(x){
+        mosaic[[x]]
+      })
+    names(layers) <- layers_used
+    mosaic_gray <- eval(parse(text = index), envir = layers)
+    # names(mosaic_gray) <- index
   } else{
-    mosaic_gray <-
-      eval(parse(text = as.character(index)))
+    R <- try(ras[[r]], TRUE)
+    G <- try(ras[[g]], TRUE)
+    B <- try(ras[[b]], TRUE)
+    NIR <- try(ras[[nir]], TRUE)
+    RE <- try(ras[[re]], TRUE)
+    if(index %in% ind$Index){
+      mosaic_gray <-
+        eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+    } else{
+      mosaic_gray <-
+        eval(parse(text = as.character(index)))
+    }
   }
+
+
   names(mosaic_gray) <- index
   if(!is.na(terra::crs(mosaic))){
     suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
@@ -1967,7 +2053,6 @@ mosaic_to_pliman <- function(mosaic,
   }
   nlr <- terra::nlyr(mosaic)
   mosaic <- stars::st_as_stars(mosaic, proxy = FALSE)
-  mosaic[mosaic == 65535] <- NA
   if(nlr == 5){
     mosaic <- EBImage::Image(mosaic[[1]])[,, c(r, g, b, re, nir)]
   } else if(nlr == 3){
@@ -2227,7 +2312,6 @@ mosaic_draw <- function(mosaic,
   polygons_ext <- terra::vect(polygons_spv)
   ext <- terra::buffer(polygons_ext, buffer) |> terra::ext()
   mosaiccr <- terra::crop(mosaic, ext)
-  mosaiccr[mosaiccr == 65535] <- NA
 
   # Compute the image indexes
   if(nlyrs > 1){
@@ -2354,7 +2438,8 @@ mosaic_draw <- function(mosaic,
                                      y = polygons,
                                      fun = summarize_fun,
                                      progress = FALSE,
-                                     force_df = TRUE)
+                                     force_df = TRUE,
+                                     summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
       )
     if(inherits(vals, "list")){
       vals <-
