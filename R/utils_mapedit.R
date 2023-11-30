@@ -303,7 +303,7 @@ plot_index <- function(img = NULL,
                        max_pixels = 1000000,
                        downsample = NULL,
                        downsample_fun = NULL,
-                       color_regions = custom_palette(),
+                       color_regions = custom_palette(n = 100),
                        ncol = NULL,
                        nrow = NULL,
                        aspect_ratio = NA){
