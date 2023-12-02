@@ -1,4 +1,17 @@
-
+sf_to_polygon <- function(shps) {
+  if(inherits(shps, "list")){
+    shps <- do.call(rbind, shps)
+  }
+  for (i in 1:nrow(shps)) {
+    if(inherits(sf::st_geometry(shps[i, ]), c("sfc_POINT", "sfc_LINESTRING"))){
+      shps[i, ] <-
+        sf::st_buffer(shps[i, ], 0.0000001) |>
+        sf::st_cast("POLYGON") |>
+        sf::st_simplify(preserveTopology = TRUE)
+    }
+  }
+  return(shps)
+}
 create_buffer <- function(coords, buffer_col, buffer_row) {
   # Calculate the new x-min, x-max, y-min, and y-max after adjustment
   x_min <- min(coords[, 1])
@@ -196,7 +209,7 @@ shapefile_build <- function(mosaic,
                           downsample = downsample,
                           quantiles = quantiles,
                           edit = TRUE)
-    cpoints <- points$finished
+    cpoints <- points$finished |> sf_to_polygon()
   } else{
     extm <- terra::ext(mosaic)
     xmin <- extm[1]
@@ -305,6 +318,7 @@ shapefile_build <- function(mosaic,
       map <-
         mapview::viewRGB(
           x = as(mosaiccr, "Raster"),
+          layer.name = "base",
           r = r,
           g = g,
           b = b,
@@ -544,26 +558,27 @@ mosaic_analyze <- function(mosaic,
   }
   if(is.null(shapefile)){
 
-    created_shapes <- shapefile_build(mosaic,
-                                      r = r,
-                                      g = g,
-                                      b = b,
-                                      re = re,
-                                      nir = nir,
-                                      grid = grid,
-                                      nrow = nrow,
-                                      ncol = ncol,
-                                      build_shapefile = build_shapefile,
-                                      check_shapefile = check_shapefile,
-                                      buffer_edge = buffer_edge,
-                                      buffer_col = buffer_col,
-                                      buffer_row = buffer_row,
-                                      max_pixels = max_pixels,
-                                      verbose = verbose,
-                                      downsample = downsample,
-                                      quantiles = quantiles)
-
-
+    created_shapes <-
+      suppressWarnings(
+        shapefile_build(mosaic,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
+                        grid = grid,
+                        nrow = nrow,
+                        ncol = ncol,
+                        build_shapefile = build_shapefile,
+                        check_shapefile = check_shapefile,
+                        buffer_edge = buffer_edge,
+                        buffer_col = buffer_col,
+                        buffer_row = buffer_row,
+                        max_pixels = max_pixels,
+                        verbose = verbose,
+                        downsample = downsample,
+                        quantiles = quantiles)
+      )
 
     # crop to the analyzed area
     if(crop_to_shape_ext){
@@ -662,6 +677,7 @@ mosaic_analyze <- function(mosaic,
 
 
   } else{
+    shapefile <- shapefile_input(shapefile |> sf_to_polygon(), info = FALSE)
     extm <- terra::ext(shapefile)
     xmin <- extm[1]
     xmax <- extm[2]
@@ -725,13 +741,17 @@ mosaic_analyze <- function(mosaic,
     if(inherits(created_shapes[[j]]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(created_shapes[[j]][[1]][[1]])) == 5 & grid[[j]]){
       plot_grid <- created_shapes[[j]]
       sf::st_geometry(plot_grid) <- "geometry"
-      ext_anal <-
-        plot_grid |>
-        sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-        terra::vect() |>
-        terra::buffer(buffer_edge) |>
-        terra::ext()
-      mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+      if(crop_to_shape_ext){
+        ext_anal <-
+          plot_grid |>
+          sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+          terra::vect() |>
+          terra::buffer(buffer_edge) |>
+          terra::ext()
+        mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+      } else{
+        mind_temp <- mind
+      }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
         if(!segment_index[j] %in% names(mind_temp)){
@@ -902,12 +922,16 @@ mosaic_analyze <- function(mosaic,
       # check if segmentation is performed
       plot_grid <- created_shapes[[j]]
       sf::st_geometry(plot_grid) <- "geometry"
-      ext_anal <-
-        plot_grid |>
-        terra::vect() |>
-        terra::buffer(20) |>
-        terra::ext()
-      mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+      if(crop_to_shape_ext){
+        ext_anal <-
+          plot_grid |>
+          terra::vect() |>
+          terra::buffer(20) |>
+          terra::ext()
+        mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+      } else{
+        mind_temp <- mind
+      }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
         if(!segment_index[j] %in% names(mind_temp)){
@@ -1222,6 +1246,7 @@ mosaic_analyze <- function(mosaic,
       map <-
         mapview::viewRGB(
           as(mosaiccr, "Raster"),
+          layer.name = "base",
           r = r,
           g = g,
           b = b,
@@ -1271,6 +1296,7 @@ mosaic_analyze <- function(mosaic,
         mapindivid <-
           mapview::viewRGB(
             as(mosaiccr, "Raster"),
+            layer.name = "base",
             r = r,
             g = g,
             b = b,
@@ -1314,13 +1340,15 @@ mosaic_analyze <- function(mosaic,
 
 
 
+
 #' Mosaic View
 #'
-#' @details The function can generate either an interactive map using the
-#'   'mapview' package or a static plot using the 'base' package, depending on
-#'   the `viewer` and `show` parameters. If show = "index" is used, the function
-#'   first computes an image index that can be either an RGB-based index or a
-#'   multispectral index, if a multispectral mosaic is provided.
+#' @details
+#' The function can generate either an interactive map using the 'mapview'
+#' package or a static plot using the 'base' package, depending on the `viewer`
+#' and `show` parameters. If show = "index" is used, the function first computes
+#' an image index that can be either an RGB-based index or a multispectral
+#' index, if a multispectral mosaic is provided.
 #'
 #' @param mosaic A mosaic of class `SpatRaster`, generally imported with
 #'   [mosaic_input()].
@@ -1355,7 +1383,6 @@ mosaic_analyze <- function(mosaic,
 #' @importFrom terra rast crs nlyr terraOptions
 #' @importFrom methods as
 #' @importFrom sf st_crs st_transform st_make_grid st_intersection st_make_valid
-#' @importFrom stars st_downsample st_as_stars
 #' @importFrom poorman summarise across mutate arrange left_join bind_cols
 #'   bind_rows contains ends_with everything between pivot_longer pivot_wider
 #'   where select filter relocate rename
@@ -1443,7 +1470,7 @@ mosaic_view <- function(mosaic,
         map <-
           mapview::viewRGB(as(mosaic, "Raster"),
                            na.color = "#00000000",
-                           layer.name = "T",
+                           layer.name = "base",
                            r = r,
                            g = g,
                            b = b,
@@ -1459,7 +1486,7 @@ mosaic_view <- function(mosaic,
       } else{
         mapview::viewRGB(as(mosaic, "Raster"),
                          na.color = "#00000000",
-                         layer.name = "T",
+                         layer.name = "base",
                          r = r,
                          g = g,
                          b = b,
@@ -1627,7 +1654,7 @@ mosaic_input <- function(mosaic,
     print(mosaic)
   }
   if(check_16bits){
-    if(max(terra::minmax(mosaic), na.rm = TRUE) == 65535){
+    if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
       mosaic[mosaic == 65535] <- NA
     }
   }
@@ -1841,12 +1868,13 @@ shapefile_view <- function(shapefile,
                            attribute = NULL,
                            color_regions = custom_palette(c("red", "yellow", "green")),
                            ...){
+suppressWarnings(
   mapview::mapview(shapefile,
                    zcol = attribute,
                    col.regions = color_regions,
                    ...)
+)
 }
-
 
 
 
@@ -1933,7 +1961,12 @@ mosaic_crop <- function(mosaic,
 #' Compute or extract an index layer from a multi-band mosaic raster.
 #' @inheritParams mosaic_view
 #' @inheritParams image_index
-#'
+#' @param index A character value (or a vector of characters) specifying the
+#'   target mode for conversion to a binary image. Use [pliman_indexes_rgb()]
+#'   and [pliman_indexes_me()] to see the available RGB and multispectral
+#'   indexes, respectively. Users can also calculate their own index using  `R,
+#'   G, B, RE, and NIR` bands (eg., `index = "R+B/G"`) or using the names of the
+#'   mosaic's layers (ex., "(band_1 + band_2) / 2").
 #' @return An index layer extracted/computed from the mosaic raster.
 #'
 #' @details This function computes or extracts an index layer from the input
@@ -1944,19 +1977,17 @@ mosaic_crop <- function(mosaic,
 #' @export
 #' @examples
 #' library(pliman)
-#' library(terra)
 #' mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
-#' confusion <-
-#'      matrix(rnorm(90*95, 100, 30),
-#'             nrow = nrow(mosaic),
-#'             ncol = ncol(mosaic))
-#' confusion <- mosaic_input(confusion)
-#' terra::ext(confusion) <- terra::ext(mosaic)
-#' terra::crs(confusion) <- terra::crs(mosaic)
-#' names(confusion) <- "confusion"
-#' two_layers <- c(mosaic, confusion)
-#' final <- mosaic_index(two_layers, "B+R", b = 1, r = 2)
-#' mosaic_view(final, viewer = "base")
+#' names(mosaic)
+#' elev2 <- mosaic_index(mosaic, "elevation * 5")
+#' oldpar <- par(no.readonly=TRUE)
+#' par(mfrow=c(1,2))
+#'
+#' mosaic_plot(mosaic)
+#' mosaic_plot(elev2)
+#'
+#' # return the original parameters
+#' par(oldpar)
 #'
 mosaic_index <- function(mosaic,
                          index = "R",
@@ -1980,7 +2011,6 @@ mosaic_index <- function(mosaic,
     pattern <- "\\b\\w+\\b"
     layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
     layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
-
     layers <-
       lapply(layers_used, function(x){
         mosaic[[x]]
@@ -2002,8 +2032,6 @@ mosaic_index <- function(mosaic,
         eval(parse(text = as.character(index)))
     }
   }
-
-
   names(mosaic_gray) <- index
   if(!is.na(terra::crs(mosaic))){
     suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
@@ -2031,7 +2059,6 @@ mosaic_index <- function(mosaic,
 #'   can be used for image analysis in `pliman`. Note that if a large
 #'   `SpatRaster` is loaded, the resulting object may increase considerably the
 #'   memory usage.
-#' @importFrom stars st_dimensions
 #' @export
 #' @examples
 #' library(pliman)
@@ -2052,13 +2079,12 @@ mosaic_to_pliman <- function(mosaic,
     mosaic <- terra::rast(mosaic)
   }
   nlr <- terra::nlyr(mosaic)
-  mosaic <- stars::st_as_stars(mosaic, proxy = FALSE)
   if(nlr == 5){
-    mosaic <- EBImage::Image(mosaic[[1]])[,, c(r, g, b, re, nir)]
+    mosaic <- EBImage::Image(terra::as.array(terra::trans(mosaic)))[,, c(r, g, b, re, nir)]
   } else if(nlr == 3){
-    mosaic <- EBImage::Image(mosaic[[1]])[,, c(r, g, b)]
+    mosaic <- EBImage::Image(terra::as.array(terra::trans(mosaic)))[,, c(r, g, b)]
   } else{
-    mosaic <- EBImage::Image(mosaic[[1]])
+    mosaic <- EBImage::Image(terra::as.array(terra::trans(mosaic)))
   }
   if(isTRUE(rescale)){
     mosaic <- mosaic / max(mosaic, na.rm = TRUE)
@@ -2068,7 +2094,6 @@ mosaic_to_pliman <- function(mosaic,
   }
   return(mosaic + coef)
 }
-
 
 #' Mosaic to RGB
 #'
@@ -2464,7 +2489,7 @@ mosaic_draw <- function(mosaic,
         map <-
           mapview::viewRGB(as(mosaiccr, "Raster"),
                            na.color = "#00000000",
-                           layer.name = "",
+                           layer.name = "base",
                            r = r,
                            g = g,
                            b = b,
