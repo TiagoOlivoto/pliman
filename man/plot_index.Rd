@@ -15,7 +15,7 @@ plot_index(
   max_pixels = 1e+06,
   downsample = NULL,
   downsample_fun = NULL,
-  color_regions = custom_palette(),
+  color_regions = custom_palette(n = 100),
   ncol = NULL,
   nrow = NULL,
   aspect_ratio = NA
@@ -84,7 +84,7 @@ if(interactive()){
 # Example usage:
 library(pliman)
 img <- image_pliman("sev_leaf.jpg")
-plot_index(img, index = "B")
+plot_index(img, index = c("R", "G"))
 }
 
 }

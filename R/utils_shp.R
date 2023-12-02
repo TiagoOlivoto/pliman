@@ -1019,14 +1019,13 @@ plot_shp <- function(coords,
 #' flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 #' res <-
 #'    analyze_objects_shp(flax,
-#'                        buffer_x = 0.2,
-#'                        buffer_y = 0.2,
+#'                        buffer_x = 0.1,
+#'                        buffer_y = 0.02,
 #'                        nrow = 3,
 #'                        ncol = 5,
 #'                        plot = FALSE,
 #'                        object_index = "DGCI")
-#' plot(res$final_image)
-#' plot_index_shp(res)
+#' plot_index_shp(res, attribute = "DGCI")
 #' }
 #'
 plot_index_shp <- function(object,
@@ -1034,12 +1033,12 @@ plot_index_shp <- function(object,
                            r = 1,
                            g = 2,
                            b = 3,
-                           color = c("red","green"),
+                           color = c("red", "yellow", "darkgreen"),
                            viewer = c("mapview", "base"),
                            max_pixels = 500000,
                            downsample = NULL,
                            downsample_fun = NULL,
-                           alpha = 0.5,
+                           alpha = 0.7,
                            legend.position = "bottom",
                            na.color = "gray",
                            classes = 6,
@@ -1105,14 +1104,19 @@ plot_index_shp <- function(object,
     sf_df <- cbind(sf_df, quant_var[, 2:ncol(quant_var)])
     sf_df <- sf::st_transform(sf_df, crs = sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m"))
     mp <-
-      mapview::mapview(sf_df,
-                       map.types = "OpenStreetMap",
-                       zcol = attribute,
-                       legend = TRUE,
-                       alpha.regions = alpha,
-                       layer.name = attribute)
-    rgb <- stars::st_as_stars(terra::rast(EBImage::transpose(object$final_image)@.Data[,,1:3]))
-    dimsto <- dim(rgb[,,,1])
+      suppressWarnings(
+        mapview::mapview(sf_df,
+                         col.regions = color,
+                         map.types = "OpenStreetMap",
+                         zcol = attribute,
+                         legend = TRUE,
+                         alpha.regions = alpha,
+                         layer.name = attribute)
+      )
+    rgb <- terra::rast(EBImage::transpose(object$final_image)@.Data[,,1:3])
+
+
+    dimsto <- dim(rgb)
     nr <- dimsto[1]
     nc <- dimsto[2]
     npix <- nc * nr
@@ -1120,40 +1124,29 @@ plot_index_shp <- function(object,
       message("The number of pixels is too high, which might slow the rendering process.")
     }
     if(npix > max_pixels){
+      possible_downsamples <- 0:50
+      possible_npix <- sapply(possible_downsamples, function(x){
+        compute_downsample(nr, nc, x)
+      })
       if(is.null(downsample)){
-        compute_downsample <- function(nr, nc, n) {
-          if (n == 0) {
-            invisible(nr * nc)
-          } else if (n == 1) {
-            invisible(ceiling(nr/2) * ceiling(nc/2))
-          } else if (n > 1) {
-            invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
-          } else {
-            stop("Invalid downsampling factor. n must be a non-negative integer.")
-          }
-        }
-        possible_downsamples <- 0:100
-        possible_npix <- sapply(possible_downsamples, function(x){
-          compute_downsample(nr, nc, x)
-        })
-        downsample <- which.min(abs(possible_npix - max_pixels)) - 1
-        message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+        downsample <- which.min(abs(possible_npix - max_pixels))
+        downsample <- ifelse(downsample == 1, 0, downsample)
       }
-      rs <- stars::st_downsample(rgb[,,,1], n = downsample)
-      gs <- stars::st_downsample(rgb[,,,2], n = downsample)
-      bs <- stars::st_downsample(rgb[,,,3], n = downsample)
-      rgb <- terra::rast(c(rs, gs, bs, along = 3)) |> stars::st_as_stars()
+      if(downsample > 0){
+        message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+        rgb <- terra::aggregate(rgb, fact = downsample)
+      }
     }
-
-    sf::st_crs(rgb) <- sf::st_crs("+proj=utm +zone=32 +datum=WGS84 +units=m ")
-
-    leafem::addStarsRGB(map = mp,
-                        x = rgb,
-                        r = r,
-                        g = g,
-                        b = b,
-                        maxBytes = 64 * 1024 * 1024,
-                        na.color = "#00000000")
+    terra::crs(rgb) <- terra::crs("+proj=utm +zone=32 +datum=WGS84 +units=m ")
+    mapview::viewRGB(
+      layer.name = "base",
+      as(rgb, "Raster"),
+      r = r,
+      g = g,
+      b = b,
+      na.color = "#00000000",
+      maxpixels = 60000000
+    ) + mp
 
   } else{
     if(!is.null(object$object_index)){

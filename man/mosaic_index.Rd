@@ -10,7 +10,11 @@ mosaic_index(mosaic, index = "R", r = 3, g = 2, b = 1, re = 4, nir = 5)
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
-\item{index}{The index to use for the index view. Defaults to "B".}
+\item{index}{A character value (or a vector of characters) specifying the
+target mode for conversion to a binary image. Use \code{\link[=pliman_indexes_rgb]{pliman_indexes_rgb()}}
+and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available RGB and multispectral
+indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, and NIR} bands (eg., \code{index = "R+B/G"}) or using the names of the
+mosaic's layers (ex., "(band_1 + band_2) / 2").}
 
 \item{r}{The layer for the Red band (default: 3).}
 
@@ -37,18 +41,16 @@ indices. The resulting index layer is returned as an \code{SpatRaster} object.
 }
 \examples{
 library(pliman)
-library(terra)
 mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
-confusion <-
-     matrix(rnorm(90*95, 100, 30),
-            nrow = nrow(mosaic),
-            ncol = ncol(mosaic))
-confusion <- mosaic_input(confusion)
-terra::ext(confusion) <- terra::ext(mosaic)
-terra::crs(confusion) <- terra::crs(mosaic)
-names(confusion) <- "confusion"
-two_layers <- c(mosaic, confusion)
-final <- mosaic_index(two_layers, "B+R", b = 1, r = 2)
-mosaic_view(final, viewer = "base")
+names(mosaic)
+elev2 <- mosaic_index(mosaic, "elevation * 5")
+oldpar <- par(no.readonly=TRUE)
+par(mfrow=c(1,2))
+
+mosaic_plot(mosaic)
+mosaic_plot(elev2)
+
+# return the original parameters
+par(oldpar)
 
 }

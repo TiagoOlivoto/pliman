@@ -27,7 +27,6 @@ Imports:
     poorman,
     Rcpp,
     sf,
-    stars,
     terra
 Suggests: 
     BiocManager,

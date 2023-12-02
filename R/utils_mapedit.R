@@ -24,11 +24,8 @@
 #'   If `max_pixels < npixels(img)`, regular sampling is used before plotting.
 #' @param color_regions The color palette for displaying index values. Default
 #'   is [custom_palette()].
-#' @param quantiles the upper and lower quantiles used for color stretching. If
-#'   set to `NULL`, stretching is performed basing on 'domain' argument.
-#' @param domain the upper and lower values used for color stretching. This is
-#'   used only if `'quantiles'` is `NULL`. If both '`domain'` and `'quantiles'`
-#'   are set to `NULL`, stretching is applied based on min-max values.
+#' @param quantiles the upper and lower quantiles used for color stretching. Set
+#'   to `c(0, 1)`
 #' @param ... Additional arguments to be passed to `downsample_fun`.
 #' @return An `sf` object, the same object returned by [mapedit::editMap()].
 #'
@@ -56,12 +53,8 @@ image_view <- function(img,
                        downsample = NULL,
                        color_regions = custom_palette(),
                        quantiles = c(0, 1),
-                       domain = NULL,
                        ...){
-  if(!is.null(domain)){
-    quantiles <- NULL
-  }
-  check_mapview()
+  # check_mapview()
   viewopt <- c("rgb", "index")
   viewopt <- viewopt[pmatch(show[[1]], viewopt)]
   compute_downsample <- function(nr, nc, n) {
@@ -78,32 +71,24 @@ image_view <- function(img,
 
   ras <- terra::rast(EBImage::transpose(img)@.Data)
   nly <- terra::nlyr(ras)
-  ras <- stars::st_as_stars(ras)
-  sf::st_crs(ras) <- sf::st_crs("EPSG:3857")
+  terra::crs(ras) <- terra::crs("EPSG:3857")
   dimsto <- dim(ras)[1:2]
   nr <- dimsto[1]
   nc <- dimsto[2]
   npix <- nc * nr
   if(npix > max_pixels){
+    possible_downsamples <- 0:50
+    possible_npix <- sapply(possible_downsamples, function(x){
+      compute_downsample(nr, nc, x)
+    })
     if(is.null(downsample)){
-      possible_downsamples <- 0:100
-      possible_npix <- sapply(possible_downsamples, function(x){
-        compute_downsample(nr, nc, x)
-      })
-      downsample <- which.min(abs(possible_npix - max_pixels)) - 1
+      downsample <- which.min(abs(possible_npix - max_pixels))
+      downsample <- ifelse(downsample == 1, 0, downsample)
+    }
+    if(downsample > 0){
       message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+      ras <- terra::aggregate(ras, fact = downsample)
     }
-    if(nly == 1){
-      ras <- stars::st_downsample(ras, n = downsample)
-    } else{
-      downsampled <-
-        lapply(1:nly, function(x){
-          stars::st_downsample(ras[,,,x], n = downsample) |> terra::rast()
-        })
-
-      ras <- terra::rast(Map(c, downsampled)) |> stars::st_as_stars()
-    }
-
   }
   if(viewopt == "rgb"){
     if(nly >= 3){
@@ -118,45 +103,51 @@ image_view <- function(img,
           crs = sf::st_crs("EPSG:3857")
         )
         colnames(sf_df) <- gsub("data.", "", colnames(sf_df))
-        mapview::mapview(sf_df,
-                         map.types = "OpenStreetMap",
-                         # col.regions = color_regions,
-                         zcol = attribute,
-                         legend = TRUE,
-                         alpha.regions = alpha,
-                         layer.name = attribute) |>
-          leafem::addRasterRGB(ras,
-                               r = r,
-                               g = g,
-                               b = b,
-                               maxBytes = 64 * 1024 * 1024,
-                               domain = domain,
-                               quantiles = quantiles)
+
+        mapview::viewRGB(
+          as(ras, "Raster"),
+          layer.name = "base",
+          r = r,
+          g = g,
+          b = b,
+          na.color = "#00000000",
+          maxpixels = 60000000,
+          quantiles = quantiles
+        ) +
+          mapview::mapview(sf_df,
+                           map.types = "OpenStreetMap",
+                           # col.regions = color_regions,
+                           zcol = attribute,
+                           legend = TRUE,
+                           alpha.regions = alpha,
+                           layer.name = attribute)
       } else{
         if(isTRUE(edit)){
           map <-
-            leaflet::leaflet() |>
-            leafem::addRasterRGB(ras,
-                                 r = r,
-                                 g = g,
-                                 b = b,
-                                 maxBytes = 64 * 1024 * 1024,
-                                 domain = domain,
-                                 quantiles = quantiles) |>
+            mapview::viewRGB(
+              as(ras, "Raster"),
+              layer.name = "base",
+              r = r,
+              g = g,
+              b = b,
+              na.color = "#00000000",
+              maxpixels = 60000000,
+              quantiles = quantiles
+            ) |>
             mapedit::editMap(editor = "leafpm",
                              title = title)
           invisible(sf::st_transform(map[["finished"]][["geometry"]], sf::st_crs(ras)))
         } else{
-          map <-
-            leaflet::leaflet() |>
-            leafem::addRasterRGB(ras,
-                                 r = r,
-                                 g = g,
-                                 b = b,
-                                 maxBytes = 64 * 1024 * 1024,
-                                 domain = domain,
-                                 quantiles = quantiles)
-          map
+          mapview::viewRGB(
+            as(ras, "Raster"),
+            layer.name = "base",
+            r = r,
+            g = g,
+            b = b,
+            na.color = "#00000000",
+            maxpixels = 60000000,
+            quantiles = quantiles
+          )
         }
       }
     } else{
@@ -189,8 +180,8 @@ image_view <- function(img,
       }
     }
   } else{
-    ind <- mosaic_index(terra::rast(ras), index = index)
-    sf::st_crs(ind) <- sf::st_crs("EPSG:3857")
+    ind <- mosaic_index(ras, index = index)
+    terra::crs(ind) <- terra::crs("EPSG:3857")
     map <-
       suppressWarnings(
         suppressMessages(
@@ -290,7 +281,7 @@ custom_palette <- function(colors = c("yellow", "#53CC67", "#009B95", "#00588B",
 #' # Example usage:
 #' library(pliman)
 #' img <- image_pliman("sev_leaf.jpg")
-#' plot_index(img, index = "B")
+#' plot_index(img, index = c("R", "G"))
 #' }
 #'
 plot_index <- function(img = NULL,
@@ -307,7 +298,7 @@ plot_index <- function(img = NULL,
                        ncol = NULL,
                        nrow = NULL,
                        aspect_ratio = NA){
-  check_mapview()
+  # check_mapview()
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
       invisible(nr * nc)
@@ -324,70 +315,53 @@ plot_index <- function(img = NULL,
 
   if(!is.null(img) & inherits(img, c("SpatRaster", "image_index"))){
     if(inherits(img, "image_index")){
-
       for(x in 1:length(img)){
         img[[x]][is.infinite(img[[x]])] <- NA
       }
       sts <-  terra::rast(
         lapply(1:length(img), function(i){
-          sto <-  terra::rast(t(img[[i]]@.Data)) |> stars::st_as_stars(proxy = FALSE)
+          sto <-  terra::rast(t(img[[i]]@.Data))
           dimsto <- dim(sto)
           nr <- dimsto[1]
           nc <- dimsto[2]
           npix <- nc * nr
           if(npix > max_pixels){
-            if(is.null(downsample)){
-              possible_downsamples <- 0:100
+              possible_downsamples <- 0:50
               possible_npix <- sapply(possible_downsamples, function(x){
                 compute_downsample(nr, nc, x)
               })
-              downsample <- which.min(abs(possible_npix - max_pixels)) - 1
-              if(i == 1){
-                message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+              if(is.null(downsample)){
+                downsample <- which.min(abs(possible_npix - max_pixels))
+                downsample <- ifelse(downsample == 1, 0, downsample)
               }
-            }
-            if(!is.null(downsample_fun)){
-              sto <- stars::st_downsample(sto, n = downsample, FUN = downsample_fun) |> terra::rast()
-            } else{
-              sto <- stars::st_downsample(sto, n = downsample) |> terra::rast()
-            }
-          } else{
-            sto <-  terra::rast(sto)
+              if(downsample > 0){
+                sto <- terra::aggregate(sto, fact = downsample)
+              }
           }
+          sto
         }
         )
       )
     } else{
-      sts <-  terra::rast(
-        lapply(1:terra::nlyr(img), function(i){
-          sto <-  img[[i]] |> stars::st_as_stars(proxy = FALSE)
-          dimsto <- dim(sto)
-          nr <- dimsto[1]
-          nc <- dimsto[2]
-          npix <- nc * nr
-          if(npix > max_pixels){
-            if(is.null(downsample)){
-              possible_downsamples <- 0:100
-              possible_npix <- sapply(possible_downsamples, function(x){
-                compute_downsample(nr, nc, x)
-              })
-              downsample <- which.min(abs(possible_npix - max_pixels)) - 1
-              if(i == 1){
-                message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
-              }
-            }
-            if(!is.null(downsample_fun)){
-              sto <- stars::st_downsample(sto, n = downsample, FUN = downsample_fun) |> terra::rast()
-            } else{
-              sto <- stars::st_downsample(sto, n = downsample) |> terra::rast()
-            }
-          } else{
-            sto <-  terra::rast(sto)
-          }
+      dimsto <- dim(img)
+      nr <- dimsto[1]
+      nc <- dimsto[2]
+      npix <- nr * nc
+      if(npix > max_pixels){
+        possible_downsamples <- 0:50
+        possible_npix <- sapply(possible_downsamples, function(x){
+          compute_downsample(nr, nc, x)
+        })
+        if(is.null(downsample)){
+          downsample <- which.min(abs(possible_npix - max_pixels))
+          downsample <- ifelse(downsample == 1, 0, downsample)
         }
-        )
-      )
-
+        if(downsample > 0){
+          sts <- terra::aggregate(img, fact = downsample)
+        }
+      } else{
+        sts <- img
+      }
     }
 
     names(sts) <- names(img)
@@ -424,8 +398,8 @@ plot_index <- function(img = NULL,
         all_layers <- FALSE
       }
       if(isTRUE(all_layers)){
-        mapbase <- stars::st_as_stars(sts[[1]])
-        sf::st_crs(mapbase) <- sf::st_crs("EPSG:3857")
+        mapbase <- sts[[1]]
+        terra::crs(mapbase) <- terra::crs("EPSG:3857")
         mapbase <- mapview::mapview(mapbase,
                                     maxpixels = 50000000,
                                     layer.name = names(mapbase),
@@ -436,8 +410,8 @@ plot_index <- function(img = NULL,
                                     verbose = FALSE)
 
         for (i in 2:terra::nlyr(sts)) {
-          lyrtmp <- stars::st_as_stars(sts[[i]])
-          sf::st_crs(lyrtmp) <- sf::st_crs("EPSG:3857")
+          lyrtmp <- sts[[i]]
+          terra::crs(lyrtmp) <- terra::crs("EPSG:3857")
           mapbase <- mapview::mapview(lyrtmp,
                                       maxpixels = 50000000,
                                       map = mapbase,
@@ -451,8 +425,8 @@ plot_index <- function(img = NULL,
 
         }
       } else{
-        mapbase <- stars::st_as_stars(sts[[layer]])
-        sf::st_crs(mapbase) <- sf::st_crs("EPSG:3857")
+        mapbase <- sts[[layer]]
+        terra::crs(mapbase) <- terra::crs("EPSG:3857")
         mapbase <- mapview::mapview(mapbase,
                                     maxpixels = 50000000,
                                     layer.name = names(mapbase),
@@ -489,27 +463,22 @@ plot_index <- function(img = NULL,
     } else{
       ras <-terra::rast(EBImage::transpose(ind)@.Data)
     }
-    sto <-  ras |> stars::st_as_stars(proxy = FALSE)
-    dimsto <- dim(sto)
+    dimsto <- dim(ras)
     nr <- dimsto[1]
     nc <- dimsto[2]
     npix <- nc * nr
     if(npix > max_pixels){
+      possible_downsamples <- 0:50
+      possible_npix <- sapply(possible_downsamples, function(x){
+        compute_downsample(nr, nc, x)
+      })
       if(is.null(downsample)){
-        possible_downsamples <- 0:100
-        possible_npix <- sapply(possible_downsamples, function(x){
-          compute_downsample(nr, nc, x)
-        })
-        downsample <- which.min(abs(possible_npix - max_pixels)) - 1
-        message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
+        downsample <- which.min(abs(possible_npix - max_pixels))
+        downsample <- ifelse(downsample == 1, 0, downsample)
       }
-      if(!is.null(downsample_fun)){
-        ras <- stars::st_downsample(sto, n = downsample, FUN = downsample_fun) |> terra::rast()
-      } else{
-        ras <- stars::st_downsample(sto, n = downsample) |> terra::rast()
+      if(downsample > 0){
+        ras <- terra::aggregate(ras, fact = downsample)
       }
-    } else{
-      ras <-  terra::rast(sto)
     }
     if(vieweropt == "base"){
       terra::plot(ras,
@@ -518,11 +487,10 @@ plot_index <- function(img = NULL,
                   cex.main = 1,
                   smooth = TRUE)
     } else{
-      stob <- stars::st_as_stars(ras)
-      sf::st_crs(stob) <- sf::st_crs("EPSG:3857")
+      terra::crs(ras) <- terra::crs("EPSG:3857")
       suppressWarnings(
         suppressMessages(
-          mapview::mapview(stob,
+          mapview::mapview(ras,
                            maxpixels = 50000000,
                            layer.name = index,
                            map.types = "CartoDB.Positron",
@@ -535,7 +503,6 @@ plot_index <- function(img = NULL,
     }
   }
 }
-
 
 #' Prepare an image
 #'
@@ -683,61 +650,3 @@ mv_points <- function(img,
   invisible(coords)
 }
 
-
-# reduce_dimensions: Resizes an image by reducing its dimensions while maintaining the aspect ratio.
-reduce_dimensions <- function(img, target_pixels = 2500000) {
-  original_rows <- dim(img)[1]
-  original_cols <- dim(img)[2]
-  original_aspect_ratio <- original_rows / original_cols
-  original_total_pixels <- original_rows * original_cols
-  reduction_factor <- sqrt(target_pixels / original_total_pixels)
-  new_rows <- round(original_rows * reduction_factor)
-  EBImage::resize(img, new_rows)
-}
-
-
-
-mosaic_index <- function(mosaic,
-                         index = "R",
-                         r = 1,
-                         g = 2,
-                         b = 3,
-                         nir = 4,
-                         re = 5){
-  if(inherits(mosaic, "Image")){
-    ras <- t(terra::rast(mosaic@.Data))
-  } else{
-    ras <- mosaic
-  }
-  ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-  if (!index %in% ind$Index) {
-    message(paste("Index '", index, "' is not available. Trying to compute your own index.",
-                  sep = ""))
-  }
-  R <- try(ras[[r]], TRUE)
-  G <- try(ras[[g]], TRUE)
-  B <- try(ras[[b]], TRUE)
-  NIR <- try(ras[[nir]], TRUE)
-  RE <- try(ras[[re]], TRUE)
-  if(index %in% ind$Index){
-    mosaic_gray <-
-      eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index]))) |>
-      stars::st_as_stars()
-  } else{
-    mosaic_gray <-
-      eval(parse(text = as.character(index))) |>
-      stars::st_as_stars()
-  }
-  names(mosaic_gray) <- index
-  if(!is.na(sf::st_crs(mosaic))){
-    suppressWarnings(sf::st_crs(mosaic_gray) <- sf::st_crs(mosaic))
-  } else{
-    suppressWarnings(sf::st_crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
-  }
-  invisible(mosaic_gray)
-}
-
-# image_orientation: Determines the orientation of an image (vertical or horizontal).
-image_orientation <- function(img){
-  ifelse(ncol(img) > nrow(img), "vertical", "horizontal")
-}

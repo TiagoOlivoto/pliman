@@ -20,7 +20,6 @@ image_view(
   downsample = NULL,
   color_regions = custom_palette(),
   quantiles = c(0, 1),
-  domain = NULL,
   ...
 )
 }
@@ -60,12 +59,8 @@ find the best downsampling factor to approximate the \code{max_pixels} value.}
 \item{color_regions}{The color palette for displaying index values. Default
 is \code{\link[=custom_palette]{custom_palette()}}.}
 
-\item{quantiles}{the upper and lower quantiles used for color stretching. If
-set to \code{NULL}, stretching is performed basing on 'domain' argument.}
-
-\item{domain}{the upper and lower values used for color stretching. This is
-used only if \code{'quantiles'} is \code{NULL}. If both '\verb{domain'} and \code{'quantiles'}
-are set to \code{NULL}, stretching is applied based on min-max values.}
+\item{quantiles}{the upper and lower quantiles used for color stretching. Set
+to \code{c(0, 1)}}
 
 \item{...}{Additional arguments to be passed to \code{downsample_fun}.}
 }

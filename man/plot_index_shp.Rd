@@ -11,12 +11,12 @@ plot_index_shp(
   r = 1,
   g = 2,
   b = 3,
-  color = c("red", "green"),
+  color = c("red", "yellow", "darkgreen"),
   viewer = c("mapview", "base"),
   max_pixels = 5e+05,
   downsample = NULL,
   downsample_fun = NULL,
-  alpha = 0.5,
+  alpha = 0.7,
   legend.position = "bottom",
   na.color = "gray",
   classes = 6,
@@ -91,14 +91,13 @@ library(pliman)
 flax <- image_pliman("flax_leaves.jpg", plot =TRUE)
 res <-
    analyze_objects_shp(flax,
-                       buffer_x = 0.2,
-                       buffer_y = 0.2,
+                       buffer_x = 0.1,
+                       buffer_y = 0.02,
                        nrow = 3,
                        ncol = 5,
                        plot = FALSE,
                        object_index = "DGCI")
-plot(res$final_image)
-plot_index_shp(res)
+plot_index_shp(res, attribute = "DGCI")
 }
 
 }

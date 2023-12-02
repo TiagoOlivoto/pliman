@@ -94,11 +94,11 @@ An sf object, the same object returned by \code{\link[mapedit:editMap]{mapedit::
 Mosaic View
 }
 \details{
-The function can generate either an interactive map using the
-'mapview' package or a static plot using the 'base' package, depending on
-the \code{viewer} and \code{show} parameters. If show = "index" is used, the function
-first computes an image index that can be either an RGB-based index or a
-multispectral index, if a multispectral mosaic is provided.
+The function can generate either an interactive map using the 'mapview'
+package or a static plot using the 'base' package, depending on the \code{viewer}
+and \code{show} parameters. If show = "index" is used, the function first computes
+an image index that can be either an RGB-based index or a multispectral
+index, if a multispectral mosaic is provided.
 }
 \examples{
 if(interactive()){
