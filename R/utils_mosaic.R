@@ -2,14 +2,12 @@ sf_to_polygon <- function(shps) {
   if(inherits(shps, "list")){
     shps <- do.call(rbind, shps)
   }
-  for (i in 1:nrow(shps)) {
-    if(inherits(sf::st_geometry(shps[i, ]), c("sfc_POINT", "sfc_LINESTRING"))){
-      shps[i, ] <-
-        sf::st_buffer(shps[i, ], 0.0000001) |>
-        sf::st_cast("POLYGON") |>
-        sf::st_simplify(preserveTopology = TRUE)
-    }
-  }
+  classes <- sapply(lapply(sf::st_geometry(shps$geometry), class), function(x){x[2]})
+  shps[classes %in% c("POINT", "LINESTRING"), ] <-
+    shps[classes %in% c("POINT", "LINESTRING"), ] |>
+    sf::st_buffer(0.0000001) |>
+    sf::st_cast("POLYGON") |>
+    sf::st_simplify(preserveTopology = TRUE)
   return(shps)
 }
 create_buffer <- function(coords, buffer_col, buffer_row) {
@@ -86,8 +84,6 @@ compute_downsample <- function(nr, nc, n) {
     stop("Invalid downsampling factor. n must be a non-negative integer.")
   }
 }
-
-
 compute_measures_mosaic <- function(contour){
   lw <- help_lw(contour)
   cdist <- help_centdist(contour)
@@ -405,7 +401,7 @@ shapefile_build <- function(mosaic,
 #'   with an interactive map view (default: TRUE). This enables live editing of
 #'   the drawn shapefile by deleting or changing the drawn grids.
 #' @param buffer_edge Width of the buffer around the shapefile (default: 5).
-#' @param buffer_col, buffer_row Buffering factor for the columns and rows,
+#' @param buffer_col,buffer_row Buffering factor for the columns and rows,
 #'   respectively, of each individual plot's side. A value between 0 and 0.5
 #'   where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 #'   value of 0.25 will buffer the plot by 25% on each side.
@@ -674,10 +670,15 @@ mosaic_analyze <- function(mosaic,
     if(!is.null(topn_upper) & length(topn_upper) != length(created_shapes)){
       warning(paste0("`topn_upper` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
-
-
   } else{
-    shapefile <- shapefile_input(shapefile |> sf_to_polygon(), info = FALSE)
+    if(inherits(shapefile, "list")){
+      shapefile <- shapefile_input(shapefile |> sf_to_polygon(), info = FALSE)
+    } else{
+      if(inherits(shapefile, "SpatVector")){
+        shapefile <- sf::st_as_sf(shapefile)
+      }
+      shapefile <- shapefile |> sf_to_polygon()
+    }
     extm <- terra::ext(shapefile)
     xmin <- extm[1]
     xmax <- extm[2]
@@ -1137,7 +1138,8 @@ mosaic_analyze <- function(mosaic,
   # bind the results  ## at a level plot
   results <-
     do.call(rbind, lapply(results, function(x){x})) |>
-    sf::st_sf()
+    sf::st_sf() |>
+    poorman::relocate(block, plot_id, .before = 1)
 
 
   if(any(segment_individuals)){
@@ -1236,7 +1238,7 @@ mosaic_analyze <- function(mosaic,
           mapview::mapview(dfplot,
                            zcol = attribute,
                            layer.name = attribute,
-                           col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
+                           col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
                            alpha.regions = 0.75,
                            na.color = "#00000000",
                            maxBytes = 64 * 1024 * 1024,
@@ -1868,12 +1870,12 @@ shapefile_view <- function(shapefile,
                            attribute = NULL,
                            color_regions = custom_palette(c("red", "yellow", "green")),
                            ...){
-suppressWarnings(
-  mapview::mapview(shapefile,
-                   zcol = attribute,
-                   col.regions = color_regions,
-                   ...)
-)
+  suppressWarnings(
+    mapview::mapview(shapefile,
+                     zcol = attribute,
+                     col.regions = color_regions,
+                     ...)
+  )
 }
 
 
