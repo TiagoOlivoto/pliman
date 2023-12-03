@@ -62,7 +62,7 @@ the drawn shapefile by deleting or changing the drawn grids.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}
 
-\item{buffer_col}{buffer_row Buffering factor for the columns and rows,
+\item{buffer_col, buffer_row}{Buffering factor for the columns and rows,
 respectively, of each individual plot's side. A value between 0 and 0.5
 where 0 means no buffering and 0.5 means complete buffering (default: 0). A
 value of 0.25 will buffer the plot by 25\% on each side.}
