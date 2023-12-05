@@ -441,7 +441,7 @@ shapefile_build <- function(mosaic,
 #'   bands (e.g., `"(R-B)/(R+B)"`). See [pliman_indexes()] and [image_index()]
 #'   for more details.
 #' @param segment_index The index used for segmentation. The same rule as
-#'   `plot_index`.
+#'   `plot_index`. Defaults to `NULL`
 #' @param threshold By default (threshold = "Otsu"), a threshold value based on
 #'   Otsu's method is used to reduce the grayscale image to a binary image. If a
 #'   numeric value is provided, this value will be used as a threshold.
@@ -519,7 +519,7 @@ mosaic_analyze <- function(mosaic,
                            extension = 1,
                            include_if = "centroid",
                            plot_index = NULL,
-                           segment_index = "GLAI",
+                           segment_index = NULL,
                            threshold = "Otsu",
                            filter = FALSE,
                            lower_noise = 0.05,
@@ -528,7 +528,7 @@ mosaic_analyze <- function(mosaic,
                            topn_lower = NULL,
                            topn_upper = NULL,
                            summarize_fun = "mean",
-                           attribute = paste(summarize_fun, segment_index, sep = "."),
+                           attribute = NULL,
                            invert = FALSE,
                            color_regions = rev(grDevices::terrain.colors(50)),
                            alpha = 1,
@@ -539,11 +539,17 @@ mosaic_analyze <- function(mosaic,
                            verbose = TRUE){
   includeopt <- c("intersect", "covered", "overlap", "centroid")
   includeopt <- includeopt[sapply(include_if, function(x){pmatch(x, includeopt)})]
+  if(is.null(plot_index) & !is.null(segment_index)){
+    plot_index <- segment_index
+  }
+  if(!is.null(plot_index) & is.null(segment_index)){
+    segment_index <- plot_index
+  }
   if(any(segment_individuals) | any(segment_plot) & !is.null(plot_index) & !segment_index %in% plot_index){
     plot_index <- unique(append(plot_index, segment_index))
   }
-  if(is.null(plot_index) & !is.null(segment_index)){
-    plot_index <- segment_index
+  if(is.null(attribute)){
+    attribute <- paste(summarize_fun[[1]], segment_index[[1]], sep = ".")
   }
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
@@ -1225,11 +1231,11 @@ mosaic_analyze <- function(mosaic,
     } else{
       dfplot <- results
     }
-    if(nlyrs == 1){
+    if(nlyrs < 3){
       map <-
         mapview::mapview(mosaiccr,
                          maxpixels = 60000000,
-                         layer.name = names(mosaiccr),
+                         legend = FALSE,
                          map.types = "CartoDB.Positron",
                          alpha.regions = 1,
                          na.color = "transparent",
@@ -1271,11 +1277,11 @@ mosaic_analyze <- function(mosaic,
 
     if(any(segment_individuals)){
       attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
-      if(nlyrs == 1){
+      if(nlyrs < 3){
         mapindivid <-
           mapview::mapview(mosaiccr,
                            maxpixels = 60000000,
-                           layer.name = names(mosaiccr),
+                           legend = FALSE,
                            map.types = "CartoDB.Positron",
                            alpha.regions = 1,
                            na.color = "transparent",

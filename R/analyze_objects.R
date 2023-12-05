@@ -688,7 +688,7 @@ analyze_objects <- function(img,
                                        title = "Use the first mouse button to pick up BACKGROUND colors. Click 'Done' to finish",
                                        viewer = viewer)
             if(viewopt != "base"){
-              image_view(img[1:10, 1:10,])
+              image_view(img[1:10, 1:10,], edit = TRUE)
             }
             if(viewopt == "base"){
               message("Use the first mouse button to pick up FOREGROUND colors. Press Est to exit")
