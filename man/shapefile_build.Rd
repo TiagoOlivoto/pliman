@@ -16,7 +16,8 @@ shapefile_build(
   nrow = 1,
   ncol = 1,
   build_shapefile = TRUE,
-  check_shapefile = TRUE,
+  check_shapefile = FALSE,
+  sf_to_polygon = FALSE,
   buffer_edge = 1,
   buffer_col = 0,
   buffer_row = 0,
@@ -59,6 +60,10 @@ if the shapefile is \code{NULL} (default: TRUE).}
 \item{check_shapefile}{Logical, indicating whether to validate the shapefile
 with an interactive map view (default: TRUE). This enables live editing of
 the drawn shapefile by deleting or changing the drawn grids.}
+
+\item{sf_to_polygon}{Convert sf geometry like POINTS and LINES to POLYGONS?
+Defaults to \code{FALSE}. Using \code{TRUE} allows using POINTS to extract values
+from a raster using \code{exactextractr::exact_extract()}.}
 
 \item{buffer_edge}{Width of the buffer around the shapefile (default: 5).}
 

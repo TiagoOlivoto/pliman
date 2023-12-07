@@ -805,3 +805,27 @@ IntegerMatrix helper_guo_hall(IntegerMatrix image) {
 
   return image;
 }
+
+// IDW interpolation function using Rcpp
+// [[Rcpp::export]]
+NumericVector idw_interpolation_cpp(NumericVector x, NumericVector y, NumericVector values,
+                                    NumericVector new_x, NumericVector new_y, double power = 2) {
+  // Calculate distances between new points and existing points
+  NumericMatrix distances(new_x.size(), x.size());
+  for (int i = 0; i < new_x.size(); ++i) {
+    distances(i, _) = sqrt(pow(x - new_x[i], 2) + pow(y - new_y[i], 2));
+  }
+
+  // Initialize a NumericVector to store results
+  NumericVector results(new_x.size(), NA_REAL);
+
+  for (int i = 0; i < new_x.size(); ++i) {
+    // Inverse distance weighting formula
+    NumericVector weights = 1.0 / pow(distances(i, _), power);
+    double weighted_sum = sum(weights * values);
+    double total_weight = sum(weights);
+    results[i] = total_weight > 0 ? weighted_sum / total_weight : NA_REAL;
+
+  }
+  return results;
+}

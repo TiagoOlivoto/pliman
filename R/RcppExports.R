@@ -61,6 +61,10 @@ helper_guo_hall <- function(image) {
     .Call(`_pliman_helper_guo_hall`, image)
 }
 
+idw_interpolation_cpp <- function(x, y, values, new_x, new_y, power = 2) {
+    .Call(`_pliman_idw_interpolation_cpp`, x, y, values, new_x, new_y, power)
+}
+
 help_area <- function(coord) {
     .Call(`_pliman_help_area`, coord)
 }

@@ -30,7 +30,7 @@ mosaic_analyze(
   extension = 1,
   include_if = "centroid",
   plot_index = NULL,
-  segment_index = "GLAI",
+  segment_index = NULL,
   threshold = "Otsu",
   filter = FALSE,
   lower_noise = 0.05,
@@ -39,7 +39,7 @@ mosaic_analyze(
   topn_lower = NULL,
   topn_upper = NULL,
   summarize_fun = "mean",
-  attribute = paste(summarize_fun, segment_index, sep = "."),
+  attribute = NULL,
   invert = FALSE,
   color_regions = rev(grDevices::terrain.colors(50)),
   alpha = 1,
@@ -138,7 +138,7 @@ bands (e.g., \code{"(R-B)/(R+B)"}). See \code{\link[=pliman_indexes]{pliman_inde
 for more details.}
 
 \item{segment_index}{The index used for segmentation. The same rule as
-\code{plot_index}.}
+\code{plot_index}. Defaults to \code{NULL}}
 
 \item{threshold}{By default (threshold = "Otsu"), a threshold value based on
 Otsu's method is used to reduce the grayscale image to a binary image. If a
@@ -172,8 +172,7 @@ be considered.}
 Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 individual-level) is returned.}
 
-\item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}
-(default: "GLAI").}
+\item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}. Defaults to the first \code{summary_fun} and first \code{segment_index}.}
 
 \item{invert}{Logical, indicating whether to invert the mask. Defaults to
 \code{FALSE}, i.e., pixels with intensity greater than the threshold values are

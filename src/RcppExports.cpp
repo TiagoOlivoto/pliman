@@ -199,6 +199,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// idw_interpolation_cpp
+NumericVector idw_interpolation_cpp(NumericVector x, NumericVector y, NumericVector values, NumericVector new_x, NumericVector new_y, double power);
+RcppExport SEXP _pliman_idw_interpolation_cpp(SEXP xSEXP, SEXP ySEXP, SEXP valuesSEXP, SEXP new_xSEXP, SEXP new_ySEXP, SEXP powerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type new_x(new_xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type new_y(new_ySEXP);
+    Rcpp::traits::input_parameter< double >::type power(powerSEXP);
+    rcpp_result_gen = Rcpp::wrap(idw_interpolation_cpp(x, y, values, new_x, new_y, power));
+    return rcpp_result_gen;
+END_RCPP
+}
 // help_area
 Rcpp::RObject help_area(Rcpp::RObject coord);
 RcppExport SEXP _pliman_help_area(SEXP coordSEXP) {
@@ -439,6 +455,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pliman_help_shp", (DL_FUNC) &_pliman_help_shp, 5},
     {"_pliman_help_otsu", (DL_FUNC) &_pliman_help_otsu, 1},
     {"_pliman_helper_guo_hall", (DL_FUNC) &_pliman_helper_guo_hall, 1},
+    {"_pliman_idw_interpolation_cpp", (DL_FUNC) &_pliman_idw_interpolation_cpp, 6},
     {"_pliman_help_area", (DL_FUNC) &_pliman_help_area, 1},
     {"_pliman_help_slide", (DL_FUNC) &_pliman_help_slide, 2},
     {"_pliman_help_distpts", (DL_FUNC) &_pliman_help_distpts, 1},

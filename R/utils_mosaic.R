@@ -71,19 +71,40 @@ make_grid <- function(points,
     sf::st_sf(crs = sf::st_crs(mosaic))
   return(gshp)
 }
-
-
-compute_downsample <- function(nr, nc, n) {
-  if (n == 0) {
-    invisible(nr * nc)
-  } else if (n == 1) {
-    invisible(ceiling(nr/2) * ceiling(nc/2))
-  } else if (n > 1) {
-    invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
-  } else {
-    stop("Invalid downsampling factor. n must be a non-negative integer.")
+find_aggrfact <- function(mosaic, max_pixels = 1000000){
+  compute_downsample <- function(nr, nc, n) {
+    if (n == 0) {
+      invisible(nr * nc)
+    } else if (n == 1) {
+      invisible(ceiling(nr/2) * ceiling(nc/2))
+    } else if (n > 1) {
+      invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+    } else {
+      stop("Invalid downsampling factor. n must be a non-negative integer.")
+    }
   }
+  nr <- nrow(mosaic)
+  nc <- ncol(mosaic)
+  npixel <- nr * nc
+  possible_downsamples <- 0:20
+  possible_npix <- sapply(possible_downsamples, function(x){
+    compute_downsample(nr, nc, x)
+  })
+  downsample <- which.min(abs(possible_npix - max_pixels))
+  downsample <- ifelse(downsample == 1, 0, downsample)
+  return(downsample)
 }
+# compute_downsample <- function(nr, nc, n) {
+#   if (n == 0) {
+#     invisible(nr * nc)
+#   } else if (n == 1) {
+#     invisible(ceiling(nr/2) * ceiling(nc/2))
+#   } else if (n > 1) {
+#     invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
+#   } else {
+#     stop("Invalid downsampling factor. n must be a non-negative integer.")
+#   }
+# }
 compute_measures_mosaic <- function(contour){
   lw <- help_lw(contour)
   cdist <- help_centdist(contour)
@@ -130,7 +151,87 @@ map_individuals <- function(object,
   means <- sapply(distances, mean)
   invisible(list(distances = distances, cvs = cvs, means = means))
 }
+linear_iterpolation <- function(mosaic, points){
+  if(inherits(points, "list")){
+    points <- do.call(rbind, points)
+  }
+  xy <- sf::st_coordinates(points)[, 1:2]
+  vals <- terra::values(mosaic)[terra::cellFromXY(mosaic, xy), ]
+  vals <- data.frame(cbind(xy, vals))
+  names(vals) <- c("x", "y", "z")
+  newdata <- as.data.frame(terra::xyFromCell(mosaic, 1:terra::ncell(mosaic)))
+  new_ras <-
+    terra::rast(
+      lapply(3:ncol(vals), function(i){
+        mod <- lm(vals[, i] ~ x + y, data = vals)
+        terra::rast(matrix(predict(mod, newdata = newdata),
+                           nrow = nrow(mosaic),
+                           ncol = ncol(mosaic),
+                           byrow = TRUE))
+      })
+    )
+  terra::crs(new_ras) <- terra::crs(mosaic)
+  terra::ext(new_ras) <- terra::ext(mosaic)
+  terra::resample(new_ras, mosaic)
+}
+idw_interpolation <- function(mosaic, points){
+  downsample <- find_aggrfact(mosaic, max_pixels = 200000)
+  if(downsample > 0){
+    magg <- terra::aggregate(mosaic, downsample)
+  } else{
+    magg <- mosaic
+  }
+  if(inherits(points, "list")){
+    points <- do.call(rbind, points)
+  }
+  xy <- sf::st_coordinates(points)[, 1:2]
+  vals <- terra::values(magg)[terra::cellFromXY(magg, xy), ]
+  vals <- data.frame(cbind(xy, vals))
 
+  xy_grid <- terra::xyFromCell(magg, 1:terra::ncell(magg))
+  newx <- seq(min(xy_grid[,1]), max(xy_grid[,1]), length.out = 1000)
+  newy <- seq(min(xy_grid[,2]), max(xy_grid[,2]), length.out = 1000)
+
+  new_ras <-
+    terra::rast(
+      lapply(3:ncol(vals), function(i){
+        interp <- idw_interpolation_cpp(vals[, 1], vals[, 2], vals[, i], xy_grid[, 1], xy_grid[, 2])
+        ra3 <-
+          terra::rast(matrix(interp,
+                             nrow = nrow(magg),
+                             ncol = ncol(magg),
+                             byrow = TRUE))
+      })
+    )
+
+  terra::crs(new_ras) <- terra::crs(mosaic)
+  terra::ext(new_ras) <- terra::ext(mosaic)
+  terra::resample(new_ras, mosaic)
+}
+
+#' Mosaic interpolation
+#'
+#' Performs the interpolation of points from a raster object.
+#'
+#' @param mosaic An `SpatRaster` object
+#' @param points An `sf` object with the points for x and y coordinates, usually
+#'   obtained with [shapefile_build()].
+#' @param method One of "bilinear" (default) or "idw" (Inverse Distance
+#'   Weighting).
+#'
+#' @return An `SpatRaster` object with the same extend and crs from `mosaic`
+#' @export
+#'
+mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "idw")){
+  if(!method[[1]] %in% c("bilinear", "idw")){
+    stop("'method' must be one of 'bilinear' or 'idw'")
+  }
+  if(method[[1]] == "bilinear"){
+    linear_iterpolation(mosaic, points)
+  } else{
+    idw_interpolation(mosaic, points)
+  }
+}
 
 #' Build a shapefile from a mosaic raster
 #'
@@ -144,7 +245,9 @@ map_individuals <- function(object,
 #' (the same argument applied to all the drawn blocks), or a vector with the
 #' same length as the number of drawn blocks. In the last, shapefiles in each
 #' block can be created with different dimensions.
-#'
+#' @param sf_to_polygon Convert sf geometry like POINTS and LINES to POLYGONS?
+#'   Defaults to `FALSE`. Using `TRUE` allows using POINTS to extract values
+#'   from a raster using `exactextractr::exact_extract()`.
 #' @inheritParams mosaic_analyze
 #' @inheritParams utils_shapefile
 #' @return A list with the built shapefile. Each element is an `sf` object with
@@ -178,7 +281,8 @@ shapefile_build <- function(mosaic,
                             nrow = 1,
                             ncol = 1,
                             build_shapefile = TRUE,
-                            check_shapefile = TRUE,
+                            check_shapefile = FALSE,
+                            sf_to_polygon = FALSE,
                             buffer_edge = 1,
                             buffer_col = 0,
                             buffer_row = 0,
@@ -205,7 +309,10 @@ shapefile_build <- function(mosaic,
                           downsample = downsample,
                           quantiles = quantiles,
                           edit = TRUE)
-    cpoints <- points$finished |> sf_to_polygon()
+    cpoints <- points$finished
+    if(sf_to_polygon){
+      cpoints <- cpoints |> sf_to_polygon()
+    }
   } else{
     extm <- terra::ext(mosaic)
     xmin <- extm[1]
@@ -300,12 +407,7 @@ shapefile_build <- function(mosaic,
           poorman::relocate(geometry, .after = 3) |>
           sf::st_transform(crs = 4326)
       }))
-    possible_downsamples <- 0:15
-    possible_npix <- sapply(possible_downsamples, function(x){
-      compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
-    })
-    downsample <- which.min(abs(possible_npix - max_pixels))
-    downsample <- ifelse(downsample == 1, 0, downsample)
+    downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
@@ -452,8 +554,7 @@ shapefile_build <- function(mosaic,
 #' @param summarize_fun The function to compute summaries for the pixel values.
 #'   Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 #'   individual-level) is returned.
-#' @param attribute The attribute to be shown at the plot when `plot` is `TRUE`
-#'   (default: "GLAI").
+#' @param attribute The attribute to be shown at the plot when `plot` is `TRUE`. Defaults to the first `summary_fun` and first `segment_index`.
 #' @param invert Logical, indicating whether to invert the mask. Defaults to
 #'   `FALSE`, i.e., pixels with intensity greater than the threshold values are
 #'   selected.
@@ -543,7 +644,7 @@ mosaic_analyze <- function(mosaic,
     plot_index <- segment_index
   }
   if(!is.null(plot_index) & is.null(segment_index)){
-    segment_index <- plot_index
+    segment_index <- plot_index[[1]]
   }
   if(any(segment_individuals) | any(segment_plot) & !is.null(plot_index) & !segment_index %in% plot_index){
     plot_index <- unique(append(plot_index, segment_index))
@@ -573,6 +674,7 @@ mosaic_analyze <- function(mosaic,
                         ncol = ncol,
                         build_shapefile = build_shapefile,
                         check_shapefile = check_shapefile,
+                        sf_to_polygon =  TRUE,
                         buffer_edge = buffer_edge,
                         buffer_col = buffer_col,
                         buffer_row = buffer_row,
@@ -1216,13 +1318,13 @@ mosaic_analyze <- function(mosaic,
     if(verbose){
       cat("\014","\nPreparing to plot...\n")
     }
-
-    possible_downsamples <- 0:15
-    possible_npix <- sapply(possible_downsamples, function(x){
-      compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
-    })
-    downsample <- which.min(abs(possible_npix - max_pixels))
-    downsample <- ifelse(downsample == 1, 0, downsample)
+    downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
+    # possible_downsamples <- 0:15
+    # possible_npix <- sapply(possible_downsamples, function(x){
+    #   compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
+    # })
+    # downsample <- which.min(abs(possible_npix - max_pixels))
+    # downsample <- ifelse(downsample == 1, 0, downsample)
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
@@ -1457,14 +1559,15 @@ mosaic_view <- function(mosaic,
   if(max_pixels > 2000000){
     message("The number of pixels is too high, which might slow the rendering process.")
   }
-  possible_downsamples <- 0:50
-  possible_npix <- sapply(possible_downsamples, function(x){
-    compute_downsample(nr, nc, x)
-  })
-  if(is.null(downsample)){
-    downsample <- which.min(abs(possible_npix - max_pixels))
-    downsample <- ifelse(downsample == 1, 0, downsample)
-  }
+  downsample <- find_aggrfact(mosaic, max_pixels = max_pixels)
+  # possible_downsamples <- 0:50
+  # possible_npix <- sapply(possible_downsamples, function(x){
+  #   compute_downsample(nr, nc, x)
+  # })
+  # if(is.null(downsample)){
+  #   downsample <- which.min(abs(possible_npix - max_pixels))
+  #   downsample <- ifelse(downsample == 1, 0, downsample)
+  # }
   if(downsample > 0){
     message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
     mosaic <- terra::aggregate(mosaic, fact = downsample)
