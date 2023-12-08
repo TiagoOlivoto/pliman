@@ -94,17 +94,6 @@ find_aggrfact <- function(mosaic, max_pixels = 1000000){
   downsample <- ifelse(downsample == 1, 0, downsample)
   return(downsample)
 }
-# compute_downsample <- function(nr, nc, n) {
-#   if (n == 0) {
-#     invisible(nr * nc)
-#   } else if (n == 1) {
-#     invisible(ceiling(nr/2) * ceiling(nc/2))
-#   } else if (n > 1) {
-#     invisible(ceiling(nr/(n+1)) * ceiling(nc/(n+1)))
-#   } else {
-#     stop("Invalid downsampling factor. n must be a non-negative integer.")
-#   }
-# }
 compute_measures_mosaic <- function(contour){
   lw <- help_lw(contour)
   cdist <- help_centdist(contour)
@@ -151,7 +140,7 @@ map_individuals <- function(object,
   means <- sapply(distances, mean)
   invisible(list(distances = distances, cvs = cvs, means = means))
 }
-linear_iterpolation <- function(mosaic, points){
+linear_iterpolation <- function(mosaic, points, method = "loess"){
   if(inherits(points, "list")){
     points <- do.call(rbind, points)
   }
@@ -163,7 +152,11 @@ linear_iterpolation <- function(mosaic, points){
   new_ras <-
     terra::rast(
       lapply(3:ncol(vals), function(i){
-        mod <- lm(vals[, i] ~ x + y, data = vals)
+        if(method == "loess"){
+          mod <- loess(vals[, i] ~ x + y, data = vals)
+        } else{
+          mod <- lm(vals[, i] ~ x + y, data = vals)
+        }
         terra::rast(matrix(predict(mod, newdata = newdata),
                            nrow = nrow(mosaic),
                            ncol = ncol(mosaic),
@@ -209,25 +202,32 @@ idw_interpolation <- function(mosaic, points){
   terra::resample(new_ras, mosaic)
 }
 
+
 #' Mosaic interpolation
 #'
 #' Performs the interpolation of points from a raster object.
 #'
 #' @param mosaic An `SpatRaster` object
 #' @param points An `sf` object with the points for x and y coordinates, usually
-#'   obtained with [shapefile_build()].
-#' @param method One of "bilinear" (default) or "idw" (Inverse Distance
-#'   Weighting).
+#'   obtained with [shapefile_build()]. Alternatively, an external shapefile
+#'   imported with [shapefile_input()] containing the x and y coordinates can be
+#'   used. The function will handle most used shapefile formats (eg.,
+#'   .shp, .rds) and convert the imported shapefile to an sf object.
+#' @param method One of "bilinear" (default), "loess" (local regression) or
+#'   "idw" (Inverse Distance Weighting).
 #'
 #' @return An `SpatRaster` object with the same extend and crs from `mosaic`
 #' @export
 #'
-mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "idw")){
-  if(!method[[1]] %in% c("bilinear", "idw")){
-    stop("'method' must be one of 'bilinear' or 'idw'")
+mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "idw")){
+  if(terra::crs(points) != terra::crs(mosaic)){
+    terra::crs(points) <- terra::crs(mosaic)
   }
-  if(method[[1]] == "bilinear"){
-    linear_iterpolation(mosaic, points)
+  if(!method[[1]] %in% c("bilinear", "idw", "loess")){
+    stop("'method' must be one of 'bilinear', 'loess', or 'idw'")
+  }
+  if(method[[1]]  %in%  c("bilinear", "loess")){
+    linear_iterpolation(mosaic, points, method = method[[1]])
   } else{
     idw_interpolation(mosaic, points)
   }
