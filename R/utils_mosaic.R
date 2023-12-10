@@ -101,9 +101,9 @@ compute_measures_mosaic <- function(contour){
              perimeter = sum(help_distpts(contour)),
              length = lw[[1]],
              width = lw[[2]],
-             diam_min = min(cdist),
-             diam_mean = mean(cdist),
-             diam_max = max(cdist))
+             diam_min = min(cdist) * 2,
+             diam_mean = mean(cdist) * 2,
+             diam_max = max(cdist) * 2)
 
 }
 map_individuals <- function(object,
@@ -718,6 +718,12 @@ mosaic_analyze <- function(mosaic,
     if(length(threshold) != length(created_shapes)){
       warning(paste0("`threshold` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
     }
+    if(length(watershed) == 1 & length(created_shapes) != 1){
+      watershed <- rep(watershed, length(created_shapes))
+    }
+    if(length(watershed) != length(created_shapes)){
+      warning(paste0("`watershed` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+    }
     if(length(segment_index) == 1 & length(created_shapes) != 1){
       segment_index <- rep(segment_index, length(created_shapes))
     }
@@ -1005,7 +1011,6 @@ mosaic_analyze <- function(mosaic,
         if(length(plot_index) == 1){
           colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
         }
-        # return(list(valindiv, gridindiv))
         if(!is.null(summarize_fun)){
           valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
@@ -1035,7 +1040,7 @@ mosaic_analyze <- function(mosaic,
         ext_anal <-
           plot_grid |>
           terra::vect() |>
-          terra::buffer(20) |>
+          terra::buffer(buffer_edge) |>
           terra::ext()
         mind_temp <- terra::crop(mind, terra::ext(ext_anal))
       } else{
@@ -1125,7 +1130,6 @@ mosaic_analyze <- function(mosaic,
           crs = terra::crs(mosaic)
         )
         centroids <- suppressWarnings(sf::st_centroid(sf_df))
-        # intersect_individ <- sf::st_overlaps(sf_df, plot_grid, sparse = FALSE)[,1]
         intersect_individ <-
           switch (includeopt[j],
                   "intersect" = sf::st_intersects(sf_df, plot_grid, sparse = FALSE)[,1],
@@ -1242,11 +1246,10 @@ mosaic_analyze <- function(mosaic,
   }
 
 
-  # return(results)
   # bind the results  ## at a level plot
   results <-
     do.call(rbind, lapply(results, function(x){x})) |>
-    sf::st_sf() |>
+    # sf::st_sf() |>
     poorman::relocate(block, plot_id, .before = 1)
 
 
@@ -1319,12 +1322,6 @@ mosaic_analyze <- function(mosaic,
       cat("\014","\nPreparing to plot...\n")
     }
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
-    # possible_downsamples <- 0:15
-    # possible_npix <- sapply(possible_downsamples, function(x){
-    #   compute_downsample(nrow(mosaiccr), ncol(mosaiccr), x)
-    # })
-    # downsample <- which.min(abs(possible_npix - max_pixels))
-    # downsample <- ifelse(downsample == 1, 0, downsample)
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
@@ -2128,7 +2125,6 @@ mosaic_index <- function(mosaic,
       })
     names(layers) <- layers_used
     mosaic_gray <- eval(parse(text = index), envir = layers)
-    # names(mosaic_gray) <- index
   } else{
     R <- try(ras[[r]], TRUE)
     G <- try(ras[[g]], TRUE)
@@ -2153,7 +2149,50 @@ mosaic_index <- function(mosaic,
 }
 
 
-
+#' Segment a mosaic
+#'
+#' Segment a `SpatRaster` using a computed image index. By default, values
+#' greater than `threshold` are kept in the mask.
+#'
+#' @inheritParams mosaic_index
+#' @inheritParams mosaic_analyze
+#'
+#'
+#' @return The segmented mosaic (`SpatRaster` object)
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#' seg <-
+#' mosaic_segment(mosaic,
+#'                index = "elevation",
+#'                threshold = 350)
+#' mosaic_plot(seg)
+mosaic_segment <- function(mosaic,
+                           index = "R",
+                           r = 3,
+                           g = 2,
+                           b = 1,
+                           re = 4,
+                           nir = 5,
+                           threshold = "Otsu",
+                           invert = FALSE){
+  ind <- mosaic_index(mosaic,
+                      index = index,
+                      r = r,
+                      g = g,
+                      b = b,
+                      re = re,
+                      nir = nir)
+  thresh <- ifelse(threshold == "Otsu", otsu(na.omit(terra::values(ind)[, index])), threshold)
+  if(invert){
+    mask <- ind[[index]] < thresh
+  } else{
+    mask <- ind[[index]] > thresh
+  }
+  terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+}
 
 #' Mosaic to pliman
 #'

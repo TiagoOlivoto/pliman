@@ -11,8 +11,8 @@ mosaic_interpolate(mosaic, points, method = c("bilinear", "loess", "idw"))
 
 \item{points}{An \code{sf} object with the points for x and y coordinates, usually
 obtained with \code{\link[=shapefile_build]{shapefile_build()}}. Alternatively, an external shapefile
-imported with \code{shapefile_input()} containing the x and y coordinates can be
-used. \code{shapefile_input()} will handle most used shapefile formats (eg.,
+imported with \code{\link[=shapefile_input]{shapefile_input()}} containing the x and y coordinates can be
+used. The function will handle most used shapefile formats (eg.,
 .shp, .rds) and convert the imported shapefile to an sf object.}
 
 \item{method}{One of "bilinear" (default), "loess" (local regression) or
