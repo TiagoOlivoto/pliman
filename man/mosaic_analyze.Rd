@@ -33,7 +33,7 @@ mosaic_analyze(
   segment_index = NULL,
   threshold = "Otsu",
   filter = FALSE,
-  lower_noise = 0.05,
+  lower_noise = 0.15,
   lower_size = NULL,
   upper_size = NULL,
   topn_lower = NULL,
@@ -204,11 +204,9 @@ A list containing the following objects:
 \itemize{
 \item \code{result_plot}: The results at a plot level.
 \item \code{result_plot_summ}: The summary of results at a plot level. When
-\itemize{
-\item \code{segment_individuals = TRUE}, the number of individuals, canopy coverage,
+\code{segment_individuals = TRUE}, the number of individuals, canopy coverage,
 and mean values of some shape statistics such as perimeter, length, width,
 and diameter are computed.
-}
 \item \code{result_individ}: The results at an individual level.
 \item \code{map_plot}: An object of class \code{mapview} showing the plot-level results.
 \item \code{map_individual}: An object of class \code{mapview} showing the individual-level
@@ -229,10 +227,10 @@ extract the raw results at pixel level.
 Since multiple blocks can be analyzed, the length of arguments \code{grid},
 \code{nrow}, \code{ncol}, \code{buffer_edge}, , \code{buffer_col}, \code{buffer_row}, \code{segment_plot},
 \verb{segment_i, ndividuals}, \code{includ_if}, \code{threshold}, \code{segment_index}, \code{invert},
-\code{filter}, \code{threshold}, \code{lower_size}, \code{upper_size}, and \code{lower_noise}, can be
-either an scalar (the same argument applied to all the drawn blocks), or a
-vector with the same length as the number of drawn. In the last, each block
-can be analyzed with different arguments.
+\code{filter}, \code{threshold}, \code{lower_size}, \code{upper_size}, \code{watershed}, and
+\code{lower_noise}, can be either an scalar (the same argument applied to all the
+drawn blocks), or a vector with the same length as the number of drawn. In
+the last, each block can be analyzed with different arguments.
 
 When \code{segment_individuals = TRUE} is enabled, individuals are included within
 each plot based on the \code{include_if} argument. The default value
