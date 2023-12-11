@@ -126,12 +126,16 @@ measure the distance between plants within each plot. The first step is
 to build the plots. By default a grid (`grid = TRUE`) is build according
 to the `nrow` and `ncol` arguments. In this step, use the “Drawn
 polygon” button to drawn a polygon that defines the area to be analyzed.
-After drawing the polygon, click “Done”.
+After drawing the polygon, click “Done”. To reproduce, download the
+[rice_ex.tif
+mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif),
+save it within the current working directory, and follow the scripts
+below.
 
 ``` r
 library(pliman)
-url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif"
-mosaic <- mosaic_input(url)
+set_wd_here() # set the directory to the file location
+mosaic <- mosaic_input("rice_ex.tif")
 
 res <- 
   mosaic_analyze(mosaic,
@@ -180,6 +184,7 @@ scripts below.
 
 ``` r
 library(pliman)
+set_wd_here() # set the directory to the file location
 # Import the mosaic
 mosaic <- mosaic_input("rice_ex.tif")
 # Import the shapefile
@@ -211,25 +216,22 @@ In this example, a multispectral orthomosaic originally available
 is used to show how `mosaic_analyze()` can be used to compute the plot
 coverage and statistics such as min, mean, and max values of three
 multispectral indexes (NDVI, EVI, and NDRE) using a design that includes
-6 rows and 15 plots per row. Note how two plots were removed during the
-live editing step.
+6 rows and 15 plots per row. To reproduce, download the
+[orthomosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif),
+save it within the current workind directory, and follow the tutorial
+below.
 
 ``` r
 library(pliman)
-url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif"
-mosaic <- mosaic_input(url)
-
-url_shp <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu_shp.shp"
-shapefile <- shapefile_input(url_shp)
+set_wd_here() # set the directory to the file location
+mosaic <- mosaic_input("ndsu.tif")
 
 res <- 
   mosaic_analyze(mosaic,
-                 shapefile = shapefile,
-                 # the following arguments can be ignored when a shapefile is provided
-                 # nrow = 3,  # use 6 if you want to analyze in a single block
-                 # ncol = 15,
-                 # buffer_row = -0.15,
-                 # buffer_col = -0.05,
+                 nrow = 3,  # use 6 if you want to analyze in a single block
+                 ncol = 15,
+                 buffer_row = -0.15,
+                 buffer_col = -0.05,
                  segment_plot = TRUE,
                  segment_index = "NDVI", 
                  plot_index = c("NDVI", "EVI", "NDRE"), 
@@ -238,14 +240,33 @@ res <-
 res$map_plot
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/coverage.png?raw=true)
-
-See how this plot was produced in [this
-video](https://www.linkedin.com/feed/update/urn:li:activity:7130585323574607872/)
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
 
 ## Counting and measuring plants within plots
 
-In this example,
+Here, I used `mosaic_analyze()` to count, measure, and extract image
+indexes at block, plot, and individual levels using an orthomosaic from
+a lettuce trial available in [this
+paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0274731).
+By using `segment_individuals = TRUE`, a deeper analysis is performed at
+individual levels, which enables counting and measuring the plants
+within plots. To reproduce, download the [lettuce
+mosaic](https://github.com/TiagoOlivoto/images/blob/master/pliman/lettuce/lettuce.tif),
+and follow the tutorial below.
+
+``` r
+library(pliman)
+set_wd_here() # set the directory to the file location
+mo <- mosaic_input("lettuce.tif")
+indexes <- c("NGRDI", "GLI", "SCI", "BI", "VARI", "EXG", "MGVRI")
+# draw four blocks of 12 plots
+an <- mosaic_analyze(mo,
+           r = 1, g = 2, b = 3,
+           nrow = 12,
+           segment_individuals = TRUE,
+           segment_index = "NGRDI",
+           plot_index = indexes)
+```
 
 ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
 
@@ -278,7 +299,7 @@ measure_disease(img = img,
                 plot = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 ``` r
 sev$severity
@@ -349,9 +370,6 @@ Please note that the pliman project is released with a [Contributor Code
 of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
 
-<div align="center">
-
-<a href='https://www.free-website-hit-counter.com'><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" alt="Free Website Hit Counter" border="0"/></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free
-website hit counter</a></small>
-
-</div>
+<!-- ::: {align="center"} -->
+<!-- <a href='https://www.free-website-hit-counter.com'><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" alt="Free Website Hit Counter" border="0"/></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free website hit counter</a></small> -->
+<!-- ::: -->
