@@ -111,19 +111,15 @@ res$map_indiv
 
 
 ### Using an external shapefile
-When shapefile is provided there is no need to build the plots, since the function will analyze the mosaic assuming the geometries provided by the shapefile.
+When a shapefile is provided there is no need to build the plots, since the function will analyze the mosaic assuming the geometries provided by the shapefile. To reproduce, download the [mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif) and [shapefile](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex_shp.rds) needed, save them within the current working directory and follow the scripts below.
 
 
-```{r warning=FALSE}
+```{r eval=FALSE}
 library(pliman)
 # Import the mosaic
-url <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif"
-mosaic <- mosaic_input(url)
-
+mosaic <- mosaic_input("rice_ex.tif")
 # Import the shapefile
-url_shp <- "https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex_shp.shp"
-shapefile <- shapefile_input(url_shp)
-shapefile_plot(shapefile)
+shapefile <- shapefile_input("rice_ex_shp.rds")
 
 # analyze the mosaic using the shapefile
 res <- 
@@ -143,6 +139,7 @@ str(res$result_plot_summ)
 # individua-level results
 str(res$result_indiv)
 ```
+
 
 
 
@@ -180,7 +177,10 @@ See how this plot was produced in [this video](https://www.linkedin.com/feed/upd
 
 
 ## Counting and measuring plants within plots
-In this example,
+In this example, 
+
+
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
 
 
 # Disease severity
