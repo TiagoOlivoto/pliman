@@ -14,7 +14,7 @@ shapefile_export(shapefile, filename, ...)
 shapefile_view(
   shapefile,
   attribute = NULL,
-  color_regions = custom_palette(c("red", "yellow", "green")),
+  color_regions = custom_palette(c("red", "yellow", "forestgreen")),
   ...
 )
 }

@@ -22,7 +22,7 @@ mosaic_view(
   downsample = NULL,
   alpha = 1,
   quantiles = c(0, 1),
-  color_regions = custom_palette(),
+  color_regions = custom_palette(c("red", "yellow", "forestgreen")),
   axes = FALSE,
   ...
 )

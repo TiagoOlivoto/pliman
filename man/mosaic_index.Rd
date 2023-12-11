@@ -4,7 +4,16 @@
 \alias{mosaic_index}
 \title{Mosaic Index}
 \usage{
-mosaic_index(mosaic, index = "R", r = 3, g = 2, b = 1, re = 4, nir = 5)
+mosaic_index(
+  mosaic,
+  index = "R",
+  r = 3,
+  g = 2,
+  b = 1,
+  re = 4,
+  nir = 5,
+  plot = TRUE
+)
 }
 \arguments{
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
@@ -25,6 +34,8 @@ mosaic's layers (ex., "(band_1 + band_2) / 2").}
 \item{re}{The layer for the Red-edge band (default: 4).}
 
 \item{nir}{The layer for the Near-infrared band(default: 5).}
+
+\item{plot}{Plot the computed index? Defaults to \code{TRUE}.}
 }
 \value{
 An index layer extracted/computed from the mosaic raster.
@@ -43,7 +54,7 @@ indices. The resulting index layer is returned as an \code{SpatRaster} object.
 library(pliman)
 mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
 names(mosaic)
-elev2 <- mosaic_index(mosaic, "elevation * 5")
+elev2 <- mosaic_index(mosaic, "elevation * 5", plot = FALSE)
 oldpar <- par(no.readonly=TRUE)
 par(mfrow=c(1,2))
 

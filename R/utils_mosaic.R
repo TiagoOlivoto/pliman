@@ -833,7 +833,8 @@ mosaic_analyze <- function(mosaic,
                          g = g,
                          b = b,
                          re = re,
-                         nir = nir)
+                         nir = nir,
+                         plot = FALSE)
           })
       )
     )
@@ -976,6 +977,7 @@ mosaic_analyze <- function(mosaic,
         ifelse(!is.null(lower_size[j]),
                gridindiv <- gridindiv[gridindiv$area > lower_size[j], ],
                gridindiv <- gridindiv[gridindiv$area > mean(gridindiv$area) * lower_noise[j], ])
+
         if(!is.null(upper_size[j])){
           gridindiv <- gridindiv[gridindiv$area < upper_size[j], ]
         }
@@ -1493,7 +1495,6 @@ mosaic_analyze <- function(mosaic,
 #' @importFrom poorman summarise across mutate arrange left_join bind_cols
 #'   bind_rows contains ends_with everything between pivot_longer pivot_wider
 #'   where select filter relocate rename
-#' @importFrom htmlwidgets JS
 #' @examples
 #' if(interactive()){
 #' library(pliman)
@@ -1526,7 +1527,7 @@ mosaic_view <- function(mosaic,
                         downsample = NULL,
                         alpha = 1,
                         quantiles = c(0, 1),
-                        color_regions = custom_palette(),
+                        color_regions = custom_palette(c("red", "yellow", "forestgreen")),
                         axes = FALSE,
                         ...){
   terra::terraOptions(progress = 0)
@@ -1557,12 +1558,12 @@ mosaic_view <- function(mosaic,
     message("The number of pixels is too high, which might slow the rendering process.")
   }
   dwspf <- find_aggrfact(mosaic, max_pixels = max_pixels)
-  if(downsample > 0 & is.null(downsample)){
+  if(dwspf > 0 & is.null(downsample)){
     message(paste0("Using downsample = ", dwspf, " so that the number of rendered pixels approximates the `max_pixels`"))
     mosaic <- terra::aggregate(mosaic, fact = dwspf)
   }
   if(viewopt == "index" & terra::nlyr(mosaic) > 2){
-    mosaic <- mosaic_index(mosaic, index = index)
+    mosaic <- mosaic_index(mosaic, index = index, plot = FALSE)
   }
   if(viewopt == "rgb"){
     if(terra::nlyr(mosaic) > 2){
@@ -1966,7 +1967,7 @@ shapefile_export <- function(shapefile, filename, ...) {
 #' @export
 shapefile_view <- function(shapefile,
                            attribute = NULL,
-                           color_regions = custom_palette(c("red", "yellow", "green")),
+                           color_regions = custom_palette(c("red", "yellow", "forestgreen")),
                            ...){
   suppressWarnings(
     mapview::mapview(shapefile,
@@ -2067,6 +2068,7 @@ mosaic_crop <- function(mosaic,
 #'   indexes, respectively. Users can also calculate their own index using  `R,
 #'   G, B, RE, and NIR` bands (eg., `index = "R+B/G"`) or using the names of the
 #'   mosaic's layers (ex., "(band_1 + band_2) / 2").
+#' @param plot Plot the computed index? Defaults to `TRUE`.
 #' @return An index layer extracted/computed from the mosaic raster.
 #'
 #' @details This function computes or extracts an index layer from the input
@@ -2079,7 +2081,7 @@ mosaic_crop <- function(mosaic,
 #' library(pliman)
 #' mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
 #' names(mosaic)
-#' elev2 <- mosaic_index(mosaic, "elevation * 5")
+#' elev2 <- mosaic_index(mosaic, "elevation * 5", plot = FALSE)
 #' oldpar <- par(no.readonly=TRUE)
 #' par(mfrow=c(1,2))
 #'
@@ -2095,7 +2097,8 @@ mosaic_index <- function(mosaic,
                          g = 2,
                          b = 1,
                          re = 4,
-                         nir = 5){
+                         nir = 5,
+                         plot = TRUE){
   if(inherits(mosaic, "Image")){
     ras <- t(terra::rast(mosaic@.Data))
   } else{
@@ -2137,6 +2140,9 @@ mosaic_index <- function(mosaic,
   } else{
     suppressWarnings(terra::crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
   }
+  if(plot){
+    terra::plot(mosaic_gray)
+  }
   invisible(mosaic_gray)
 }
 
@@ -2176,7 +2182,8 @@ mosaic_segment <- function(mosaic,
                       g = g,
                       b = b,
                       re = re,
-                      nir = nir)
+                      nir = nir,
+                      plot = FALSE)
   thresh <- ifelse(threshold == "Otsu", otsu(na.omit(terra::values(ind)[, index])), threshold)
   if(invert){
     mask <- ind[[index]] < thresh
@@ -2491,7 +2498,8 @@ mosaic_draw <- function(mosaic,
                          g = g,
                          b = b,
                          re = re,
-                         nir = nir)
+                         nir = nir,
+                         plot = FALSE)
           })
       )
     )

@@ -36,14 +36,10 @@ install.packages("pliman")
 
 ```
 
-The development version of `pliman` can be installed from [GitHub](https://github.com/TiagoOlivoto/pliman) with:
+The development version of `pliman` can be installed from [GitHub](https://github.com/TiagoOlivoto/pliman) using the [pak](https://github.com/r-lib/pak) package:
 
 ```{r, eval=FALSE}
-devtools::install_github("TiagoOlivoto/pliman")
-
-# To build the HTML vignette use
-devtools::install_github("TiagoOlivoto/pliman", build_vignettes = TRUE)
-
+pak::pak("TiagoOlivoto/pliman")
 ```
 
 *Note*: If you are a Windows user, you should also first download and install the latest version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
@@ -181,6 +177,10 @@ res$map_plot
 ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/coverage.png?raw=true)
 
 See how this plot was produced in [this video](https://www.linkedin.com/feed/update/urn:li:activity:7130585323574607872/)
+
+
+## Counting and measuring plants within plots
+In this example,
 
 
 # Disease severity
