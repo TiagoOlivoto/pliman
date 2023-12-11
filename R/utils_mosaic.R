@@ -2109,10 +2109,10 @@ mosaic_index <- function(mosaic,
     message(paste("Index '", index, "' is not available. Trying to compute your own index.",
                   sep = ""))
   }
-  if(!any(index  %in% ind$Index) & !any(index  %in% c("R", "G", "B", "RE", "NIR"))){
+  pattern <- "\\b\\w+\\b"
+  layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
+  if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR"))){
     # Extract individual layers based on the expression
-    pattern <- "\\b\\w+\\b"
-    layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
     layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
     layers <-
       lapply(layers_used, function(x){
@@ -2145,7 +2145,6 @@ mosaic_index <- function(mosaic,
   }
   invisible(mosaic_gray)
 }
-
 
 #' Segment a mosaic
 #'
