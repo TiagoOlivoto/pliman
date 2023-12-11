@@ -115,9 +115,68 @@ plot(flax, measure = "length")
 
 # Analyzing orthomosaics
 
-## Counting and measuring distance betwen plants
+## Counting and measuring plants within plots
 
-### Building the plots
+Here, I used `mosaic_analyze()` to count, measure, and extract image
+indexes at block, plot, and individual levels using an orthomosaic from
+a lettuce trial available in [this
+paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0274731).
+By using `segment_individuals = TRUE`, a deeper analysis is performed at
+individual levels, which enables counting and measuring the plants
+within plots. To reproduce, download the [lettuce
+mosaic](https://github.com/TiagoOlivoto/images/blob/master/pliman/lettuce/lettuce.tif?raw=true),
+and follow the tutorial below.
+
+``` r
+library(pliman)
+set_wd_here() # set the directory to the file location
+mo <- mosaic_input("lettuce.tif")
+indexes <- c("NGRDI", "GLI", "SCI", "BI", "VARI", "EXG", "MGVRI")
+# draw four blocks of 12 plots
+an <- mosaic_analyze(mo,
+           r = 1, g = 2, b = 3,
+           nrow = 12,
+           segment_individuals = TRUE,
+           segment_index = "NGRDI",
+           plot_index = indexes)
+```
+
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
+
+## Canopy coverage and multispectral indexes
+
+In this example, a multispectral orthomosaic originally available
+[here](https://github.com/diegojgris/draw-plots-qgis/blob/main/sampledata/MicaSenseMXRed_5bands.tif)
+is used to show how `mosaic_analyze()` can be used to compute the plot
+coverage and statistics such as min, mean, and max values of three
+multispectral indexes (NDVI, EVI, and NDRE) using a design that includes
+6 rows and 15 plots per row. To reproduce, download the
+[orthomosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif?raw=true),
+save it within the current workind directory, and follow the tutorial
+below.
+
+``` r
+library(pliman)
+set_wd_here() # set the directory to the file location
+mosaic <- mosaic_input("ndsu.tif")
+
+res <- 
+  mosaic_analyze(mosaic,
+                 nrow = 3,  # use 6 if you want to analyze in a single block
+                 ncol = 15,
+                 buffer_row = -0.15,
+                 buffer_col = -0.05,
+                 segment_plot = TRUE,
+                 segment_index = "NDVI", 
+                 plot_index = c("NDVI", "EVI", "NDRE"), 
+                 summarize_fun = c("min", "mean", "max"),
+                 attribute = "coverage")
+res$map_plot
+```
+
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
+
+## Counting and measuring distance betwen plants
 
 In this example, an RGB orthomosaic from a rice field originally
 available [here](https://github.com/aipal-nchu/RiceSeedlingDataset) is
@@ -126,10 +185,22 @@ measure the distance between plants within each plot. The first step is
 to build the plots. By default a grid (`grid = TRUE`) is build according
 to the `nrow` and `ncol` arguments. In this step, use the “Drawn
 polygon” button to drawn a polygon that defines the area to be analyzed.
-After drawing the polygon, click “Done”. To reproduce, download the
-[rice_ex.tif
-mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif),
-save it within the current working directory, and follow the scripts
+After drawing the polygon, click “Done”. When the argument
+`check_shapefile = TRUE` (default) is used, users can check if the plots
+were correctly drawn. In this step, it is also possible to a live
+edition of the plots by clicking on “edit layers” button. After the
+changes are made, don’t forget to click “Save”. To remove any plot, just
+click on “Delete layers” button, followed by “Save”. After all the
+editions are made, click “Done”. The function will follow the mosaic
+analysis using the edited shapefile. After the mosaic has been analyzed,
+a plot is produced by default. In this plot, individuals are highlighted
+with a color scale showing the area of each individual. The results on
+both plot- and individual level are stored in data frames that can be
+easily exported for further analysis
+
+To reproduce, download the [rice_ex.tif
+mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif?raw=true),
+save it within the current working directory, and follow the tutorial
 below.
 
 ``` r
@@ -147,38 +218,16 @@ res <-
                  map_individuals = TRUE)
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/build_plots.png?raw=true)
-
-When the argument `check_shapefile = TRUE` (default) is used, users can
-check if the plots were correctly drawn. In this step, it is also
-possible to a live edition of the plots by clicking on “edit layers”
-button. After the changes are made, don’t forget to click “Save”. To
-remove any plot, just click on “Delete layers” button, followed by
-“Save”. After all the editions are made, click “Done”. The function will
-follow the mosaic analysis using the edited shapefile.
-
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/drawn_plots.png?raw=true)
-
-After the mosaic has been analyzed, a plot is produced by default. In
-this plot, individuals are highlighted with a color scale showing the
-area of each individual. The results on both plot- and individual level
-are stored in data frames that can be easily exported for further
-analysis
-
-``` r
-res$map_indiv
-```
-
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/results.png?raw=true)
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true)
 
 ### Using an external shapefile
 
 When a shapefile is provided there is no need to build the plots, since
 the function will analyze the mosaic assuming the geometries provided by
 the shapefile. To reproduce, download the
-[mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif)
+[mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif?raw=true)
 and
-[shapefile](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex_shp.rds)
+[shapefile](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex_shp.rds?raw=true)
 needed, save them within the current working directory and follow the
 scripts below.
 
@@ -209,67 +258,6 @@ str(res$result_plot_summ)
 str(res$result_indiv)
 ```
 
-## Canopy coverage and multispectral indexes
-
-In this example, a multispectral orthomosaic originally available
-[here](https://github.com/diegojgris/draw-plots-qgis/blob/main/sampledata/MicaSenseMXRed_5bands.tif)
-is used to show how `mosaic_analyze()` can be used to compute the plot
-coverage and statistics such as min, mean, and max values of three
-multispectral indexes (NDVI, EVI, and NDRE) using a design that includes
-6 rows and 15 plots per row. To reproduce, download the
-[orthomosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/NDSU/ndsu.tif),
-save it within the current workind directory, and follow the tutorial
-below.
-
-``` r
-library(pliman)
-set_wd_here() # set the directory to the file location
-mosaic <- mosaic_input("ndsu.tif")
-
-res <- 
-  mosaic_analyze(mosaic,
-                 nrow = 3,  # use 6 if you want to analyze in a single block
-                 ncol = 15,
-                 buffer_row = -0.15,
-                 buffer_col = -0.05,
-                 segment_plot = TRUE,
-                 segment_index = "NDVI", 
-                 plot_index = c("NDVI", "EVI", "NDRE"), 
-                 summarize_fun = c("min", "mean", "max"),
-                 attribute = "coverage")
-res$map_plot
-```
-
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
-
-## Counting and measuring plants within plots
-
-Here, I used `mosaic_analyze()` to count, measure, and extract image
-indexes at block, plot, and individual levels using an orthomosaic from
-a lettuce trial available in [this
-paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0274731).
-By using `segment_individuals = TRUE`, a deeper analysis is performed at
-individual levels, which enables counting and measuring the plants
-within plots. To reproduce, download the [lettuce
-mosaic](https://github.com/TiagoOlivoto/images/blob/master/pliman/lettuce/lettuce.tif),
-and follow the tutorial below.
-
-``` r
-library(pliman)
-set_wd_here() # set the directory to the file location
-mo <- mosaic_input("lettuce.tif")
-indexes <- c("NGRDI", "GLI", "SCI", "BI", "VARI", "EXG", "MGVRI")
-# draw four blocks of 12 plots
-an <- mosaic_analyze(mo,
-           r = 1, g = 2, b = 3,
-           nrow = 12,
-           segment_individuals = TRUE,
-           segment_index = "NGRDI",
-           plot_index = indexes)
-```
-
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
-
 # Disease severity
 
 ## Using image indexes
@@ -299,7 +287,7 @@ measure_disease(img = img,
                 plot = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ``` r
 sev$severity
@@ -369,7 +357,3 @@ making {pliman} even better!
 Please note that the pliman project is released with a [Contributor Code
 of Conduct](https://tiagoolivoto.github.io/pliman/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
-
-<!-- ::: {align="center"} -->
-<!-- <a href='https://www.free-website-hit-counter.com'><img src="https://www.free-website-hit-counter.com/c.php?d=9&amp;id=144207&amp;s=2" alt="Free Website Hit Counter" border="0"/></a><br/><small><a href='https://www.free-website-hit-counter.com' title="Free Website Hit Counter">Free website hit counter</a></small> -->
-<!-- ::: -->
