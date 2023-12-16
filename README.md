@@ -141,7 +141,7 @@ an <- mosaic_analyze(mo,
            plot_index = indexes)
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true) -->
 
 ## Canopy coverage and multispectral indexes
 
@@ -174,7 +174,7 @@ res <-
 res$map_plot
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true) -->
 
 ## Counting and measuring distance betwen plants
 
@@ -218,7 +218,7 @@ res <-
                  map_individuals = TRUE)
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true) -->
 
 ### Using an external shapefile
 

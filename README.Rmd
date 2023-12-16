@@ -92,7 +92,7 @@ an <- mosaic_analyze(mo,
 ```
 
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true) -->
 
 
 ## Canopy coverage and multispectral indexes
@@ -118,7 +118,7 @@ res$map_plot
 
 ```
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true) -->
 
 
 
@@ -147,7 +147,7 @@ res <-
 
 
 
-![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true)
+<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true) -->
 
 ### Using an external shapefile
 When a shapefile is provided there is no need to build the plots, since the function will analyze the mosaic assuming the geometries provided by the shapefile. To reproduce, download the [mosaic](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex.tif?raw=true) and [shapefile](https://github.com/TiagoOlivoto/images/raw/master/pliman/rice_field/rice_ex_shp.rds?raw=true) needed, save them within the current working directory and follow the scripts below.
