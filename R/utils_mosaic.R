@@ -215,6 +215,7 @@ idw_interpolation <- function(mosaic, points){
 #'   .shp, .rds) and convert the imported shapefile to an sf object.
 #' @param method One of "bilinear" (default), "loess" (local regression) or
 #'   "idw" (Inverse Distance Weighting).
+#' @importFrom stats loess
 #'
 #' @return An `SpatRaster` object with the same extend and crs from `mosaic`
 #' @export
