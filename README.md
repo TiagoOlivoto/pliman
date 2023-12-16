@@ -49,7 +49,7 @@ The development version of `pliman` can be installed from
 [pak](https://github.com/r-lib/pak) package:
 
 ``` r
-pak::z("TiagoOlivoto/pliman")
+pak::pkg_install("TiagoOlivoto/pliman")
 ```
 
 *Note*: If you are a Windows user, you should also first download and
