@@ -49,7 +49,7 @@ The development version of `pliman` can be installed from
 [pak](https://github.com/r-lib/pak) package:
 
 ``` r
-pak::pak("TiagoOlivoto/pliman")
+pak::z("TiagoOlivoto/pliman")
 ```
 
 *Note*: If you are a Windows user, you should also first download and
@@ -141,7 +141,7 @@ an <- mosaic_analyze(mo,
            plot_index = indexes)
 ```
 
-<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true) -->
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_mosaico.gif?raw=true)
 
 ## Canopy coverage and multispectral indexes
 
@@ -174,7 +174,7 @@ res <-
 res$map_plot
 ```
 
-<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true) -->
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_ndsu.gif?raw=true)
 
 ## Counting and measuring distance betwen plants
 
@@ -218,7 +218,7 @@ res <-
                  map_individuals = TRUE)
 ```
 
-<!-- ![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true) -->
+![](https://github.com/TiagoOlivoto/images/blob/master/pliman/analise_rice.gif?raw=true)
 
 ### Using an external shapefile
 
