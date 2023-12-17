@@ -1328,32 +1328,17 @@ mosaic_analyze <- function(mosaic,
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
-    if(any(segment_individuals)){
-      dfplot <- result_plot_summ
-    } else{
-      dfplot <- results
-    }
     if(nlyrs < 3){
-      map <-
+      basemap <-
         mapview::mapview(mosaiccr,
                          maxpixels = 60000000,
                          legend = FALSE,
                          map.types = "CartoDB.Positron",
                          alpha.regions = 1,
                          na.color = "transparent",
-                         verbose = FALSE) +
-        suppressWarnings(
-          mapview::mapview(dfplot,
-                           zcol = attribute,
-                           layer.name = attribute,
-                           col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
-                           alpha.regions = 0.75,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE)
-        )
+                         verbose = FALSE)
     } else{
-      map <-
+      basemap <-
         mapview::viewRGB(
           as(mosaiccr, "Raster"),
           layer.name = "base",
@@ -1363,72 +1348,44 @@ mosaic_analyze <- function(mosaic,
           na.color = "#00000000",
           maxpixels = 60000000,
           quantiles = quantiles
-        ) +
-        suppressWarnings(
-          mapview::mapview(dfplot,
-                           zcol = attribute,
-                           layer.name = attribute,
-                           col.regions = custom_palette(c("red", "yellow", "darkgreen"), n = 3),
-                           alpha.regions = 0.75,
-                           na.color = "#00000000",
-                           maxBytes = 64 * 1024 * 1024,
-                           verbose = FALSE)
         )
     }
-
+    if(any(segment_individuals)){
+      dfplot <- result_plot_summ
+    } else{
+      dfplot <- results
+    }
+    map <-
+      basemap +
+      suppressWarnings(
+        mapview::mapview(dfplot,
+                         zcol = attribute,
+                         layer.name = attribute,
+                         col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
+                         alpha.regions = 0.75,
+                         na.color = "#00000000",
+                         maxBytes = 64 * 1024 * 1024,
+                         verbose = FALSE)
+      )
 
     if(any(segment_individuals)){
       attribute <- ifelse(!attribute %in% colnames(result_indiv), "area", attribute)
-      if(nlyrs < 3){
-        mapindivid <-
-          mapview::mapview(mosaiccr,
-                           maxpixels = 60000000,
+      mapindivid <-
+        basemap +
+        suppressWarnings(
+          mapview::mapview(result_plot_summ,
                            legend = FALSE,
-                           map.types = "CartoDB.Positron",
-                           alpha.regions = 1,
-                           na.color = "transparent",
-                           verbose = FALSE) +
-          suppressWarnings(
-            mapview::mapview(result_plot_summ,
-                             legend = FALSE,
-                             alpha.regions = 0.4,
-                             zcol = "block",
-                             map.types = "OpenStreetMap") +
-              mapview::mapview(result_indiv,
-                               zcol = attribute,
-                               layer.name = attribute,
-                               col.regions = color_regions,
-                               alpha.regions = alpha,
-                               na.color = "#00000000",
-                               maxBytes = 64 * 1024 * 1024,
-                               verbose = FALSE))
-      } else{
-        mapindivid <-
-          mapview::viewRGB(
-            as(mosaiccr, "Raster"),
-            layer.name = "base",
-            r = r,
-            g = g,
-            b = b,
-            na.color = "#00000000",
-            maxpixels = 60000000,
-            quantiles = quantiles,
-          ) +
-          suppressWarnings(
-            mapview::mapview(result_plot_summ,
-                             legend = FALSE,
-                             alpha.regions = 0.4,
-                             zcol = "block",
-                             map.types = "OpenStreetMap") +
-              mapview::mapview(result_indiv,
-                               zcol = attribute,
-                               layer.name = attribute,
-                               col.regions = color_regions,
-                               alpha.regions = alpha,
-                               na.color = "#00000000",
-                               maxBytes = 64 * 1024 * 1024,
-                               verbose = FALSE))
-      }
+                           alpha.regions = 0.4,
+                           zcol = "block",
+                           map.types = "OpenStreetMap") +
+            mapview::mapview(result_indiv,
+                             zcol = attribute,
+                             layer.name = attribute,
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE))
     } else{
       mapindivid <- NULL
     }
@@ -1448,6 +1405,190 @@ mosaic_analyze <- function(mosaic,
               shapefile = created_shapes))
 }
 
+#' Analyze mosaics iteratively
+#'
+#' High-resolution mosaics can take a significant amount of time to analyze,
+#' especially when `segment_individuals = TRUE` is used in mosaic_analyze().
+#' This is because the function needs to create in-memory arrays to segment
+#' individual using the watershed algorithm. This process utilizes a for-loop
+#' approach, iteratively analyzing each shape within the mosaic one at a time.
+#' To speed up processing, the function crops the original mosaic to the extent
+#' of the current shape before analyzing it. This reduces the resolution for
+#' that specific analysis, sacrificing some detail for faster processing.
+#'
+#' @inheritParams mosaic_analyze
+#' @param ... Further arguments passed on to [mosaic_analyze()]
+#'
+#' @return A list containing the following objects:
+#' * `result_plot`: The results at a plot level.
+#' *  `result_plot_summ`: The summary of results at a plot level. When
+#'  `segment_individuals = TRUE`, the number of individuals, canopy coverage,
+#'  and mean values of some shape statistics such as perimeter, length, width,
+#'  and diameter are computed.
+#' * `result_individ`: The results at an individual level.
+#' * `map_plot`: An object of class `mapview` showing the plot-level results.
+#' * `map_individual`: An object of class `mapview` showing the individual-level
+#'   results.
+#' @export
+#'
+mosaic_analyze_iter <- function(mosaic,
+                                shapefile,
+                                r = 3,
+                                g = 2,
+                                b = 1,
+                                plot = TRUE,
+                                verbose = TRUE,
+                                max_pixels = 3e6,
+                                attribute = "area",
+                                alpha = 0.75,
+                                segment_individuals = FALSE,
+                                segment_index = "VARI",
+                                plot_index =  "VARI",
+                                quantiles = c(0, 1),
+                                ...){
+  bind <- list()
+  for (i in 1:nrow(shapefile)) {
+    if(verbose){
+      cat("\014","\nAnalyzing plot", i, "\n")
+    }
+    bind[[paste0("P", leading_zeros(i, 4))]] <-
+      mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
+                     build_shapefile = FALSE,
+                     r = r, g = g, b = b,
+                     shapefile = shapefile[i, ],
+                     grid = FALSE,
+                     segment_individuals = segment_individuals,
+                     segment_index = segment_index,
+                     plot_index = plot_index,
+                     plot = FALSE,
+                     verbose = FALSE,
+                     ...)
+  }
+  if(is.null(bind[[1]]$result_individ_map)){
+    result_individ_map <- NULL
+  }
+  if(is.null(bind[[1]]$result_indiv)){
+    result_indiv <- result_plot_summ <- NULL
+  } else{
+    result_indiv <- poorman::bind_rows(
+      lapply(bind, function(x){
+        tmp <- x$result_indiv
+        tmp$plot_id <- NULL
+        tmp
+      }),
+      .id = "plot_id"
+    ) |>
+      poorman::relocate(plot_id, .after = block) |>
+      sf::st_as_sf()
+
+    result_plot_summ <- poorman::bind_rows(
+      lapply(bind, function(x){
+        tmp <- x$result_plot_summ
+        tmp$plot_id <- NULL
+        tmp
+      }),
+      .id = "plot_id"
+    ) |>
+      poorman::relocate(plot_id, .after = block) |>
+      sf::st_as_sf()
+  }
+
+  result_plot <- poorman::bind_rows(
+    lapply(bind, function(x){
+      tmp <- x$result_plot
+      tmp$plot_id <- NULL
+      tmp
+    }),
+    .id = "plot_id"
+  ) |>
+    poorman::relocate(plot_id, .after = block) |>
+    sf::st_as_sf()
+
+
+
+  if(isTRUE(plot)){
+    if(verbose){
+      cat("\014","\nPreparing to plot...\n")
+    }
+    if(terra::nlyr(mosaic) < 3){
+      basemap <-
+        suppressWarnings(
+          mapview::mapview(mosaic,
+                           maxpixels = 5e6,
+                           legend = FALSE,
+                           map.types = "CartoDB.Positron",
+                           alpha.regions = 1,
+                           na.color = "transparent",
+                           verbose = FALSE)
+        )
+    } else{
+      basemap <-
+        suppressWarnings(
+          mapview::viewRGB(
+            as(mosaic, "Raster"),
+            layer.name = "base",
+            r = r,
+            g = g,
+            b = b,
+            na.color = "#00000000",
+            maxpixels = 5e6,
+            quantiles = quantiles
+          )
+        )
+    }
+    if(!is.null(result_indiv)){
+      dfplot <- result_plot_summ
+    } else{
+      dfplot <- result_plot
+    }
+    # plot level
+    map <-
+      basemap +
+      suppressWarnings(
+        mapview::mapview(dfplot,
+                         zcol = attribute,
+                         layer.name = attribute,
+                         col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
+                         alpha.regions = 0.75,
+                         na.color = "#00000000",
+                         maxBytes = 64 * 1024 * 1024,
+                         verbose = FALSE)
+      )
+    # individual plot
+    if(!is.null(result_indiv)){
+      mapindivid <-
+        basemap +
+        suppressWarnings(
+          mapview::mapview(result_plot_summ,
+                           alpha.regions = 0.4,
+                           zcol = attribute,
+                           col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
+                           map.types = "OpenStreetMap") +
+            mapview::mapview(result_indiv,
+                             zcol = ifelse(!attribute %in% colnames(result_indiv), "area", attribute),
+                             layer.name = ifelse(!attribute %in% colnames(result_indiv), "area", attribute),
+                             col.regions = color_regions,
+                             alpha.regions = alpha,
+                             na.color = "#00000000",
+                             maxBytes = 64 * 1024 * 1024,
+                             verbose = FALSE))
+    } else{
+      mapindivid <- NULL
+    }
+  } else{
+    map <- NULL
+    mapindivid <- NULL
+  }
+  if(verbose){
+    cat("\014","\nDone", i, "\n")
+  }
+  return(list(result_plot = result_plot,
+              result_plot_summ = result_plot_summ,
+              result_indiv = result_indiv,
+              result_individ_map = result_individ_map,
+              map_plot = map,
+              map_indiv = mapindivid))
+}
 
 
 
@@ -1855,6 +1996,22 @@ mosaic_plot <- function(mosaic, ...){
   terra::plot(mosaic, ...)
 }
 
+#' A wrapper around terra::plotRGB()
+#'
+#' Plot the RGB of a SpatRaster
+#'
+#' @param mosaic SpatRaster
+#' @param ... Further arguments passed on to [terra::plotRGB()].
+#'
+#' @return A `NULL` object
+#' @export
+#'
+mosaic_plot_rgb <- function(mosaic, ...){
+  if(!inherits(mosaic, "SpatRaster")){
+    stop("'mosaic' must be an object of class 'SpatRaster'")
+  }
+  terra::plotRGB(mosaic, ...)
+}
 
 #' A wrapper around terra::plot()
 #'
@@ -2137,7 +2294,9 @@ mosaic_index <- function(mosaic,
   }
   names(mosaic_gray) <- index
   if(!is.na(terra::crs(mosaic))){
-    suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
+    if(terra::crs(mosaic_gray) != terra::crs(mosaic)){
+      suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
+    }
   } else{
     suppressWarnings(terra::crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
   }
