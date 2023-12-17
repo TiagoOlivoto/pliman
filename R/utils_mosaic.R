@@ -1440,10 +1440,11 @@ mosaic_analyze_iter <- function(mosaic,
                                 verbose = TRUE,
                                 max_pixels = 3e6,
                                 attribute = "area",
-                                alpha = 0.75,
                                 segment_individuals = FALSE,
                                 segment_index = "VARI",
                                 plot_index =  "VARI",
+                                color_regions = rev(grDevices::terrain.colors(50)),
+                                alpha = 0.75,
                                 quantiles = c(0, 1),
                                 ...){
   bind <- list()

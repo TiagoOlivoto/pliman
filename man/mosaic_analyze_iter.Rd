@@ -14,10 +14,11 @@ mosaic_analyze_iter(
   verbose = TRUE,
   max_pixels = 3e+06,
   attribute = "area",
-  alpha = 0.75,
   segment_individuals = FALSE,
   segment_index = "VARI",
   plot_index = "VARI",
+  color_regions = rev(grDevices::terrain.colors(50)),
+  alpha = 0.75,
   quantiles = c(0, 1),
   ...
 )
@@ -45,8 +46,6 @@ for analysis.}
 
 \item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}. Defaults to the first \code{summary_fun} and first \code{segment_index}.}
 
-\item{alpha}{opacity of the fill color of the raster layer(s).}
-
 \item{segment_individuals}{Logical, indicating whether to segment individuals
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
 computed, and pixels with values below the \code{threshold} will be selected, and
@@ -60,6 +59,11 @@ single vegetation index (e.g., \code{"GLAI"}), a vector of indexes (e.g.,
 \code{c("GLAI", "NGRDI", "HUE")}), or a custom index based on the available
 bands (e.g., \code{"(R-B)/(R+B)"}). See \code{\link[=pliman_indexes]{pliman_indexes()}} and \code{\link[=image_index]{image_index()}}
 for more details.}
+
+\item{color_regions}{The color palette for regions (default:
+rev(grDevices::terrain.colors(50))).}
+
+\item{alpha}{opacity of the fill color of the raster layer(s).}
 
 \item{quantiles}{the upper and lower quantiles used for color stretching.}
 
