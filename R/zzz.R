@@ -36,7 +36,7 @@ NULL
 
 
 .onAttach <- function(libname, pkgname) {
-  vers <-  "2.1.0"
+  vers <-  "2.2.0"
   packageStartupMessage("|==========================================================|")
   packageStartupMessage("| Tools for Plant Image Analysis (pliman ", vers,  ")            |")
   packageStartupMessage("| Author: Tiago Olivoto                                    |")
@@ -55,7 +55,7 @@ if (getRversion() >= "2.15.1") {
       "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames", "s.radius.sd",
       "perimeter", "radius_max", "radius_mean", "radius_min", "radius_sd", "X1",
       "X2", "%dopar%", "i", "img", "plotn", "x", "leaf", "Band", "block", "mosaic",
-      "geometry", "n", "area_sum", "individual", "compute_downsample"))
+      "geometry", "n", "area_sum", "individual", "compute_downsample", "plot_id"))
 }
 
 

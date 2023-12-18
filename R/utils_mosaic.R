@@ -1252,7 +1252,6 @@ mosaic_analyze <- function(mosaic,
   # bind the results  ## at a level plot
   results <-
     do.call(rbind, lapply(results, function(x){x})) |>
-    # sf::st_sf() |>
     poorman::relocate(block, plot_id, .before = 1)
 
 
@@ -1262,7 +1261,6 @@ mosaic_analyze <- function(mosaic,
     blockid <- unique(result_indiv$block)
     summres <-
       lapply(1:length(blockid), function(i){
-        # tmp <-
         result_indiv |>
           poorman::filter(block == blockid[i]) |>
           as.data.frame() |>
@@ -1331,7 +1329,7 @@ mosaic_analyze <- function(mosaic,
     if(nlyrs < 3){
       basemap <-
         mapview::mapview(mosaiccr,
-                         maxpixels = 60000000,
+                         maxpixels = 5e6,
                          legend = FALSE,
                          map.types = "CartoDB.Positron",
                          alpha.regions = 1,
@@ -1454,15 +1452,16 @@ mosaic_analyze_iter <- function(mosaic,
     }
     bind[[paste0("P", leading_zeros(i, 4))]] <-
       mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
-                     build_shapefile = FALSE,
                      r = r, g = g, b = b,
                      shapefile = shapefile[i, ],
-                     grid = FALSE,
                      segment_individuals = segment_individuals,
                      segment_index = segment_index,
                      plot_index = plot_index,
+                     build_shapefile = FALSE,
                      plot = FALSE,
+                     grid = FALSE,
                      verbose = FALSE,
+                     crop_to_shape_ext = FALSE,
                      ...)
   }
   if(is.null(bind[[1]]$result_individ_map)){
@@ -2136,6 +2135,66 @@ shapefile_view <- function(shapefile,
   )
 }
 
+#' Edit Features in a Shapefile
+#'
+#' This function allows you to interactively edit features in a shapefile using
+#' the mapedit package.
+#'
+#' @param shapefile A shapefile (`sf` object) that can be created with
+#'   [shapefile_input()].
+#' @param mosaic Optionally, a mosaic (SpatRaster) to be displayed as a
+#'   background.
+#' @param r Red band index for RGB display (default is 3).
+#' @param g Green band index for RGB display (default is 2).
+#' @param b Blue band index for RGB display (default is 1).
+#' @param max_pixels Maximum number of pixels for down-sampling the mosaic
+#'   (default is 3e6).
+#' @export
+#' @return A modified shapefile with user-edited features.
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' shp <- shapefile_input(system.file("ex/lux.shp", package="terra"))
+#' edited <- shapefile_edit(shp)
+#' }
+shapefile_edit <- function(shapefile,
+                           mosaic = NULL,
+                           r = 3,
+                           g = 2,
+                           b = 1,
+                           max_pixels = 3e6){
+  shapefile <- shapefile_input(shapefile, info = FALSE)
+  if(!is.null(mosaic)){
+    downsample <- find_aggrfact(mosaic, max_pixels = max_pixels)
+    if(downsample > 0){
+      mosaic <- terra::aggregate(mosaic, fact = downsample, progress = FALSE)
+    }
+    nlyrs <- terra::nlyr(mosaic)
+    if(nlyrs > 2){
+      map <-
+        mapview::viewRGB(
+          x = as(mosaic, "Raster"),
+          layer.name = "base",
+          r = r,
+          g = g,
+          b = b,
+          na.color = "#00000000",
+          maxpixels = 5e6
+        )
+    } else{
+      map <-
+        mapview::mapview() %>%
+        leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
+                             colorOptions = leafem::colorOptions(palette = custom_palette(),
+                                                                 na.color = "transparent"))
+    }
+    edited <- mapedit::editFeatures(shapefile |> sf::st_transform(crs = 4326), map)
+  } else{
+    edited <- mapedit::editFeatures(shapefile)
+  }
+  return(edited)
+}
 
 
 #' Crop a mosaic
