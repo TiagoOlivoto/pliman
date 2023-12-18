@@ -2412,6 +2412,94 @@ mosaic_segment <- function(mosaic,
   terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
 }
 
+
+#' Segments a mosaic interactively
+#'
+#' The function segments a mosaic using an interative process where the user
+#' picks samples from background (eg., soil) and foreground (eg., plants).
+#'
+#' @inheritParams mosaic_analyze
+#' @param return The output of the function. Either 'mosaic' (the segmented
+#'   mosaic), or 'mask' (the binary mask).
+#'
+#' @return An `SpatRaster` object with the segmented `mosaic` (if `return =
+#'   'mosaic'`) or a mask (if `return = 'mask'`).
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#'  mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#'  seg <- mosaic_segment_pick(mosaic)
+#'  mosaic_plot(seg)
+#' }
+mosaic_segment_pick <- function(mosaic,
+                                g = 2,
+                                r = 3,
+                                b = 1,
+                                re = 4,
+                                nir = 5,
+                                max_pixels = 2e6,
+                                downsample = NULL,
+                                quantiles = c(0, 1),
+                                return = c("mosaic", "mask")){
+  if(!return[[1]] %in% c("mosaic", "mask")){
+    stop("'return' must be one of 'mosaic' or 'mask'.")
+  }
+  downsample <- ifelse(is.null(downsample), find_aggrfact(mosaic, max_pixels = max_pixels), downsample)
+  if(downsample > 0){
+    mosaic <- terra::aggregate(mosaic, downsample)
+  }
+  basemap <-
+    mosaic_view(mosaic,
+                r = r,
+                g = g,
+                b = b,
+                re = re,
+                nir = nir,
+                max_pixels = max_pixels,
+                downsample = downsample,
+                quantiles = quantiles)
+  soil <- mapedit::editMap(basemap,
+                           title = "Use the 'Draw Rectangle' tool to pick up background fractions",
+                           editor = "leafpm")$finished
+  soil <- soil |> sf::st_transform(sf::st_crs(mosaic))
+  soil_sample <-
+    exactextractr::exact_extract(mosaic, soil, progress = FALSE) |>
+    poorman::bind_rows() |>
+    poorman::select(-coverage_fraction) |>
+    poorman::mutate(class = 0)
+
+  mapview::mapview() |> mapedit::editMap()
+
+  plant <- mapedit::editMap(basemap,
+                            title = "Use the 'Draw Rectangle' tool to pick up foreground fractions",
+                            editor = "leafpm")$finished
+  plant <- plant |> sf::st_transform(sf::st_crs(mosaic))
+  plant_sample <-
+    exactextractr::exact_extract(mosaic, plant, progress = FALSE) |>
+    poorman::bind_rows() |>
+    poorman::select(-coverage_fraction) |>
+    poorman::mutate(class = 1)
+  df_train <- poorman::bind_rows(plant_sample, soil_sample)
+  if(ncol(df_train) == 2){
+    names(df_train)[[1]] <- names(mosaic)
+  }
+  mod <- suppressWarnings(
+    glm(class ~.,
+        data = df_train,
+        family = binomial("logit"))
+  )
+  mask <- terra::predict(mosaic, mod, type = "response")
+  mask[mask < 0.5] <- 0
+  mask[mask > 0.5] <- 1
+  if(return[[1]] == 'mosaic'){
+    terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+  } else{
+    mask
+  }
+}
+
+
 #' Mosaic to pliman
 #'
 #' Convert an `SpatRaster` object to a `Image` object with optional scaling.
