@@ -91,6 +91,10 @@
 #'   `index_dh`, respectively.
 #' @param invert Inverts the binary image if desired. This is useful to process
 #'   images with black background. Defaults to `FALSE`.
+#'@param lower_noise By default, lesions with lesser than 10% of the mean area
+#'  of all lesions are removed (`lower_noise = 0.1`). Increasing this value will
+#'  remove larger lesions. To define an explicit lower or upper size (in pixel
+#'  unit), use the `lower_size` and `upper_size` arguments.
 #' @param lower_size Lower limit for size for the image analysis. Leaf images
 #'   often contain dirt and dust. To prevent dust from affecting the image
 #'   analysis, the lower limit of analyzed size is set to 0.1, i.e., objects
@@ -227,6 +231,7 @@ measure_disease <- function(img,
                             has_white_bg = FALSE,
                             threshold = NULL,
                             invert = FALSE,
+                            lower_noise = 0.1,
                             lower_size = NULL,
                             upper_size = NULL,
                             topn_lower = NULL,
@@ -588,7 +593,7 @@ measure_disease <- function(img,
                             threshold = my_thresh2,
                             invert = invert2,
                             has_white_bg = has_white_bg,
-                            resize = FALSE)
+                            resize = resize)
         img2@.Data[is.na(img2@.Data)] <- FALSE
         # which(is.na(img2@.Data))
         res <- length(img2)
@@ -681,7 +686,7 @@ measure_disease <- function(img,
         shape <- shape$shape
         ifelse(!is.null(lower_size),
                shape <- shape[shape$area > lower_size, ],
-               shape <- shape[shape$area > mean(shape$area) * 0.1, ])
+               shape <- shape[shape$area > mean(shape$area) * lower_noise, ])
         if(!is.null(upper_size)){
           shape <- shape[shape$area < upper_size, ]
         }
