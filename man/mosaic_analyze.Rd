@@ -23,13 +23,14 @@ mosaic_analyze(
   buffer_row = 0,
   segment_plot = FALSE,
   segment_individuals = FALSE,
+  segment_pick = FALSE,
   map_individuals = FALSE,
   map_direction = c("horizontal", "vertical"),
   watershed = TRUE,
   tolerance = 1,
   extension = 1,
   include_if = "centroid",
-  plot_index = NULL,
+  plot_index = "GLI",
   segment_index = NULL,
   threshold = "Otsu",
   filter = FALSE,
@@ -101,6 +102,11 @@ values below the \code{threshold} will be selected.}
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
 computed, and pixels with values below the \code{threshold} will be selected, and
 a watershed-based segmentation will be performed.}
+
+\item{segment_pick}{When \code{segment_plot} or \code{segment_individuals} are \code{TRUE},
+\code{segment_pick} allows segmenting background (eg., soil) and foreground
+(eg., plants) interactively by picking samples from background and
+foreground using \code{\link[=mosaic_segment_pick]{mosaic_segment_pick()}}}
 
 \item{map_individuals}{If \code{TRUE}, the distance between objects within plots
 is computed. The distance can be mapped either in the horizontal or vertical

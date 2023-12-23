@@ -127,7 +127,7 @@ measure_disease_byl <- function(img,
     splits <- object_split(img,
                            index = index,
                            watershed = watershed,
-                           invert = invert,
+                           invert = invert[[1]],
                            fill_hull = fill_hull,
                            filter = filter,
                            threshold = threshold,
@@ -153,6 +153,7 @@ measure_disease_byl <- function(img,
                                  name = "",
                                  filter = filter,
                                  threshold = threshold,
+                                 invert = ifelse(length(invert) > 1, invert[[2]], invert[[1]]),
                                  ...)
                })
 

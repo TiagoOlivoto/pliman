@@ -6,6 +6,7 @@
 \usage{
 mosaic_segment_pick(
   mosaic,
+  basemap = NULL,
   g = 2,
   r = 3,
   b = 1,
@@ -20,6 +21,8 @@ mosaic_segment_pick(
 \arguments{
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
+
+\item{basemap}{An optional \code{mapview} object.}
 
 \item{g}{The layer for the Green band (default: 2).}
 

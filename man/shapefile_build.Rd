@@ -6,6 +6,7 @@
 \usage{
 shapefile_build(
   mosaic,
+  basemap = NULL,
   r = 3,
   g = 2,
   b = 1,
@@ -31,6 +32,8 @@ shapefile_build(
 \arguments{
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
+
+\item{basemap}{An optional \code{mapview} object.}
 
 \item{r}{The layer for the Red band (default: 3).}
 

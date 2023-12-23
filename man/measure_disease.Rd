@@ -21,6 +21,7 @@ measure_disease(
   has_white_bg = FALSE,
   threshold = NULL,
   invert = FALSE,
+  lower_noise = 0.1,
   lower_size = NULL,
   upper_size = NULL,
   topn_lower = NULL,
@@ -128,6 +129,11 @@ be a vector of length 2 to indicate the threshold for \code{index_lb} and
 
 \item{invert}{Inverts the binary image if desired. This is useful to process
 images with black background. Defaults to \code{FALSE}.}
+
+\item{lower_noise}{By default, lesions with lesser than 10\% of the mean area
+of all lesions are removed (\code{lower_noise = 0.1}). Increasing this value will
+remove larger lesions. To define an explicit lower or upper size (in pixel
+unit), use the \code{lower_size} and \code{upper_size} arguments.}
 
 \item{lower_size}{Lower limit for size for the image analysis. Leaf images
 often contain dirt and dust. To prevent dust from affecting the image

@@ -249,6 +249,7 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #' @param sf_to_polygon Convert sf geometry like POINTS and LINES to POLYGONS?
 #'   Defaults to `FALSE`. Using `TRUE` allows using POINTS to extract values
 #'   from a raster using `exactextractr::exact_extract()`.
+#' @param basemap An optional `mapview` object.
 #' @inheritParams mosaic_analyze
 #' @inheritParams utils_shapefile
 #' @return A list with the built shapefile. Each element is an `sf` object with
@@ -272,6 +273,7 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #'
 #'
 shapefile_build <- function(mosaic,
+                            basemap = NULL,
                             r = 3,
                             g = 2,
                             b = 1,
@@ -292,6 +294,7 @@ shapefile_build <- function(mosaic,
                             max_pixels = 1000000,
                             downsample = NULL,
                             quantiles =  c(0, 1)){
+
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
   }
@@ -300,16 +303,18 @@ shapefile_build <- function(mosaic,
     cat("\014","\nBuilding the mosaic...\n")
   }
   if(build_shapefile){
-    points <- mosaic_view(mosaic,
-                          r = r,
-                          g = g,
-                          b = b,
-                          re = re,
-                          nir = nir,
-                          max_pixels = max_pixels,
-                          downsample = downsample,
-                          quantiles = quantiles,
-                          edit = TRUE)
+    if(is.null(basemap)){
+      basemap <- mosaic_view(mosaic,
+                             r = r,
+                             g = g,
+                             b = b,
+                             re = re,
+                             nir = nir,
+                             max_pixels = max_pixels,
+                             downsample = downsample,
+                             quantiles = quantiles)
+    }
+    points <- mapedit::editMap(basemap, editor = "leafpm")
     cpoints <- points$finished
     if(sf_to_polygon){
       cpoints <- cpoints |> sf_to_polygon()
@@ -413,30 +418,30 @@ shapefile_build <- function(mosaic,
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
 
-    if(nlyrs > 2){
-      map <-
-        mapview::viewRGB(
-          x = as(mosaiccr, "Raster"),
-          layer.name = "base",
-          r = r,
-          g = g,
-          b = b,
-          na.color = "#00000000",
-          maxpixels = 6000000,
-          quantiles = quantiles
-        )
-    } else{
-      map <-
-        mapview::mapview() %>%
-        leafem::addGeoRaster(x = as(mosaiccr[[1]], "Raster"),
-                             colorOptions = leafem::colorOptions(palette = custom_palette(),
-                                                                 na.color = "transparent"))
-    }
+    # if(nlyrs > 2){
+    #   map <-
+    #     mapview::viewRGB(
+    #       x = as(mosaiccr, "Raster"),
+    #       layer.name = "base",
+    #       r = r,
+    #       g = g,
+    #       b = b,
+    #       na.color = "#00000000",
+    #       maxpixels = 6000000,
+    #       quantiles = quantiles
+    #     )
+    # } else{
+    #   map <-
+    #     mapview::mapview() %>%
+    #     leafem::addGeoRaster(x = as(mosaiccr[[1]], "Raster"),
+    #                          colorOptions = leafem::colorOptions(palette = custom_palette(),
+    #                                                              na.color = "transparent"))
+    # }
     if(build_shapefile){
       mapview::mapview() |> mapedit::editMap()
     }
     edited <-
-      mapedit::editFeatures(pg_edit, map) |>
+      mapedit::editFeatures(pg_edit, basemap) |>
       poorman::select(geometry, block) |>
       sf::st_transform(sf::st_crs(mosaic))
     sfeat <- sf::st_as_sf(edited$geometry)
@@ -515,6 +520,10 @@ shapefile_build <- function(mosaic,
 #'   within plots (default: FALSE). If `TRUE`, the `segment_index` will be
 #'   computed, and pixels with values below the `threshold` will be selected, and
 #'   a watershed-based segmentation will be performed.
+#' @param segment_pick When `segment_plot` or `segment_individuals` are `TRUE`,
+#'   `segment_pick` allows segmenting background (eg., soil) and foreground
+#'   (eg., plants) interactively by picking samples from background and
+#'   foreground using [mosaic_segment_pick()]
 #' @param map_individuals If `TRUE`, the distance between objects within plots
 #'   is computed. The distance can be mapped either in the horizontal or vertical
 #'   direction. The distances, coefficient of variation (CV), and mean of
@@ -614,13 +623,14 @@ mosaic_analyze <- function(mosaic,
                            buffer_row = 0,
                            segment_plot = FALSE,
                            segment_individuals = FALSE,
+                           segment_pick = FALSE,
                            map_individuals = FALSE,
                            map_direction = c("horizontal", "vertical"),
                            watershed = TRUE,
                            tolerance = 1,
                            extension = 1,
                            include_if = "centroid",
-                           plot_index = NULL,
+                           plot_index = "GLI",
                            segment_index = NULL,
                            threshold = "Otsu",
                            filter = FALSE,
@@ -634,7 +644,7 @@ mosaic_analyze <- function(mosaic,
                            invert = FALSE,
                            color_regions = rev(grDevices::terrain.colors(50)),
                            alpha = 1,
-                           max_pixels = 2000000,
+                           max_pixels = 2e6,
                            downsample = NULL,
                            quantiles = c(0, 1),
                            plot = TRUE,
@@ -660,16 +670,30 @@ mosaic_analyze <- function(mosaic,
   if(verbose){
     cat("\014","\nBuilding the mosaic...\n")
   }
+  basemap <-
+    suppressWarnings(
+      mosaic_view(mosaic,
+                  r = r,
+                  g = g,
+                  b = b,
+                  re = re,
+                  nir = nir,
+                  max_pixels = max_pixels,
+                  verbose = verbose,
+                  downsample = downsample,
+                  quantiles = quantiles,
+                  edit = FALSE)
+    )
   if(is.null(shapefile)){
-
     created_shapes <-
       suppressWarnings(
         shapefile_build(mosaic,
-                        r = r,
-                        g = g,
-                        b = b,
-                        re = re,
-                        nir = nir,
+                        basemap = basemap,
+                        # r = r,
+                        # g = g,
+                        # b = b,
+                        # re = re,
+                        # nir = nir,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
@@ -848,6 +872,23 @@ mosaic_analyze <- function(mosaic,
   results <- list()
   result_indiv <- list()
   extends <- terra::ext(mosaiccr)
+  usepickmask <- segment_pick & (segment_individuals | segment_plot)
+  if(usepickmask){
+    if(build_shapefile & is.null(shapefile)){
+      mapview::mapview() |> mapedit::editMap()
+    }
+    mask <- suppressWarnings(
+      mosaic_segment_pick(mosaic,
+                          basemap = basemap,
+                          r = r,
+                          g = g,
+                          b = b,
+                          re = re,
+                          nir = nir,
+                          max_pixels = max_pixels,
+                          return = "mask")
+    )
+  }
   for(j in seq_along(created_shapes)){
     if(segment_plot[j] & segment_individuals[j]){
       stop("Only `segment_plot` OR `segment_individuals` can be used", call. = FALSE)
@@ -871,14 +912,20 @@ mosaic_analyze <- function(mosaic,
       }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
-        if(!segment_index[j] %in% names(mind_temp)){
-          stop("`segment_index` must be one of used in `plot_index`.")
-        }
-        thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
-        if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] < thresh
+        if(usepickmask){
+          if(crop_to_shape_ext){
+            mask <- terra::crop(mask, terra::ext(ext_anal))
+          }
         } else{
-          mask <- mind_temp[[segment_index[j]]] > thresh
+          if(!segment_index[j] %in% names(mind_temp)){
+            stop("`segment_index` must be one of used in `plot_index`.")
+          }
+          thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
+          if(invert[j]){
+            mask <- mind_temp[[segment_index[j]]] < thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] > thresh
+          }
         }
         # compute plot coverage
         dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
@@ -921,11 +968,18 @@ mosaic_analyze <- function(mosaic,
       }
       # check if segmentation is performed (analyze individuals)
       if(segment_individuals[j]){
-        thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
-        if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] < thresh
+        if(usepickmask){
+          if(crop_to_shape_ext){
+            mask <- terra::crop(mask, terra::ext(ext_anal))
+          }
+
         } else{
-          mask <- mind_temp[[segment_index[j]]] > thresh
+          thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
+          if(invert[j]){
+            mask <- mind_temp[[segment_index[j]]] < thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] > thresh
+          }
         }
         dmask <- EBImage::Image(matrix(mask, ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
         dmask[is.na(dmask) == TRUE] <- 1
@@ -1051,14 +1105,20 @@ mosaic_analyze <- function(mosaic,
       }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
-        if(!segment_index[j] %in% names(mind_temp)){
-          stop("`segment_index` must be one of used in `plot_index`.")
-        }
-        thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
-        if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] < thresh
+        if(usepickmask){
+          if(crop_to_shape_ext){
+            mask <- terra::crop(mask, terra::ext(ext_anal))
+          }
         } else{
-          mask <- mind_temp[[segment_index[j]]] > thresh
+          if(!segment_index[j] %in% names(mind_temp)){
+            stop("`segment_index` must be one of used in `plot_index`.")
+          }
+          thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
+          if(invert[j]){
+            mask <- mind_temp[[segment_index[j]]] < thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] > thresh
+          }
         }
         # compute plot coverage
         dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
@@ -1101,14 +1161,20 @@ mosaic_analyze <- function(mosaic,
       }
 
       if(segment_individuals[j]){
-        thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
-        extends <- terra::ext(mind_temp)
-        if(invert[j]){
-          mask <- mind_temp[[segment_index[j]]] < thresh
+        if(usepickmask){
+          if(crop_to_shape_ext){
+            mask <- terra::crop(mask, terra::ext(ext_anal))
+          }
         } else{
-          mask <- mind_temp[[segment_index[j]]] > thresh
+          thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
+          if(invert[j]){
+            mask <- mind_temp[[segment_index[j]]] < thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] > thresh
+          }
         }
         dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
+        extends <- terra::ext(mind_temp)
         dmask[is.na(dmask) == TRUE] <- 1
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
@@ -1326,28 +1392,28 @@ mosaic_analyze <- function(mosaic,
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
-    if(nlyrs < 3){
-      basemap <-
-        mapview::mapview(mosaiccr,
-                         maxpixels = 5e6,
-                         legend = FALSE,
-                         map.types = "CartoDB.Positron",
-                         alpha.regions = 1,
-                         na.color = "transparent",
-                         verbose = FALSE)
-    } else{
-      basemap <-
-        mapview::viewRGB(
-          as(mosaiccr, "Raster"),
-          layer.name = "base",
-          r = r,
-          g = g,
-          b = b,
-          na.color = "#00000000",
-          maxpixels = 60000000,
-          quantiles = quantiles
-        )
-    }
+    # if(nlyrs < 3){
+    #   basemap <-
+    #     mapview::mapview(mosaiccr,
+    #                      maxpixels = 5e6,
+    #                      legend = FALSE,
+    #                      map.types = "CartoDB.Positron",
+    #                      alpha.regions = 1,
+    #                      na.color = "transparent",
+    #                      verbose = FALSE)
+    # } else{
+    #   basemap <-
+    #     mapview::viewRGB(
+    #       as(mosaiccr, "Raster"),
+    #       layer.name = "base",
+    #       r = r,
+    #       g = g,
+    #       b = b,
+    #       na.color = "#00000000",
+    #       maxpixels = 60000000,
+    #       quantiles = quantiles
+    #     )
+    # }
     if(any(segment_individuals)){
       dfplot <- result_plot_summ
     } else{
@@ -2419,6 +2485,7 @@ mosaic_segment <- function(mosaic,
 #' picks samples from background (eg., soil) and foreground (eg., plants).
 #'
 #' @inheritParams mosaic_analyze
+#' @param basemap An optional `mapview` object.
 #' @param return The output of the function. Either 'mosaic' (the segmented
 #'   mosaic), or 'mask' (the binary mask).
 #'
@@ -2433,6 +2500,7 @@ mosaic_segment <- function(mosaic,
 #'  mosaic_plot(seg)
 #' }
 mosaic_segment_pick <- function(mosaic,
+                                basemap = NULL,
                                 g = 2,
                                 r = 3,
                                 b = 1,
@@ -2447,18 +2515,20 @@ mosaic_segment_pick <- function(mosaic,
   }
   downsample <- ifelse(is.null(downsample), find_aggrfact(mosaic, max_pixels = max_pixels), downsample)
   if(downsample > 0){
-    mosaic <- terra::aggregate(mosaic, downsample)
+    mosaicp <- terra::aggregate(mosaic, downsample, progress = FALSE)
   }
-  basemap <-
-    mosaic_view(mosaic,
-                r = r,
-                g = g,
-                b = b,
-                re = re,
-                nir = nir,
-                max_pixels = max_pixels,
-                downsample = downsample,
-                quantiles = quantiles)
+  if(is.null(basemap)){
+    basemap <-
+      mosaic_view(mosaicp,
+                  r = r,
+                  g = g,
+                  b = b,
+                  re = re,
+                  nir = nir,
+                  max_pixels = max_pixels,
+                  downsample = downsample,
+                  quantiles = quantiles)
+  }
   soil <- mapedit::editMap(basemap,
                            title = "Use the 'Draw Rectangle' tool to pick up background fractions",
                            editor = "leafpm")$finished
