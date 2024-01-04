@@ -2388,6 +2388,7 @@ mosaic_crop <- function(mosaic,
 #' # return the original parameters
 #' par(oldpar)
 #'
+
 mosaic_index <- function(mosaic,
                          index = "R",
                          r = 3,
@@ -2403,12 +2404,15 @@ mosaic_index <- function(mosaic,
       ras <- mosaic
     }
     ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-    if (!index %in% ind$Index) {
-      message(paste("Index '", index, "' is not available. Trying to compute your own index.",
+    checkind <- index %in% ind$Index
+    if (!all(checkind)) {
+      message(paste("Index '", paste0(index[!checkind], collapse = ", "), "' is not available. Trying to compute your own index.",
                     sep = ""))
     }
     pattern <- "\\b\\w+\\b"
-    layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
+    layersused <- unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE)))
+    onlychar <- suppressWarnings(is.na(as.numeric(layersused)))
+    layers_used <- layersused[onlychar]
     if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR"))){
       # Extract individual layers based on the expression
       layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
@@ -2461,7 +2465,6 @@ mosaic_index <- function(mosaic,
   }
   invisible(mosaic_gray)
 }
-
 #' Segment a mosaic
 #'
 #' Segment a `SpatRaster` using a computed image index. By default, values

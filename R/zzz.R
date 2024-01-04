@@ -55,7 +55,8 @@ if (getRversion() >= "2.15.1") {
       "m.majoraxis", "s.radius.mean", "n_greater", "n_less", "setNames", "s.radius.sd",
       "perimeter", "radius_max", "radius_mean", "radius_min", "radius_sd", "X1",
       "X2", "%dopar%", "i", "img", "plotn", "x", "leaf", "Band", "block", "mosaic",
-      "geometry", "n", "area_sum", "individual", "compute_downsample", "plot_id"))
+      "geometry", "n", "area_sum", "individual", "compute_downsample", "plot_id",
+      "re", "nir", "coverage_fraction"))
 }
 
 
