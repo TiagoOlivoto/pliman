@@ -1,3 +1,5 @@
+# pliman (development version)
+
 # pliman 2.2.0
 ## New functions
 * `mosaic_analyze()` to analyze orthomosaics.
