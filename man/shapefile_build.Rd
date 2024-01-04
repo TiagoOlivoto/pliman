@@ -7,6 +7,7 @@
 shapefile_build(
   mosaic,
   basemap = NULL,
+  controlpoints = NULL,
   r = 3,
   g = 2,
   b = 1,
@@ -34,6 +35,9 @@ shapefile_build(
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
 \item{basemap}{An optional \code{mapview} object.}
+
+\item{controlpoints}{An \code{sf} object created with \code{\link[mapedit:editMap]{mapedit::editMap()}},
+containing the polygon that defines the region of interest to be analyzed.}
 
 \item{r}{The layer for the Red band (default: 3).}
 

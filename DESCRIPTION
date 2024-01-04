@@ -1,6 +1,6 @@
 Package: pliman
 Title: Tools for Plant Image Analysis
-Version: 2.2.0
+Version: 2.1.0
 Authors@R: 
     person("Tiago", "Olivoto", , "tiagoolivoto@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0241-9636"))

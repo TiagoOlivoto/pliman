@@ -250,6 +250,8 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #'   Defaults to `FALSE`. Using `TRUE` allows using POINTS to extract values
 #'   from a raster using `exactextractr::exact_extract()`.
 #' @param basemap An optional `mapview` object.
+#' @param controlpoints An `sf` object created with [mapedit::editMap()],
+#'   containing the polygon that defines the region of interest to be analyzed.
 #' @inheritParams mosaic_analyze
 #' @inheritParams utils_shapefile
 #' @return A list with the built shapefile. Each element is an `sf` object with
@@ -274,6 +276,7 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #'
 shapefile_build <- function(mosaic,
                             basemap = NULL,
+                            controlpoints = NULL,
                             r = 3,
                             g = 2,
                             b = 1,
@@ -299,10 +302,10 @@ shapefile_build <- function(mosaic,
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
   }
   nlyrs <- terra::nlyr(mosaic)
-  if(verbose){
-    cat("\014","\nBuilding the mosaic...\n")
-  }
   if(build_shapefile){
+    if(verbose){
+      cat("\014","\nBuilding the mosaic...\n")
+    }
     if(is.null(basemap)){
       basemap <- mosaic_view(mosaic,
                              r = r,
@@ -314,8 +317,12 @@ shapefile_build <- function(mosaic,
                              downsample = downsample,
                              quantiles = quantiles)
     }
-    points <- mapedit::editMap(basemap, editor = "leafpm")
-    cpoints <- points$finished
+    if(is.null(controlpoints)){
+      points <- mapedit::editMap(basemap, editor = "leafpm")
+      cpoints <- points$finished
+    } else{
+      cpoints <- controlpoints
+    }
     if(sf_to_polygon){
       cpoints <- cpoints |> sf_to_polygon()
     }
@@ -417,26 +424,6 @@ shapefile_build <- function(mosaic,
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
-
-    # if(nlyrs > 2){
-    #   map <-
-    #     mapview::viewRGB(
-    #       x = as(mosaiccr, "Raster"),
-    #       layer.name = "base",
-    #       r = r,
-    #       g = g,
-    #       b = b,
-    #       na.color = "#00000000",
-    #       maxpixels = 6000000,
-    #       quantiles = quantiles
-    #     )
-    # } else{
-    #   map <-
-    #     mapview::mapview() %>%
-    #     leafem::addGeoRaster(x = as(mosaiccr[[1]], "Raster"),
-    #                          colorOptions = leafem::colorOptions(palette = custom_palette(),
-    #                                                              na.color = "transparent"))
-    # }
     if(build_shapefile){
       mapview::mapview() |> mapedit::editMap()
     }
@@ -501,8 +488,11 @@ shapefile_build <- function(mosaic,
 #'   (default: TRUE).
 #' @param nrow Number of rows for the grid (default: 1).
 #' @param ncol Number of columns for the grid (default: 1).
+#' @param indexes An optional `SpatRaster` object with the image indexes,
+#'   computed with [mosaic_index()].
 #' @param shapefile An optional shapefile containing regions of interest (ROIs)
 #'   for analysis.
+#' @param basemap An optional basemap generated with [mosaic_view()].
 #' @param build_shapefile Logical, indicating whether to interactively draw ROIs
 #'   if the shapefile is `NULL` (default: TRUE).
 #' @param check_shapefile Logical, indicating whether to validate the shapefile
@@ -615,7 +605,9 @@ mosaic_analyze <- function(mosaic,
                            grid = TRUE,
                            nrow = 1,
                            ncol = 1,
+                           indexes = NULL,
                            shapefile = NULL,
+                           basemap = NULL,
                            build_shapefile = TRUE,
                            check_shapefile = TRUE,
                            buffer_edge = 1,
@@ -654,6 +646,9 @@ mosaic_analyze <- function(mosaic,
   if(is.null(plot_index) & !is.null(segment_index)){
     plot_index <- segment_index
   }
+  if(!is.null(indexes)){
+    plot_index <- names(indexes)
+  }
   if(!is.null(plot_index) & is.null(segment_index)){
     segment_index <- plot_index[[1]]
   }
@@ -670,30 +665,32 @@ mosaic_analyze <- function(mosaic,
   if(verbose){
     cat("\014","\nBuilding the mosaic...\n")
   }
-  basemap <-
-    suppressWarnings(
-      mosaic_view(mosaic,
-                  r = r,
-                  g = g,
-                  b = b,
-                  re = re,
-                  nir = nir,
-                  max_pixels = max_pixels,
-                  verbose = verbose,
-                  downsample = downsample,
-                  quantiles = quantiles,
-                  edit = FALSE)
-    )
+  if(is.null(basemap)){
+    basemap <-
+      suppressWarnings(
+        mosaic_view(mosaic,
+                    r = r,
+                    g = g,
+                    b = b,
+                    re = re,
+                    nir = nir,
+                    max_pixels = max_pixels,
+                    verbose = verbose,
+                    downsample = downsample,
+                    quantiles = quantiles,
+                    edit = FALSE)
+      )
+  }
   if(is.null(shapefile)){
     created_shapes <-
       suppressWarnings(
         shapefile_build(mosaic,
                         basemap = basemap,
-                        # r = r,
-                        # g = g,
-                        # b = b,
-                        # re = re,
-                        # nir = nir,
+                        r = r,
+                        g = g,
+                        b = b,
+                        re = re,
+                        nir = nir,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
@@ -845,28 +842,35 @@ mosaic_analyze <- function(mosaic,
 
   # return(created_shapes)
   # compute the indexes
-  if(verbose){
-    cat("\014","\nComputing the indexes...\n")
-  }
-  if(nlyrs > 1){
-    mind <- terra::rast(
-      Map(c,
-          lapply(seq_along(plot_index), function(i){
-            mosaic_index(mosaiccr,
-                         index = plot_index[[i]],
-                         r = r,
-                         g = g,
-                         b = b,
-                         re = re,
-                         nir = nir,
-                         plot = FALSE)
-          })
-      )
-    )
 
+  if(is.null(indexes)){
+    if(verbose){
+      cat("\014","\nComputing the indexes...\n")
+    }
+    if(nlyrs > 1){
+      mind <- terra::rast(
+        Map(c,
+            lapply(seq_along(plot_index), function(i){
+              mosaic_index(mosaiccr,
+                           index = plot_index[[i]],
+                           r = r,
+                           g = g,
+                           b = b,
+                           re = re,
+                           nir = nir,
+                           plot = FALSE)
+            })
+        )
+      )
+    } else{
+      plot_index <- names(mosaiccr)
+      mind <- mosaiccr
+    }
   } else{
-    plot_index <- names(mosaiccr)
-    mind <- mosaiccr
+    mind <- indexes
+    if(!segment_index %in% names(mind)){
+      stop("`segment_index` must be present in `indexes`")
+    }
   }
 
   results <- list()
@@ -1512,6 +1516,14 @@ mosaic_analyze_iter <- function(mosaic,
                                 quantiles = c(0, 1),
                                 ...){
   bind <- list()
+  ind <- mosaic_index(mosaic,
+                      index = unique(c(plot_index, segment_index)),
+                      r = r,
+                      g = g,
+                      b = b,
+                      re = re,
+                      nir = nir,
+                      plot = FALSE)
   for (i in 1:nrow(shapefile)) {
     if(verbose){
       cat("\014","\nAnalyzing plot", i, "\n")
@@ -1519,6 +1531,7 @@ mosaic_analyze_iter <- function(mosaic,
     bind[[paste0("P", leading_zeros(i, 4))]] <-
       mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
                      r = r, g = g, b = b,
+                     indexes = terra::crop(ind, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
                      shapefile = shapefile[i, ],
                      segment_individuals = segment_individuals,
                      segment_index = segment_index,
@@ -2383,48 +2396,65 @@ mosaic_index <- function(mosaic,
                          re = 4,
                          nir = 5,
                          plot = TRUE){
-  if(inherits(mosaic, "Image")){
-    ras <- t(terra::rast(mosaic@.Data))
-  } else{
-    ras <- mosaic
-  }
-  ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
-  if (!index %in% ind$Index) {
-    message(paste("Index '", index, "' is not available. Trying to compute your own index.",
-                  sep = ""))
-  }
-  pattern <- "\\b\\w+\\b"
-  layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
-  if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR"))){
-    # Extract individual layers based on the expression
-    layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
-    layers <-
-      lapply(layers_used, function(x){
-        mosaic[[x]]
-      })
-    names(layers) <- layers_used
-    mosaic_gray <- eval(parse(text = index), envir = layers)
-  } else{
-    R <- try(ras[[r]], TRUE)
-    G <- try(ras[[g]], TRUE)
-    B <- try(ras[[b]], TRUE)
-    NIR <- try(ras[[nir]], TRUE)
-    RE <- try(ras[[re]], TRUE)
-    if(index %in% ind$Index){
-      mosaic_gray <-
-        eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+  if(length(index) == 1){
+    if(inherits(mosaic, "Image")){
+      ras <- t(terra::rast(mosaic@.Data))
     } else{
-      mosaic_gray <-
-        eval(parse(text = as.character(index)))
+      ras <- mosaic
     }
-  }
-  names(mosaic_gray) <- index
-  if(!is.na(terra::crs(mosaic))){
-    if(terra::crs(mosaic_gray) != terra::crs(mosaic)){
-      suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
+    ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+    if (!index %in% ind$Index) {
+      message(paste("Index '", index, "' is not available. Trying to compute your own index.",
+                    sep = ""))
+    }
+    pattern <- "\\b\\w+\\b"
+    layers_used <- unique(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))))
+    if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR"))){
+      # Extract individual layers based on the expression
+      layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
+      layers <-
+        lapply(layers_used, function(x){
+          mosaic[[x]]
+        })
+      names(layers) <- layers_used
+      mosaic_gray <- eval(parse(text = index), envir = layers)
+    } else{
+      R <- try(ras[[r]], TRUE)
+      G <- try(ras[[g]], TRUE)
+      B <- try(ras[[b]], TRUE)
+      NIR <- try(ras[[nir]], TRUE)
+      RE <- try(ras[[re]], TRUE)
+      if(index %in% ind$Index){
+        mosaic_gray <-
+          eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+      } else{
+        mosaic_gray <-
+          eval(parse(text = as.character(index)))
+      }
+    }
+    names(mosaic_gray) <- index
+    if(!is.na(terra::crs(mosaic))){
+      if(terra::crs(mosaic_gray) != terra::crs(mosaic)){
+        suppressWarnings(terra::crs(mosaic_gray) <- terra::crs(mosaic))
+      }
+    } else{
+      suppressWarnings(terra::crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
     }
   } else{
-    suppressWarnings(terra::crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
+    mosaic_gray <- terra::rast(
+      Map(c,
+          lapply(seq_along(unique(index)), function(i){
+            mosaic_index(mosaic,
+                         index = unique(index)[[i]],
+                         r = r,
+                         g = g,
+                         b = b,
+                         re = re,
+                         nir = nir,
+                         plot = FALSE)
+          })
+      )
+    )
   }
   if(plot){
     terra::plot(mosaic_gray)

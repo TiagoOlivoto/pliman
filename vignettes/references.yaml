@@ -1293,4 +1293,48 @@ references:
   update-policy: "http://dx.doi.org/10.1002/crossmark_policy"
   URL: "http://dx.doi.org/10.2135/cropsci2003.9430"
   volume: 43
+- id: bendig2015
+  author:
+  - family: Bendig
+    given: Juliane
+  - family: Yu
+    given: Kang
+  - family: Aasen
+    given: Helge
+  - family: Bolten
+    given: Andreas
+  - family: Bennertz
+    given: Simon
+  - family: Broscheit
+    given: Janis
+  - family: Gnyp
+    given: Martin L.
+  - family: Bareth
+    given: Georg
+  container-title: International Journal of Applied Earth Observation
+    and Geoinformation
+  container-title-short: International Journal of Applied Earth
+    Observation and Geoinformation
+  DOI: 10.1016/j.jag.2015.02.012
+  is-referenced-by-count: 551
+  ISSN: 1569-8432
+  issued: 2015-07
+  language: en
+  member: 78
+  page: 79-87
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 55
+  references-count: 55
+  score: 1
+  source: Crossref
+  subject: Management, Monitoring, Policy and Law
+  title: Combining UAV-based plant height from crop surface models,
+    visible, and near infrared vegetation indices for biomass monitoring
+    in barley
+  type: article-journal
+  update-policy: "http://dx.doi.org/10.1016/elsevier_cm_policy"
+  URL: "http://dx.doi.org/10.1016/j.jag.2015.02.012"
+  volume: 39
 ...

@@ -15,7 +15,9 @@ mosaic_analyze(
   grid = TRUE,
   nrow = 1,
   ncol = 1,
+  indexes = NULL,
   shapefile = NULL,
+  basemap = NULL,
   build_shapefile = TRUE,
   check_shapefile = TRUE,
   buffer_edge = 1,
@@ -77,8 +79,13 @@ extension.}
 
 \item{ncol}{Number of columns for the grid (default: 1).}
 
+\item{indexes}{An optional \code{SpatRaster} object with the image indexes,
+computed with \code{\link[=mosaic_index]{mosaic_index()}}.}
+
 \item{shapefile}{An optional shapefile containing regions of interest (ROIs)
 for analysis.}
+
+\item{basemap}{An optional basemap generated with \code{\link[=mosaic_view]{mosaic_view()}}.}
 
 \item{build_shapefile}{Logical, indicating whether to interactively draw ROIs
 if the shapefile is \code{NULL} (default: TRUE).}
