@@ -35,11 +35,14 @@ Suggests:
     leaflet (>= 2.1.2),
     mapedit (>= 0.6.0),
     mapview (>= 2.11.0),
+    plimanshiny,
     rmarkdown,
-    rstudioapi
+    rstudioapi,
+    pak
 LinkingTo: 
     Rcpp,
     RcppArmadillo
+Remotes: TiagoOlivoto/plimanshiny
 biocViews:
 Encoding: UTF-8
 Language: en-US

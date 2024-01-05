@@ -525,6 +525,24 @@ check_ebi <- function(){
     }
   }
 }
+check_plimanshiny <- function(){
+  if(!requireNamespace("plimanshiny", quietly = TRUE)) {
+    if(interactive() == TRUE){
+      inst <-
+        switch(menu(c("Yes", "No"), title = "The package {plimanshiny} is required to run pliman::run_app() but is not installed.\nDo you want to install it now?"),
+               "yes", "no")
+      if(inst == "yes"){
+        if(!requireNamespace("pak", quietly = TRUE)) {
+          install.packages("pak", quiet = TRUE)
+        }
+        pak::pak("TiagoOlivoto/plimanshiny")
+      } else{
+        message("To use `pliman::run_app()`, first install {plimanshiny} following the directions at ")
+      }
+    }
+  }
+}
+
 # correct coordinates in analyze_objects_shp()
 correct_coords <- function(coords, nrowimg, ncolimg, nrow, ncol){
   get_row_number <- function(vector, rows, cols) {
@@ -789,3 +807,21 @@ open_wd <- function(path = getwd()){
   }
 }
 
+#' Shiny UI for pliman package
+#'
+#' run_app calls plimanshiny::run_app() that will starts the Shiny interface of
+#' the pliman package
+#'
+#' @export
+#'
+#' @examples
+#' if(interactive()){
+#' library(pliman)
+#' run_app()
+#' }
+#'
+#'
+run_app <- function(){
+  check_plimanshiny()
+  plimanshiny::run_app()
+}
