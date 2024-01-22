@@ -42,6 +42,7 @@ mosaic_analyze(
   topn_lower = NULL,
   topn_upper = NULL,
   summarize_fun = "mean",
+  summarize_quantiles = NULL,
   attribute = NULL,
   invert = FALSE,
   color_regions = rev(grDevices::terrain.colors(50)),
@@ -184,6 +185,8 @@ be considered.}
 \item{summarize_fun}{The function to compute summaries for the pixel values.
 Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 individual-level) is returned.}
+
+\item{summarize_quantiles}{quantiles to be computed when 'quantile' is on \code{summarize_fun}.}
 
 \item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}. Defaults to the first \code{summary_fun} and first \code{segment_index}.}
 

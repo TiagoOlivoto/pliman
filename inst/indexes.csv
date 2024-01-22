@@ -31,9 +31,10 @@ SAT;((max(R, G, B) - min(R, G, B)) / max(R, G, B));RGB
 SHP;(2 * (R - G - B) / (G - B));RGB
 RI;(R^2 / (B * G^3));RGB
 SAVI;(1 + 0.5)*(G-R)/(G+R+0.5);RGB
-EXG;2*G-R-B;RGB
+ERVI;((1.4*R)- G);RGB
+EGVI;2*G-R-B;RGB
+CIVE;(0.811*G)+(0.385*B)+18.78745;RGB
 MGVRI;(G^2-R^2)/(G^2+R^2);RGB
-GRAY2;((R^2.2+(1.5*G)^2.2+(0.6*B)^2.2)/(1+1.5^2.2+0.6^2.2))^1/2.2;RGB
 DGCI;((h - 60)/60 + (1 - s/100) + (1 - b/100)) / 3;HSB
 L*;(0.2126 * R + 0.7152 * G + 0.0722 * B);CIELab
 a;0.55*( (R - (0.2126 * R + 0.7152 * G + 0.0722 * B)) / (1.0 - 0.2126));CIELab
@@ -47,7 +48,7 @@ GNDVI;(NIR - G) / (NIR + G);MULTI
 RVI;R/NIR;MULTI
 VIN;NIR/R;MULTI
 NDRE;(NIR-RE)/(NIR+RE);MULTI
-SAVI;((NIR-R) / (NIR + R + 0.5) * 1 + 0.5);MULTI
+SAVI2;((NIR-R) / (NIR + R + 0.5) * 1 + 0.5);MULTI
 TSAVI;(2*((NIR-2)*(R-1)))/(R+2*(NIR-1)+0.5*(1+2*2));MULTI
 TVI;sqrt((NIR - R) / (NIR + R) + 0.5);MULTI
 EVI;2.5*(NIR-R)/(NIR+6*R-7.5*B+1);MULTI

@@ -31,6 +31,7 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
   resized_coords[, 2] <- (resized_coords[, 2] - y_min) * y_scale_factor + new_y_min
   return(resized_coords)
 }
+
 make_grid <- function(points,
                       nrow,
                       ncol,
@@ -41,13 +42,6 @@ make_grid <- function(points,
   grids <-
     sf::st_make_grid(points, n = c(nrow, ncol)) |>
     sf::st_transform(sf::st_crs(mosaic))
-
-  for(k in 1:length(grids)){
-    coords <- grids[[k]][[1]]
-    grids[[k]][[1]] <- create_buffer(coords,
-                                     buffer_col = buffer_row,
-                                     buffer_row = buffer_col)
-  }
 
   sxy <-
     points |>
@@ -66,11 +60,21 @@ make_grid <- function(points,
   parms <- cvm$coefficients[2:3, ]
   intercept <- cvm$coefficients[1, ]
   geometry <- grids * parms + intercept
+
+  if(buffer_row != 0 | buffer_col != 0){
+    for(k in 1:length(geometry)){
+      coords <- geometry[[k]][[1]]
+      geometry[[k]][[1]] <- create_buffer(coords,
+                                      buffer_col = buffer_row,
+                                      buffer_row = buffer_col)
+    }
+  }
   gshp <-
     geometry |>
     sf::st_sf(crs = sf::st_crs(mosaic))
   return(gshp)
 }
+
 find_aggrfact <- function(mosaic, max_pixels = 1000000){
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
@@ -554,6 +558,7 @@ shapefile_build <- function(mosaic,
 #' @param summarize_fun The function to compute summaries for the pixel values.
 #'   Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 #'   individual-level) is returned.
+#' @param summarize_quantiles quantiles to be computed when 'quantile' is on `summarize_fun`.
 #' @param attribute The attribute to be shown at the plot when `plot` is `TRUE`. Defaults to the first `summary_fun` and first `segment_index`.
 #' @param invert Logical, indicating whether to invert the mask. Defaults to
 #'   `FALSE`, i.e., pixels with intensity greater than the threshold values are
@@ -632,6 +637,7 @@ mosaic_analyze <- function(mosaic,
                            topn_lower = NULL,
                            topn_upper = NULL,
                            summarize_fun = "mean",
+                           summarize_quantiles = NULL,
                            attribute = NULL,
                            invert = FALSE,
                            color_regions = rev(grDevices::terrain.colors(50)),
@@ -1051,6 +1057,7 @@ mosaic_analyze <- function(mosaic,
           exactextractr::exact_extract(x = mind_temp,
                                        y = gridindiv,
                                        fun = summarize_fun,
+                                       quantiles = summarize_quantiles,
                                        progress = FALSE,
                                        force_df = TRUE,
                                        summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
@@ -1088,6 +1095,7 @@ mosaic_analyze <- function(mosaic,
         exactextractr::exact_extract(x = mind_temp,
                                      y = plot_grid,
                                      fun = summarize_fun,
+                                     quantiles = summarize_quantiles,
                                      progress = FALSE,
                                      force_df = TRUE,
                                      summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
@@ -1240,6 +1248,7 @@ mosaic_analyze <- function(mosaic,
           exactextractr::exact_extract(x = mind_temp,
                                        y = gridindiv,
                                        fun = summarize_fun,
+                                       quantiles = summarize_quantiles,
                                        progress = FALSE,
                                        force_df = TRUE,
                                        summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
@@ -1275,6 +1284,7 @@ mosaic_analyze <- function(mosaic,
         exactextractr::exact_extract(x = mind_temp,
                                      y = plot_grid,
                                      fun = summarize_fun,
+                                     quantiles = summarize_quantiles,
                                      progress = FALSE,
                                      force_df = TRUE,
                                      summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
@@ -3022,6 +3032,7 @@ mosaic_draw <- function(mosaic,
         exactextractr::exact_extract(x = mind,
                                      y = polygons,
                                      fun = summarize_fun,
+                                     quantiles = summarize_quantiles,
                                      progress = FALSE,
                                      force_df = TRUE,
                                      summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
