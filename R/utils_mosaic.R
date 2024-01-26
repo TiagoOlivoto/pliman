@@ -518,6 +518,9 @@ shapefile_build <- function(mosaic,
 #'   `segment_pick` allows segmenting background (eg., soil) and foreground
 #'   (eg., plants) interactively by picking samples from background and
 #'   foreground using [mosaic_segment_pick()]
+#' @param simplify Removes vertices in polygons to form simpler shapes. The
+#'   function implementation uses the Douglas–Peucker algorithm using
+#'   [sf::st_simplify()] for simplification.
 #' @param map_individuals If `TRUE`, the distance between objects within plots
 #'   is computed. The distance can be mapped either in the horizontal or vertical
 #'   direction. The distances, coefficient of variation (CV), and mean of
@@ -621,6 +624,7 @@ mosaic_analyze <- function(mosaic,
                            segment_plot = FALSE,
                            segment_individuals = FALSE,
                            segment_pick = FALSE,
+                           simplify = FALSE,
                            map_individuals = FALSE,
                            map_direction = c("horizontal", "vertical"),
                            watershed = TRUE,
@@ -959,6 +963,9 @@ mosaic_analyze <- function(mosaic,
           crs = terra::crs(mosaic)
         ) |>
           sf::st_make_valid()
+        if(simplify){
+          sf_plt <- sf_plt |> sf::st_simplify(preserveTopology = TRUE)
+        }
         covered_area <-
           suppressWarnings(
             sapply(1:nrow(plot_grid), function(i){
@@ -1015,7 +1022,9 @@ mosaic_analyze <- function(mosaic,
           data = data.frame(individual = paste0(1:length(conts))),
           crs = terra::crs(mosaic)
         )
-
+        if(simplify){
+          sf_df <- sf_df |> sf::st_simplify(preserveTopology = TRUE)
+        }
         centroids <- suppressWarnings(sf::st_centroid(sf_df))
         intersects <-
           switch (includeopt[j],
@@ -1154,6 +1163,9 @@ mosaic_analyze <- function(mosaic,
           crs = terra::crs(mosaic)
         ) |>
           sf::st_make_valid()
+        if(simplify){
+          sf_plt <- sf_plt |> sf::st_simplify(preserveTopology = TRUE)
+        }
         covered_area <-
           suppressWarnings(
             sapply(1:nrow(plot_grid), function(i){
@@ -1210,6 +1222,9 @@ mosaic_analyze <- function(mosaic,
           data = data.frame(individual = paste0(1:length(conts))),
           crs = terra::crs(mosaic)
         )
+        if(simplify){
+          sf_df <- sf_df |> sf::st_simplify(preserveTopology = TRUE)
+        }
         centroids <- suppressWarnings(sf::st_centroid(sf_df))
         intersect_individ <-
           switch (includeopt[j],
@@ -1406,28 +1421,6 @@ mosaic_analyze <- function(mosaic,
     if(downsample > 0){
       mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
     }
-    # if(nlyrs < 3){
-    #   basemap <-
-    #     mapview::mapview(mosaiccr,
-    #                      maxpixels = 5e6,
-    #                      legend = FALSE,
-    #                      map.types = "CartoDB.Positron",
-    #                      alpha.regions = 1,
-    #                      na.color = "transparent",
-    #                      verbose = FALSE)
-    # } else{
-    #   basemap <-
-    #     mapview::viewRGB(
-    #       as(mosaiccr, "Raster"),
-    #       layer.name = "base",
-    #       r = r,
-    #       g = g,
-    #       b = b,
-    #       na.color = "#00000000",
-    #       maxpixels = 60000000,
-    #       quantiles = quantiles
-    #     )
-    # }
     if(any(segment_individuals)){
       dfplot <- result_plot_summ
     } else{

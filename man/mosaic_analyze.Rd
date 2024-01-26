@@ -26,6 +26,7 @@ mosaic_analyze(
   segment_plot = FALSE,
   segment_individuals = FALSE,
   segment_pick = FALSE,
+  simplify = FALSE,
   map_individuals = FALSE,
   map_direction = c("horizontal", "vertical"),
   watershed = TRUE,
@@ -115,6 +116,10 @@ a watershed-based segmentation will be performed.}
 \code{segment_pick} allows segmenting background (eg., soil) and foreground
 (eg., plants) interactively by picking samples from background and
 foreground using \code{\link[=mosaic_segment_pick]{mosaic_segment_pick()}}}
+
+\item{simplify}{Removes vertices in polygons to form simpler shapes. The
+function implementation uses the Douglas–Peucker algorithm using
+\code{\link[sf:geos_unary]{sf::st_simplify()}} for simplification.}
 
 \item{map_individuals}{If \code{TRUE}, the distance between objects within plots
 is computed. The distance can be mapped either in the horizontal or vertical
