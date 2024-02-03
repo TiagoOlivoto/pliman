@@ -87,7 +87,7 @@ image_view <- function(img,
     }
     if(downsample > 0){
       message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
-      ras <- terra::aggregate(ras, fact = downsample)
+      ras <- mosaic_aggregate(ras, pct = round(100 / downsample))
     }
   }
   if(viewopt == "rgb"){
@@ -335,7 +335,7 @@ plot_index <- function(img = NULL,
                 downsample <- ifelse(downsample == 1, 0, downsample)
               }
               if(downsample > 0){
-                sto <- terra::aggregate(sto, fact = downsample)
+                sto <- mosaic_aggregate(sto, pct = round(100 / downsample))
               }
           }
           sto
@@ -357,7 +357,7 @@ plot_index <- function(img = NULL,
           downsample <- ifelse(downsample == 1, 0, downsample)
         }
         if(downsample > 0){
-          sts <- terra::aggregate(img, fact = downsample)
+          sts <- mosaic_aggregate(img, pct = round(100 / downsample))
         }
       } else{
         sts <- img
@@ -477,7 +477,7 @@ plot_index <- function(img = NULL,
         downsample <- ifelse(downsample == 1, 0, downsample)
       }
       if(downsample > 0){
-        ras <- terra::aggregate(ras, fact = downsample)
+        ras <- mosaic_aggregate(ras, pct = round(100 / downsample))
       }
     }
     if(vieweropt == "base"){

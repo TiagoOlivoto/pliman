@@ -2,31 +2,40 @@
 % Please edit documentation in R/utils_mosaic.R
 \name{mosaic_aggregate}
 \alias{mosaic_aggregate}
-\title{A wrapper around terra::aggregate()}
+\title{SpatRaster aggregation}
 \usage{
-mosaic_aggregate(mosaic, fact = 2, ...)
+mosaic_aggregate(mosaic, pct = 50, fun = "nearest", in_memory = TRUE)
 }
 \arguments{
 \item{mosaic}{SpatRaster}
 
-\item{fact}{Aggregation factor expressed as number of cells in each direction
-(horizontally and vertically). See \code{\link[terra:aggregate]{terra::aggregate()}} for more details.}
+\item{pct}{The size as a fraction (percentage) of the input image size.
+Either a scalar (eg., 50), or a length-two numeric vector. In the last,
+different percentage reduction/expansion can be used for columns, and rows,
+respectively.}
 
-\item{...}{Further arguments passed on to \code{\link[terra:aggregate]{terra::aggregate()}}.}
+\item{fun}{The resampling function. Defaults to \code{nearest}, which applies the
+nearest neighbor (simple sampling) resampler. Other accepted values are:
+'average', 'rms', 'bilinear', 'cubic', 'cubicspline', 'lanczos', and
+'mode'. See Details for a detailed explanation.}
+
+\item{in_memory}{Wheter to return an 'in-memory' \code{SpatRaster}. If \code{FALSE},
+the aggregated raster will be returned as an 'in-disk' object.}
 }
 \value{
 SpatRaster
 }
 \description{
 Aggregate a SpatRaster to create a new SpatRaster with a lower resolution
-(larger cells). See \code{\link[terra:aggregate]{terra::aggregate()}} for more details
+(larger cells), using the GDAL's gdal_translate utility
+https://gdal.org/programs/gdal_translate.html
 }
 \examples{
 library(pliman)
 library(terra)
 r <- rast()
 values(r) <- 1:ncell(r)
-r2 <- mosaic_aggregate(r, fact = 10)
+r2 <- mosaic_aggregate(r, pct = 10)
 opar <- par(no.readonly = TRUE)
 par(mfrow=c(1,2))
 mosaic_plot(r)

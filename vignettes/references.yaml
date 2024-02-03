@@ -1337,4 +1337,59 @@ references:
   update-policy: "http://dx.doi.org/10.1016/elsevier_cm_policy"
   URL: "http://dx.doi.org/10.1016/j.jag.2015.02.012"
   volume: 39
+- id: meyer2008
+  author:
+  - family: Meyer
+    given: George E.
+  - family: Neto
+    given: João Camargo
+  container-title: Computers and Electronics in Agriculture
+  container-title-short: Computers and Electronics in Agriculture
+  DOI: 10.1016/j.compag.2008.03.009
+  is-referenced-by-count: 582
+  ISSN: 0168-1699
+  issue: 2
+  issued: 2008-10
+  language: en
+  member: 78
+  page: 282-293
+  prefix: 10.1016
+  providerKey: doi
+  publisher: Elsevier BV
+  reference-count: 31
+  references-count: 31
+  score: 1
+  source: Crossref
+  subject: Horticulture
+  title: Verification of color vegetation indices for automated crop
+    imaging applications
+  type: article-journal
+  URL: "http://dx.doi.org/10.1016/j.compag.2008.03.009"
+  volume: 63
+- id: kataoka2003
+  accessed: "17:48:30"
+  author:
+  - family: Kataoka
+    given: T.
+  - family: Kaneko
+    given: T.
+  - family: Okamoto
+    given: H.
+  - family: Hata
+    given: S.
+  container-title: Proceedings 2003 IEEE/ASME International Conference
+    on Advanced Intelligent Mechatronics (AIM 2003)
+  DOI: 10.1109/AIM.2003.1225492
+  event: Proceedings 2003 IEEE/ASME International Conference on Advanced
+    Intelligent Mechatronics (AIM 2003)
+  issued: 2003-07
+  key: C8XRKYFW
+  libraryID: 1
+  page: b1079-b1083 vol.2
+  providerKey: Zotero
+  source: IEEE Xplore
+  title: Crop growth estimation system using machine vision
+  type: paper-conference
+  URL: "https://ieeexplore.ieee.org/document/1225492"
+  volume: 2
 ...

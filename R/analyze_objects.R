@@ -1422,18 +1422,16 @@ analyze_objects <- function(img,
     if(parallel == TRUE){
       init_time <- Sys.time()
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
-      cl <- parallel::makePSOCKcluster(nworkers)
-      doParallel::registerDoParallel(cl)
-      on.exit(parallel::stopCluster(cl))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
-      ## declare alias for dopar command
-      `%dopar%` <- foreach::`%dopar%`
 
       results <-
-        foreach::foreach(i = seq_along(names_plant), .packages = c("pliman", "EBImage")) %dopar%{
+        foreach::foreach(i = seq_along(names_plant)) %dofut%{
           help_count(names_plant[i],
                      foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
                      tolerance , extension, randomize, nrows, plot, show_original,

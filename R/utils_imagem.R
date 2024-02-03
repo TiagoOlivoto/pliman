@@ -427,8 +427,6 @@ image_pliman <- function(img, plot = FALSE){
 #' @param plot If `TRUE` plots the modified image. Defaults to `FALSE`.
 #' @param ... Additional arguments passed on to [image_binary()].
 #' @md
-#' @importFrom parallel detectCores clusterExport makeCluster parLapply
-#'   stopCluster
 #' @export
 #' @author Tiago Olivoto \email{tiagoolivoto@@gmail.com}
 #' @return
@@ -454,7 +452,7 @@ image_autocrop <- function(img,
                            workers = NULL,
                            verbose = TRUE,
                            plot = FALSE){
-  check_ebi()
+  # check_ebi()
   if(is.list(img)){
     if(class(img) %in% c("binary_list", "segment_list", "index_list",
                          "img_mat_list", "palette_list")){
@@ -464,14 +462,18 @@ image_autocrop <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
+
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_autocrop, index, edge)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_autocrop(img[[i]], index, edge)
+        }
     } else{
       res <- lapply(img, image_autocrop, index, edge)
     }
@@ -517,14 +519,17 @@ image_crop <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_crop, width, height, viewer, downsample, max_pixels)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_crop(img[[i]],  width, height, viewer, downsample, max_pixels)
+        }
     } else{
       res <- lapply(img, image_crop, width, height, viewer, downsample, max_pixels)
     }
@@ -601,17 +606,20 @@ image_dimension <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
       res <-
         as.data.frame(
           do.call(rbind,
-                  parLapply(clust, img,  image_dimension, verbose =  FALSE))
+                  foreach::foreach(i = seq_along(img)) %dofut%{
+                    image_dimension(img[[i]], verbose =  FALSE)
+                  }
+          )
         )
       res <- transform(res, image = rownames(res))[,c(3, 1, 2)]
     } else{
@@ -666,14 +674,17 @@ image_rotate <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_rotate, angle, bg_col)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_rotate(img[[i]], angle, bg_col)
+        }
     } else{
       lapply(img, image_rotate, angle, bg_col)
     }
@@ -702,14 +713,16 @@ image_horizontal <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_horizontal)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_horizontal(img[[i]])
+      }
     } else{
       lapply(img, image_horizontal)
     }
@@ -744,14 +757,16 @@ image_vertical <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_vertical)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_vertical(img[[i]])
+      }
     } else{
       lapply(img, image_vertical)
     }
@@ -786,14 +801,16 @@ image_hreflect <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_hreflect)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_hreflect(img[[i]])
+      }
     } else{
       lapply(img, image_hreflect)
     }
@@ -822,14 +839,16 @@ image_vreflect <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_vreflect)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_vreflect(img[[i]])
+      }
     } else{
       lapply(img, image_vreflect)
     }
@@ -862,14 +881,16 @@ image_resize <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_resize, rel_size)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_resize(img[[i]], rel_size)
+      }
     } else{
       lapply(img, image_resize, rel_size, width, height)
     }
@@ -917,14 +938,16 @@ image_trim <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_trim, edge, top, bottom, left, right)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_trim(img[[i]], edge, top, bottom, left, right)
+      }
     } else{
       lapply(img, image_trim, edge, top, bottom, left, right)
     }
@@ -959,14 +982,16 @@ image_dilate <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_dilate, kern, size, shape)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_dilate(img[[i]], kern, size, shape)
+      }
     } else{
       lapply(img, image_dilate, kern, size, shape)
     }
@@ -1006,14 +1031,16 @@ image_erode <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_erode, kern, size, shape)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_erode(img[[i]], kern, size, shape)
+      }
     } else{
       lapply(img, image_erode, size, kern, shape)
     }
@@ -1052,14 +1079,16 @@ image_opening <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_opening, kern, size, shape)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_opening(img[[i]], kern, size, shape)
+      }
     } else{
       lapply(img, image_opening, size, kern, shape)
     }
@@ -1098,14 +1127,16 @@ image_closing <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_closing, kern, size, shape)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_closing(img[[i]], kern, size, shape)
+      }
     } else{
       lapply(img, image_closing, size, kern, shape)
     }
@@ -1144,14 +1175,16 @@ image_skeleton <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_skeleton)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_skeleton(img[[i]])
+      }
     } else{
       lapply(img, image_skeleton)
     }
@@ -1199,14 +1232,16 @@ image_thinning <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_thinning, niter)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_thinning(img[[i]], niter)
+      }
     } else{
       lapply(img, image_thinning, niter)
     }
@@ -1289,13 +1324,15 @@ image_thinning_guo_hall <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.4), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_thinning_guo_hall)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_thinning_guo_hall(img[[i]])
+      }
     } else{
       lapply(img, image_thinning_guo_hall)
     }
@@ -1336,14 +1373,16 @@ image_filter <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_filter, size, cache)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_filter(img[[i]], size, cache)
+      }
     } else{
       lapply(img, image_filter, size, cache)
     }
@@ -1372,14 +1411,16 @@ image_blur <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_blur, sigma)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_blur(img[[i]], sigma)
+      }
     } else{
       lapply(img, image_blur, sigma)
     }
@@ -1407,14 +1448,16 @@ image_contrast <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      parLapply(clust, img, image_contrast)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_contrast(img[[i]], sigma)
+      }
     } else{
       lapply(img, image_contrast)
     }
@@ -1604,36 +1647,37 @@ image_binary <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust,
-                       img,
-                       image_binary,
-                       index,
-                       r,
-                       g,
-                       b,
-                       re,
-                       nir,
-                       return_class,
-                       threshold,
-                       k,
-                       windowsize,
-                       has_white_bg,
-                       resize,
-                       fill_hull,
-                       filter,
-                       re,
-                       nir,
-                       invert,
-                       plot,
-                       nrow,
-                       ncol)
+      res <-
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        image_binary(img[[i]],
+                     index,
+                     r,
+                     g,
+                     b,
+                     re,
+                     nir,
+                     return_class,
+                     threshold,
+                     k,
+                     windowsize,
+                     has_white_bg,
+                     resize,
+                     fill_hull,
+                     filter,
+                     re,
+                     nir,
+                     invert,
+                     plot,
+                     nrow,
+                     ncol)
+      }
     } else{
       res <- lapply(img,
                     image_binary,
@@ -1850,14 +1894,17 @@ image_index <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_index, index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_index(img[[i]], index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
+        }
     } else{
       res <- lapply(img, image_index, index, r, g, b, re, nir, resize, has_white_bg, plot, nrow, ncol, max_pixels)
     }
@@ -2137,14 +2184,17 @@ image_segment <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter,invert, plot = plot, nrow, ncol)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_segment(img[[i]], index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter,invert, plot = plot, nrow, ncol)
+        }
     } else{
       res <- lapply(img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, invert, plot = plot, nrow, ncol)
     }
@@ -2270,14 +2320,17 @@ image_segment_iter <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, c("image", "image_segment", "image_combine"))
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      a <- parLapply(clust, img, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol,  ...)
+      a <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_segment_iter(img[[i]], nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol,  ...)
+        }
     } else{
       a <- lapply(img, image_segment_iter, nseg, index, invert, threshold, has_white_bg, plot, verbose, nrow, ncol, ...)
     }
@@ -2758,14 +2811,17 @@ image_to_mat <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.7), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
-      res <- parLapply(clust, img, image_to_mat)
+      res <-
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_to_mat(img[[i]])
+        }
     } else{
       res <- lapply(img, image_to_mat)
     }

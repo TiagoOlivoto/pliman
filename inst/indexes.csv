@@ -27,7 +27,6 @@ GRAY;0.299 * R + 0.587 * G + 0.114 * B;RGB
 GRAY2;((R^2.2 + (1.5 * G)^2.2 + (0.6 * B)^2.2) / (1 + 1.5^2.2 + 0.6^2.2))^(1/2.2);RGB
 GLAI;(25 * (G - R) / (G + R - B) + 1.25);RGB
 CI;((R - B) / R);RGB
-SAT;((max(R, G, B) - min(R, G, B)) / max(R, G, B));RGB
 SHP;(2 * (R - G - B) / (G - B));RGB
 RI;(R^2 / (B * G^3));RGB
 SAVI;(1 + 0.5)*(G-R)/(G+R+0.5);RGB

@@ -326,18 +326,16 @@ object_export_shp <- function(img,
 
       init_time <- Sys.time()
       nworkers <- trunc(detectCores()*.3)
-      cl <- parallel::makePSOCKcluster(nworkers)
-      doParallel::registerDoParallel(cl)
-      on.exit(stopCluster(cl))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
-      ## declare alias for dopar command
-      `%dopar%` <- foreach::`%dopar%`
 
       results <-
-        foreach::foreach(i = seq_along(plants), .packages = c("pliman")) %dopar%{
+        foreach::foreach(i = seq_along(plants)) %dofut%{
 
           tmpimg <- image_import(plants[[i]], path = diretorio_original)
 
@@ -642,17 +640,13 @@ analyze_objects_shp <- function(img,
   }
 
   if(parallel == TRUE){
-    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.3), workers)
-    cl <- parallel::makePSOCKcluster(workers)
-    doParallel::registerDoParallel(cl)
-    on.exit(stopCluster(cl))
+    nworkers <- ifelse(is.null(workers), ceiling(detectCores() * 0.3), workers)
+    future::plan(future::multisession, workers = nworkers)
+    on.exit(future::plan(future::sequential))
+    `%dofut%` <- doFuture::`%dofuture%`
 
-    ## declare alias for dopar command
-    `%dopar%` <- foreach::`%dopar%`
-
-
-    results <-
-      foreach::foreach(i = seq_along(imgs), .packages = "pliman") %dopar%{
+        results <-
+      foreach::foreach(i = seq_along(imgs)) %dofut%{
         analyze_objects(imgs[[i]],
                         index = index,
                         segment_objects = segment_objects,
@@ -1134,7 +1128,7 @@ plot_index_shp <- function(object,
       }
       if(downsample > 0){
         message(paste0("Using downsample = ", downsample, " so that the number of rendered pixels approximates the `max_pixels`"))
-        rgb <- terra::aggregate(rgb, fact = downsample)
+        rgb <- mosaic_aggregate(rgb, pct = round(100 / downsample))
       }
     }
     terra::crs(rgb) <- terra::crs("+proj=utm +zone=32 +datum=WGS84 +units=m ")
@@ -1286,8 +1280,6 @@ measure_disease_shp <- function(img,
              dir_original,
              paste0("./", dir_original))
   }
-  ## declare alias for dopar command
-  `%dopar%` <- foreach::`%dopar%`
   # helper function
   help_meas_shp <- function(img,
                             nrow,
@@ -1423,15 +1415,15 @@ measure_disease_shp <- function(img,
     }
 
     if(parallel == TRUE){
-      workers2 <- ifelse(is.null(workers), ceiling(detectCores() * 0.2), workers)
-      cl2 <- parallel::makePSOCKcluster(workers2)
-      doParallel::registerDoParallel(cl2)
-      on.exit(stopCluster(cl2))
+      nworkers <- ifelse(is.null(workers), ceiling(detectCores() * 0.2), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
-        message("Image processing using multiple sessions (",workers2, "). Please wait.")
+        message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
       results <-
-        foreach::foreach(i = seq_along(names_plant), .packages = "pliman") %dopar%{
+        foreach::foreach(i = seq_along(names_plant)) %dofut%{
           help_meas_shp(names_plant[[i]],
                         nrow,
                         ncol,

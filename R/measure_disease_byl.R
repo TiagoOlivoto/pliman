@@ -246,19 +246,17 @@ measure_disease_byl <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust,
-                    varlist = c("names_plant", "help_byl", "img_healthy", "img_symptoms", "back"),
-                    envir=environment())
-      on.exit(stopCluster(clust))
+      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
       results <-
-        parLapply(clust, names_plant,
-                  function(x){
-                    help_byl(img  = x, img_healthy, img_symptoms, back, index_dh, index_lb)
-                  })
+        foreach::foreach(i = seq_along(names_plant)) %dofut%{
+          help_byl(img  = names_plant[i], img_healthy, img_symptoms, back, index_dh, index_lb)
+        }
     } else{
       results <- list()
       pb <- progress(max = length(plants), style = 4)

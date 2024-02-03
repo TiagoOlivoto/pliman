@@ -823,25 +823,22 @@ measure_disease <- function(img,
     if(parallel == TRUE){
       init_time <- Sys.time()
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust,
-                    varlist = c("names_plant", "help_count"),
-                    envir=environment())
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
+
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
       results <-
-        parLapply(clust, names_plant,
-                  function(x){
-                    help_count(x,
-                               img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
-                               index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
-                               nsample, plot, show_original, show_background, col_leaf,
-                               col_lesions, col_background,  save_image, dir_original, dir_processed,
-                               marker, marker_col, marker_size)
-                  })
-
+      foreach::foreach(i = seq_along(names_plant)) %dofut%{
+        help_count(names_plant[i],
+                   img_healthy, img_symptoms, img_background, resize, fill_hull, invert,
+                   index_lb, index_dh, has_white_bg, lesion_size, tolerance, extension, randomize,
+                   nsample, plot, show_original, show_background, col_leaf,
+                   col_lesions, col_background,  save_image, dir_original, dir_processed,
+                   marker, marker_col, marker_size)
+      }
     } else{
       init_time <- Sys.time()
       results <- list()

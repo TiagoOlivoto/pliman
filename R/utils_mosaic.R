@@ -65,8 +65,8 @@ make_grid <- function(points,
     for(k in 1:length(geometry)){
       coords <- geometry[[k]][[1]]
       geometry[[k]][[1]] <- create_buffer(coords,
-                                      buffer_col = buffer_row,
-                                      buffer_row = buffer_col)
+                                          buffer_col = buffer_row,
+                                          buffer_row = buffer_col)
     }
   }
   gshp <-
@@ -174,7 +174,7 @@ linear_iterpolation <- function(mosaic, points, method = "loess"){
 idw_interpolation <- function(mosaic, points){
   downsample <- find_aggrfact(mosaic, max_pixels = 200000)
   if(downsample > 0){
-    magg <- terra::aggregate(mosaic, downsample)
+    magg <- mosaic_aggregate(mosaic, pct = round(100 / downsample))
   } else{
     magg <- mosaic
   }
@@ -426,7 +426,7 @@ shapefile_build <- function(mosaic,
       }))
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
     if(downsample > 0){
-      mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
+      mosaiccr <- mosaic_aggregate(mosaiccr, pct = round(100 / downsample))
     }
     if(build_shapefile){
       mapview::mapview() |> mapedit::editMap()
@@ -1419,7 +1419,7 @@ mosaic_analyze <- function(mosaic,
     }
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
     if(downsample > 0){
-      mosaiccr <- terra::aggregate(mosaiccr, fact = downsample)
+      mosaiccr <- mosaic_aggregate(mosaiccr, pct = round(100 / downsample))
     }
     if(any(segment_individuals)){
       dfplot <- result_plot_summ
@@ -1784,7 +1784,7 @@ mosaic_view <- function(mosaic,
   dwspf <- find_aggrfact(mosaic, max_pixels = max_pixels)
   if(dwspf > 0 & is.null(downsample)){
     message(paste0("Using downsample = ", dwspf, " so that the number of rendered pixels approximates the `max_pixels`"))
-    mosaic <- terra::aggregate(mosaic, fact = dwspf)
+    mosaic <- mosaic_aggregate(mosaic, pct = round(100 / dwspf))
   }
   if(viewopt == "index" & terra::nlyr(mosaic) > 2){
     mosaic <- mosaic_index(mosaic, index = index, plot = FALSE)
@@ -2028,16 +2028,23 @@ mosaic_resample <- function(mosaic, y, ...){
 }
 
 
-#' A wrapper around terra::aggregate()
+#' SpatRaster aggregation
 #'
 #' Aggregate a SpatRaster to create a new SpatRaster with a lower resolution
-#' (larger cells). See [terra::aggregate()] for more details
+#' (larger cells), using the GDAL's gdal_translate utility
+#' https://gdal.org/programs/gdal_translate.html
 #'
 #' @param mosaic SpatRaster
-#' @param fact Aggregation factor expressed as number of cells in each direction
-#'   (horizontally and vertically). See [terra::aggregate()] for more details.
-#' @param ... Further arguments passed on to [terra::aggregate()].
-#'
+#' @param pct The size as a fraction (percentage) of the input image size.
+#'   Either a scalar (eg., 50), or a length-two numeric vector. In the last,
+#'   different percentage reduction/expansion can be used for columns, and rows,
+#'   respectively.
+#' @param fun The resampling function. Defaults to `nearest`, which applies the
+#'   nearest neighbor (simple sampling) resampler. Other accepted values are:
+#'   'average', 'rms', 'bilinear', 'cubic', 'cubicspline', 'lanczos', and
+#'   'mode'. See Details for a detailed explanation.
+#' @param in_memory Wheter to return an 'in-memory' `SpatRaster`. If `FALSE`,
+#'   the aggregated raster will be returned as an 'in-disk' object.
 #' @return SpatRaster
 #' @export
 #'
@@ -2046,14 +2053,47 @@ mosaic_resample <- function(mosaic, y, ...){
 #' library(terra)
 #' r <- rast()
 #' values(r) <- 1:ncell(r)
-#' r2 <- mosaic_aggregate(r, fact = 10)
+#' r2 <- mosaic_aggregate(r, pct = 10)
 #' opar <- par(no.readonly = TRUE)
 #' par(mfrow=c(1,2))
 #' mosaic_plot(r)
 #' mosaic_plot(r2)
 #' par(opar)
-mosaic_aggregate <- function(mosaic, fact = 2, ...){
-  terra::aggregate(mosaic, fact, ...)
+mosaic_aggregate <- function(mosaic,
+                             pct = 50,
+                             fun = "nearest",
+                             in_memory = TRUE){
+  outsize <- compute_outsize(pct)
+  td <- tempdir()
+  if(terra::inMemory(mosaic)){
+    in_raster <- file.path(td, "tmp_aggregate.tif")
+    terra::writeRaster(mosaic, in_raster, overwrite = TRUE)
+    on.exit({
+      file.remove(in_raster)
+      if(in_memory){
+        file.remove(out_raster)
+      }
+    })
+  } else{
+    in_raster <- terra::sources(mosaic)
+    on.exit(
+      if(in_memory){
+        file.remove(out_raster)
+      }
+    )
+  }
+  out_raster <- file.path(td, "tmp_aggregate_small.tif")
+  sf::gdal_utils(
+    util = "translate",
+    source = in_raster,
+    destination = out_raster,
+    options = strsplit(paste("-r", fun, "-outsize", outsize[1], outsize[2]), split = "\\s")[[1]]
+  )
+  if(in_memory){
+    terra::rast(out_raster) |> terra::wrap() |> terra::unwrap()
+  } else{
+    terra::rast(out_raster)
+  }
 }
 
 
@@ -2250,7 +2290,7 @@ shapefile_edit <- function(shapefile,
   if(!is.null(mosaic)){
     downsample <- find_aggrfact(mosaic, max_pixels = max_pixels)
     if(downsample > 0){
-      mosaic <- terra::aggregate(mosaic, fact = downsample, progress = FALSE)
+      mosaic <- mosaic_aggregate(mosaic, pct = round(100 / downsample))
     }
     nlyrs <- terra::nlyr(mosaic)
     if(nlyrs > 2){
@@ -2369,6 +2409,12 @@ mosaic_crop <- function(mosaic,
 #'   G, B, RE, and NIR` bands (eg., `index = "R+B/G"`) or using the names of the
 #'   mosaic's layers (ex., "(band_1 + band_2) / 2").
 #' @param plot Plot the computed index? Defaults to `TRUE`.
+#' @param in_memory Logical, indicating whether the indexes should be computed
+#'   in memory. Defaults to `TRUE`. In most cases, this is 2-3 times faster, but
+#'   errors can occur if `mosaic` is a large `SpatRaster`. If `FALSE`, raster
+#'   algebra operations are performed on temporary files.
+#' @param workers numeric. The number of workers you want to use for parallel
+#'   processing when computing multiple indexes.
 #' @return An index layer extracted/computed from the mosaic raster.
 #'
 #' @details This function computes or extracts an index layer from the input
@@ -2399,7 +2445,9 @@ mosaic_index <- function(mosaic,
                          b = 1,
                          re = 4,
                          nir = 5,
-                         plot = TRUE){
+                         plot = TRUE,
+                         in_memory = TRUE,
+                         workers = 1){
   if(length(index) == 1){
     if(inherits(mosaic, "Image")){
       ras <- t(terra::rast(mosaic@.Data))
@@ -2412,6 +2460,7 @@ mosaic_index <- function(mosaic,
       message(paste("Index '", paste0(index[!checkind], collapse = ", "), "' is not available. Trying to compute your own index.",
                     sep = ""))
     }
+    dimmo <- prod(dim(mosaic)[1:2])
     pattern <- "\\b\\w+\\b"
     layersused <- unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE)))
     onlychar <- suppressWarnings(is.na(as.numeric(layersused)))
@@ -2426,17 +2475,24 @@ mosaic_index <- function(mosaic,
       names(layers) <- layers_used
       mosaic_gray <- eval(parse(text = index), envir = layers)
     } else{
-      R <- try(ras[[r]], TRUE)
-      G <- try(ras[[g]], TRUE)
-      B <- try(ras[[b]], TRUE)
-      NIR <- try(ras[[nir]], TRUE)
-      RE <- try(ras[[re]], TRUE)
-      if(index %in% ind$Index){
-        mosaic_gray <-
-          eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+      if(in_memory){
+        if(index %in% ind$Index){
+          formula <- as.character(ind$Equation[as.character(ind$Index)==index])
+          mosaic_gray <- terra::lapp(mosaic[[c(r, g, b, re, nir)]], parse_formula(formula))
+        } else{
+          mosaic_gray <- terra::lapp(mosaic[[c(r, g, b, re, nir)]], parse_formula(index))
+        }
       } else{
-        mosaic_gray <-
-          eval(parse(text = as.character(index)))
+        R <- try(ras[[r]], TRUE)
+        G <- try(ras[[g]], TRUE)
+        B <- try(ras[[b]], TRUE)
+        NIR <- try(ras[[nir]], TRUE)
+        RE <- try(ras[[re]], TRUE)
+        if(index %in% ind$Index){
+          mosaic_gray <- eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
+        } else{
+          mosaic_gray <- eval(parse(text = index))
+        }
       }
     }
     names(mosaic_gray) <- index
@@ -2448,26 +2504,142 @@ mosaic_index <- function(mosaic,
       suppressWarnings(terra::crs(mosaic_gray) <- "+proj=utm +zone=32 +datum=WGS84 +units=m")
     }
   } else{
-    mosaic_gray <- terra::rast(
-      Map(c,
-          lapply(seq_along(unique(index)), function(i){
-            mosaic_index(mosaic,
-                         index = unique(index)[[i]],
-                         r = r,
-                         g = g,
-                         b = b,
-                         re = re,
-                         nir = nir,
-                         plot = FALSE)
-          })
+    if(workers > 1){
+      future::plan(future::multisession, workers = workers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
+      if(terra::inMemory(mosaic)){
+        tf <- paste0(tempfile(), ".tif")
+        on.exit(file.remove(tf))
+        terra::writeRaster(mosaic, filename = tf)
+        tempf <- tf
+      } else{
+        tempf <- terra::sources(mosaic)
+      }
+      d <-
+        foreach::foreach(i = seq_along(index),
+                         .options.future = list(
+                           seed = TRUE
+                         )) %dofut%{
+                           tfil <- paste0(tempfile(), ".tif")
+                           mosaic_index(terra::rast(tempf),
+                                        index = unique(index)[[i]],
+                                        r = r,
+                                        g = g,
+                                        b = b,
+                                        re = re,
+                                        nir = nir,
+                                        in_memory = in_memory,
+                                        plot = FALSE) |>
+                             terra::writeRaster(tfil, overwrite = TRUE)
+                           tfil
+                         }
+      mosaic_gray <- terra::rast(unlist(d)) |> terra::wrap() |> terra::unwrap()
+      on.exit(file.remove(unlist(d)))
+    } else{
+      mosaic_gray <- terra::rast(
+        Map(c,
+            lapply(seq_along(unique(index)), function(i){
+              mosaic_index(mosaic,
+                           index = unique(index)[[i]],
+                           r = r,
+                           g = g,
+                           b = b,
+                           re = re,
+                           nir = nir,
+                           in_memory = in_memory,
+                           plot = FALSE)
+            })
+        )
       )
-    )
+    }
   }
   if(plot){
     terra::plot(mosaic_gray)
   }
   invisible(mosaic_gray)
 }
+
+#' Mosaic Index with GDAL
+#'
+#' Compute or extract an index layer from a multi-band mosaic raster using
+#' gdal_calc.py (https://gdal.org/programs/gdal_calc.html). This requires a
+#' Python and GDAL installation.
+#' @inheritParams mosaic_index
+#' @param python The PATH for python.exe
+#' @param gdal The PATH for gdal_calc.py
+#' @return An index layer extracted/computed from the mosaic raster.
+#' @export
+#' @examples
+#' if((Sys.which('python.exe') != '' ) & (Sys.which('gdal_calc.py') != '' )){
+#' library(pliman)
+#' mosaic <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#' names(mosaic) <- "R"
+#' elev2 <- mosaic_index2(mosaic, "R * 5", plot = FALSE)
+#' oldpar <- par(no.readonly=TRUE)
+#' mosaic_plot(mosaic)
+#' mosaic_plot(elev2)
+#' par(mfrow=c(1,2))
+#' }
+
+mosaic_index2 <- function(mosaic,
+                          index = "B",
+                          r = 3,
+                          g = 2,
+                          b = 1,
+                          re = 4,
+                          nir = 5,
+                          plot = TRUE,
+                          python = Sys.which('python.exe'),
+                          gdal = Sys.which('gdal_calc.py')) {
+  if(python == ''){
+    stop('Error: Python executable (python.exe) not found on the system. Please, install it and add it to the PATH variable')
+  }
+  if(gdal==''){
+    stop("Error: gdal_calc.py not found on the system. Make sure GDAL is installed and available in the system PATH.
+         You can install GDAL by installing miniconda (https://docs.conda.io/projects/miniconda/en/latest/)
+         and then running 'conda install -c conda-forge gdal' in the conda terminal.
+         Additionally, make sure that the Python Scripts directory is added to the system PATH.")
+  }
+  ind <- read.csv(file=system.file("indexes.csv", package = "pliman", mustWork = TRUE), header = T, sep = ";")
+  checkind <- index %in% ind$Index
+  if (!checkind) {
+    message(paste("Index '", paste0(index[!checkind], collapse = ", "), "' is not available. Trying to compute your own index.",
+                  sep = ""))
+  } else{
+    index <- as.character(ind$Equation[as.character(ind$Index)==index])
+  }
+  if(terra::inMemory(mosaic)){
+    tf <- tempfile(fileext = ".tif")
+    mosaic_export(mosaic, tf)
+    on.exit(file.remove(tf))
+    infile <- tf
+  } else{
+    infile <- terra::sources(mosaic)
+  }
+  mosaicbands <- c("R", "G", "B", "E", "I")
+  outfile <- tempfile(fileext = ".tif")
+  nbands <- terra::nlyr(mosaic)
+  inputs <- paste0('-',
+                   mosaicbands[seq_len(nbands)], ' ', infile, ' --',
+                   mosaicbands[seq_len(nbands)], '_band ', seq_len(nbands), collapse=' ')
+  system2(python,
+          args=c(gdal,
+                 inputs,
+                 sprintf("--outfile=%s", outfile),
+                 sprintf('--calc="%s"', index),
+                 '--co="COMPRESS=DEFLATE"',
+                 '--co="BIGTIFF=IF_NEEDED"',
+                 '--overwrite'),
+          stdout=FALSE
+  )
+  res <- terra::rast(outfile)
+  if(plot){
+    terra::plot(res)
+  }
+  return(res)
+}
+
 #' Segment a mosaic
 #'
 #' Segment a `SpatRaster` using a computed image index. By default, values
@@ -2551,7 +2723,7 @@ mosaic_segment_pick <- function(mosaic,
   }
   downsample <- ifelse(is.null(downsample), find_aggrfact(mosaic, max_pixels = max_pixels), downsample)
   if(downsample > 0){
-    mosaicp <- terra::aggregate(mosaic, downsample, progress = FALSE)
+    mosaicp <- mosaic_aggregate(mosaicp, pct = round(100 / downsample))
   }
   if(is.null(basemap)){
     basemap <-

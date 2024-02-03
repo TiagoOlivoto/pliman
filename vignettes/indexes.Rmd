@@ -28,49 +28,51 @@ The RGB (Red, Green, Blue) color space is a widely used color representation in 
 
 ## Indexes in the RGB Color Space
 
-| Abbreviation | Name                                    | Formula                                                                       | Reference          |
-|---------------|---------------|---------------------------|---------------|
-| R            | Red (650 nm)                            | `R`                                                                           |                    |
-| G            | Green (545 nm)                          | `G`                                                                           |                    |
-| B            | Blue (445 nm)                           | `B`                                                                           |                    |
-| NR           | Normalized Red                          | `R / (R + G + B)`                                                             | @yang2015          |
-| NG           | Normalized Green                        | `G / (R + G + B)`                                                             | @yang2015          |
-| NB           | Normalized Blue                         | `B / (R + G + B)`                                                             | @yang2015          |
-| GB           | Green-Blue Ratio                        | `G / B`                                                                       |                    |
-| RB           | Red-Blue Ratio                          | `R / B`                                                                       |                    |
-| GR           | Green-Red Ratio                         | `G / R`                                                                       |                    |
-| BI           | Brightness Index                        | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 | @richardson1977    |
-| BI2          | Brightness Index 2                      | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 |                    |
-| SCI          | Soil Colour Index                       | `(R - G) / (R + G)`                                                           | @mathieu1998       |
-| GLI          | Green Leaf Index                        | `((G-R)+(G-B))/(G+R+G+B)`                                                     | @louhaichi2001     |
-| HI           | Primary Colours Hue Index               | `(2*R-G-B)/(G-B)`                                                             | @escadafal1994     |
-| NGRDI        | Normalized Green-Red Difference Index   | `(G-R)/(G+R)`                                                                 | @tucker1979        |
-| NGBDI        | Normalized Green-Blue Difference Index  | `(G-B)/(G+B)`                                                                 | @bannari1995       |
-| SI           | Normalized Red-Blue Difference Index    | `(R-B)/(R+B)`                                                                 | @escadafal1994     |
-| I            | Total intensity                         | `R + G + B`                                                                   |                    |
-| S            | Saturation                              | `((R + G + B) - 3 * B) / (R + G + B)`                                         |                    |
-| L            | Average Intensity                       | `(R + G + B) / 3`                                                             |                    |
-| VARI         | Visible Atmospherically Resistant Index | `(G-R)/(G+R-B)`                                                               | @gitelson2002      |
-| HUE          | Overall Hue Index                       | `atan(2*(B-G-R)/30.5*(G-R))`                                                  | @escadafal1994     |
-| HUE2         | Overall Hue Index 2                     | `atan(2*(R-G-R)/30.5*(G-B))`                                                  | @escadafal1994     |
-| BGI          | Blue Green Pigment                      | `B/G`                                                                         | @zarco-tejada2005  |
-| GRAY         |                                         | `0.299 * R + 0.587 * G + 0.114 * B`                                           |                    |
-| GRAY2        |                                         | `((R^2.2 + (1.5 * G)^2.2 + (0.6 * B)^2.2) / (1 + 1.5^2.2 + 0.6^2.2))^(1/2.2)` |                    |
-| GLAI         |                                         | `(25 * (G - R) / (G + R - B) + 1.25)`                                         |                    |
-| CI           | Coloration Index                        | `((R - B) / R)`                                                               |                    |
-| SAT          | Overall Saturation Index                | `((max(R, G, B) - min(R, G, B)) / max(R, G, B))`                              |                    |
-| SHP          | Shape Index                             | `(2 * (R - G - B) / (G - B))`                                                 |                    |
-| RI           | Redness Index                           | `(R^2 / (B * G^3))`                                                           |                    |
-| SAVI         | Soild Adjusted Vegetation Index         | `(1 + 0.5)*(G-R)/(G+R+0.5)`                                                   | @li2010            |
-| EXG          | Excess Green Index                      | `2 * G - R - B`                                                               | @d.m.woebbecke1995 |
-| MGVRI        | Modified Green Red Vegetation Index     | `(G2 - R2) / (G2 + R2)`                                                       | @bendig2015        |
+| Abbreviation | Name                                     | Formula                                                                       | Reference          |
+|----------------|----------------|------------------------|----------------|
+| R            | Red (650 nm)                             | `R`                                                                           |                    |
+| G            | Green (545 nm)                           | `G`                                                                           |                    |
+| B            | Blue (445 nm)                            | `B`                                                                           |                    |
+| NR           | Normalized Red                           | `R / (R + G + B)`                                                             | @yang2015          |
+| NG           | Normalized Green                         | `G / (R + G + B)`                                                             | @yang2015          |
+| NB           | Normalized Blue                          | `B / (R + G + B)`                                                             | @yang2015          |
+| GB           | Green-Blue Ratio                         | `G / B`                                                                       |                    |
+| RB           | Red-Blue Ratio                           | `R / B`                                                                       |                    |
+| GR           | Green-Red Ratio                          | `G / R`                                                                       |                    |
+| BI           | Brightness Index                         | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 | @richardson1977    |
+| BI2          | Brightness Index 2                       | `sqrt((R^2 + G^2 + B^2) / 3)`                                                 |                    |
+| SCI          | Soil Colour Index                        | `(R - G) / (R + G)`                                                           | @mathieu1998       |
+| GLI          | Green Leaf Index                         | `((G-R)+(G-B))/(G+R+G+B)`                                                     | @louhaichi2001     |
+| HI           | Primary Colours Hue Index                | `(2*R-G-B)/(G-B)`                                                             | @escadafal1994     |
+| NGRDI        | Normalized Green-Red Difference Index    | `(G-R)/(G+R)`                                                                 | @tucker1979        |
+| NGBDI        | Normalized Green-Blue Difference Index   | `(G-B)/(G+B)`                                                                 | @bannari1995       |
+| SI           | Normalized Red-Blue Difference Index     | `(R-B)/(R+B)`                                                                 | @escadafal1994     |
+| I            | Total intensity                          | `R + G + B`                                                                   |                    |
+| S            | Saturation                               | `((R + G + B) - 3 * B) / (R + G + B)`                                         |                    |
+| L            | Average Intensity                        | `(R + G + B) / 3`                                                             |                    |
+| VARI         | Visible Atmospherically Resistant Index  | `(G-R)/(G+R-B)`                                                               | @gitelson2002      |
+| HUE          | Overall Hue Index                        | `atan(2*(B-G-R)/30.5*(G-R))`                                                  | @escadafal1994     |
+| HUE2         | Overall Hue Index 2                      | `atan(2*(R-G-R)/30.5*(G-B))`                                                  | @escadafal1994     |
+| BGI          | Blue Green Pigment                       | `B/G`                                                                         | @zarco-tejada2005  |
+| GRAY         |                                          | `0.299 * R + 0.587 * G + 0.114 * B`                                           |                    |
+| GRAY2        |                                          | `((R^2.2 + (1.5 * G)^2.2 + (0.6 * B)^2.2) / (1 + 1.5^2.2 + 0.6^2.2))^(1/2.2)` |                    |
+| GLAI         |                                          | `(25 * (G - R) / (G + R - B) + 1.25)`                                         |                    |
+| CI           | Coloration Index                         | `((R - B) / R)`                                                               |                    |
+| SAT          | Overall Saturation Index                 | `((max(R, G, B) - min(R, G, B)) / max(R, G, B))`                              |                    |
+| SHP          | Shape Index                              | `(2 * (R - G - B) / (G - B))`                                                 |                    |
+| RI           | Redness Index                            | `(R^2 / (B * G^3))`                                                           |                    |
+| SAVI         | Soild Adjusted Vegetation Index          | `(1 + 0.5)*(G-R)/(G+R+0.5)`                                                   | @li2010            |
+| EGVI         | Excess Green Index                       | `2 * G - R - B`                                                               | @d.m.woebbecke1995 |
+| ERVI         | Excess Red Vegetation Index              | `((1.4 * R) - G)`                                                             | @meyer2008         |
+| MGVRI        | Modified Green Red Vegetation Index      | `(G2 - R2) / (G2 + R2)`                                                       | @bendig2015        |
+| CIVE         | Color Index of Vegetation Extraction     | `(0.811*G)+(0.385*B)+18.78745)`                                               | @kataoka2003       |
 
 ## Multispectral indexes
 
 {pliman} provides tools to analyze up to 5 bands , which are generally B, G, R, RE (red-edge) and NIR (near-infrared). The following build-in indexes are available.
 
 | Abbreviation | Name                                               | Formula                                                                                                              | Reference          |
-|--------------|--------------|-----------------------------|--------------|
+|----------------|----------------|--------------------------|----------------|
 | NDVI         | Normalized Diference Vegetation Index              | `(NIR - R) / (NIR + R)`                                                                                              | @j1969             |
 | PSRI         | Plant Senescence Reflectance Index                 | `(R-G)/RE`                                                                                                           | @merzlyak1999      |
 | GNDVI        | Normalized Difference NIR/G                        | `(NIR - G) / (NIR + G)`                                                                                              | @gitelson1996      |
@@ -142,7 +144,7 @@ The `rgb_to_hsb()` function can be used to convert RGB to HSB color space. The c
 ## Indexes in the HSB Color Space
 
 | Abbreviation | Name                  | Formula                                           | Reference    |
-|---------------|---------------|---------------------------|---------------|
+|----------------|----------------|------------------------|----------------|
 | DGCI         | Dark Green Color Inde | `((H - 60) / 60 + (1 - S/100) + (1 - B/100)) / 3` | @karcher2003 |
 
 # CIE-Lab Color Space

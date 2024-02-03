@@ -19,9 +19,10 @@ BugReports: https://github.com/TiagoOlivoto/pliman/issues
 Depends: 
     R (>= 4.1)
 Imports: 
-    doParallel,
+    doFuture,
     exactextractr,
     foreach,
+    future,
     methods,
     poorman,
     Rcpp,

@@ -99,13 +99,15 @@ object_coord <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, img, object_coord, id, index, invert,
-                fill_hull, threshold, edge, extension, tolerance,
-                object_size, plot)
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          object_coord(img[[i]], id, index, invert,
+                       fill_hull, threshold, edge, extension, tolerance,
+                       object_size, plot)
+        }
     } else{
       lapply(img, object_coord, id, index, invert, fill_hull, threshold,
              edge, extension, tolerance, object_size, plot)
@@ -205,12 +207,16 @@ object_contour <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
+
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, img, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
-                watershed, extension, tolerance, object_size, plot = plot)
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          object_contour(img[[i]],
+                         pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
+                         watershed, extension, tolerance, object_size, plot = plot)
+        }
     } else{
       lapply(img, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
              watershed, extension, tolerance, object_size, plot = plot)
@@ -315,17 +321,15 @@ object_contour <- function(img,
       if(parallel == TRUE){
         init_time <- Sys.time()
         nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
-        cl <- parallel::makePSOCKcluster(nworkers)
-        doParallel::registerDoParallel(cl)
-        on.exit(parallel::stopCluster(cl))
+        future::plan(future::multisession, workers = nworkers)
+        on.exit(future::plan(future::sequential))
+        `%dofut%` <- doFuture::`%dofuture%`
 
         if(verbose == TRUE){
           message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
         }
-        ## declare alias for dopar command
-        `%dopar%` <- foreach::`%dopar%`
         results <-
-          foreach::foreach(i = seq_along(plants), .packages = c("pliman", "EBImage")) %dopar%{
+          foreach::foreach(i = seq_along(plants)) %dofut%{
             help_contour(plants[[i]])
           }
 
@@ -365,11 +369,13 @@ object_isolate <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, img, object_isolate, id, ...)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        object_isolate(img[[i]], id)
+      }
     } else{
       lapply(img, object_isolate, id, ...)
     }
@@ -396,11 +402,13 @@ object_id <- function(img,
     }
     if(parallel == TRUE){
       nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      clust <- makeCluster(nworkers)
-      clusterExport(clust, "img")
-      on.exit(stopCluster(clust))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
-      parLapply(clust, img, object_id, ...)
+      foreach::foreach(i = seq_along(img)) %dofut%{
+        object_id(img[[i]], ...)
+      }
     } else{
       lapply(img, object_id, ...)
     }
@@ -624,18 +632,16 @@ image_augment <- function(img,
 
       init_time <- Sys.time()
       nworkers <- trunc(detectCores()*.3)
-      cl <- parallel::makePSOCKcluster(nworkers)
-      doParallel::registerDoParallel(cl)
-      on.exit(stopCluster(cl))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
-      ## declare alias for dopar command
-      `%dopar%` <- foreach::`%dopar%`
       obj_list <- list()
       results <-
-        foreach::foreach(i = seq_along(plants), .packages = c("pliman")) %dopar%{
+        foreach::foreach(i = seq_along(plants)) %dofut%{
 
           tmpimg <- image_import(plants[[i]], path = diretorio_original)
 
@@ -857,18 +863,16 @@ object_export <- function(img,
 
       init_time <- Sys.time()
       nworkers <- trunc(detectCores()*.3)
-      cl <- parallel::makePSOCKcluster(nworkers)
-      doParallel::registerDoParallel(cl)
-      on.exit(stopCluster(cl))
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
 
       if(verbose == TRUE){
         message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
       }
-      ## declare alias for dopar command
-      `%dopar%` <- foreach::`%dopar%`
 
       results <-
-        foreach::foreach(i = seq_along(plants), .packages = c("pliman")) %dopar%{
+        foreach::foreach(i = seq_along(plants)) %dofut%{
 
           tmpimg <- image_import(plants[[i]], path = diretorio_original)
 
