@@ -20,6 +20,7 @@ mosaic_view(
   index = "B",
   max_pixels = 1e+06,
   downsample = NULL,
+  downsample_fun = "nearest",
   alpha = 1,
   quantiles = c(0, 1),
   color_regions = custom_palette(c("red", "yellow", "forestgreen")),
@@ -75,6 +76,8 @@ view and "index" for index view.}
 x height) is greater than \code{max_pixels} a downsampling factor will be
 automatically chosen so that the number of plotted pixels approximates the
 \code{max_pixels}.}
+
+\item{downsample_fun}{The resampling function. Defaults to nearest. See further details in \code{\link[=mosaic_aggregate]{mosaic_aggregate()}}.}
 
 \item{alpha}{opacity of the fill color of the raster layer(s).}
 

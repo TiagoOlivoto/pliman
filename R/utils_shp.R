@@ -325,7 +325,7 @@ object_export_shp <- function(img,
     if(isTRUE(parallel)){
 
       init_time <- Sys.time()
-      nworkers <- trunc(detectCores()*.3)
+      nworkers <- trunc(parallel::detectCores()*.3)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -640,7 +640,7 @@ analyze_objects_shp <- function(img,
   }
 
   if(parallel == TRUE){
-    nworkers <- ifelse(is.null(workers), ceiling(detectCores() * 0.3), workers)
+    nworkers <- ifelse(is.null(workers), ceiling(parallel::detectCores() * 0.3), workers)
     future::plan(future::multisession, workers = nworkers)
     on.exit(future::plan(future::sequential))
     `%dofut%` <- doFuture::`%dofuture%`
@@ -1415,7 +1415,7 @@ measure_disease_shp <- function(img,
     }
 
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), ceiling(detectCores() * 0.2), workers)
+      nworkers <- ifelse(is.null(workers), ceiling(parallel::detectCores() * 0.2), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`

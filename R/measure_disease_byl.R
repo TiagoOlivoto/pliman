@@ -245,8 +245,7 @@ measure_disease_byl <- function(img,
       stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.3), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.3), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`

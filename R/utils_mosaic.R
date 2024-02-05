@@ -65,8 +65,8 @@ make_grid <- function(points,
     for(k in 1:length(geometry)){
       coords <- geometry[[k]][[1]]
       geometry[[k]][[1]] <- create_buffer(coords,
-                                          buffer_col = buffer_row,
-                                          buffer_row = buffer_col)
+                                          buffer_col = buffer_col,
+                                          buffer_row = buffer_row)
     }
   }
   gshp <-
@@ -603,6 +603,7 @@ shapefile_build <- function(mosaic,
 #'# map with individual results
 #'res$map_indiv
 #' }
+
 mosaic_analyze <- function(mosaic,
                            r = 3,
                            g = 2,
@@ -732,114 +733,23 @@ mosaic_analyze <- function(mosaic,
       mosaiccr <- mosaic
     }
 
-    if(length(segment_plot) == 1 & length(created_shapes) != 1){
-      segment_plot <- rep(segment_plot, length(created_shapes))
-    }
-    if(length(segment_plot) != length(created_shapes)){
-      warning(paste0("`segment_plot` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(segment_individuals) == 1 & length(created_shapes) != 1){
-      segment_individuals <- rep(segment_individuals, length(created_shapes))
-    }
-    if(length(segment_individuals) != length(created_shapes)){
-      warning(paste0("`segment_individuals` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(threshold) == 1 & length(created_shapes) != 1){
-      threshold <- rep(threshold, length(created_shapes))
-    }
-    if(length(threshold) != length(created_shapes)){
-      warning(paste0("`threshold` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(watershed) == 1 & length(created_shapes) != 1){
-      watershed <- rep(watershed, length(created_shapes))
-    }
-    if(length(watershed) != length(created_shapes)){
-      warning(paste0("`watershed` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(segment_index) == 1 & length(created_shapes) != 1){
-      segment_index <- rep(segment_index, length(created_shapes))
-    }
-    if(length(segment_index) != length(created_shapes)){
-      warning(paste0("`segment_index` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(invert) == 1 & length(created_shapes) != 1){
-      invert <- rep(invert, length(created_shapes))
-    }
-    if(length(invert) != length(created_shapes)){
-      warning(paste0("`invert` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(includeopt) == 1 & length(created_shapes) != 1){
-      includeopt <- rep(includeopt, length(created_shapes))
-    }
-    if(length(includeopt) != length(created_shapes)){
-      warning(paste0("`includeopt` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(filter) == 1 & length(created_shapes) != 1){
-      filter <- rep(filter, length(created_shapes))
-    }
-    if(length(filter) != length(created_shapes)){
-      warning(paste0("`filter` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(grid) == 1 & length(created_shapes) != 1){
-      grid <- rep(grid, length(created_shapes))
-    }
-    if(length(grid) != length(created_shapes)){
-      warning(paste0("`grid` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(length(lower_noise) == 1 & length(created_shapes) != 1){
-      lower_noise <- rep(lower_noise, length(created_shapes))
-    }
-    if(length(lower_noise) != length(created_shapes)){
-      warning(paste0("`lower_noise` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(is.null(lower_size) | length(lower_size) == 1 & length(created_shapes) != 1){
-      lower_size <- rep(lower_size, length(created_shapes))
-    }
-    if(!is.null(lower_size) & length(lower_size) != length(created_shapes)){
-      warning(paste0("`lower_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(is.null(upper_size) | length(upper_size) == 1 & length(created_shapes) != 1){
-      upper_size <- rep(upper_size, length(created_shapes))
-    }
-    if(!is.null(upper_size) & length(upper_size) != length(created_shapes)){
-      warning(paste0("`upper_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(is.null(topn_lower) | length(topn_lower) == 1 & length(created_shapes) != 1){
-      topn_lower <- rep(topn_lower, length(created_shapes))
-    }
-    if(!is.null(topn_lower) & length(topn_lower) != length(created_shapes)){
-      warning(paste0("`topn_lower` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
-    if(is.null(topn_upper) | length(topn_upper) == 1 & length(created_shapes) != 1){
-      topn_upper <- rep(topn_upper, length(created_shapes))
-    }
-    if(!is.null(topn_upper) & length(topn_upper) != length(created_shapes)){
-      warning(paste0("`topn_upper` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-    }
   } else{
     if(inherits(shapefile, "list")){
-      shapefile <- shapefile_input(shapefile |> sf_to_polygon(), info = FALSE)
+      created_shapes <-
+        lapply(shapefile, function(x){
+          shapefile_input(x |> sf_to_polygon(), info = FALSE)
+        })
     } else{
       if(inherits(shapefile, "SpatVector")){
-        shapefile <- sf::st_as_sf(shapefile)
+        created_shapes <- sf::st_as_sf(shapefile) |> sf_to_polygon()
       }
-      shapefile <- shapefile |> sf_to_polygon()
+      created_shapes <- shapefile |> sf_to_polygon()
     }
-    extm <- terra::ext(shapefile)
-    xmin <- extm[1]
-    xmax <- extm[2]
-    ymin <- extm[3]
-    ymax <- extm[4]
-    coords <- matrix(c(xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, xmin, ymax), ncol = 2, byrow = TRUE)
-
-    geoms <- sf::st_as_sf(shapefile$geometry)
-    sf::st_geometry(geoms) <- "geometry"
-    created_shapes <- list(geoms)
-
-    # crop to the analyzed area
     if(crop_to_shape_ext){
       poly_ext <-
-        created_shapes[[1]] |>
+        do.call(rbind, lapply(created_shapes, function(x){
+          x
+        })) |>
         sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
         terra::vect() |>
         terra::buffer(buffer_edge) |>
@@ -848,6 +758,90 @@ mosaic_analyze <- function(mosaic,
     } else{
       mosaiccr <- mosaic
     }
+  }
+  if(length(segment_plot) == 1 & length(created_shapes) != 1){
+    segment_plot <- rep(segment_plot, length(created_shapes))
+  }
+  if(length(segment_plot) != length(created_shapes)){
+    warning(paste0("`segment_plot` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(segment_individuals) == 1 & length(created_shapes) != 1){
+    segment_individuals <- rep(segment_individuals, length(created_shapes))
+  }
+  if(length(segment_individuals) != length(created_shapes)){
+    warning(paste0("`segment_individuals` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(threshold) == 1 & length(created_shapes) != 1){
+    threshold <- rep(threshold, length(created_shapes))
+  }
+  if(length(threshold) != length(created_shapes)){
+    warning(paste0("`threshold` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(watershed) == 1 & length(created_shapes) != 1){
+    watershed <- rep(watershed, length(created_shapes))
+  }
+  if(length(watershed) != length(created_shapes)){
+    warning(paste0("`watershed` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(segment_index) == 1 & length(created_shapes) != 1){
+    segment_index <- rep(segment_index, length(created_shapes))
+  }
+  if(length(segment_index) != length(created_shapes)){
+    warning(paste0("`segment_index` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(invert) == 1 & length(created_shapes) != 1){
+    invert <- rep(invert, length(created_shapes))
+  }
+  if(length(invert) != length(created_shapes)){
+    warning(paste0("`invert` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(includeopt) == 1 & length(created_shapes) != 1){
+    includeopt <- rep(includeopt, length(created_shapes))
+  }
+  if(length(includeopt) != length(created_shapes)){
+    warning(paste0("`includeopt` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(filter) == 1 & length(created_shapes) != 1){
+    filter <- rep(filter, length(created_shapes))
+  }
+  if(length(filter) != length(created_shapes)){
+    warning(paste0("`filter` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(grid) == 1 & length(created_shapes) != 1){
+    grid <- rep(grid, length(created_shapes))
+  }
+  if(length(grid) != length(created_shapes)){
+    warning(paste0("`grid` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(length(lower_noise) == 1 & length(created_shapes) != 1){
+    lower_noise <- rep(lower_noise, length(created_shapes))
+  }
+  if(length(lower_noise) != length(created_shapes)){
+    warning(paste0("`lower_noise` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(is.null(lower_size) | length(lower_size) == 1 & length(created_shapes) != 1){
+    lower_size <- rep(lower_size, length(created_shapes))
+  }
+  if(!is.null(lower_size) & length(lower_size) != length(created_shapes)){
+    warning(paste0("`lower_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(is.null(upper_size) | length(upper_size) == 1 & length(created_shapes) != 1){
+    upper_size <- rep(upper_size, length(created_shapes))
+  }
+  if(!is.null(upper_size) & length(upper_size) != length(created_shapes)){
+    warning(paste0("`upper_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(is.null(topn_lower) | length(topn_lower) == 1 & length(created_shapes) != 1){
+    topn_lower <- rep(topn_lower, length(created_shapes))
+  }
+  if(!is.null(topn_lower) & length(topn_lower) != length(created_shapes)){
+    warning(paste0("`topn_lower` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  if(is.null(topn_upper) | length(topn_upper) == 1 & length(created_shapes) != 1){
+    topn_upper <- rep(topn_upper, length(created_shapes))
+  }
+  if(!is.null(topn_upper) & length(topn_upper) != length(created_shapes)){
+    warning(paste0("`topn_upper` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
   }
 
   # return(created_shapes)
@@ -886,7 +880,7 @@ mosaic_analyze <- function(mosaic,
   results <- list()
   result_indiv <- list()
   extends <- terra::ext(mosaiccr)
-  usepickmask <- segment_pick & (segment_individuals | segment_plot)
+  usepickmask <- segment_pick & (segment_individuals[[1]] | segment_plot[[1]])
   if(usepickmask){
     if(build_shapefile & is.null(shapefile)){
       mapview::mapview() |> mapedit::editMap()
@@ -1706,6 +1700,7 @@ mosaic_analyze_iter <- function(mosaic,
 #'   x height) is greater than `max_pixels` a downsampling factor will be
 #'   automatically chosen so that the number of plotted pixels approximates the
 #'   `max_pixels`.
+#' @param downsample_fun The resampling function. Defaults to nearest. See further details in [mosaic_aggregate()].
 #' @param alpha opacity of the fill color of the raster layer(s).
 #' @param quantiles the upper and lower quantiles used for color stretching.
 #' @param axes logical. Draw axes? Defaults to `FALSE`.
@@ -1749,6 +1744,7 @@ mosaic_view <- function(mosaic,
                         index = "B",
                         max_pixels = 1000000,
                         downsample = NULL,
+                        downsample_fun = "nearest",
                         alpha = 1,
                         quantiles = c(0, 1),
                         color_regions = custom_palette(c("red", "yellow", "forestgreen")),
@@ -1784,7 +1780,7 @@ mosaic_view <- function(mosaic,
   dwspf <- find_aggrfact(mosaic, max_pixels = max_pixels)
   if(dwspf > 0 & is.null(downsample)){
     message(paste0("Using downsample = ", dwspf, " so that the number of rendered pixels approximates the `max_pixels`"))
-    mosaic <- mosaic_aggregate(mosaic, pct = round(100 / dwspf))
+    mosaic <- mosaic_aggregate(mosaic, pct = round(100 / dwspf), fun = downsample_fun)
   }
   if(viewopt == "index" & terra::nlyr(mosaic) > 2){
     mosaic <- mosaic_index(mosaic, index = index, plot = FALSE)
@@ -2065,7 +2061,7 @@ mosaic_aggregate <- function(mosaic,
                              in_memory = TRUE){
   outsize <- compute_outsize(pct)
   td <- tempdir()
-  if(terra::inMemory(mosaic)){
+  if(terra::inMemory(mosaic)[[1]]){
     in_raster <- file.path(td, "tmp_aggregate.tif")
     terra::writeRaster(mosaic, in_raster, overwrite = TRUE)
     on.exit({
@@ -2075,7 +2071,7 @@ mosaic_aggregate <- function(mosaic,
       }
     })
   } else{
-    in_raster <- terra::sources(mosaic)
+    in_raster <- terra::sources(mosaic)[[1]]
     on.exit(
       if(in_memory){
         file.remove(out_raster)

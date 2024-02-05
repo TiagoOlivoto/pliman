@@ -98,7 +98,7 @@ object_coord <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -206,7 +206,7 @@ object_contour <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -368,7 +368,7 @@ object_isolate <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -401,7 +401,7 @@ object_id <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.5), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.5), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -631,7 +631,7 @@ image_augment <- function(img,
     if(isTRUE(parallel)){
 
       init_time <- Sys.time()
-      nworkers <- trunc(detectCores()*.3)
+      nworkers <- trunc(parallel::detectCores()*.3)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`
@@ -862,7 +862,7 @@ object_export <- function(img,
     if(isTRUE(parallel)){
 
       init_time <- Sys.time()
-      nworkers <- trunc(detectCores()*.3)
+      nworkers <- trunc(parallel::detectCores()*.3)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`

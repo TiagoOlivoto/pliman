@@ -1323,7 +1323,7 @@ image_thinning_guo_hall <- function(img,
       stop("All images must be of class 'Image'")
     }
     if(parallel == TRUE){
-      nworkers <- ifelse(is.null(workers), trunc(detectCores()*.4), workers)
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.4), workers)
       future::plan(future::multisession, workers = nworkers)
       on.exit(future::plan(future::sequential))
       `%dofut%` <- doFuture::`%dofuture%`

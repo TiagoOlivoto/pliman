@@ -91,7 +91,7 @@ apply_fun_to_imgs <- function(pattern,
   }
 
   if(parallel == TRUE){
-    workers <- ifelse(is.null(workers), ceiling(detectCores() * 0.5), workers)
+    workers <- ifelse(is.null(workers), ceiling(parallel::detectCores() * 0.5), workers)
     future::plan(future::multisession, workers = workers)
     on.exit(future::plan(future::sequential))
     `%dofut%` <- doFuture::`%dofuture%`
