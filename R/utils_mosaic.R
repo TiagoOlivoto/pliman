@@ -31,7 +31,6 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
   resized_coords[, 2] <- (resized_coords[, 2] - y_min) * y_scale_factor + new_y_min
   return(resized_coords)
 }
-
 make_grid <- function(points,
                       nrow,
                       ncol,
@@ -74,6 +73,7 @@ make_grid <- function(points,
     sf::st_sf(crs = sf::st_crs(mosaic))
   return(gshp)
 }
+
 
 find_aggrfact <- function(mosaic, max_pixels = 1000000){
   compute_downsample <- function(nr, nc, n) {
@@ -716,7 +716,6 @@ mosaic_analyze <- function(mosaic,
                         downsample = downsample,
                         quantiles = quantiles)
       )
-
     # crop to the analyzed area
     if(crop_to_shape_ext){
       poly_ext <-
@@ -732,18 +731,17 @@ mosaic_analyze <- function(mosaic,
     } else{
       mosaiccr <- mosaic
     }
-
   } else{
     if(inherits(shapefile, "list")){
-      created_shapes <-
-        lapply(shapefile, function(x){
-          shapefile_input(x |> sf_to_polygon(), info = FALSE)
-        })
+      created_shapes <- lapply(shapefile, function(x){
+        x[, "geometry"]
+      })
     } else{
       if(inherits(shapefile, "SpatVector")){
         created_shapes <- sf::st_as_sf(shapefile) |> sf_to_polygon()
       }
-      created_shapes <- shapefile |> sf_to_polygon()
+      created_shapes <- list(shapefile |> sf_to_polygon())
+      names(created_shapes) <- paste(1:length(created_shapes))
     }
     if(crop_to_shape_ext){
       poly_ext <-
@@ -872,7 +870,7 @@ mosaic_analyze <- function(mosaic,
     }
   } else{
     mind <- indexes
-    if(!segment_index %in% names(mind)){
+    if(!all(segment_index %in% names(mind))){
       stop("`segment_index` must be present in `indexes`")
     }
   }
