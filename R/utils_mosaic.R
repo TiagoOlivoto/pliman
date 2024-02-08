@@ -405,7 +405,7 @@ shapefile_build <- function(mosaic,
                   buffer_col = buffer_col[k],
                   buffer_row = buffer_row[k])
     } else{
-      plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> poorman::select(geometry)
+      plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> dplyr::select(geometry)
     }
     created_shapes[[k]] <- plot_grid
 
@@ -418,10 +418,10 @@ shapefile_build <- function(mosaic,
     pg_edit <-
       do.call(rbind, lapply(seq_along(created_shapes), function(i){
         created_shapes[[i]] |>
-          poorman::mutate(`_leaflet_id` = 1:nrow(created_shapes[[i]]),
-                          feature_type = "polygon",
-                          block = i) |>
-          poorman::relocate(geometry, .after = 3) |>
+          dplyr::mutate(`_leaflet_id` = 1:nrow(created_shapes[[i]]),
+                        feature_type = "polygon",
+                        block = i) |>
+          dplyr::relocate(geometry, .after = 3) |>
           sf::st_transform(crs = 4326)
       }))
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
@@ -433,7 +433,7 @@ shapefile_build <- function(mosaic,
     }
     edited <-
       mapedit::editFeatures(pg_edit, basemap) |>
-      poorman::select(geometry, block) |>
+      dplyr::select(geometry, block) |>
       sf::st_transform(sf::st_crs(mosaic))
     sfeat <- sf::st_as_sf(edited$geometry)
     sf::st_geometry(sfeat) <- "geometry"
@@ -969,9 +969,9 @@ mosaic_analyze <- function(mosaic,
           )
         plot_grid <-
           plot_grid |>
-          poorman::mutate(covered_area = as.numeric(covered_area),
-                          plot_area = as.numeric(sf::st_area(geometry)),
-                          coverage = covered_area / plot_area)
+          dplyr::mutate(covered_area = as.numeric(covered_area),
+                        plot_area = as.numeric(sf::st_area(geometry)),
+                        coverage = covered_area / plot_area)
 
         mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
@@ -1064,27 +1064,43 @@ mosaic_analyze <- function(mosaic,
                                        summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
 
         if(inherits(valindiv, "list")){
-          valindiv <-
-            do.call(rbind, lapply(1:length(valindiv), function(i){
-              tmp <- transform(valindiv[[i]],
-                               individual = paste0(i),
-                               block = paste0("B", leading_zeros(j, n = 2)))
-              tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
-
+          if(is.null(summarize_fun)){
+            valindiv <- dplyr::bind_rows(valindiv, .id = "individual")
+            if("coverage_fraction" %in% colnames(valindiv)){
+              valindiv$coverage_fraction <- NULL
             }
-            ))
-          if("coverage_fraction" %in% colnames(valindiv)){
-            valindiv$coverage_fraction <- NULL
+            if("value" %in% colnames(valindiv)){
+              colnames(valindiv)[2] <- plot_index
+            }
+            valindiv <- valindiv |> dplyr::nest_by(individual)
+          } else{
+            valindiv <-
+              do.call(rbind, lapply(1:length(valindiv), function(i){
+                tmp <- transform(valindiv[[i]],
+                                 individual = paste0(i),
+                                 block = paste0("B", leading_zeros(j, n = 2)))
+                tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
+
+              }
+              ))
+
+            if(length(plot_index) == 1){
+              colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+            } else{
+              colnames(valindiv) <- c("block", "plot_id", plot_index)
+            }
           }
-        }
-        if(length(plot_index) == 1){
-          colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+        } else{
+          if(length(plot_index) == 1){
+            colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+          }
         }
         if(!is.null(summarize_fun)){
           valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         } else{
-          result_indiv[[j]] <- valindiv
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual)), check.names = FALSE)
+          result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         }
       } else{
         dmask <- NULL
@@ -1169,9 +1185,9 @@ mosaic_analyze <- function(mosaic,
           )
         plot_grid <-
           plot_grid |>
-          poorman::mutate(covered_area = as.numeric(covered_area),
-                          plot_area = as.numeric(sf::st_area(geometry)),
-                          coverage = covered_area / plot_area)
+          dplyr::mutate(covered_area = as.numeric(covered_area),
+                        plot_area = as.numeric(sf::st_area(geometry)),
+                        coverage = covered_area / plot_area)
 
         mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
@@ -1261,27 +1277,44 @@ mosaic_analyze <- function(mosaic,
                                        summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
 
         if(inherits(valindiv, "list")){
-          valindiv <-
-            do.call(rbind, lapply(1:length(valindiv), function(i){
-              tmp <- transform(valindiv[[i]],
-                               individual = paste0(i),
-                               block = paste0("B", leading_zeros(j, n = 2)))
-              tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
+          if(is.null(summarize_fun)){
+            valindiv <- dplyr::bind_rows(valindiv, .id = "individual")
+            if("coverage_fraction" %in% colnames(valindiv)){
+              valindiv$coverage_fraction <- NULL
             }
-            ))
-          if("coverage_fraction" %in% colnames(valindiv)){
-            valindiv$coverage_fraction <- NULL
+            if("value" %in% colnames(valindiv)){
+              colnames(valindiv)[2] <- plot_index
+            }
+            valindiv <- valindiv |> dplyr::nest_by(individual) |> dplyr::ungroup()
+          } else{
+            valindiv <-
+              do.call(rbind, lapply(1:length(valindiv), function(i){
+                tmp <- transform(valindiv[[i]],
+                                 individual = paste0(i),
+                                 block = paste0("B", leading_zeros(j, n = 2)))
+                tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
+
+              }
+              ))
+
+            if(length(plot_index) == 1){
+              colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+            } else{
+              colnames(valindiv) <- c("block", "plot_id", plot_index)
+            }
           }
-        }
-        if(length(plot_index) == 1){
-          colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+        } else{
+          if(length(plot_index) == 1){
+            colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
+          }
         }
 
         if(!is.null(summarize_fun)){
           valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), plot_id = leading_zeros(1, n = 4), gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv
         } else{
-          result_indiv[[j]] <- valindiv
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual)), check.names = FALSE)
+          result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         }
       } else{
         result_indiv[[j]] <- NULL
@@ -1311,16 +1344,24 @@ mosaic_analyze <- function(mosaic,
         vals$coverage_fraction <- NULL
       }
       if(length(plot_index) == 1){
-        colnames(vals) <- paste0(colnames(vals), ".", plot_index)
+        if(ncol(vals) == 1){
+          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
+        } else{
+          colnames(vals) <- c("block", "plot_id", plot_index)
+        }
       }
       vals <-
         vals |>
-        poorman::nest_by(block, plot_id) |>
-        poorman::ungroup()
+        dplyr::nest_by(block, plot_id) |>
+        dplyr::ungroup()
       vals <- cbind(plot_grid, vals)
     } else{
       if(length(plot_index) == 1){
-        colnames(vals) <- paste0(colnames(vals), ".", plot_index)
+        if(ncol(vals) == 1){
+          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
+        } else{
+          colnames(vals) <- c("block", "plot_id", plot_index)
+        }
       }
       vals <- transform(vals,
                         plot_id = paste0(leading_zeros(1:nrow(vals), n = 4)),
@@ -1339,7 +1380,7 @@ mosaic_analyze <- function(mosaic,
   # bind the results  ## at a level plot
   results <-
     do.call(rbind, lapply(results, function(x){x})) |>
-    poorman::relocate(block, plot_id, .before = 1)
+    dplyr::relocate(block, plot_id, .before = 1)
 
 
   if(any(segment_individuals)){
@@ -1349,31 +1390,31 @@ mosaic_analyze <- function(mosaic,
     summres <-
       lapply(1:length(blockid), function(i){
         result_indiv |>
-          poorman::filter(block == blockid[i]) |>
+          dplyr::filter(block == blockid[i]) |>
           as.data.frame() |>
-          poorman::group_by(plot_id) |>
-          poorman::summarise(poorman::across(poorman::where(is.numeric), \(x){mean(x, na.rm = TRUE)}),
-                             n = length(area),
-                             area_sum = sum(area, na.rm = TRUE)) |>
-          poorman::mutate(block = blockid[i], .before = 1) |>
-          poorman::ungroup() |>
-          poorman::relocate(n, .after = plot_id)
+          dplyr::group_by(plot_id) |>
+          dplyr::summarise(area_sum = sum(area, na.rm = TRUE),
+                           n = length(area),
+                           dplyr::across(dplyr::where(is.numeric), \(x){mean(x, na.rm = TRUE)})
+          ) |>
+          dplyr::mutate(block = blockid[i], .before = 1) |>
+          dplyr::ungroup() |>
+          dplyr::relocate(n, .after = plot_id)
       })
     names(summres) <- blockid
     # compute plot area
     plot_area <-
       results |>
-      poorman::mutate(plot_area = sf::st_area(geometry)) |>
+      dplyr::mutate(plot_area = sf::st_area(geometry)) |>
       as.data.frame(check.names = FALSE) |>
-      poorman::select(block, plot_id, plot_area)
+      dplyr::select(block, plot_id, plot_area)
     # compute coverage area
     result_plot_summ <-
       do.call(rbind, lapply(summres, function(x){x})) |>
-      poorman::left_join(plot_area, by = c("block", "plot_id")) |>
-      poorman::mutate(coverage = as.numeric(area_sum / plot_area), .after = area) |>
-      poorman::left_join(results |>   poorman::select(block, plot_id, geometry), by = c("block", "plot_id")) |>
+      dplyr::left_join(plot_area, by = dplyr::join_by(block, plot_id)) |>
+      dplyr::mutate(coverage = as.numeric(area_sum / plot_area), .after = area) |>
+      dplyr::left_join(results |>   dplyr::select(block, plot_id, geometry), by = dplyr::join_by(block, plot_id)) |>
       sf::st_as_sf()
-    colnames(result_plot_summ)[12:(ncol(result_plot_summ) - 3)] <- colnames(result_indiv)[11:(ncol(result_indiv) - 1)]
 
     centroid <-
       suppressWarnings(sf::st_centroid(result_indiv) |>
@@ -1381,18 +1422,17 @@ mosaic_analyze <- function(mosaic,
                          as.data.frame() |>
                          setNames(c("x", "y")))
     result_indiv <-
-      poorman::bind_cols(result_indiv, centroid) |>
-      poorman::relocate(x, y, .after = individual)
-
+      dplyr::bind_cols(result_indiv, centroid) |>
+      dplyr::relocate(x, y, .after = individual)
 
     if(map_individuals){
       result_individ_map <- map_individuals(result_indiv, direction = map_direction)
 
       result_plot_summ <-
         result_plot_summ |>
-        poorman::mutate(mean_distance = result_individ_map$means,
-                        cv = result_individ_map$cvs,
-                        .before = n)
+        dplyr::mutate(mean_distance = result_individ_map$means,
+                      cv = result_individ_map$cvs,
+                      .before = n)
     } else{
       result_individ_map <- NULL
     }
@@ -1405,7 +1445,7 @@ mosaic_analyze <- function(mosaic,
 
   }
 
-  if(!is.null(summarize_fun) & isTRUE(plot)){
+  if(isTRUE(plot)){
     if(verbose){
       cat("\014","\nPreparing to plot...\n")
     }
@@ -1415,9 +1455,16 @@ mosaic_analyze <- function(mosaic,
     }
     if(any(segment_individuals)){
       dfplot <- result_plot_summ
+      if(!attribute %in% colnames(dfplot)){
+        attribute <- "area"
+      }
     } else{
       dfplot <- results
+      if(!attribute %in% colnames(dfplot)){
+        attribute <- NULL
+      }
     }
+
     map <-
       basemap +
       suppressWarnings(
@@ -1544,7 +1591,7 @@ mosaic_analyze_iter <- function(mosaic,
   if(is.null(bind[[1]]$result_indiv)){
     result_indiv <- result_plot_summ <- NULL
   } else{
-    result_indiv <- poorman::bind_rows(
+    result_indiv <- dplyr::bind_rows(
       lapply(bind, function(x){
         tmp <- x$result_indiv
         tmp$plot_id <- NULL
@@ -1552,10 +1599,10 @@ mosaic_analyze_iter <- function(mosaic,
       }),
       .id = "plot_id"
     ) |>
-      poorman::relocate(plot_id, .after = block) |>
+      dplyr::relocate(plot_id, .after = block) |>
       sf::st_as_sf()
 
-    result_plot_summ <- poorman::bind_rows(
+    result_plot_summ <- dplyr::bind_rows(
       lapply(bind, function(x){
         tmp <- x$result_plot_summ
         tmp$plot_id <- NULL
@@ -1563,11 +1610,11 @@ mosaic_analyze_iter <- function(mosaic,
       }),
       .id = "plot_id"
     ) |>
-      poorman::relocate(plot_id, .after = block) |>
+      dplyr::relocate(plot_id, .after = block) |>
       sf::st_as_sf()
   }
 
-  result_plot <- poorman::bind_rows(
+  result_plot <- dplyr::bind_rows(
     lapply(bind, function(x){
       tmp <- x$result_plot
       tmp$plot_id <- NULL
@@ -1575,7 +1622,7 @@ mosaic_analyze_iter <- function(mosaic,
     }),
     .id = "plot_id"
   ) |>
-    poorman::relocate(plot_id, .after = block) |>
+    dplyr::relocate(plot_id, .after = block) |>
     sf::st_as_sf()
 
 
@@ -1709,9 +1756,9 @@ mosaic_analyze_iter <- function(mosaic,
 #' @importFrom terra rast crs nlyr terraOptions
 #' @importFrom methods as
 #' @importFrom sf st_crs st_transform st_make_grid st_intersection st_make_valid
-#' @importFrom poorman summarise across mutate arrange left_join bind_cols
-#'   bind_rows contains ends_with everything between pivot_longer pivot_wider
-#'   where select filter relocate rename
+#' @importFrom dplyr summarise across mutate arrange left_join bind_cols
+#'   bind_rows contains ends_with everything between where select filter
+#'   relocate rename
 #' @examples
 #' if(interactive()){
 #' library(pliman)
@@ -2737,9 +2784,9 @@ mosaic_segment_pick <- function(mosaic,
   soil <- soil |> sf::st_transform(sf::st_crs(mosaic))
   soil_sample <-
     exactextractr::exact_extract(mosaic, soil, progress = FALSE) |>
-    poorman::bind_rows() |>
-    poorman::select(-coverage_fraction) |>
-    poorman::mutate(class = 0)
+    dplyr::bind_rows() |>
+    dplyr::select(-coverage_fraction) |>
+    dplyr::mutate(class = 0)
 
   mapview::mapview() |> mapedit::editMap()
 
@@ -2749,10 +2796,10 @@ mosaic_segment_pick <- function(mosaic,
   plant <- plant |> sf::st_transform(sf::st_crs(mosaic))
   plant_sample <-
     exactextractr::exact_extract(mosaic, plant, progress = FALSE) |>
-    poorman::bind_rows() |>
-    poorman::select(-coverage_fraction) |>
-    poorman::mutate(class = 1)
-  df_train <- poorman::bind_rows(plant_sample, soil_sample)
+    dplyr::bind_rows() |>
+    dplyr::select(-coverage_fraction) |>
+    dplyr::mutate(class = 1)
+  df_train <- dplyr::bind_rows(plant_sample, soil_sample)
   if(ncol(df_train) == 2){
     names(df_train)[[1]] <- names(mosaic)
   }

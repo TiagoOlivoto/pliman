@@ -20,11 +20,11 @@ Depends:
     R (>= 4.1)
 Imports: 
     doFuture,
+    dplyr,
     exactextractr,
     foreach,
     future,
     methods,
-    poorman,
     Rcpp,
     sf,
     terra
