@@ -26,6 +26,7 @@ mosaic_analyze(
   segment_plot = FALSE,
   segment_individuals = FALSE,
   segment_pick = FALSE,
+  mask = NULL,
   simplify = FALSE,
   map_individuals = FALSE,
   map_direction = c("horizontal", "vertical"),
@@ -116,6 +117,8 @@ a watershed-based segmentation will be performed.}
 \code{segment_pick} allows segmenting background (eg., soil) and foreground
 (eg., plants) interactively by picking samples from background and
 foreground using \code{\link[=mosaic_segment_pick]{mosaic_segment_pick()}}}
+
+\item{mask}{An optional mask (SpatRaster) to mask the mosaic.}
 
 \item{simplify}{Removes vertices in polygons to form simpler shapes. The
 function implementation uses the Douglas–Peucker algorithm using

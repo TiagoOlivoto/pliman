@@ -13,7 +13,8 @@ mosaic_segment(
   re = 4,
   nir = 5,
   threshold = "Otsu",
-  invert = FALSE
+  invert = FALSE,
+  return = c("mosaic", "mask")
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ numeric value is provided, this value will be used as a threshold.}
 \item{invert}{Logical, indicating whether to invert the mask. Defaults to
 \code{FALSE}, i.e., pixels with intensity greater than the threshold values are
 selected.}
+
+\item{return}{The output of the function. Either 'mosaic' (the segmented
+mosaic), or 'mask' (the binary mask).}
 }
 \value{
 The segmented mosaic (\code{SpatRaster} object)

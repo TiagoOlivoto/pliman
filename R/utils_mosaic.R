@@ -518,6 +518,7 @@ shapefile_build <- function(mosaic,
 #'   `segment_pick` allows segmenting background (eg., soil) and foreground
 #'   (eg., plants) interactively by picking samples from background and
 #'   foreground using [mosaic_segment_pick()]
+#' @param mask An optional mask (SpatRaster) to mask the mosaic.
 #' @param simplify Removes vertices in polygons to form simpler shapes. The
 #'   function implementation uses the Douglas–Peucker algorithm using
 #'   [sf::st_simplify()] for simplification.
@@ -625,6 +626,7 @@ mosaic_analyze <- function(mosaic,
                            segment_plot = FALSE,
                            segment_individuals = FALSE,
                            segment_pick = FALSE,
+                           mask = NULL,
                            simplify = FALSE,
                            map_individuals = FALSE,
                            map_direction = c("horizontal", "vertical"),
@@ -895,6 +897,10 @@ mosaic_analyze <- function(mosaic,
                           return = "mask")
     )
   }
+  ihaveamask <- !is.null(mask) & (segment_individuals[[1]] | segment_plot[[1]])
+  if(ihaveamask){
+    mask <- mask
+  }
   for(j in seq_along(created_shapes)){
     if(segment_plot[j] & segment_individuals[j]){
       stop("Only `segment_plot` OR `segment_individuals` can be used", call. = FALSE)
@@ -918,7 +924,7 @@ mosaic_analyze <- function(mosaic,
       }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
-        if(usepickmask){
+        if(usepickmask | ihaveamask){
           if(crop_to_shape_ext){
             mask <- terra::crop(mask, terra::ext(ext_anal))
           }
@@ -977,7 +983,7 @@ mosaic_analyze <- function(mosaic,
       }
       # check if segmentation is performed (analyze individuals)
       if(segment_individuals[j]){
-        if(usepickmask){
+        if(usepickmask | ihaveamask){
           if(crop_to_shape_ext){
             mask <- terra::crop(mask, terra::ext(ext_anal))
           }
@@ -1134,7 +1140,7 @@ mosaic_analyze <- function(mosaic,
       }
       extends <- terra::ext(mind_temp)
       if(segment_plot[j]){
-        if(usepickmask){
+        if(usepickmask | ihaveamask){
           if(crop_to_shape_ext){
             mask <- terra::crop(mask, terra::ext(ext_anal))
           }
@@ -1193,7 +1199,7 @@ mosaic_analyze <- function(mosaic,
       }
 
       if(segment_individuals[j]){
-        if(usepickmask){
+        if(usepickmask | ihaveamask){
           if(crop_to_shape_ext){
             mask <- terra::crop(mask, terra::ext(ext_anal))
           }
@@ -2688,7 +2694,8 @@ mosaic_index2 <- function(mosaic,
 #'
 #' @inheritParams mosaic_index
 #' @inheritParams mosaic_analyze
-#'
+#' @param return The output of the function. Either 'mosaic' (the segmented
+#'   mosaic), or 'mask' (the binary mask).
 #'
 #' @return The segmented mosaic (`SpatRaster` object)
 #' @export
@@ -2709,7 +2716,11 @@ mosaic_segment <- function(mosaic,
                            re = 4,
                            nir = 5,
                            threshold = "Otsu",
-                           invert = FALSE){
+                           invert = FALSE,
+                           return = c("mosaic", "mask")){
+  if(!return[[1]] %in% c("mosaic", "mask")){
+    stop("'return' must be one of 'mosaic' or 'mask'.")
+  }
   ind <- mosaic_index(mosaic,
                       index = index,
                       r = r,
@@ -2724,7 +2735,11 @@ mosaic_segment <- function(mosaic,
   } else{
     mask <- ind[[index]] > thresh
   }
-  terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+  if(return[[1]] == 'mosaic'){
+    terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+  } else{
+    mask
+  }
 }
 
 
