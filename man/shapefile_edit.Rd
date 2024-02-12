@@ -7,6 +7,7 @@
 shapefile_edit(
   shapefile,
   mosaic = NULL,
+  basemap = NULL,
   r = 3,
   g = 2,
   b = 1,
@@ -19,6 +20,8 @@ shapefile_edit(
 
 \item{mosaic}{Optionally, a mosaic (SpatRaster) to be displayed as a
 background.}
+
+\item{basemap}{An optional \code{mapview} object.}
 
 \item{r}{Red band index for RGB display (default is 3).}
 

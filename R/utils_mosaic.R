@@ -1575,7 +1575,8 @@ mosaic_analyze_iter <- function(mosaic,
                                 plot = TRUE,
                                 verbose = TRUE,
                                 max_pixels = 3e6,
-                                attribute = "area",
+                                attribute = NULL,
+                                summarize_fun = "mean",
                                 segment_plot = FALSE,
                                 segment_individuals = FALSE,
                                 segment_index = "VARI",
@@ -1584,6 +1585,10 @@ mosaic_analyze_iter <- function(mosaic,
                                 alpha = 0.75,
                                 quantiles = c(0, 1),
                                 ...){
+  pind <- unique(c(plot_index, segment_index))
+  if(is.null(attribute)){
+    attribute <- paste(summarize_fun, pind[[1]], sep = ".")
+  }
   bind <- list()
   for (i in 1:nrow(shapefile)) {
     if(verbose){
@@ -1597,7 +1602,7 @@ mosaic_analyze_iter <- function(mosaic,
                      segment_individuals = segment_individuals,
                      segment_index = segment_index,
                      segment_plot = segment_plot,
-                     plot_index = unique(c(plot_index, segment_index)),
+                     plot_index = pind,
                      build_shapefile = FALSE,
                      plot = FALSE,
                      grid = FALSE,

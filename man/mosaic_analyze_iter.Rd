@@ -7,13 +7,18 @@
 mosaic_analyze_iter(
   mosaic,
   shapefile,
+  basemap = NULL,
   r = 3,
   g = 2,
   b = 1,
+  re = 4,
+  nir = 5,
   plot = TRUE,
   verbose = TRUE,
   max_pixels = 3e+06,
-  attribute = "area",
+  attribute = NULL,
+  summarize_fun = "mean",
+  segment_plot = FALSE,
   segment_individuals = FALSE,
   segment_index = "VARI",
   plot_index = "VARI",
@@ -30,11 +35,17 @@ mosaic_analyze_iter(
 \item{shapefile}{An optional shapefile containing regions of interest (ROIs)
 for analysis.}
 
+\item{basemap}{An optional basemap generated with \code{\link[=mosaic_view]{mosaic_view()}}.}
+
 \item{r}{The layer for the Red band (default: 3).}
 
 \item{g}{The layer for the Green band (default: 2).}
 
 \item{b}{The layer for the Blue band (default: 1).}
+
+\item{re}{The layer for the Red-edge band (default: 4).}
+
+\item{nir}{The layer for the Near-infrared band(default: 5).}
 
 \item{plot}{Logical, indicating whether to generate plots (default: TRUE).}
 
@@ -45,6 +56,14 @@ for analysis.}
 (default: 500000).}
 
 \item{attribute}{The attribute to be shown at the plot when \code{plot} is \code{TRUE}. Defaults to the first \code{summary_fun} and first \code{segment_index}.}
+
+\item{summarize_fun}{The function to compute summaries for the pixel values.
+Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
+individual-level) is returned.}
+
+\item{segment_plot}{Logical, indicating whether to segment plots (default:
+FALSE). If \code{TRUE}, the \code{segment_index} will be computed, and pixels with
+values below the \code{threshold} will be selected.}
 
 \item{segment_individuals}{Logical, indicating whether to segment individuals
 within plots (default: FALSE). If \code{TRUE}, the \code{segment_index} will be
