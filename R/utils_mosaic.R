@@ -919,6 +919,9 @@ mosaic_analyze <- function(mosaic,
           terra::buffer(buffer_edge) |>
           terra::ext()
         mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+        if(!is.null(mask)){
+          mask <- terra::crop(mask, terra::ext(ext_anal))
+        }
       } else{
         mind_temp <- mind
       }
@@ -1114,6 +1117,10 @@ mosaic_analyze <- function(mosaic,
       }
 
       # extract the values for the individual plots
+      # check if a mask is used and no segmentation
+      if(!is.null(mask) & (!segment_individuals[[1]] & !segment_plot[[1]])){
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = TRUE)
+      }
       vals <-
         exactextractr::exact_extract(x = mind_temp,
                                      y = plot_grid,
@@ -1135,6 +1142,9 @@ mosaic_analyze <- function(mosaic,
           terra::buffer(buffer_edge) |>
           terra::ext()
         mind_temp <- terra::crop(mind, terra::ext(ext_anal))
+        if(!is.null(mask)){
+          mask <- terra::crop(mask, terra::ext(ext_anal))
+        }
       } else{
         mind_temp <- mind
       }
@@ -1326,6 +1336,11 @@ mosaic_analyze <- function(mosaic,
         result_indiv[[j]] <- NULL
       }
 
+      # extract the values for the individual plots
+      # check if a mask is used and no segmentation
+      if(!is.null(mask) & (!segment_individuals[[1]] & !segment_plot[[1]])){
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = TRUE)
+      }
       vals <-
         exactextractr::exact_extract(x = mind_temp,
                                      y = plot_grid,
@@ -1547,15 +1562,21 @@ mosaic_analyze <- function(mosaic,
 #'   results.
 #' @export
 #'
+
+
 mosaic_analyze_iter <- function(mosaic,
                                 shapefile,
+                                basemap = NULL,
                                 r = 3,
                                 g = 2,
                                 b = 1,
+                                re = 4,
+                                nir = 5,
                                 plot = TRUE,
                                 verbose = TRUE,
                                 max_pixels = 3e6,
                                 attribute = "area",
+                                segment_plot = FALSE,
                                 segment_individuals = FALSE,
                                 segment_index = "VARI",
                                 plot_index =  "VARI",
@@ -1564,31 +1585,24 @@ mosaic_analyze_iter <- function(mosaic,
                                 quantiles = c(0, 1),
                                 ...){
   bind <- list()
-  ind <- mosaic_index(mosaic,
-                      index = unique(c(plot_index, segment_index)),
-                      r = r,
-                      g = g,
-                      b = b,
-                      re = re,
-                      nir = nir,
-                      plot = FALSE)
   for (i in 1:nrow(shapefile)) {
     if(verbose){
       cat("\014","\nAnalyzing plot", i, "\n")
     }
     bind[[paste0("P", leading_zeros(i, 4))]] <-
       mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
-                     r = r, g = g, b = b,
-                     indexes = terra::crop(ind, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
+                     basemap = basemap,
+                     r = r, g = g, b = b, re = re, nir = nir,
                      shapefile = shapefile[i, ],
                      segment_individuals = segment_individuals,
                      segment_index = segment_index,
-                     plot_index = plot_index,
+                     segment_plot = segment_plot,
+                     plot_index = unique(c(plot_index, segment_index)),
                      build_shapefile = FALSE,
                      plot = FALSE,
                      grid = FALSE,
                      verbose = FALSE,
-                     crop_to_shape_ext = FALSE,
+                     crop_to_shape_ext = TRUE,
                      ...)
   }
   if(is.null(bind[[1]]$result_individ_map)){
@@ -1637,31 +1651,33 @@ mosaic_analyze_iter <- function(mosaic,
     if(verbose){
       cat("\014","\nPreparing to plot...\n")
     }
-    if(terra::nlyr(mosaic) < 3){
-      basemap <-
-        suppressWarnings(
-          mapview::mapview(mosaic,
-                           maxpixels = 5e6,
-                           legend = FALSE,
-                           map.types = "CartoDB.Positron",
-                           alpha.regions = 1,
-                           na.color = "transparent",
-                           verbose = FALSE)
-        )
-    } else{
-      basemap <-
-        suppressWarnings(
-          mapview::viewRGB(
-            as(mosaic, "Raster"),
-            layer.name = "base",
-            r = r,
-            g = g,
-            b = b,
-            na.color = "#00000000",
-            maxpixels = 5e6,
-            quantiles = quantiles
+    if(is.null(basemap)){
+      if(terra::nlyr(mosaic) < 3){
+        basemap <-
+          suppressWarnings(
+            mapview::mapview(mosaic,
+                             maxpixels = 5e6,
+                             legend = FALSE,
+                             map.types = "CartoDB.Positron",
+                             alpha.regions = 1,
+                             na.color = "transparent",
+                             verbose = FALSE)
           )
-        )
+      } else{
+        basemap <-
+          suppressWarnings(
+            mapview::viewRGB(
+              as(mosaic, "Raster"),
+              layer.name = "base",
+              r = r,
+              g = g,
+              b = b,
+              na.color = "#00000000",
+              maxpixels = 5e6,
+              quantiles = quantiles
+            )
+          )
+      }
     }
     if(!is.null(result_indiv)){
       dfplot <- result_plot_summ
@@ -2165,6 +2181,29 @@ mosaic_plot <- function(mosaic, ...){
   terra::plot(mosaic, ...)
 }
 
+#' A wrapper around terra::hist()
+#'
+#' Create a histogram of the values of a `SpatRaster`.
+#'
+#' @param mosaic SpatRaster
+#' @param layer positive integer or character to indicate layer numbers (or
+#'   names). If missing, all layers are used
+#' @param ... Further arguments passed on to [terra::hist()].
+#'
+#' @return A `NULL` object
+#' @export
+#'
+#' @examples
+#' library(pliman)
+#' r <- mosaic_input(system.file("ex/elev.tif", package="terra"))
+#' mosaic_hist(r)
+mosaic_hist <- function(mosaic, layer, ...){
+  if(!inherits(mosaic, "SpatRaster")){
+    stop("'mosaic' must be an object of class 'SpatRaster'")
+  }
+  terra::hist(mosaic, layer, ...)
+}
+
 #' A wrapper around terra::plotRGB()
 #'
 #' Plot the RGB of a SpatRaster
@@ -2313,6 +2352,7 @@ shapefile_view <- function(shapefile,
 #'   [shapefile_input()].
 #' @param mosaic Optionally, a mosaic (SpatRaster) to be displayed as a
 #'   background.
+#' @param basemap An optional `mapview` object.
 #' @param r Red band index for RGB display (default is 3).
 #' @param g Green band index for RGB display (default is 2).
 #' @param b Blue band index for RGB display (default is 1).
@@ -2329,34 +2369,39 @@ shapefile_view <- function(shapefile,
 #' }
 shapefile_edit <- function(shapefile,
                            mosaic = NULL,
+                           basemap = NULL,
                            r = 3,
                            g = 2,
                            b = 1,
                            max_pixels = 3e6){
   shapefile <- shapefile_input(shapefile, info = FALSE)
   if(!is.null(mosaic)){
-    downsample <- find_aggrfact(mosaic, max_pixels = max_pixels)
-    if(downsample > 0){
-      mosaic <- mosaic_aggregate(mosaic, pct = round(100 / downsample))
-    }
-    nlyrs <- terra::nlyr(mosaic)
-    if(nlyrs > 2){
-      map <-
-        mapview::viewRGB(
-          x = as(mosaic, "Raster"),
-          layer.name = "base",
-          r = r,
-          g = g,
-          b = b,
-          na.color = "#00000000",
-          maxpixels = 5e6
-        )
+    if(is.null(basemap)){
+      downsample <- find_aggrfact(mosaic, max_pixels = max_pixels)
+      if(downsample > 0){
+        mosaic <- mosaic_aggregate(mosaic, pct = round(100 / downsample))
+      }
+      nlyrs <- terra::nlyr(mosaic)
+      if(nlyrs > 2){
+        map <-
+          mapview::viewRGB(
+            x = as(mosaic, "Raster"),
+            layer.name = "base",
+            r = r,
+            g = g,
+            b = b,
+            na.color = "#00000000",
+            maxpixels = 5e6
+          )
+      } else{
+        map <-
+          mapview::mapview() %>%
+          leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
+                               colorOptions = leafem::colorOptions(palette = custom_palette(),
+                                                                   na.color = "transparent"))
+      }
     } else{
-      map <-
-        mapview::mapview() %>%
-        leafem::addGeoRaster(x = as(mosaic[[1]], "Raster"),
-                             colorOptions = leafem::colorOptions(palette = custom_palette(),
-                                                                 na.color = "transparent"))
+      map <- basemap
     }
     edited <- mapedit::editFeatures(shapefile |> sf::st_transform(crs = 4326), map)
   } else{
@@ -2779,11 +2824,11 @@ mosaic_segment_pick <- function(mosaic,
   }
   downsample <- ifelse(is.null(downsample), find_aggrfact(mosaic, max_pixels = max_pixels), downsample)
   if(downsample > 0){
-    mosaicp <- mosaic_aggregate(mosaicp, pct = round(100 / downsample))
+    mosaic <- mosaic_aggregate(mosaic, pct = round(100 / downsample))
   }
   if(is.null(basemap)){
     basemap <-
-      mosaic_view(mosaicp,
+      mosaic_view(mosaic,
                   r = r,
                   g = g,
                   b = b,
