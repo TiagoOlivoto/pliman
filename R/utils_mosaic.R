@@ -1689,8 +1689,8 @@ mosaic_analyze_iter <- function(mosaic,
       basemap +
       suppressWarnings(
         mapview::mapview(dfplot,
-                         zcol = attribute,
-                         layer.name = attribute,
+                         zcol = ifelse(!attribute %in% colnames(dfplot), "area", attribute),
+                         layer.name = ifelse(!attribute %in% colnames(dfplot), "area", attribute),
                          col.regions = custom_palette(c("darkred", "yellow", "darkgreen"), n = 3),
                          alpha.regions = 0.75,
                          na.color = "#00000000",
