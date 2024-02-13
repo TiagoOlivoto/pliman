@@ -2013,6 +2013,9 @@ mosaic_view <- function(mosaic,
 #' @param check_16bits Checks if mosaic has maximum value in the 16-bits format
 #'   (65535), and replaces it by NA. Defaults to `TRUE`.
 #' @param filename character. The Output filename.
+#' @param datatype The datatype. By default, the function will try to guess the
+#'   data type that saves more memory usage and file size. See
+#'   [terra::writeRaster()] and [terra::datatype()] for more details.
 #' @param overwrite logical. If `TRUE`, filename is overwritten.
 #' @param ... Additional arguments passed to [terra::rast()] (`mosaic_input()`)
 #'   or  [terra::writeRaster()] (`mosaic_output()`)
@@ -2043,6 +2046,25 @@ mosaic_input <- function(mosaic,
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
   }
+  cels <- sample(1:terra::ncell(mosaic), 2000)
+  a <- na.omit(unlist(terra::extract(mosaic, cels)))
+  a <- a[!is.infinite(a)]
+  if(length(a[a - floor(a) != 0]) == 0){
+    minv <- min(a)
+    maxv <- max(a)
+    if(all(minv >= 0) & all(maxv <= 255)){
+      datatype <- "INT1U"
+    } else{
+      datatype <- "INT2U"
+    }
+  } else{
+    datatype <- "FLT4S"
+  }
+  dtterra <- terra::datatype(mosaic)[[1]]
+  if(datatype != dtterra){
+    warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
+                  ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
+  }
   if(info){
     print(mosaic)
   }
@@ -2058,11 +2080,32 @@ mosaic_input <- function(mosaic,
 #' @name mosaic_input
 mosaic_export <- function(mosaic,
                           filename,
+                          datatype = NULL,
                           overwrite = FALSE,
                           ...){
+  cels <- sample(1:terra::ncell(mosaic), 2000)
+  a <- na.omit(unlist(terra::extract(mosaic, cels)))
+  a <- a[!is.infinite(a)]
+
+  if(is.null(datatype)){
+    if(length(a[a - floor(a) != 0]) == 0){
+      minv <- min(a)
+      maxv <- max(a)
+      if(all(minv >= 0) & all(maxv <= 255)){
+        datatype <- "INT1U"
+      } else{
+        datatype <- "INT2U"
+      }
+    } else{
+      datatype <- "FLT4S"
+    }
+  }
+  message(paste0("Exporting the mosaic using datatype = ", datatype))
   terra::writeRaster(mosaic,
                      filename = filename,
                      overwrite = overwrite,
+                     datatype = datatype,
+                     gdal=c("COMPRESS=DEFLATE", "BIGTIFF=IF_NEEDED"),
                      ...)
 }
 

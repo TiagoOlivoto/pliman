@@ -7,7 +7,7 @@
 \usage{
 mosaic_input(mosaic, info = TRUE, check_16bits = TRUE, ...)
 
-mosaic_export(mosaic, filename, overwrite = FALSE, ...)
+mosaic_export(mosaic, filename, datatype = NULL, overwrite = FALSE, ...)
 }
 \arguments{
 \item{mosaic}{\itemize{
@@ -25,6 +25,10 @@ array or a list of \code{SpatRaster} objects.
 or  \code{\link[terra:writeRaster]{terra::writeRaster()}} (\code{mosaic_output()})}
 
 \item{filename}{character. The Output filename.}
+
+\item{datatype}{The datatype. By default, the function will try to guess the
+data type that saves more memory usage and file size. See
+\code{\link[terra:writeRaster]{terra::writeRaster()}} and \code{\link[terra:datatype]{terra::datatype()}} for more details.}
 
 \item{overwrite}{logical. If \code{TRUE}, filename is overwritten.}
 }
