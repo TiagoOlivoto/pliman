@@ -942,48 +942,30 @@ mosaic_analyze <- function(mosaic,
             mask <- mind_temp[[segment_index[j]]] > thresh
           }
         }
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
         # compute plot coverage
-        dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
-        dmask[is.na(dmask) == TRUE] <- 1
-        if(!isFALSE(filter[j]) & filter[j] > 1){
-          dmask <- EBImage::medianFilter(dmask, filter[j])
-        }
-        dmask <- EBImage::bwlabel(dmask)
-        conts <- EBImage::ocontour(dmask)
-        conts <- conts[sapply(conts, nrow) > 2]
-        resx <- terra::res(mosaiccr)[1]
-        resy <- terra::res(mosaiccr)[1]
-        sf_plt <- sf::st_sf(
-          geometry = lapply(conts, function(x) {
-            tmp <- x
-            tmp[, 2] <-  extends[3] + (nrow(mask) - tmp[, 2]) * resy
-            tmp[, 1] <- extends[1] + tmp[, 1] * resy
-            geometry = sf::st_polygon(list(as.matrix(tmp |> poly_close())))
-          }),
-          data = data.frame(individual = paste0(1:length(conts))),
-          crs = terra::crs(mosaic)
-        ) |>
-          sf::st_make_valid()
-        if(simplify){
-          sf_plt <- sf_plt |> sf::st_simplify(preserveTopology = TRUE)
-        }
+
+        tmp <- exactextractr::exact_extract(mind_temp,
+                                            plot_grid,
+                                            coverage_area = TRUE,
+                                            force_df = TRUE,
+                                            progress = FALSE)
         covered_area <-
-          suppressWarnings(
-            sapply(1:nrow(plot_grid), function(i){
-              plot_grid[i, ] |>
-                sf::st_intersection(sf_plt) |>
-                sf::st_area() |>
-                sum()
+          dplyr::bind_rows(
+            lapply(seq_along(tmp), function(i){
+              data.frame(covered_area = sum(na.omit(tmp[[i]])[, 2]),
+                         plot_area = sum(tmp[[i]][, 2])) |>
+                dplyr::mutate(coverage = covered_area / plot_area)
             })
           )
-        plot_grid <-
-          plot_grid |>
-          dplyr::mutate(covered_area = as.numeric(covered_area),
-                        plot_area = as.numeric(sf::st_area(geometry)),
-                        coverage = covered_area / plot_area)
+        plot_grid <- dplyr::bind_cols(plot_grid, covered_area)
+        if(simplify){
+          plot_grid <- plot_grid |> sf::st_simplify(preserveTopology = TRUE)
+        }
+        rm(tmp)
 
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
+
       # check if segmentation is performed (analyze individuals)
       if(segment_individuals[j]){
         if(usepickmask | ihaveamask){
@@ -1166,46 +1148,26 @@ mosaic_analyze <- function(mosaic,
           }
         }
         # compute plot coverage
-        dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
-        dmask[is.na(dmask) == TRUE] <- 1
-        if(!isFALSE(filter[j]) & filter[j] > 1){
-          dmask <- EBImage::medianFilter(dmask, filter[j])
-        }
-        dmask <- EBImage::bwlabel(dmask)
-        conts <- EBImage::ocontour(dmask)
-        conts <- conts[sapply(conts, nrow) > 2]
-        resx <- terra::res(mosaiccr)[1]
-        resy <- terra::res(mosaiccr)[1]
-        sf_plt <- sf::st_sf(
-          geometry = lapply(conts, function(x) {
-            tmp <- x
-            tmp[, 2] <-  extends[3] + (nrow(mask) - tmp[, 2]) * resy
-            tmp[, 1] <- extends[1] + tmp[, 1] * resy
-            geometry = sf::st_polygon(list(as.matrix(tmp |> poly_close())))
-          }),
-          data = data.frame(individual = paste0(1:length(conts))),
-          crs = terra::crs(mosaic)
-        ) |>
-          sf::st_make_valid()
-        if(simplify){
-          sf_plt <- sf_plt |> sf::st_simplify(preserveTopology = TRUE)
-        }
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
+        tmp <- exactextractr::exact_extract(mind_temp,
+                                            plot_grid,
+                                            coverage_area = TRUE,
+                                            force_df = TRUE,
+                                            progress = FALSE)
         covered_area <-
-          suppressWarnings(
-            sapply(1:nrow(plot_grid), function(i){
-              plot_grid[i, ] |>
-                sf::st_intersection(sf_plt) |>
-                sf::st_area() |>
-                sum()
+          dplyr::bind_rows(
+            lapply(seq_along(tmp), function(i){
+              data.frame(covered_area = sum(na.omit(tmp[[i]])[, 2]),
+                         plot_area = sum(tmp[[i]][, 2])) |>
+                dplyr::mutate(coverage = covered_area / plot_area)
             })
           )
-        plot_grid <-
-          plot_grid |>
-          dplyr::mutate(covered_area = as.numeric(covered_area),
-                        plot_area = as.numeric(sf::st_area(geometry)),
-                        coverage = covered_area / plot_area)
+        plot_grid <- dplyr::bind_cols(plot_grid, covered_area)
+        if(simplify){
+          plot_grid <- plot_grid |> sf::st_simplify(preserveTopology = TRUE)
+        }
+        rm(tmp)
 
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
       }
 
       if(segment_individuals[j]){
