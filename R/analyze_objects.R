@@ -1052,9 +1052,7 @@ analyze_objects <- function(img,
           object_contour <- shape$cont
           ch <- shape$ch
           shape <- shape$shape
-          if(isTRUE(show_lw)){
-            shape_ori <- shape
-          }
+
 
           if(isTRUE(reference_larger)){
             id_ref <- which.max(shape$area)
@@ -1066,6 +1064,9 @@ analyze_objects <- function(img,
             id_ref <- which.min(shape$area)
             npix_ref <- shape[id_ref, 4]
             shape <- shape[-id_ref,]
+          }
+          if(isTRUE(show_lw)){
+            shape_ori <- shape
           }
 
           px_side <- sqrt(reference_area / npix_ref)

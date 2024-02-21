@@ -908,7 +908,7 @@ mosaic_analyze <- function(mosaic,
     if(verbose){
       cat("\014","\nExtracting data from block", j, "\n")
     }
-    if(inherits(created_shapes[[j]]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(created_shapes[[j]][[1]][[1]])) == 5 & grid[[j]]){
+    if(inherits(created_shapes[[j]]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(created_shapes[[j]]$geometry[[1]])) == 5 & grid[[j]]){
       plot_grid <- created_shapes[[j]]
       sf::st_geometry(plot_grid) <- "geometry"
       if(crop_to_shape_ext){
