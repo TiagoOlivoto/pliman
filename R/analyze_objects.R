@@ -1312,6 +1312,11 @@ analyze_objects <- function(img,
         }
         marker_col <- ifelse(is.null(marker_col), "white", marker_col)
         marker_size <- ifelse(is.null(marker_size), 0.75, marker_size)
+        # correct the contour
+        object_contour <- lapply(object_contour, function(x){
+          x + 1
+        })
+
         if(plot == TRUE){
           if(marker != "point"){
             plot(im2)
