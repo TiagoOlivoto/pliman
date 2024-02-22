@@ -14,7 +14,7 @@ Description: Tools for single or batch image manipulation and analysis as
     orthomosaics, which enables high throughput field phenotyping using UVAs- 
     or satelite-based imagery.
 License: GPL (>= 3)
-URL: https://github.com/TiagoOlivoto/pliman
+URL: https://tiagoolivoto.github.io/pliman/, https://github.com/TiagoOlivoto/pliman
 BugReports: https://github.com/TiagoOlivoto/pliman/issues
 Depends: 
     R (>= 4.1)
