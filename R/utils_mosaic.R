@@ -110,40 +110,24 @@ compute_measures_mosaic <- function(contour){
              diam_max = max(cdist) * 2)
 
 }
-map_individuals <- function(object,
-                            by_column = "plot_id",
-                            direction = c("horizontal", "vertical")) {
+compute_dists <- function(subset_coords, direction = c("horizontal", "vertical")){
   optdirec <- c("horizontal", "vertical")
   optdirec <- pmatch(direction[[1]], optdirec)
-  object <- as.data.frame(object)
-  unique_values <- unique(object[, by_column] )
-  distances <- vector("list", length(unique_values))
-  for (i in 1:length(unique_values)) {
-    subset_coords <- object[object[, by_column] == unique_values[i], 4:5]
-    n <- nrow(subset_coords)
-    nearest <- order(subset_coords[, optdirec])
-    subset_distances <- numeric(n - 1)
-    for (j in 1:(n - 1)) {
-      x1 <- subset_coords[nearest[j], 1]
-      y1 <- subset_coords[nearest[j], 2]
-      x2 <- subset_coords[nearest[j+1], 1]
-      y2 <- subset_coords[nearest[j+1], 2]
-      distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
-      subset_distances[j] <- distance
-    }
-    distances[[i]] <- subset_distances
+  n <- nrow(subset_coords)
+  subset_coords <- subset_coords |> dplyr::select(x, y) |> as.data.frame()
+  nearest <- order(subset_coords[, optdirec])
+  subset_distances <- numeric(n - 1)
+  for (j in 1:(n - 1)) {
+    x1 <- subset_coords[nearest[j], 1]
+    y1 <- subset_coords[nearest[j], 2]
+    x2 <- subset_coords[nearest[j+1], 1]
+    y2 <- subset_coords[nearest[j+1], 2]
+    distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+    subset_distances[j] <- distance
   }
-  if(optdirec == 1){
-    names(distances) <- paste0("row", 1:length(distances))
-  } else{
-    names(distances) <- paste0("column", 1:length(distances))
-  }
-  cvs <- sapply(distances, function(x){
-    (sd(x) / mean(x)) * 100
-  })
-  means <- sapply(distances, mean)
-  invisible(list(distances = distances, cvs = cvs, means = means))
+  subset_distances
 }
+
 linear_iterpolation <- function(mosaic, points, method = "loess"){
   if(inherits(points, "list")){
     points <- do.call(rbind, points)
@@ -1409,13 +1393,29 @@ mosaic_analyze <- function(mosaic,
       dplyr::relocate(x, y, .after = individual)
 
     if(map_individuals){
-      result_individ_map <- map_individuals(result_indiv, direction = map_direction)
+      dists <-
+        result_indiv |>
+        sf::st_drop_geometry() |>
+        dplyr::select(block, plot_id, x, y) |>
+        dplyr::group_by(block, plot_id)
+
+      splits <- dplyr::group_split(dists)
+      names(splits) <- dplyr::group_keys(dists) |> dplyr::mutate(key = paste0(block, "_", plot_id)) |> dplyr::pull()
+      dists <- lapply(splits, compute_dists)
+
+      cvs <- sapply(dists, function(x){
+        (sd(x) / mean(x)) * 100
+      })
+      means <- sapply(dists, mean)
 
       result_plot_summ <-
         result_plot_summ |>
-        dplyr::mutate(mean_distance = result_individ_map$means,
-                      cv = result_individ_map$cvs,
+        dplyr::mutate(mean_distance = means,
+                      cv = cvs,
                       .before = n)
+      result_individ_map <- list(distances = dists,
+                                 means = means,
+                                 cvs = cvs)
     } else{
       result_individ_map <- NULL
     }

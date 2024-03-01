@@ -1279,7 +1279,6 @@ poly_apex_base_angle <- function(x,
 #' @return The PCV value(s) computed for the contour(s).
 #'
 #' @details
-#'
 #' The PCV is computed using the following formula: \deqn{PCV =
 #' \frac{sum(dists) \times sd(dists)}{perim}} where \eqn{dists}
 #' represents the distances between corresponding points in the original and

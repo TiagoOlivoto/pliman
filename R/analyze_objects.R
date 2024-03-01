@@ -1324,8 +1324,8 @@ analyze_objects <- function(img,
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(show_mark){
-              text(shape[, 2],
-                   shape[, 3],
+              text(shape[, 2] + 1,
+                   shape[, 3] + 1,
                    round(shape[, marker], 2),
                    col = marker_col,
                    cex = marker_size)
@@ -1339,8 +1339,8 @@ analyze_objects <- function(img,
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(show_mark){
-              points(shape[, 2],
-                     shape[, 3],
+              points(shape[, 2] + 1,
+                     shape[, 3] + 1,
                      col = marker_col,
                      pch = 16,
                      cex = marker_size)
@@ -1372,8 +1372,8 @@ analyze_objects <- function(img,
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(show_mark){
-              text(shape[, 2],
-                   shape[, 3],
+              text(shape[, 2] + 1,
+                   shape[, 3] + 1,
                    round(shape[, marker], 2),
                    col = marker_col,
                    cex = marker_size)
@@ -1384,8 +1384,8 @@ analyze_objects <- function(img,
               plot_contour(object_contour, col = contour_col, lwd = contour_size)
             }
             if(show_mark){
-              points(shape[, 2],
-                     shape[, 3],
+              points(shape[, 2] + 1,
+                     shape[, 3] + 1,
                      col = marker_col,
                      pch = 16,
                      cex = marker_size)
