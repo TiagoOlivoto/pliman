@@ -1655,29 +1655,29 @@ image_binary <- function(img,
         message("Image processing using multiple sessions (",nworkers, "). Please wait.")
       }
       res <-
-      foreach::foreach(i = seq_along(img)) %dofut%{
-        image_binary(img[[i]],
-                     index,
-                     r,
-                     g,
-                     b,
-                     re,
-                     nir,
-                     return_class,
-                     threshold,
-                     k,
-                     windowsize,
-                     has_white_bg,
-                     resize,
-                     fill_hull,
-                     filter,
-                     re,
-                     nir,
-                     invert,
-                     plot,
-                     nrow,
-                     ncol)
-      }
+        foreach::foreach(i = seq_along(img)) %dofut%{
+          image_binary(img[[i]],
+                       index,
+                       r,
+                       g,
+                       b,
+                       re,
+                       nir,
+                       return_class,
+                       threshold,
+                       k,
+                       windowsize,
+                       has_white_bg,
+                       resize,
+                       fill_hull,
+                       filter,
+                       re,
+                       nir,
+                       invert,
+                       plot,
+                       nrow,
+                       ncol)
+        }
     } else{
       res <- lapply(img,
                     image_binary,
@@ -2107,6 +2107,7 @@ plot.image_index <- function(x,
 #' or any operation involving the RGB values (e.g., `"B/R+G"`).
 #' @param col_background The color of the segmented background. Defaults to
 #'   `NULL` (white background).
+#' @param na_background Consider the background as NA? Defaults to FALSE.
 #' @param has_white_bg Logical indicating whether a white background is present.
 #'   If `TRUE`, pixels that have R, G, and B values equals to 1 will be
 #'   considered as `NA`. This may be useful to compute an image index for
@@ -2165,6 +2166,7 @@ image_segment <- function(img,
                           k = 0.1,
                           windowsize = NULL,
                           col_background = NULL,
+                          na_background = FALSE,
                           has_white_bg = FALSE,
                           fill_hull = FALSE,
                           filter = FALSE,
@@ -2252,13 +2254,24 @@ image_segment <- function(img,
                           filter = filter,
                           invert = invert)
       ID <- which(img2@.Data == FALSE)
-      imgmask@.Data[,,1][ID] <- col_background[1]
-      imgmask@.Data[,,2][ID] <- col_background[2]
-      imgmask@.Data[,,3][ID] <- col_background[3]
-      if(dim(img)[[3]] > 3){
-        imgmask@.Data[,,4][ID] <- 1
-        imgmask@.Data[,,5][ID] <- 1
+      if(!na_background){
+        imgmask@.Data[,,1][ID] <- col_background[1]
+        imgmask@.Data[,,2][ID] <- col_background[2]
+        imgmask@.Data[,,3][ID] <- col_background[3]
+        if(dim(img)[[3]] > 3){
+          imgmask@.Data[,,4][ID] <- 1
+          imgmask@.Data[,,5][ID] <- 1
+        }
+      } else{
+        imgmask@.Data[,,1][ID] <- NA
+        imgmask@.Data[,,2][ID] <- NA
+        imgmask@.Data[,,3][ID] <- NA
+        if(dim(img)[[3]] > 3){
+          imgmask@.Data[,,4][ID] <- NA
+          imgmask@.Data[,,5][ID] <- NA
+        }
       }
+
       imgs[[i]] <- imgmask
     }
     names(imgs) <- index
@@ -2552,8 +2565,11 @@ image_segment_kmeans <-   function (img,
   } else{
     imb <- image_to_mat(imm)[, -c(1, 2)]
   }
-  x <- suppressWarnings(stats::kmeans(imb, nclasses))
-  x2 <- x3 <- x$cluster
+  # rownames(imb) <- paste0("r", 1:nrow(imb))
+  x <- suppressWarnings(stats::kmeans(na.omit(imb), nclasses))
+  imm <- cbind(imb, 'clus'=NA)
+  imm[names(x$cluster), ] <- x$cluster
+  x2 <- x3 <- imm$clus
   nm <- names(sort(table(x2)))
   for (i in 1:length(nm)) {
     x3[x2 == nm[i]] <- i
@@ -2875,6 +2891,8 @@ image_palette <- function (img,
   id <- matrix(TRUE,
                nrow = nrow(img@.Data[, , 1]),
                ncol = ncol(img@.Data[, , 1]))
+  nc <- ncol(img)
+  nr <- nrow(img)
   ck <- image_segment_kmeans(img, nclasses = npal, plot = FALSE)[["masks"]]
   layers = length(ck)
   ck2 <- 1 * ck[[1]]
@@ -2909,28 +2927,28 @@ image_palette <- function (img,
   rownames(props) <- NULL
   if (proportional == FALSE) {
     n <- ncol(MAT)
-    ARR <- array(NA, dim = c(150, 66 * n, 3))
+    ARR <- array(NA, dim = c(100, 66 * n, 3))
     c = 1
     f = 66
     for (i in 1:n) {
-      ARR[1:150, c:f, 1] <- MAT[1, i]
-      ARR[1:150, c:f, 2] <- MAT[2, i]
-      ARR[1:150, c:f, 3] <- MAT[3, i]
+      ARR[1:100, c:f, 1] <- MAT[1, i]
+      ARR[1:100, c:f, 2] <- MAT[2, i]
+      ARR[1:100, c:f, 3] <- MAT[3, i]
       c = f + 1
       f = f + 66
     }
   }
   if (proportional == TRUE) {
     n <- ncol(MAT)
-    ARR <- array(NA, dim = c(150, 66 * n, 3))
+    ARR <- array(NA, dim = c(100, 66 * n, 3))
     nn <- round(66 * n * (MATn/sum(MATn)), 0)
     a <- 1
     b <- nn[1]
     nn <- c(nn, 0)
     for (i in 1:n) {
-      ARR[1:150, a:b, 1] <- MAT[1, i]
-      ARR[1:150, a:b, 2] <- MAT[2, i]
-      ARR[1:150, a:b, 3] <- MAT[3, i]
+      ARR[1:100, a:b, 1] <- MAT[1, i]
+      ARR[1:100, a:b, 2] <- MAT[2, i]
+      ARR[1:100, a:b, 3] <- MAT[3, i]
       a <- b + 1
       b <- b + nn[i + 1]
       if (b > (66 * n)) {
@@ -2940,6 +2958,12 @@ image_palette <- function (img,
   }
   im2 <- EBImage::as.Image(ARR)
   EBImage::colorMode(im2) <- 2
+  im2 <- image_resize(im2, height = ncol(img), width = nc * 0.1)
+  im2@.Data[1:nrow(im2), 1:1, ] <- 0
+  im2@.Data[1:1, 1:ncol(im2), ] <- 0
+  im2@.Data[1:nrow(im2), ncol(im2):(ncol(im2)-1), ] <- 0
+  im2@.Data[nrow(im2):(nrow(im2)-1), 1:ncol(im2), ] <- 0
+  im2 <- EBImage::abind(img, im2, along = 1)
   if (plot == TRUE) {
     plot(im2)
   }

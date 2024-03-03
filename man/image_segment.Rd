@@ -17,6 +17,7 @@ image_segment(
   k = 0.1,
   windowsize = NULL,
   col_background = NULL,
+  na_background = FALSE,
   has_white_bg = FALSE,
   fill_hull = FALSE,
   filter = FALSE,
@@ -86,6 +87,8 @@ adaptive thresholding. By default it is set to \code{1/3 * minxy}, where
 
 \item{col_background}{The color of the segmented background. Defaults to
 \code{NULL} (white background).}
+
+\item{na_background}{Consider the background as NA? Defaults to FALSE.}
 
 \item{has_white_bg}{Logical indicating whether a white background is present.
 If \code{TRUE}, pixels that have R, G, and B values equals to 1 will be
