@@ -2893,7 +2893,8 @@ image_palette <- function (img,
                ncol = ncol(img@.Data[, , 1]))
   nc <- ncol(img)
   nr <- nrow(img)
-  ck <- image_segment_kmeans(img, nclasses = npal, plot = FALSE)[["masks"]]
+  ckm <- image_segment_kmeans(img, nclasses = npal, plot = FALSE)
+  ck <- ckm[["masks"]]
   layers = length(ck)
   ck2 <- 1 * ck[[1]]
   for (i in 2:layers) {
@@ -2969,8 +2970,8 @@ image_palette <- function (img,
   }
   invisible(list(palette_list = pal_list,
                  joint = im2,
-                 proportions = props,
-                 rgbs = pal_rgb))
+                 proportions = cbind(props, do.call(rbind, pal_rgb)),
+                 mask = ckm[["clusters"]]))
 }
 
 
