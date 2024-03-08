@@ -726,7 +726,12 @@ measure_disease <- function(img,
       }
       if(isTRUE(show_contour) & show_original == TRUE){
         ocont <- EBImage::ocontour(nmask)
+        # correct the contour
+        ocont <- lapply(ocont, function(x){
+          x + 1
+        })
       }
+
       if(plot == TRUE){
         if(marker != "point"){
           plot(im2)

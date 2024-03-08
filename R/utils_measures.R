@@ -978,8 +978,49 @@ compute_measures <- function(mask,
     colnames(shape) <- c(names_measures(), har_names())
   }
   invisible(list(shape = shape,
-              cont = ocont,
-              ch = ch))
+                 cont = ocont,
+                 ch = ch))
+}
+
+## helper function to compute the measures based on a mask
+compute_measures_minimal <- function(mask){
+  ocont <- EBImage::ocontour(mask)
+  shape <- cbind(features_moment(ocont), cbind(area = get_area_mask(mask)))
+  valid <- which(shape$mx != "NaN")
+  shape <- shape[valid, ]
+  ocont <- ocont[valid]
+  names(ocont) <- valid
+  lw <- help_lw(ocont)
+  shape <- transform(shape,
+                     id = as.numeric(valid),
+                     length = lw[, 1],
+                     width = lw[, 2],
+                     asp_ratio = lw[, 1] / lw[, 2],
+                     circularity_norm = poly_circularity_norm(ocont))
+  shape <- shape[, c("id",
+                     "mx",
+                     "my",
+                     "area",
+                     "maj_axis",
+                     "min_axis",
+                     "length",
+                     "width",
+                     "eccentricity",
+                     "circularity_norm",
+                     "asp_ratio")]
+  colnames(shape) <- c("id",
+                       "x",
+                       "y",
+                       "area",
+                       "major_axis",
+                       "minor_axis",
+                       "length",
+                       "width",
+                       "eccentricity",
+                       "circularity_norm",
+                       "asp_ratio")
+  invisible(list(shape = shape,
+                 cont = ocont))
 }
 
 ## helper function to compute the measures based on a mask
@@ -1019,7 +1060,7 @@ compute_measures_disease <- function(mask){
                      "length",
                      "width")]
   invisible(list(shape = shape,
-              cont = ocont))
+                 cont = ocont))
 }
 
 
