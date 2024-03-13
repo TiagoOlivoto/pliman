@@ -2888,68 +2888,69 @@ image_palette <- function (img,
                            npal = 5,
                            proportional = TRUE,
                            plot = TRUE) {
-  id <- matrix(TRUE,
-               nrow = nrow(img@.Data[, , 1]),
-               ncol = ncol(img@.Data[, , 1]))
   nc <- ncol(img)
   nr <- nrow(img)
-  ckm <- image_segment_kmeans(img, nclasses = npal, plot = FALSE)
-  ck <- ckm[["masks"]]
-  layers = length(ck)
-  ck2 <- 1 * ck[[1]]
-  for (i in 2:layers) {
-    ck2 <- ck2 + i * ck[[i]]
+  if(length(dim(img)) < 3){
+    imb <- data.frame(B1 = image_to_mat(img)[,3])
+  } else{
+    imb <- image_to_mat(img)[, -c(1, 2)]
   }
-  ck <- ck2
-  MAT <- NULL
-  for (i in unique(na.omit(c(ck)))) {
-    r = mean(img@.Data[, , 1][ck == i], na.rm = T)
-    g = mean(img@.Data[, , 2][ck == i], na.rm = T)
-    b = mean(img@.Data[, , 3][ck == i], na.rm = T)
-    MAT = cbind(MAT, c(r = r, g = g, b = b))
+  if(any(is.na(imb[, 1]))){
+    rownames(imb) <- paste0("r", 1:nrow(imb))
+    km <- suppressWarnings(stats::kmeans(na.omit(imb), npal))
+    imb <- cbind(imb, 'cluster'=NA)
+    imb[names(km$cluster), "cluster"] <- km$cluster
+  } else{
+    km <- suppressWarnings(stats::kmeans(imb, npal))
+    imb$cluster <- km$cluster
   }
+  props <-
+    data.frame(n = km$size,
+               prop = km$size / sum(km$size),
+               R = km$centers[, 1],
+               G = km$centers[, 2],
+               B = km$centers[, 3]) |>
+    dplyr::arrange(prop) |>
+    dplyr::mutate(cluster = paste0("c", 1:npal),
+                  .before = 1)
+
+
   pal_list <- list()
   pal_rgb <- list()
-  for(i in 1:ncol(MAT)){
-    R <- matrix(rep(MAT[[1, i]], 10000), 100, 100)
-    G <- matrix(rep(MAT[[2, i]], 10000), 100, 100)
-    B <- matrix(rep(MAT[[3, i]], 10000), 100, 100)
+  for(i in 1:nrow(props)){
+    R <- matrix(rep(props[[i, 4]], 10000), 100, 100)
+    G <- matrix(rep(props[[i, 5]], 10000), 100, 100)
+    B <- matrix(rep(props[[i, 6]], 10000), 100, 100)
     pal_list[[paste0("pal_", i)]] <- EBImage::rgbImage(R, G, B)
     pal_rgb[[paste0("pal_", i)]] <- c(R = R[1], G = G[1], B = B[1])
   }
-  MATn <- NULL
-  for (i in unique(na.omit(c(ck)))) {
-    r <- length(na.omit(img@.Data[, , 1][ck == i]))
-    MATn <- cbind(MATn, r = r)
-  }
-  props <- data.frame(class = paste0("c", 1:length(MATn)),
-                      pixels = t(MATn),
-                      prop = t(MATn/sum(MATn)))
+
+
   rownames(props) <- NULL
   if (proportional == FALSE) {
-    n <- ncol(MAT)
+    n <- nrow(props)
     ARR <- array(NA, dim = c(100, 66 * n, 3))
     c = 1
     f = 66
     for (i in 1:n) {
-      ARR[1:100, c:f, 1] <- MAT[1, i]
-      ARR[1:100, c:f, 2] <- MAT[2, i]
-      ARR[1:100, c:f, 3] <- MAT[3, i]
+      ARR[1:100, c:f, 1] <- props[[i, 4]]
+      ARR[1:100, c:f, 2] <- props[[i, 5]]
+      ARR[1:100, c:f, 3] <- props[[i, 6]]
       c = f + 1
       f = f + 66
     }
   }
   if (proportional == TRUE) {
-    n <- ncol(MAT)
+    n <- nrow(props)
     ARR <- array(NA, dim = c(100, 66 * n, 3))
-    nn <- round(66 * n * (MATn/sum(MATn)), 0)
+    nn <- round(66 * n * props$prop, 0)
     a <- 1
     b <- nn[1]
     nn <- c(nn, 0)
     for (i in 1:n) {
-      ARR[1:100, a:b, 1] <- MAT[1, i]
-      ARR[1:100, a:b, 2] <- MAT[2, i]
-      ARR[1:100, a:b, 3] <- MAT[3, i]
+      ARR[1:100, a:b, 1] <- props[[i, 4]]
+      ARR[1:100, a:b, 2] <- props[[i, 5]]
+      ARR[1:100, a:b, 3] <- props[[i, 6]]
       a <- b + 1
       b <- b + nn[i + 1]
       if (b > (66 * n)) {
@@ -2970,8 +2971,7 @@ image_palette <- function (img,
   }
   invisible(list(palette_list = pal_list,
                  joint = im2,
-                 proportions = cbind(props, do.call(rbind, pal_rgb)),
-                 mask = ckm[["clusters"]]))
+                 proportions = props))
 }
 
 
