@@ -287,7 +287,8 @@ shapefile_build <- function(mosaic,
                             quantiles =  c(0, 1)){
 
   if(terra::crs(mosaic) == ""){
-    terra::crs(mosaic) <- terra::crs("EPSG:3857")
+    terra::crs(mosaic) <- terra::crs("EPSG:4326")
+    terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
   nlyrs <- terra::nlyr(mosaic)
   if(build_shapefile){
@@ -656,7 +657,8 @@ mosaic_analyze <- function(mosaic,
     attribute <- paste(summarize_fun[[1]], segment_index[[1]], sep = ".")
   }
   if(terra::crs(mosaic) == ""){
-    terra::crs(mosaic) <- terra::crs("EPSG:3857")
+    terra::crs(mosaic) <- terra::crs("EPSG:4326")
+    terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
   nlyrs <- terra::nlyr(mosaic)
   if(verbose){
@@ -2011,6 +2013,7 @@ mosaic_input <- function(mosaic,
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
+    terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
   cels <- sample(1:terra::ncell(mosaic), 2000)
   a <- na.omit(unlist(terra::extract(mosaic, cels)))
