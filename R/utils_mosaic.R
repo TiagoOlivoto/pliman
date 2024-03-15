@@ -835,7 +835,7 @@ mosaic_analyze <- function(mosaic,
     if(verbose){
       cat("\014","\nComputing the indexes...\n")
     }
-    if(nlyrs > 1){
+    if(nlyrs > 1 | !all(plot_index %in% names(mosaiccr))){
       mind <- terra::rast(
         Map(c,
             lapply(seq_along(plot_index), function(i){
@@ -1062,7 +1062,8 @@ mosaic_analyze <- function(mosaic,
             if(length(plot_index) == 1){
               colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
             } else{
-              colnames(valindiv) <- c("block", "plot_id", plot_index)
+              # colnames(valindiv) <- c("block", "plot_id", plot_index)
+              colnames(vals) <- paste0(colnames(vals), ".", plot_index)
             }
           }
         } else{
@@ -1262,7 +1263,8 @@ mosaic_analyze <- function(mosaic,
             if(length(plot_index) == 1){
               colnames(valindiv) <- paste0(colnames(valindiv), ".", plot_index)
             } else{
-              colnames(valindiv) <- c("block", "plot_id", plot_index)
+              # colnames(valindiv) <- c("block", "plot_id", plot_index)
+              colnames(vals) <- paste0(colnames(vals), ".", plot_index)
             }
           }
         } else{
@@ -1314,7 +1316,8 @@ mosaic_analyze <- function(mosaic,
         if(ncol(vals) == 1){
           colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         } else{
-          colnames(vals) <- c("block", "plot_id", plot_index)
+          # colnames(vals) <- c("block", "plot_id", plot_index)
+          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         }
       }
       vals <-
@@ -1327,7 +1330,8 @@ mosaic_analyze <- function(mosaic,
         if(ncol(vals) == 1){
           colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         } else{
-          colnames(vals) <- c("block", "plot_id", plot_index)
+          # colnames(vals) <- c("block", "plot_id", plot_index)
+          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         }
       }
       vals <- transform(vals,

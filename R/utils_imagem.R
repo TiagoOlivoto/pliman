@@ -2913,7 +2913,7 @@ image_palette <- function (img,
     dplyr::arrange(prop) |>
     dplyr::mutate(cluster = paste0("c", 1:npal),
                   .before = 1)
-
+if(plot){
 
   pal_list <- list()
   pal_rgb <- list()
@@ -2969,6 +2969,11 @@ image_palette <- function (img,
   if (plot == TRUE) {
     plot(im2)
   }
+} else{
+  im2 <- NULL
+  pal_list <- NULL
+}
+
   invisible(list(palette_list = pal_list,
                  joint = im2,
                  proportions = props))
