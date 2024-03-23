@@ -56,7 +56,7 @@ if (getRversion() >= "2.15.1") {
       "perimeter", "radius_max", "radius_mean", "radius_min", "radius_sd", "X1",
       "X2", "%dofut%", "i", "img", "plotn", "x", "leaf", "Band", "block", "mosaic",
       "geometry", "n", "area_sum", "individual", "compute_downsample", "plot_id",
-      "re", "nir", "coverage_fraction", "sigma", "summarize_quantiles"))
+      "re", "nir", "coverage_fraction", "sigma", "summarize_quantiles", "prop"))
 }
 
 

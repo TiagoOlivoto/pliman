@@ -27,7 +27,9 @@ image_autocrop(
   img,
   index = "NB",
   edge = 5,
-  filter = 3,
+  opening = 5,
+  closing = FALSE,
+  filter = FALSE,
   parallel = FALSE,
   workers = NULL,
   verbose = TRUE,
@@ -221,9 +223,21 @@ image. If \code{edge = 0} the image will be cropped to create a bounding rectang
 default, 20 pixels are removed from all the edges.
 }}
 
-\item{filter}{Performs median filtering in the binary image. This is useful
-to remove noise (like dust) and improve the image autocropping method. See
-more at \code{\link[=image_filter]{image_filter()}}. Set to \code{FALSE} to remove the median filtering.}
+\item{opening, closing, filter}{\strong{Morphological operations (brush size)}
+\itemize{
+\item \code{opening} performs an erosion followed by a dilation. This helps to
+remove small objects while preserving the shape and size of larger objects.
+\item \code{closing} performs a dilatation followed by an erosion. This helps to
+fill small holes while preserving the shape and size of larger objects.
+\item \code{filter} performs median filtering in the binary image. Provide a positive
+integer > 1 to indicate the size of the median filtering. Higher values are
+more efficient to remove noise in the background but can dramatically impact
+the perimeter of objects, mainly for irregular perimeters such as leaves
+with serrated edges.
+}
+
+Hierarchically, the operations are performed as opening > closing > filter.
+The value declared in each argument will define the brush size.}
 
 \item{parallel}{Processes the images asynchronously (in parallel) in separate
 R sessions running in the background on the same machine. It may speed up

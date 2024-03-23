@@ -40,6 +40,7 @@
 #' features for each object based on a gray-level co-occurrence matrix (Haralick
 #' et al. 1979). See more details in [analyze_objects()].
 #'
+#' @inheritParams image_binary
 #' @param img The image to be analyzed.
 #' @param img_healthy A color palette of healthy tissues.
 #' @param img_symptoms A color palette of lesioned tissues.
@@ -54,11 +55,6 @@
 #'   matches the pattern (e.g., img1.-, image1.-, im2.-) will be analyzed.
 #'   Providing any number as pattern (e.g., `pattern = "1"`) will select
 #'   images that are named as 1.-, 2.-, and so on.
-#' @param filter Performs median filtering in the binary image that segments the
-#'   leaf from background? By default, a median filter of `size = 10` is applied.
-#'   This is useful to reduce the noise and segment the leaf and background more
-#'   accurately. See more at [image_filter()]. Set to `FALSE` to cancel median
-#'   filtering.
 #' @param parallel Processes the images asynchronously (in parallel) in separate
 #'   R sessions running in the background on the same machine. It may speed up
 #'   the processing time, especially when `pattern` is used is informed. The
@@ -221,7 +217,9 @@ measure_disease <- function(img,
                             img_symptoms = NULL,
                             img_background = NULL,
                             pattern = NULL,
-                            filter = 10,
+                            opening = 10,
+                            closing = FALSE,
+                            filter = FALSE,
                             parallel = FALSE,
                             workers = NULL,
                             resize = FALSE,
@@ -458,6 +456,12 @@ measure_disease <- function(img,
           ifelse(fill_hull == TRUE,
                  plant_background <- EBImage::fillHull(matrix(pred1, ncol = ncol_img)),
                  plant_background <- matrix(pred1, ncol = ncol_img))
+          if(is.numeric(opening) & opening > 0){
+            plant_background <- image_opening(plant_background, opening)
+          }
+          if(is.numeric(closing) & closing > 0){
+            plant_background <- image_closing(plant_background, closing)
+          }
           if(is.numeric(filter) & filter > 1){
             plant_background <- EBImage::medianFilter(plant_background, size = filter)
           }
@@ -570,6 +574,8 @@ measure_disease <- function(img,
                               index = index_lb,
                               threshold = my_thresh,
                               invert = invert1,
+                              opening = opening,
+                              closing = closing,
                               filter = filter)
 
           img <- seg

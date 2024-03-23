@@ -1,3 +1,12 @@
+validate_and_replicate <- function(argument, created_shapes) {
+  if (length(argument) == 1 & length(created_shapes) != 1) {
+    argument <- rep(argument, length(created_shapes))
+  }
+  if (length(argument) != length(created_shapes)) {
+    warning(paste0("`", deparse(substitute(argument)), "` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
+  return(argument)
+}
 sf_to_polygon <- function(shps) {
   if(inherits(shps, "list")){
     shps <- do.call(rbind, shps)
@@ -288,8 +297,8 @@ shapefile_build <- function(mosaic,
 
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:4326")
-    terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
+  ress <- terra::res(mosaic)
   nlyrs <- terra::nlyr(mosaic)
   if(build_shapefile){
     if(verbose){
@@ -325,6 +334,10 @@ shapefile_build <- function(mosaic,
     # Create a Polygon object
     polygon <- sf::st_polygon(list(coords))
     # Create an sf object with a data frame that includes the 'geometry' column
+    if(sum(ress) == 2){
+      crop_to_shape_ext <- FALSE
+
+    }
     cpoints <- sf::st_sf(data.frame(id = 1),
                          geometry = sf::st_sfc(polygon),
                          crs = sf::st_crs(mosaic))
@@ -332,13 +345,16 @@ shapefile_build <- function(mosaic,
 
   # crop to the analyzed area
   if(crop_to_shape_ext){
+    if(sum(ress) != 2){
+      cpoints <- cpoints |> sf::st_transform(crs = sf::st_crs(terra::crs(mosaic)))
+    }
     poly_ext <-
       cpoints |>
-      sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
       terra::vect() |>
       terra::buffer(buffer_edge) |>
       terra::ext()
     mosaiccr <- terra::crop(mosaic, poly_ext)
+
   } else{
     mosaiccr <- mosaic
   }
@@ -469,6 +485,7 @@ shapefile_build <- function(mosaic,
 #'
 #' @inheritParams mosaic_view
 #' @inheritParams analyze_objects
+#' @inheritParams image_binary
 #' @param crop_to_shape_ext Crop the mosaic to the extension of shapefile?
 #'   Defaults to `TRUE`. This allows for a faster index computation when the
 #'   region of the built shapefile is much smaller than the entire mosaic
@@ -540,10 +557,6 @@ shapefile_build <- function(mosaic,
 #' @param threshold By default (threshold = "Otsu"), a threshold value based on
 #'   Otsu's method is used to reduce the grayscale image to a binary image. If a
 #'   numeric value is provided, this value will be used as a threshold.
-#' @param filter Performs median filtering in the binary image? See more at
-#'   image_filter(). Defaults to FALSE. Use a positive integer to define the
-#'   size of the median filtering. Larger values are effective at removing
-#'   noise but adversely affect edges.
 #' @param summarize_fun The function to compute summaries for the pixel values.
 #'   Defaults to "mean," i.e., the mean value of the pixels (either at a plot- or
 #'   individual-level) is returned.
@@ -622,6 +635,8 @@ mosaic_analyze <- function(mosaic,
                            plot_index = "GLI",
                            segment_index = NULL,
                            threshold = "Otsu",
+                           opening = FALSE,
+                           closing = FALSE,
                            filter = FALSE,
                            lower_noise = 0.15,
                            lower_size = NULL,
@@ -658,7 +673,7 @@ mosaic_analyze <- function(mosaic,
   }
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:4326")
-    terra::ext(mosaic) <- c(0, 1, 0, 1)
+    # terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
   nlyrs <- terra::nlyr(mosaic)
   if(verbose){
@@ -706,15 +721,25 @@ mosaic_analyze <- function(mosaic,
       )
     # crop to the analyzed area
     if(crop_to_shape_ext){
-      poly_ext <-
-        do.call(rbind, lapply(created_shapes, function(x){
-          x
-        })) |>
-        sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-        terra::vect() |>
-        terra::buffer(buffer_edge) |>
-        terra::ext()
-
+      ress <- terra::res(mosaic)
+      if(sum(ress) != 2){
+        poly_ext <-
+          do.call(rbind, lapply(created_shapes, function(x){
+            x
+          })) |>
+          sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+          terra::vect() |>
+          terra::buffer(buffer_edge) |>
+          terra::ext()
+      } else{
+        poly_ext <-
+          do.call(rbind, lapply(created_shapes, function(x){
+            x
+          })) |>
+          terra::vect() |>
+          terra::buffer(buffer_edge) |>
+          terra::ext()
+      }
       mosaiccr <- terra::crop(mosaic, poly_ext)
     } else{
       mosaiccr <- mosaic
@@ -732,106 +757,60 @@ mosaic_analyze <- function(mosaic,
       names(created_shapes) <- paste(1:length(created_shapes))
     }
     if(crop_to_shape_ext){
-      poly_ext <-
-        do.call(rbind, lapply(created_shapes, function(x){
-          x
-        })) |>
-        sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
-        terra::vect() |>
-        terra::buffer(buffer_edge) |>
-        terra::ext()
+      ress <- terra::res(mosaic)
+      if(sum(ress) != 2){
+        poly_ext <-
+          do.call(rbind, lapply(created_shapes, function(x){
+            x
+          })) |>
+          sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
+          terra::vect() |>
+          terra::buffer(buffer_edge) |>
+          terra::ext()
+      } else{
+        poly_ext <-
+          do.call(rbind, lapply(created_shapes, function(x){
+            x
+          })) |>
+          terra::vect() |>
+          terra::buffer(buffer_edge) |>
+          terra::ext()
+      }
+
       mosaiccr <- terra::crop(mosaic, poly_ext)
+
     } else{
       mosaiccr <- mosaic
     }
   }
-  if(length(segment_plot) == 1 & length(created_shapes) != 1){
-    segment_plot <- rep(segment_plot, length(created_shapes))
-  }
-  if(length(segment_plot) != length(created_shapes)){
-    warning(paste0("`segment_plot` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(segment_individuals) == 1 & length(created_shapes) != 1){
-    segment_individuals <- rep(segment_individuals, length(created_shapes))
-  }
-  if(length(segment_individuals) != length(created_shapes)){
-    warning(paste0("`segment_individuals` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(threshold) == 1 & length(created_shapes) != 1){
-    threshold <- rep(threshold, length(created_shapes))
-  }
-  if(length(threshold) != length(created_shapes)){
-    warning(paste0("`threshold` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(watershed) == 1 & length(created_shapes) != 1){
-    watershed <- rep(watershed, length(created_shapes))
-  }
-  if(length(watershed) != length(created_shapes)){
-    warning(paste0("`watershed` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(segment_index) == 1 & length(created_shapes) != 1){
-    segment_index <- rep(segment_index, length(created_shapes))
-  }
-  if(length(segment_index) != length(created_shapes)){
-    warning(paste0("`segment_index` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(invert) == 1 & length(created_shapes) != 1){
-    invert <- rep(invert, length(created_shapes))
-  }
-  if(length(invert) != length(created_shapes)){
-    warning(paste0("`invert` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(includeopt) == 1 & length(created_shapes) != 1){
-    includeopt <- rep(includeopt, length(created_shapes))
-  }
-  if(length(includeopt) != length(created_shapes)){
-    warning(paste0("`includeopt` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(filter) == 1 & length(created_shapes) != 1){
-    filter <- rep(filter, length(created_shapes))
-  }
-  if(length(filter) != length(created_shapes)){
-    warning(paste0("`filter` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(grid) == 1 & length(created_shapes) != 1){
-    grid <- rep(grid, length(created_shapes))
-  }
-  if(length(grid) != length(created_shapes)){
-    warning(paste0("`grid` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(length(lower_noise) == 1 & length(created_shapes) != 1){
-    lower_noise <- rep(lower_noise, length(created_shapes))
-  }
-  if(length(lower_noise) != length(created_shapes)){
-    warning(paste0("`lower_noise` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(is.null(lower_size) | length(lower_size) == 1 & length(created_shapes) != 1){
-    lower_size <- rep(lower_size, length(created_shapes))
-  }
-  if(!is.null(lower_size) & length(lower_size) != length(created_shapes)){
-    warning(paste0("`lower_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(is.null(upper_size) | length(upper_size) == 1 & length(created_shapes) != 1){
-    upper_size <- rep(upper_size, length(created_shapes))
-  }
-  if(!is.null(upper_size) & length(upper_size) != length(created_shapes)){
-    warning(paste0("`upper_size` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(is.null(topn_lower) | length(topn_lower) == 1 & length(created_shapes) != 1){
-    topn_lower <- rep(topn_lower, length(created_shapes))
-  }
-  if(!is.null(topn_lower) & length(topn_lower) != length(created_shapes)){
-    warning(paste0("`topn_lower` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
-  if(is.null(topn_upper) | length(topn_upper) == 1 & length(created_shapes) != 1){
-    topn_upper <- rep(topn_upper, length(created_shapes))
-  }
-  if(!is.null(topn_upper) & length(topn_upper) != length(created_shapes)){
-    warning(paste0("`topn_upper` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
-  }
+  segment_plot <- validate_and_replicate(segment_plot, created_shapes)
+  segment_individuals <- validate_and_replicate(segment_individuals, created_shapes)
+  threshold <- validate_and_replicate(threshold, created_shapes)
+  watershed <- validate_and_replicate(watershed, created_shapes)
+  segment_index <- validate_and_replicate(segment_index, created_shapes)
+  invert <- validate_and_replicate(invert, created_shapes)
+  includeopt <- validate_and_replicate(includeopt, created_shapes)
+  opening <- validate_and_replicate(opening, created_shapes)
+  closing <- validate_and_replicate(closing, created_shapes)
+  filter <- validate_and_replicate(filter, created_shapes)
+  grid <- validate_and_replicate(grid, created_shapes)
+  lower_noise <- validate_and_replicate(lower_noise, created_shapes)
 
-  # return(created_shapes)
-  # compute the indexes
+  if(!is.null(lower_size)){
+    lower_size <- validate_and_replicate(lower_size, created_shapes)
+  }
+  if(!is.null(upper_size)){
+    upper_size <- validate_and_replicate(upper_size, created_shapes)
+  }
+  if(!is.null(topn_lower)){
+    topn_lower <- validate_and_replicate(topn_lower, created_shapes)
+  }
+  if(!is.null(topn_upper)){
+    topn_upper <- validate_and_replicate(topn_upper, created_shapes)
+  }
+  #
+
+
 
   if(is.null(indexes)){
     if(verbose){
@@ -898,12 +877,19 @@ mosaic_analyze <- function(mosaic,
       plot_grid <- created_shapes[[j]]
       sf::st_geometry(plot_grid) <- "geometry"
       if(crop_to_shape_ext){
+
+        ress <- terra::res(mosaic)
+        if(sum(ress) != 2){
+          plot_grid <-
+            plot_grid |>
+            sf::st_transform(crs = sf::st_crs(terra::crs(mosaic)))
+        }
         ext_anal <-
           plot_grid |>
-          sf::st_transform(crs = sf::st_crs(terra::crs(mosaic))) |>
           terra::vect() |>
           terra::buffer(buffer_edge) |>
           terra::ext()
+
         mind_temp <- terra::crop(mind, terra::ext(ext_anal))
         if(!is.null(mask)){
           mask <- terra::crop(mask, terra::ext(ext_anal))
@@ -969,6 +955,12 @@ mosaic_analyze <- function(mosaic,
         }
         dmask <- EBImage::Image(matrix(mask, ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
         dmask[is.na(dmask) == TRUE] <- 1
+        if(is.numeric(opening[j]) & opening[j] > 0){
+          dmask <- image_opening(dmask, size = opening[j])
+        }
+        if(is.numeric(closing[j]) & closing[j] > 0){
+          dmask <- image_closing(dmask, size = closing[j])
+        }
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
@@ -1173,6 +1165,12 @@ mosaic_analyze <- function(mosaic,
         dmask <- EBImage::Image(matrix(matrix(mask), ncol = nrow(mind_temp), nrow = ncol(mind_temp)))
         extends <- terra::ext(mind_temp)
         dmask[is.na(dmask) == TRUE] <- 1
+        if(is.numeric(opening[j]) & opening[j] > 0){
+          dmask <- image_opening(dmask, opening[j])
+        }
+        if(is.numeric(closing[j]) & closing[j] > 0){
+          dmask <- image_closing(dmask, closing[j])
+        }
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
@@ -1979,7 +1977,7 @@ mosaic_view <- function(mosaic,
 #'  * For `mosaic_export()`, an `SpatRaster` object.
 #' @param info Print the mosaic informations (eg., CRS, extend). Defaults to `TRUE`
 #' @param check_16bits Checks if mosaic has maximum value in the 16-bits format
-#'   (65535), and replaces it by NA. Defaults to `TRUE`.
+#'   (65535), and replaces it by NA. Defaults to `FALSE`.
 #' @param filename character. The Output filename.
 #' @param datatype The datatype. By default, the function will try to guess the
 #'   data type that saves more memory usage and file size. See
@@ -1996,9 +1994,9 @@ mosaic_view <- function(mosaic,
 #' library(pliman)
 #'
 #' # create an SpatRaster object based on a matrix
-#' x <- matrix(1:20, nrow = 4, ncol = 5)
+#' x <- system.file("ex/logo.tif", package="terra")
 #' rast <- mosaic_input(x)
-#' mosaic_view(rast, viewer = "base", axes = TRUE)
+#' mosaic_plot(rast)
 #'
 #' # create a temporary filename for the example
 #' f <- file.path(tempdir(), "test.tif")
@@ -2007,15 +2005,14 @@ mosaic_view <- function(mosaic,
 #'
 mosaic_input <- function(mosaic,
                          info = TRUE,
-                         check_16bits = TRUE,
+                         check_16bits = FALSE,
                          ...){
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
-    terra::ext(mosaic) <- c(0, 1, 0, 1)
   }
-  cels <- sample(1:terra::ncell(mosaic), 2000)
+  cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
   a <- na.omit(unlist(terra::extract(mosaic, cels)))
   a <- a[!is.infinite(a)]
   if(length(a[a - floor(a) != 0]) == 0){

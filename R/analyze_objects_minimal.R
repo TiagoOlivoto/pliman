@@ -29,6 +29,8 @@ analyze_objects_minimal <- function(img,
                                     workers = NULL,
                                     watershed = TRUE,
                                     fill_hull = FALSE,
+                                    opening = FALSE,
+                                    closing = FALSE,
                                     filter = FALSE,
                                     invert = FALSE,
                                     object_size = "medium",
@@ -89,7 +91,7 @@ analyze_objects_minimal <- function(img,
              paste0("./", dir_processed))
   }
   help_count <-
-    function(img, fill_hull, threshold, filter, tolerance, extension,  plot,
+    function(img, fill_hull, threshold, opening, closing, filter, tolerance, extension,  plot,
              show_original,  marker, marker_col, marker_size,
              save_image, prefix, dir_original, dir_processed, verbose,
              col_background, col_foreground, lower_noise){
@@ -117,6 +119,8 @@ analyze_objects_minimal <- function(img,
                               invert = invert,
                               fill_hull = fill_hull,
                               threshold = threshold,
+                              opening = opening,
+                              closing = closing,
                               filter = filter,
                               resize = FALSE)
           if(isTRUE(watershed)){
@@ -165,6 +169,8 @@ analyze_objects_minimal <- function(img,
             help_binary(img,
                         threshold = threshold,
                         index = back_fore_index,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         r = r,
                         g = g,
@@ -194,6 +200,8 @@ analyze_objects_minimal <- function(img,
                         b = b,
                         re = re,
                         nir = nir,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         invert = invert2)
           mask <- img_bf
@@ -244,6 +252,8 @@ analyze_objects_minimal <- function(img,
                         b = b,
                         re = re,
                         nir = nir,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         invert = invert,
                         fill_hull = fill_hull)
@@ -443,7 +453,7 @@ analyze_objects_minimal <- function(img,
     }
 
   if(missing(pattern)){
-    help_count(img, fill_hull, threshold, filter, tolerance, extension,  plot,
+    help_count(img, fill_hull, threshold, opening, closing, filter, tolerance, extension,  plot,
                show_original,  marker, marker_col, marker_size,
                save_image, prefix, dir_original, dir_processed, verbose,
                col_background, col_foreground, lower_noise)
@@ -476,7 +486,7 @@ analyze_objects_minimal <- function(img,
       results <-
         foreach::foreach(i = seq_along(names_plant)) %dofut%{
           help_count(names_plant[i],
-                     fill_hull, threshold, filter, tolerance, extension,  plot,
+                     fill_hull, threshold, opening, closing, filter, tolerance, extension,  plot,
                      show_original,  marker, marker_col, marker_size,
                      save_image, prefix, dir_original, dir_processed, verbose,
                      col_background, col_foreground, lower_noise)
@@ -565,8 +575,8 @@ analyze_objects_minimal <- function(img,
 #' # density of area
 #' plot(rgb)
 #'
-#' # histogram of perimeter
-#' plot(rgb, measure = "perimeter", type = "histogram") # or 'hist'
+#' # histogram of area
+#' plot(rgb, type = "histogram") # or 'hist'
 #' }
 plot.anal_obj_minimal <- function(x,
                                   which = "measure",

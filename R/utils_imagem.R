@@ -389,9 +389,19 @@ image_pliman <- function(img, plot = FALSE){
 #' (x and y coordinates) around the image objects.
 #' * for [image_trim()], the number of pixels removed from the edges. By
 #' default, 20 pixels are removed from all the edges.
-#' @param filter Performs median filtering in the binary image. This is useful
-#'   to remove noise (like dust) and improve the image autocropping method. See
-#'   more at [image_filter()]. Set to `FALSE` to remove the median filtering.
+#' @param opening,closing,filter **Morphological operations (brush size)**
+#'  * `opening` performs an erosion followed by a dilation. This helps to
+#'   remove small objects while preserving the shape and size of larger objects.
+#'  * `closing` performs a dilatation followed by an erosion. This helps to
+#'   fill small holes while preserving the shape and size of larger objects.
+#'  * `filter` performs median filtering in the binary image. Provide a positive
+#'  integer > 1 to indicate the size of the median filtering. Higher values are
+#'  more efficient to remove noise in the background but can dramatically impact
+#'  the perimeter of objects, mainly for irregular perimeters such as leaves
+#'  with serrated edges.
+#'
+#'   Hierarchically, the operations are performed as opening > closing > filter.
+#'   The value declared in each argument will define the brush size.
 #' @param top,bottom,left,right The number of pixels removed from `top`,
 #'   `bottom`, `left`, and `right` when using [image_trim()].
 #' @param angle The rotation angle in degrees.
@@ -447,7 +457,9 @@ image_pliman <- function(img, plot = FALSE){
 image_autocrop <- function(img,
                            index = "NB",
                            edge = 5,
-                           filter = 3,
+                           opening = 5,
+                           closing = FALSE,
+                           filter = FALSE,
                            parallel = FALSE,
                            workers = NULL,
                            verbose = TRUE,
@@ -484,6 +496,8 @@ image_autocrop <- function(img,
                               id = NULL,
                               edge = edge,
                               plot = FALSE,
+                              opening = opening,
+                              closing = closing,
                               filter = filter)
     segmented <- img[conv_hull[1]:conv_hull[2],
                      conv_hull[3]:conv_hull[4],
@@ -1584,11 +1598,20 @@ image_create <- function(color,
 #'   `resize = 30`, the resized image will have 30% of the size of original
 #'   image.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
-#' @param filter Performs median filtering in the binary image? (Defaults to
-#'   `FALSE`). Provide a positive integer > 1 to indicate the size of the median
-#'   filtering. Higher values are more efficient to remove noise in the
-#'   background but can dramatically impact the perimeter of objects, mainly for
-#'   irregular perimeters such as leaves with serrated edges.
+#'
+#' @param opening,closing,filter **Morphological operations (brush size)**
+#'  * `opening` performs an erosion followed by a dilation. This helps to
+#'   remove small objects while preserving the shape and size of larger objects.
+#'  * `closing` performs a dilatation followed by an erosion. This helps to
+#'   fill small holes while preserving the shape and size of larger objects.
+#'  * `filter` performs median filtering in the binary image. Provide a positive
+#'  integer > 1 to indicate the size of the median filtering. Higher values are
+#'  more efficient to remove noise in the background but can dramatically impact
+#'  the perimeter of objects, mainly for irregular perimeters such as leaves
+#'  with serrated edges.
+#'
+#'   Hierarchically, the operations are performed as opening > closing > filter.
+#'   The value declared in each argument will define the brush size.
 #' @param invert Inverts the binary image, if desired.
 #' @param plot Show image after processing?
 #' @param nrow,ncol The number of rows or columns in the plot grid. Defaults to
@@ -1633,6 +1656,8 @@ image_binary <- function(img,
                          has_white_bg = FALSE,
                          resize = FALSE,
                          fill_hull = FALSE,
+                         opening = FALSE,
+                         closing = FALSE,
                          filter = FALSE,
                          invert = FALSE,
                          plot = TRUE,
@@ -1671,6 +1696,8 @@ image_binary <- function(img,
                        resize,
                        fill_hull,
                        filter,
+                       closing,
+                       opening,
                        re,
                        nir,
                        invert,
@@ -1695,6 +1722,8 @@ image_binary <- function(img,
                     resize,
                     fill_hull,
                     filter,
+                    closing,
+                    opening,
                     re,
                     nir,
                     invert,
@@ -1708,7 +1737,9 @@ image_binary <- function(img,
                         invert,
                         fill_hull,
                         threshold,
-                        filter){
+                        filter,
+                        closing,
+                        opening){
       # adapted from imagerExtra  https://bit.ly/3Wp4pwv
       if(threshold == "adaptive"){
         if(is.null(windowsize)){
@@ -1761,6 +1792,12 @@ image_binary <- function(img,
       if(isTRUE(fill_hull)){
         imgs <- EBImage::fillHull(imgs)
       }
+      if(is.numeric(opening) & opening > 0){
+        imgs <- image_opening(imgs, size = opening)
+      }
+      if(is.numeric(closing) & closing > 0){
+        imgs <- image_closing(imgs, size = closing)
+      }
       if(is.numeric(filter) & filter > 1){
         imgs <- EBImage::medianFilter(imgs, filter)
       }
@@ -1772,7 +1809,9 @@ image_binary <- function(img,
                    invert,
                    fill_hull,
                    threshold,
-                   filter)
+                   filter,
+                   closing,
+                   opening)
     if(plot == TRUE){
       num_plots <- length(imgs)
       if (is.null(nrow) && is.null(ncol)){
@@ -2114,10 +2153,19 @@ plot.image_index <- function(x,
 #'   objects that have, for example, a white background. In such cases, the
 #'   background will not be considered for the threshold computation.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
-#' @param filter Performs median filtering in the binary image? See more at
-#'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
-#'   size of the median filtering. Larger values are effective at removing
-#'   noise, but adversely affect edges.
+#' @param opening,closing,filter **Morphological operations (brush size)**
+#'  * `opening` performs an erosion followed by a dilation. This helps to
+#'   remove small objects while preserving the shape and size of larger objects.
+#'  * `closing` performs a dilatation followed by an erosion. This helps to
+#'   fill small holes while preserving the shape and size of larger objects.
+#'  * `filter` performs median filtering in the binary image. Provide a positive
+#'  integer > 1 to indicate the size of the median filtering. Higher values are
+#'  more efficient to remove noise in the background but can dramatically impact
+#'  the perimeter of objects, mainly for irregular perimeters such as leaves
+#'  with serrated edges.
+#'
+#'   Hierarchically, the operations are performed as opening > closing > filter.
+#'   The value declared in each argument will define the brush size.
 #' @param invert Inverts the binary image, if desired. For
 #'   `image_segmentation_iter()` use a vector with the same length of `nseg`.
 #' @param plot Show image after processing?
@@ -2169,6 +2217,8 @@ image_segment <- function(img,
                           na_background = FALSE,
                           has_white_bg = FALSE,
                           fill_hull = FALSE,
+                          opening = FALSE,
+                          closing = FALSE,
                           filter = FALSE,
                           invert = FALSE,
                           plot = TRUE,
@@ -2195,10 +2245,10 @@ image_segment <- function(img,
       }
       res <-
         foreach::foreach(i = seq_along(img)) %dofut%{
-          image_segment(img[[i]], index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter,invert, plot = plot, nrow, ncol)
+          image_segment(img[[i]], index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, opening, closing, filter,invert, plot = plot, nrow, ncol)
         }
     } else{
-      res <- lapply(img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, filter, invert, plot = plot, nrow, ncol)
+      res <- lapply(img, image_segment, index, r, g, b, re, nir, threshold, k, windowsize, col_background, has_white_bg, fill_hull, opening, closing, filter, invert, plot = plot, nrow, ncol)
     }
     invisible(structure(res, class = "segment_list"))
   } else{
@@ -2251,6 +2301,8 @@ image_segment <- function(img,
                           has_white_bg = has_white_bg,
                           resize = FALSE,
                           fill_hull = fill_hull,
+                          opening = opening,
+                          closing = closing,
                           filter = filter,
                           invert = invert)
       ID <- which(img2@.Data == FALSE)
@@ -2525,15 +2577,13 @@ image_segment_iter <- function(img,
 #' Image segmentation using k-means clustering
 #'
 #' Segments image objects using clustering by the k-means clustering algorithm
-#'
+#' @inheritParams image_segment
 #' @param img An `Image` object.
 #' @param bands A numeric integer/vector indicating the RGB band used in the
 #'   segmentation. Defaults to `1:3`, i.e., all the RGB bands are used.
 #' @param nclasses The number of desired classes after image segmentation.
 #' @param invert Invert the segmentation? Defaults to `FALSE`. If `TRUE` the
 #'   binary matrix is inverted.
-#' @param filter Applies a median filtering in the binary matrix? Defaults to
-#'   `FALSE`. Use a numeric integer to indicate the size of the median filter.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param plot Plot the segmented image?
 #' @return A list with the following values:
@@ -2556,6 +2606,8 @@ image_segment_kmeans <-   function (img,
                                     bands = 1:3,
                                     nclasses = 2,
                                     invert = FALSE,
+                                    opening = FALSE,
+                                    closing = FALSE,
                                     filter = FALSE,
                                     fill_hull = FALSE,
                                     plot = TRUE){
@@ -2582,6 +2634,12 @@ image_segment_kmeans <-   function (img,
   }
   if(isTRUE(fill_hull)){
     LIST <- lapply(LIST, EBImage::fillHull)
+  }
+  if(is.numeric(opening) & opening > 0){
+    LIST <- lapply(LIST, image_opening, size = opening)
+  }
+  if(is.numeric(closing) & closing > 0){
+    LIST <- lapply(LIST, image_closing, size = closing)
   }
   if(is.numeric(filter) & filter > 1){
     LIST <- lapply(LIST, EBImage::medianFilter, size = filter)
@@ -3452,6 +3510,8 @@ help_segment <- function(img,
                          col_background = NULL,
                          has_white_bg = FALSE,
                          fill_hull = FALSE,
+                         opening = FALSE,
+                         closing = FALSE,
                          filter = FALSE,
                          invert = FALSE){
   img2 <- help_binary(img,
@@ -3467,6 +3527,8 @@ help_segment <- function(img,
                       has_white_bg = has_white_bg,
                       resize = FALSE,
                       fill_hull = fill_hull,
+                      opening = opening,
+                      closing = closing,
                       filter = filter,
                       invert = invert)
   ID <- which(img2@.Data == FALSE)
@@ -3504,6 +3566,8 @@ help_binary <- function(img,
                         has_white_bg = FALSE,
                         resize = FALSE,
                         fill_hull = FALSE,
+                        opening = FALSE,
+                        closing = FALSE,
                         filter = FALSE,
                         invert = FALSE){
   threshold <- threshold[[1]]
@@ -3512,6 +3576,8 @@ help_binary <- function(img,
                       invert,
                       fill_hull,
                       threshold,
+                      opening,
+                      closing,
                       filter){
     # adapted from imagerExtra  https://bit.ly/3Wp4pwv
     if(threshold == "adaptive"){
@@ -3564,6 +3630,12 @@ help_binary <- function(img,
     if(isTRUE(fill_hull)){
       imgs <- EBImage::fillHull(imgs)
     }
+    if(is.numeric(opening) & opening > 0){
+      imgs <- image_opening(imgs, size = opening)
+    }
+    if(is.numeric(closing) & closing > 0){
+      imgs <- image_closing(imgs, size = closing)
+    }
     if(is.numeric(filter) & filter > 1){
       imgs <- EBImage::medianFilter(imgs, filter)
     }
@@ -3575,6 +3647,8 @@ help_binary <- function(img,
                      invert,
                      fill_hull,
                      threshold,
+                     opening,
+                     closing,
                      filter)
   invisible(bin_img)
 }

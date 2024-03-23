@@ -24,10 +24,19 @@
 #' @param index The index to produce a binary image used to compute bounding
 #'   rectangle coordinates. See [image_binary()] for more details.
 #' @param invert Inverts the binary image, if desired. Defaults to `FALSE`.
-#' @param filter Performs median filtering in the binary image? See more at
-#'   [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
-#'   size of the median filtering. Larger values are effective at removing
-#'   noise, but adversely affect edges.
+#' @param opening,closing,filter **Morphological operations (brush size)**
+#'  * `opening` performs an erosion followed by a dilation. This helps to
+#'   remove small objects while preserving the shape and size of larger objects.
+#'  * `closing` performs a dilatation followed by an erosion. This helps to
+#'   fill small holes while preserving the shape and size of larger objects.
+#'  * `filter` performs median filtering in the binary image. Provide a positive
+#'  integer > 1 to indicate the size of the median filtering. Higher values are
+#'  more efficient to remove noise in the background but can dramatically impact
+#'  the perimeter of objects, mainly for irregular perimeters such as leaves
+#'  with serrated edges.
+#'
+#'   Hierarchically, the operations are performed as opening > closing > filter.
+#'   The value declared in each argument will define the brush size.
 #' @param fill_hull Fill holes in the objects? Defaults to `FALSE`.
 #' @param watershed If `TRUE` (default) performs watershed-based object
 #'   detection. This will detect objects even when they are touching one other.
@@ -83,6 +92,8 @@ object_coord <- function(img,
                          index = "NB",
                          watershed = TRUE,
                          invert = FALSE,
+                         opening = FALSE,
+                         closing = FALSE,
                          filter = FALSE,
                          fill_hull = FALSE,
                          threshold = "Otsu",
@@ -116,6 +127,8 @@ object_coord <- function(img,
     img2 <- help_binary(img,
                         index = index,
                         invert = invert,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         fill_hull = fill_hull,
                         threshold = threshold)
@@ -181,6 +194,8 @@ object_contour <- function(img,
                            center =  FALSE,
                            index = "NB",
                            invert = FALSE,
+                           opening = FALSE,
+                           closing = FALSE,
                            filter = FALSE,
                            fill_hull = FALSE,
                            threshold = "Otsu",
@@ -214,11 +229,11 @@ object_contour <- function(img,
       message("Image processing using multiple sessions (",nworkers, "). Please wait.")
         foreach::foreach(i = seq_along(img)) %dofut%{
           object_contour(img[[i]],
-                         pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
+                         pattern, dir_original, center, index, invert, opening, closing, filter, fill_hull, threshold,
                          watershed, extension, tolerance, object_size, plot = plot)
         }
     } else{
-      lapply(img, object_contour, pattern, dir_original, center, index, invert, filter, fill_hull, threshold,
+      lapply(img, object_contour, pattern, dir_original, center, index, invert, opening, closing, filter, fill_hull, threshold,
              watershed, extension, tolerance, object_size, plot = plot)
     }
   } else{
@@ -226,6 +241,8 @@ object_contour <- function(img,
       img2 <- help_binary(img,
                           index = index,
                           invert = invert,
+                          opening = opening,
+                          closing = closing,
                           filter = filter,
                           fill_hull = fill_hull,
                           threshold = threshold)
@@ -286,6 +303,8 @@ object_contour <- function(img,
         img2 <- help_binary(img,
                             index = index,
                             invert = invert,
+                            opening = opening,
+                            closing = closing,
                             filter = filter,
                             fill_hull = fill_hull,
                             threshold = threshold)
@@ -450,7 +469,9 @@ object_split <- function(img,
                          watershed = TRUE,
                          invert = FALSE,
                          fill_hull = FALSE,
-                         filter = 2,
+                         opening = 3,
+                         closing = FALSE,
+                         filter = FALSE,
                          threshold = "Otsu",
                          extension = NULL,
                          tolerance = NULL,
@@ -462,6 +483,8 @@ object_split <- function(img,
                          ...){
 
   img2 <- help_binary(img,
+                      opening = opening,
+                      closing = closing,
                       filter = filter,
                       index = index,
                       invert = invert,
@@ -772,7 +795,9 @@ object_export <- function(img,
                           watershed = FALSE,
                           invert = FALSE,
                           fill_hull = FALSE,
-                          filter = 2,
+                          opening = 3,
+                          closing = FALSE,
+                          filter = FALSE,
                           threshold = "Otsu",
                           extension = NULL,
                           tolerance = NULL,
@@ -788,6 +813,8 @@ object_export <- function(img,
                                  watershed = watershed,
                                  invert = invert,
                                  fill_hull = fill_hull,
+                                 opening = opening,
+                                 closing = closing,
                                  filter = filter,
                                  threshold = threshold,
                                  extension = extension,
@@ -882,6 +909,8 @@ object_export <- function(img,
                                        watershed = watershed,
                                        invert = invert,
                                        fill_hull = fill_hull,
+                                       opening = opening,
+                                       closing = closing,
                                        filter = filter,
                                        threshold = threshold,
                                        extension = extension,
@@ -940,6 +969,8 @@ object_export <- function(img,
                                      watershed = watershed,
                                      invert = invert,
                                      fill_hull = fill_hull,
+                                     opening = opening,
+                                     closing = closing,
                                      filter = filter,
                                      threshold = threshold,
                                      extension = extension,

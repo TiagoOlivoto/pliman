@@ -5,7 +5,7 @@
 \alias{mosaic_export}
 \title{Create and Export mosaics}
 \usage{
-mosaic_input(mosaic, info = TRUE, check_16bits = TRUE, ...)
+mosaic_input(mosaic, info = TRUE, check_16bits = FALSE, ...)
 
 mosaic_export(mosaic, filename, datatype = NULL, overwrite = FALSE, ...)
 }
@@ -19,7 +19,7 @@ array or a list of \code{SpatRaster} objects.
 \item{info}{Print the mosaic informations (eg., CRS, extend). Defaults to \code{TRUE}}
 
 \item{check_16bits}{Checks if mosaic has maximum value in the 16-bits format
-(65535), and replaces it by NA. Defaults to \code{TRUE}.}
+(65535), and replaces it by NA. Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \code{\link[terra:rast]{terra::rast()}} (\code{mosaic_input()})
 or  \code{\link[terra:writeRaster]{terra::writeRaster()}} (\code{mosaic_output()})}
@@ -53,9 +53,9 @@ a \code{SpatRaster} object to a file.
 library(pliman)
 
 # create an SpatRaster object based on a matrix
-x <- matrix(1:20, nrow = 4, ncol = 5)
+x <- system.file("ex/logo.tif", package="terra")
 rast <- mosaic_input(x)
-mosaic_view(rast, viewer = "base", axes = TRUE)
+mosaic_plot(rast)
 
 # create a temporary filename for the example
 f <- file.path(tempdir(), "test.tif")

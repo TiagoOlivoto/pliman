@@ -19,6 +19,8 @@ image_binary(
   has_white_bg = FALSE,
   resize = FALSE,
   fill_hull = FALSE,
+  opening = FALSE,
+  closing = FALSE,
   filter = FALSE,
   invert = FALSE,
   plot = TRUE,
@@ -79,11 +81,21 @@ image.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 
-\item{filter}{Performs median filtering in the binary image? (Defaults to
-\code{FALSE}). Provide a positive integer > 1 to indicate the size of the median
-filtering. Higher values are more efficient to remove noise in the
-background but can dramatically impact the perimeter of objects, mainly for
-irregular perimeters such as leaves with serrated edges.}
+\item{opening, closing, filter}{\strong{Morphological operations (brush size)}
+\itemize{
+\item \code{opening} performs an erosion followed by a dilation. This helps to
+remove small objects while preserving the shape and size of larger objects.
+\item \code{closing} performs a dilatation followed by an erosion. This helps to
+fill small holes while preserving the shape and size of larger objects.
+\item \code{filter} performs median filtering in the binary image. Provide a positive
+integer > 1 to indicate the size of the median filtering. Higher values are
+more efficient to remove noise in the background but can dramatically impact
+the perimeter of objects, mainly for irregular perimeters such as leaves
+with serrated edges.
+}
+
+Hierarchically, the operations are performed as opening > closing > filter.
+The value declared in each argument will define the brush size.}
 
 \item{invert}{Inverts the binary image, if desired.}
 

@@ -25,6 +25,8 @@ analyze_objects_shp(
   parallel = FALSE,
   workers = NULL,
   watershed = TRUE,
+  opening = FALSE,
+  closing = FALSE,
   filter = FALSE,
   object_size = "medium",
   efourier = FALSE,
@@ -104,10 +106,21 @@ If \code{FALSE}, all pixels for each connected set of foreground pixels are set
 to a unique object. This is faster but is not able to segment touching
 objects.}
 
-\item{filter}{Performs median filtering in the binary image? See more at
-\code{\link[=image_filter]{image_filter()}}. Defaults to \code{FALSE}. Use a positive integer to define the
-size of the median filtering. Larger values are effective at removing noise,
-but adversely affect edges.}
+\item{opening, closing, filter}{\strong{Morphological operations (brush size)}
+\itemize{
+\item \code{opening} performs an erosion followed by a dilation. This helps to
+remove small objects while preserving the shape and size of larger objects.
+\item \code{closing} performs a dilatation followed by an erosion. This helps to
+fill small holes while preserving the shape and size of larger objects.
+\item \code{filter} performs median filtering in the binary image. Provide a positive
+integer > 1 to indicate the size of the median filtering. Higher values are
+more efficient to remove noise in the background but can dramatically impact
+the perimeter of objects, mainly for irregular perimeters such as leaves
+with serrated edges.
+}
+
+Hierarchically, the operations are performed as opening > closing > filter.
+The value declared in each argument will define the brush size.}
 
 \item{object_size}{Argument to control control the watershed segmentation.
 See \code{\link[=analyze_objects]{analyze_objects()}} for more details.}

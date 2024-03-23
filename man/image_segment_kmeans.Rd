@@ -9,6 +9,8 @@ image_segment_kmeans(
   bands = 1:3,
   nclasses = 2,
   invert = FALSE,
+  opening = FALSE,
+  closing = FALSE,
   filter = FALSE,
   fill_hull = FALSE,
   plot = TRUE
@@ -25,8 +27,21 @@ segmentation. Defaults to \code{1:3}, i.e., all the RGB bands are used.}
 \item{invert}{Invert the segmentation? Defaults to \code{FALSE}. If \code{TRUE} the
 binary matrix is inverted.}
 
-\item{filter}{Applies a median filtering in the binary matrix? Defaults to
-\code{FALSE}. Use a numeric integer to indicate the size of the median filter.}
+\item{opening, closing, filter}{\strong{Morphological operations (brush size)}
+\itemize{
+\item \code{opening} performs an erosion followed by a dilation. This helps to
+remove small objects while preserving the shape and size of larger objects.
+\item \code{closing} performs a dilatation followed by an erosion. This helps to
+fill small holes while preserving the shape and size of larger objects.
+\item \code{filter} performs median filtering in the binary image. Provide a positive
+integer > 1 to indicate the size of the median filtering. Higher values are
+more efficient to remove noise in the background but can dramatically impact
+the perimeter of objects, mainly for irregular perimeters such as leaves
+with serrated edges.
+}
+
+Hierarchically, the operations are performed as opening > closing > filter.
+The value declared in each argument will define the brush size.}
 
 \item{fill_hull}{Fill holes in the objects? Defaults to \code{FALSE}.}
 

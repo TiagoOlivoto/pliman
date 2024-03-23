@@ -230,10 +230,6 @@
 #'  the background. IMPORTANT: Objects touching each other can be combined into
 #'  one single object, which may underestimate the number of objects in an
 #'  image.
-#'@param filter Performs median filtering in the binary image? See more at
-#'  [image_filter()]. Defaults to `FALSE`. Use a positive integer to define the
-#'  size of the median filtering. Larger values are effective at removing noise,
-#'  but adversely affect edges.
 #'@param invert Inverts the binary image if desired. This is useful to process
 #'  images with a black background. Defaults to `FALSE`. If `reference = TRUE`
 #'  is use, `invert` can be declared as a logical vector of length 2 (eg.,
@@ -565,6 +561,8 @@ analyze_objects <- function(img,
                             resize = FALSE,
                             trim = FALSE,
                             fill_hull = FALSE,
+                            opening = FALSE,
+                            closing = FALSE,
                             filter = FALSE,
                             invert = FALSE,
                             object_size = "medium",
@@ -638,7 +636,7 @@ analyze_objects <- function(img,
              paste0("./", dir_processed))
   }
   help_count <-
-    function(img, foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
+    function(img, foreground, background, pick_palettes, resize, fill_hull, threshold, opening, closing, filter,
              tolerance, extension, randomize, nrows, plot, show_original,
              show_background, marker, marker_col, marker_size, save_image,
              prefix, dir_original, dir_processed, verbose, col_background,
@@ -782,6 +780,8 @@ analyze_objects <- function(img,
                                 threshold = threshold,
                                 k = k,
                                 windowsize = windowsize,
+                                opening = opening,
+                                closing = closing,
                                 filter = filter,
                                 resize = FALSE)
             if(isTRUE(watershed)){
@@ -837,6 +837,8 @@ analyze_objects <- function(img,
             help_binary(img,
                         threshold = threshold,
                         index = back_fore_index,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         r = r,
                         g = g,
@@ -868,6 +870,8 @@ analyze_objects <- function(img,
                         b = b,
                         re = re,
                         nir = nir,
+                        opening = opening,
+                        closing = closing,
                         filter = filter,
                         k = k,
                         windowsize = windowsize,
@@ -1019,6 +1023,8 @@ analyze_objects <- function(img,
                           nir = nir,
                           k = k,
                           windowsize = windowsize,
+                          opening = opening,
+                          closing = closing,
                           filter = filter,
                           invert = invert,
                           fill_hull = fill_hull)
@@ -1405,7 +1411,7 @@ analyze_objects <- function(img,
     }
 
   if(missing(pattern)){
-    help_count(img, foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
+    help_count(img, foreground, background, pick_palettes, resize, fill_hull, threshold, opening, closing, filter,
                tolerance , extension, randomize, nrows, plot, show_original,
                show_background, marker, marker_col, marker_size, save_image, prefix,
                dir_original, dir_processed, verbose, col_background,
@@ -1439,7 +1445,7 @@ analyze_objects <- function(img,
       results <-
         foreach::foreach(i = seq_along(names_plant)) %dofut%{
           help_count(names_plant[i],
-                     foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
+                     foreground, background, pick_palettes, resize, fill_hull, threshold, opening, closing, filter,
                      tolerance , extension, randomize, nrows, plot, show_original,
                      show_background, marker, marker_col, marker_size, save_image, prefix,
                      dir_original, dir_processed, verbose, col_background,
@@ -1454,7 +1460,7 @@ analyze_objects <- function(img,
           run_progress(pb, ...)
         }
         help_count(img  = plants,
-                   foreground, background, pick_palettes, resize, fill_hull, threshold, filter,
+                   foreground, background, pick_palettes, resize, fill_hull, threshold, opening, closing, filter,
                    tolerance , extension, randomize, nrows, plot, show_original,
                    show_background, marker, marker_col, marker_size, save_image, prefix,
                    dir_original, dir_processed, verbose, col_background,
