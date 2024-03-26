@@ -2925,6 +2925,9 @@ image_to_mat <- function(img,
 #' @param proportional Creates a joint palette with proportional size equal to
 #'   the number of pixels in the image? Defaults to `TRUE`.
 #' @param plot Plot the generated palette? Defaults to `TRUE`.
+#' @param colorspace The color space to produce the clusters. Defaults to `rgb`.
+#'   If `hsb`, the color space is first converted from RGB > HSB before k-means
+#'   algorithm be applied.
 #' @return `image_palette()` returns a list with two elements:
 #' * `palette_list` A list with `npal` color palettes of class `Image`.
 #' * `joint` An object of class `Image` with the color palettes
@@ -2945,29 +2948,64 @@ image_to_mat <- function(img,
 image_palette <- function (img,
                            npal = 5,
                            proportional = TRUE,
-                           plot = TRUE) {
+                           plot = TRUE,
+                           colorspace = c("rgb", "hsb")) {
+  if(!colorspace[[1]]  %in% c("rgb", "hsb")){
+    warning("`colorspace` must be one of 'rgb' or 'hsb'. Setting to 'rgb'", call. = FALSE)
+    colorspace <- "rgb"
+  }
   nc <- ncol(img)
   nr <- nrow(img)
-  if(length(dim(img)) < 3){
-    imb <- data.frame(B1 = image_to_mat(img)[,3])
-  } else{
+  if(length(dim(img)) == 1){
+    if(colorspace[[1]] == "hsb"){
+      stop("HSB can only be computed with an 3 layers array (RGB)")
+    } else{
+      imb <- data.frame(B1 = rgb_to_hsb(img)[,3])
+    }
+  } else if(length(dim(img)) == 3){
+    if(colorspace[[1]] == "hsb"){
     imb <- image_to_mat(img)[, -c(1, 2)]
+    rownames(imb) <- paste0("r", 1:nrow(imb))
+    hsb <- rgb_to_hsb(img)
+    rownames(hsb) <- paste0("r", 1:nrow(hsb))
+    } else{
+    imb <- image_to_mat(img)[, -c(1, 2)]
+    rownames(imb) <- paste0("r", 1:nrow(imb))
+
+    }
   }
   if(any(is.na(imb[, 1]))){
-    rownames(imb) <- paste0("r", 1:nrow(imb))
-    km <- suppressWarnings(stats::kmeans(na.omit(imb), npal))
+
+    if(colorspace[[1]] == "rgb"){
+      set.seed(10)
+      km <- suppressWarnings(stats::kmeans(na.omit(imb), npal))
+    } else{
+      set.seed(10)
+      km <- suppressWarnings(stats::kmeans(na.omit(hsb), npal))
+    }
     imb <- cbind(imb, 'cluster'=NA)
     imb[names(km$cluster), "cluster"] <- km$cluster
   } else{
-    km <- suppressWarnings(stats::kmeans(imb, npal))
-    imb$cluster <- km$cluster
+    if(colorspace[[1]] == "rgb"){
+      set.seed(10)
+      km <- suppressWarnings(stats::kmeans(imb, npal))
+      imb$cluster <- km$cluster
+    } else{
+      set.seed(10)
+      km <- suppressWarnings(stats::kmeans(hsb, npal))
+      imb$cluster <- km$cluster
+    }
   }
   props <-
-    data.frame(n = km$size,
-               prop = km$size / sum(km$size),
-               R = km$centers[, 1],
-               G = km$centers[, 2],
-               B = km$centers[, 3]) |>
+    imb |>
+    dplyr::group_by(cluster) |>
+    dplyr::summarise(
+      n = n(),
+      R = mean(B1, na.rm = TRUE),
+      G = mean(B2, na.rm = TRUE),
+      B = mean(B3, na.rm = TRUE)
+    ) |>
+    dplyr::mutate(prop = n / sum(n), .after = n) |>
     dplyr::arrange(prop) |>
     dplyr::mutate(cluster = paste0("c", 1:npal),
                   .before = 1)

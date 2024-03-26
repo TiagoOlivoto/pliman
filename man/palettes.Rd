@@ -5,7 +5,13 @@
 \alias{image_palette}
 \title{Create image palettes}
 \usage{
-image_palette(img, npal = 5, proportional = TRUE, plot = TRUE)
+image_palette(
+  img,
+  npal = 5,
+  proportional = TRUE,
+  plot = TRUE,
+  colorspace = c("rgb", "hsb")
+)
 }
 \arguments{
 \item{img}{An image object.}
@@ -16,6 +22,10 @@ image_palette(img, npal = 5, proportional = TRUE, plot = TRUE)
 the number of pixels in the image? Defaults to \code{TRUE}.}
 
 \item{plot}{Plot the generated palette? Defaults to \code{TRUE}.}
+
+\item{colorspace}{The color space to produce the clusters. Defaults to \code{rgb}.
+If \code{hsb}, the color space is first converted from RGB > HSB before k-means
+algorithm be applied.}
 }
 \value{
 \code{image_palette()} returns a list with two elements:

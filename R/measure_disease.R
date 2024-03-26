@@ -217,9 +217,9 @@ measure_disease <- function(img,
                             img_symptoms = NULL,
                             img_background = NULL,
                             pattern = NULL,
-                            opening = 10,
-                            closing = FALSE,
-                            filter = FALSE,
+                            opening = c(10, 0),
+                            closing = c(0, 0),
+                            filter = c(0, 0),
                             parallel = FALSE,
                             workers = NULL,
                             resize = FALSE,
@@ -456,14 +456,14 @@ measure_disease <- function(img,
           ifelse(fill_hull == TRUE,
                  plant_background <- EBImage::fillHull(matrix(pred1, ncol = ncol_img)),
                  plant_background <- matrix(pred1, ncol = ncol_img))
-          if(is.numeric(opening) & opening > 0){
-            plant_background <- image_opening(plant_background, opening)
+          if(is.numeric(opening[[1]]) & opening[[1]] > 0){
+            plant_background <- image_opening(plant_background, opening[[1]])
           }
-          if(is.numeric(closing) & closing > 0){
-            plant_background <- image_closing(plant_background, closing)
+          if(is.numeric(closing[[1]]) & closing[[1]] > 0){
+            plant_background <- image_closing(plant_background, closing[[1]])
           }
-          if(is.numeric(filter) & filter > 1){
-            plant_background <- EBImage::medianFilter(plant_background, size = filter)
+          if(is.numeric(filter[[1]]) & filter[[1]] > 1){
+            plant_background <- EBImage::medianFilter(plant_background, size = filter[[1]])
           }
           plant_background[plant_background == 1] <- 2
           sadio_sintoma <-
@@ -493,6 +493,15 @@ measure_disease <- function(img,
           tol <- ifelse(is.null(tolerance), parms2[rowid, 4], tolerance)
           if(isTRUE(fill_hull)){
             leaf_sympts <- EBImage::fillHull(leaf_sympts)
+          }
+          if(is.numeric(opening[[2]]) & opening[[2]] > 0){
+            leaf_sympts <- image_opening(leaf_sympts, opening[[1]])
+          }
+          if(is.numeric(closing[[2]]) & closing[[2]] > 0){
+            leaf_sympts <- image_closing(leaf_sympts, closing[[1]])
+          }
+          if(is.numeric(filter[[2]]) & filter[[2]] > 1){
+            leaf_sympts <- EBImage::medianFilter(leaf_sympts, size = filter[[1]])
           }
           ifelse(watershed == FALSE,
                  nmask <- EBImage::bwlabel(leaf_sympts),
@@ -574,9 +583,10 @@ measure_disease <- function(img,
                               index = index_lb,
                               threshold = my_thresh,
                               invert = invert1,
-                              opening = opening,
-                              closing = closing,
-                              filter = filter)
+                              fill_hull = fill_hull,
+                              opening = opening[[1]],
+                              closing = closing[[1]],
+                              filter = filter[[1]])
 
           img <- seg
         }
@@ -596,6 +606,9 @@ measure_disease <- function(img,
         }
         img2 <- help_binary(img,
                             index = index_dh,
+                            opening = opening[[2]],
+                            closing = closing[[2]],
+                            filter = filter[[2]],
                             threshold = my_thresh2,
                             invert = invert2,
                             has_white_bg = has_white_bg,
