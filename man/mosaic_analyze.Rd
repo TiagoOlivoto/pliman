@@ -15,6 +15,7 @@ mosaic_analyze(
   grid = TRUE,
   nrow = 1,
   ncol = 1,
+  layout = "lrtb",
   indexes = NULL,
   shapefile = NULL,
   basemap = NULL,
@@ -83,6 +84,16 @@ extension.}
 \item{nrow}{Number of rows for the grid (default: 1).}
 
 \item{ncol}{Number of columns for the grid (default: 1).}
+
+\item{layout}{Character: one of
+\itemize{
+\item \code{'tblr'} for top/bottom left/right orientation
+\item \code{'tbrl'} for top/bottom right/left orientation
+\item \code{'lrtb'} for left/right top/bottom orientation
+\item \code{'lrbt'} for left/right bottom/top orientation
+\item \code{'rltb'} for right/left top/bottom orientation
+\item \code{'rlbt'} for right/left bottom/top orientation
+}}
 
 \item{indexes}{An optional \code{SpatRaster} object with the image indexes,
 computed with \code{\link[=mosaic_index]{mosaic_index()}}.}

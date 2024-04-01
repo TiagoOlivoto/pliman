@@ -2920,6 +2920,7 @@ image_to_mat <- function(img,
 #'
 #' `image_palette()`  creates image palettes by applying the k-means algorithm
 #' to the RGB values.
+#' @inheritParams analyze_objects
 #' @param img An image object.
 #' @param npal The number of color palettes.
 #' @param proportional Creates a joint palette with proportional size equal to
@@ -2928,6 +2929,9 @@ image_to_mat <- function(img,
 #' @param colorspace The color space to produce the clusters. Defaults to `rgb`.
 #'   If `hsb`, the color space is first converted from RGB > HSB before k-means
 #'   algorithm be applied.
+#' @param parallel If TRUE processes the images asynchronously (in parallel) in
+#'   separate R sessions running in the background on the same machine.
+#' @param return_pal Return the color palette image? Defaults to `FALSE`.
 #' @return `image_palette()` returns a list with two elements:
 #' * `palette_list` A list with `npal` color palettes of class `Image`.
 #' * `joint` An object of class `Image` with the color palettes
@@ -2945,134 +2949,278 @@ image_to_mat <- function(img,
 #'image_combine(pal$palette_list)
 #'
 #'}
+#'
+#'
+
 image_palette <- function (img,
+                           pattern = NULL,
                            npal = 5,
                            proportional = TRUE,
+                           colorspace = c("rgb", "hsb"),
                            plot = TRUE,
-                           colorspace = c("rgb", "hsb")) {
-  if(!colorspace[[1]]  %in% c("rgb", "hsb")){
-    warning("`colorspace` must be one of 'rgb' or 'hsb'. Setting to 'rgb'", call. = FALSE)
-    colorspace <- "rgb"
-  }
-  nc <- ncol(img)
-  nr <- nrow(img)
-  if(length(dim(img)) == 1){
-    if(colorspace[[1]] == "hsb"){
-      stop("HSB can only be computed with an 3 layers array (RGB)")
-    } else{
-      imb <- data.frame(B1 = rgb_to_hsb(img)[,3])
-    }
-  } else if(length(dim(img)) == 3){
-    if(colorspace[[1]] == "hsb"){
-    imb <- image_to_mat(img)[, -c(1, 2)]
-    rownames(imb) <- paste0("r", 1:nrow(imb))
-    hsb <- rgb_to_hsb(img)
-    rownames(hsb) <- paste0("r", 1:nrow(hsb))
-    } else{
-    imb <- image_to_mat(img)[, -c(1, 2)]
-    rownames(imb) <- paste0("r", 1:nrow(imb))
-
-    }
-  }
-  if(any(is.na(imb[, 1]))){
-
-    if(colorspace[[1]] == "rgb"){
-      set.seed(10)
-      km <- suppressWarnings(stats::kmeans(na.omit(imb), npal))
-    } else{
-      set.seed(10)
-      km <- suppressWarnings(stats::kmeans(na.omit(hsb), npal))
-    }
-    imb <- cbind(imb, 'cluster'=NA)
-    imb[names(km$cluster), "cluster"] <- km$cluster
+                           save_image = FALSE,
+                           prefix = "proc_",
+                           dir_original = NULL,
+                           dir_processed = NULL,
+                           return_pal = FALSE,
+                           parallel = FALSE,
+                           workers = NULL,
+                           verbose = TRUE) {
+  if(is.null(dir_original)){
+    diretorio_original <- paste0("./")
   } else{
-    if(colorspace[[1]] == "rgb"){
-      set.seed(10)
-      km <- suppressWarnings(stats::kmeans(imb, npal))
-      imb$cluster <- km$cluster
+    diretorio_original <-
+      ifelse(grepl("[/\\]", dir_original),
+             dir_original,
+             paste0("./", dir_original))
+  }
+  if(is.null(dir_processed)){
+    diretorio_processada <- paste0("./")
+  } else{
+    diretorio_processada <-
+      ifelse(grepl("[/\\]", dir_processed),
+             dir_processed,
+             paste0("./", dir_processed))
+  }
+
+  help_pal <- function(img, npal, proportional, colorspace, plot, save_image, prefix){
+    if(is.character(img)){
+      all_files <- sapply(list.files(diretorio_original), file_name)
+      # check_names_dir(img, all_files, diretorio_original)
+      imag <- list.files(diretorio_original, pattern = paste0("^",img, "\\."))
+      name_ori <- file_name(imag)
+      extens_ori <- file_extension(imag)
+      img <- image_import(paste(name_ori, ".", extens_ori, sep = ""), path = diretorio_original)
     } else{
-      set.seed(10)
-      km <- suppressWarnings(stats::kmeans(hsb, npal))
-      imb$cluster <- km$cluster
+      name_ori <- match.call()[[2]]
+      extens_ori <- "jpg"
     }
-  }
-  props <-
-    imb |>
-    dplyr::group_by(cluster) |>
-    dplyr::summarise(
-      n = n(),
-      R = mean(B1, na.rm = TRUE),
-      G = mean(B2, na.rm = TRUE),
-      B = mean(B3, na.rm = TRUE)
-    ) |>
-    dplyr::mutate(prop = n / sum(n), .after = n) |>
-    dplyr::arrange(prop) |>
-    dplyr::mutate(cluster = paste0("c", 1:npal),
-                  .before = 1)
-if(plot){
-
-  pal_list <- list()
-  pal_rgb <- list()
-  for(i in 1:nrow(props)){
-    R <- matrix(rep(props[[i, 4]], 10000), 100, 100)
-    G <- matrix(rep(props[[i, 5]], 10000), 100, 100)
-    B <- matrix(rep(props[[i, 6]], 10000), 100, 100)
-    pal_list[[paste0("pal_", i)]] <- EBImage::rgbImage(R, G, B)
-    pal_rgb[[paste0("pal_", i)]] <- c(R = R[1], G = G[1], B = B[1])
-  }
-
-
-  rownames(props) <- NULL
-  if (proportional == FALSE) {
-    n <- nrow(props)
-    ARR <- array(NA, dim = c(100, 66 * n, 3))
-    c = 1
-    f = 66
-    for (i in 1:n) {
-      ARR[1:100, c:f, 1] <- props[[i, 4]]
-      ARR[1:100, c:f, 2] <- props[[i, 5]]
-      ARR[1:100, c:f, 3] <- props[[i, 6]]
-      c = f + 1
-      f = f + 66
+    if(!colorspace[[1]]  %in% c("rgb", "hsb")){
+      warning("`colorspace` must be one of 'rgb' or 'hsb'. Setting to 'rgb'", call. = FALSE)
+      colorspace <- "rgb"
     }
-  }
-  if (proportional == TRUE) {
-    n <- nrow(props)
-    ARR <- array(NA, dim = c(100, 66 * n, 3))
-    nn <- round(66 * n * props$prop, 0)
-    a <- 1
-    b <- nn[1]
-    nn <- c(nn, 0)
-    for (i in 1:n) {
-      ARR[1:100, a:b, 1] <- props[[i, 4]]
-      ARR[1:100, a:b, 2] <- props[[i, 5]]
-      ARR[1:100, a:b, 3] <- props[[i, 6]]
-      a <- b + 1
-      b <- b + nn[i + 1]
-      if (b > (66 * n)) {
-        b <- 66 * n
+    nc <- ncol(img)
+    nr <- nrow(img)
+    if(length(dim(img)) == 1){
+      if(colorspace[[1]] == "hsb"){
+        stop("HSB can only be computed with an 3 layers array (RGB)")
+      } else{
+        imb <- data.frame(B1 = rgb_to_hsb(img)[,3])
+      }
+    } else if(length(dim(img)) == 3){
+      if(colorspace[[1]] == "hsb"){
+        imb <- image_to_mat(img)[, -c(1, 2)]
+        rownames(imb) <- paste0("r", 1:nrow(imb))
+        hsb <- rgb_to_hsb(img)
+        rownames(hsb) <- paste0("r", 1:nrow(hsb))
+      } else{
+        imb <- image_to_mat(img)[, -c(1, 2)]
+        rownames(imb) <- paste0("r", 1:nrow(imb))
       }
     }
-  }
-  im2 <- EBImage::as.Image(ARR)
-  EBImage::colorMode(im2) <- 2
-  im2 <- image_resize(im2, height = ncol(img), width = nc * 0.1)
-  im2@.Data[1:nrow(im2), 1:1, ] <- 0
-  im2@.Data[1:1, 1:ncol(im2), ] <- 0
-  im2@.Data[1:nrow(im2), ncol(im2):(ncol(im2)-1), ] <- 0
-  im2@.Data[nrow(im2):(nrow(im2)-1), 1:ncol(im2), ] <- 0
-  im2 <- EBImage::abind(img, im2, along = 1)
-  if (plot == TRUE) {
-    plot(im2)
-  }
-} else{
-  im2 <- NULL
-  pal_list <- NULL
-}
+    if(any(is.na(imb[, 1]))){
+      if(colorspace[[1]] == "rgb"){
+        set.seed(10)
+        km <- suppressWarnings(stats::kmeans(na.omit(imb), npal))
+      } else{
+        set.seed(10)
+        km <- suppressWarnings(stats::kmeans(na.omit(hsb), npal))
+      }
+      imb <- cbind(imb, 'cluster'=NA)
+      imb[names(km$cluster), "cluster"] <- km$cluster
+    } else{
+      if(colorspace[[1]] == "rgb"){
+        set.seed(10)
+        km <- suppressWarnings(stats::kmeans(imb, npal))
+        imb$cluster <- km$cluster
+      } else{
+        set.seed(10)
+        km <- suppressWarnings(stats::kmeans(hsb, npal))
+        imb$cluster <- km$cluster
+      }
+    }
+    if(colorspace[[1]] == "hsb"){
+      props <-
+        imb |>
+        dplyr::bind_cols(hsb) |>
+        dplyr::relocate(cluster, .before = 1) |>
+        dplyr::group_by(cluster) |>
+        dplyr::summarise(
+          n = dplyr::n(),
+          R = mean(B1, na.rm = TRUE),
+          G = mean(B2, na.rm = TRUE),
+          B = mean(B3, na.rm = TRUE),
+          h = mean(h, na.rm = TRUE),
+          s = mean(s, na.rm = TRUE),
+          b = mean(b, na.rm = TRUE)
+        )
+    } else{
+      props <-
+        imb |>
+        dplyr::group_by(cluster) |>
+        dplyr::summarise(
+          n = dplyr::n(),
+          R = mean(B1, na.rm = TRUE),
+          G = mean(B2, na.rm = TRUE),
+          B = mean(B3, na.rm = TRUE)
+        )
+    }
+    props <-
+      props |>
+      dplyr::mutate(prop = n / sum(n), .after = n) |>
+      dplyr::arrange(prop) |>
+      dplyr::mutate(cluster = paste0("c", 1:npal),
+                    .before = 1) |>
+      dplyr::ungroup()
+    if(plot){
 
-  invisible(list(palette_list = pal_list,
-                 joint = im2,
-                 proportions = props))
+      pal_list <- list()
+      pal_rgb <- list()
+      for(i in 1:nrow(props)){
+        R <- matrix(rep(props[[i, 4]], 10000), 100, 100)
+        G <- matrix(rep(props[[i, 5]], 10000), 100, 100)
+        B <- matrix(rep(props[[i, 6]], 10000), 100, 100)
+        pal_list[[paste0("pal_", i)]] <- EBImage::rgbImage(R, G, B)
+        pal_rgb[[paste0("pal_", i)]] <- c(R = R[1], G = G[1], B = B[1])
+      }
+
+
+      rownames(props) <- NULL
+      if (proportional == FALSE) {
+        n <- nrow(props)
+        ARR <- array(NA, dim = c(100, 66 * n, 3))
+        c = 1
+        f = 66
+        for (i in 1:n) {
+          ARR[1:100, c:f, 1] <- props[[i, 4]]
+          ARR[1:100, c:f, 2] <- props[[i, 5]]
+          ARR[1:100, c:f, 3] <- props[[i, 6]]
+          c = f + 1
+          f = f + 66
+        }
+      }
+      if (proportional == TRUE) {
+        n <- nrow(props)
+        ARR <- array(NA, dim = c(100, 66 * n, 3))
+        nn <- round(66 * n * props$prop, 0)
+        a <- 1
+        b <- nn[1]
+        nn <- c(nn, 0)
+        for (i in 1:n) {
+          ARR[1:100, a:b, 1] <- props[[i, 4]]
+          ARR[1:100, a:b, 2] <- props[[i, 5]]
+          ARR[1:100, a:b, 3] <- props[[i, 6]]
+          a <- b + 1
+          b <- b + nn[i + 1]
+          if (b > (66 * n)) {
+            b <- 66 * n
+          }
+        }
+      }
+      im2 <- EBImage::as.Image(ARR)
+      EBImage::colorMode(im2) <- 2
+      im2 <- image_resize(im2, height = ncol(img), width = nc * 0.1)
+      im2@.Data[1:nrow(im2), 1:1, ] <- 0
+      im2@.Data[1:1, 1:ncol(im2), ] <- 0
+      im2@.Data[1:nrow(im2), ncol(im2):(ncol(im2)-1), ] <- 0
+      im2@.Data[nrow(im2):(nrow(im2)-1), 1:ncol(im2), ] <- 0
+      im2 <- EBImage::abind(img, im2, along = 1)
+      if (plot == TRUE) {
+        plot(im2)
+      }
+      if(save_image == TRUE){
+        if(dir.exists(diretorio_processada) == FALSE){
+          dir.create(diretorio_processada, recursive = TRUE)
+        }
+        jpeg(paste0(diretorio_processada, "/",
+                    prefix,
+                    name_ori, ".",
+                    extens_ori),
+             width = dim(im2@.Data)[1],
+             height = dim(im2@.Data)[2])
+        plot(im2)
+        dev.off()
+      }
+    } else{
+      im2 <- NULL
+      pal_list <- NULL
+    }
+    if(!return_pal){
+      im2 <- NULL
+      pal_list <- NULL
+    }
+    # gc()
+    return(list(palette_list = pal_list,
+                joint = im2,
+                proportions = props))
+  }
+  if(missing(pattern)){
+    help_pal(img, npal, proportional, colorspace, plot, save_image, prefix)
+  } else{
+    if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      pattern <- "^[0-9].*$"
+    }
+    plants <- list.files(pattern = pattern, diretorio_original)
+    extensions <- as.character(sapply(plants, file_extension))
+    names_plant <- as.character(sapply(plants, file_name))
+    if(length(grep(pattern, names_plant)) == 0){
+      stop(paste("Pattern '", pattern, "' not found in '",
+                 paste(getwd(), sub(".", "", diretorio_original), sep = ""), "'", sep = ""),
+           call. = FALSE)
+    }
+    if(!all(extensions %in% c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF"))){
+      stop("Allowed extensions are .png, .jpeg, .jpg, .tiff")
+    }
+    if(parallel == TRUE){
+      init_time <- Sys.time()
+      nworkers <- ifelse(is.null(workers), trunc(parallel::detectCores()*.3), workers)
+      future::plan(future::multisession, workers = nworkers)
+      on.exit(future::plan(future::sequential))
+      `%dofut%` <- doFuture::`%dofuture%`
+
+      if(verbose == TRUE){
+        message("Processing ", length(names_plant), " images in multiple sessions (",nworkers, "). Please, wait.")
+      }
+
+      results <-
+        foreach::foreach(i = seq_along(names_plant), .options.future = list(seed = TRUE)) %dofut%{
+          help_pal(names_plant[i], npal, proportional, colorspace, plot, save_image, prefix)
+        }
+
+    } else{
+      init_time <- Sys.time()
+      pb <- progress(max = length(plants), style = 4)
+      foo <- function(plants, ...){
+        if(verbose == TRUE){
+          run_progress(pb, ...)
+        }
+        help_pal(plants, npal, proportional, colorspace, plot, save_image, prefix)
+      }
+      results <-
+        lapply(seq_along(names_plant), function(i){
+          foo(names_plant[i],
+              actual = i,
+              text = paste("Processing image", names_plant[i]))
+        })
+    }
+    names(results) <- names_plant
+    proportions <- do.call(rbind, lapply(seq_along(results), function(i){
+      results[[i]]$proportions |> dplyr::mutate(img = names(results[i]), .before = 1)
+    }))
+    palette_list <- lapply(seq_along(results), function(i){
+      results[[i]]$palette_list
+    })
+    joint <- lapply(seq_along(results), function(i){
+      results[[i]]$joint
+    })
+    names(joint) <- names_plant
+
+    message("Done!")
+    message("Elapsed time: ", sec_to_hms(as.numeric(difftime(Sys.time(),  init_time, units = "secs"))))
+    return(list(proportions = proportions,
+                palette_list = palette_list,
+                joint = joint))
+  }
 }
 
 

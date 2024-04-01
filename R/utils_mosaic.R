@@ -199,7 +199,76 @@ idw_interpolation <- function(mosaic, points){
   terra::resample(new_ras, mosaic)
 }
 
+#' Generate plot IDs with different layouts
+#'
+#' Based on a shapefile, number of columns and rows, generate plot IDs with
+#' different layouts.
+#'
+#' @param shapefile An object computed with [shapefile_build()]
+#' @param nrow The number of columns
+#' @param ncol The number of rows
+#' @param layout Character: one of
+#'  * `'tblr'` for top/bottom left/right orientation
+#'  * `'tbrl'` for top/bottom right/left orientation
+#'  * `'lrtb'` for left/right top/bottom orientation
+#'  * `'lrbt'` for left/right bottom/top orientation
+#'  * `'rltb'` for right/left top/bottom orientation
+#'  * `'rlbt'` for right/left bottom/top orientation
+#' @param plot_prefix The plot_id prefix. Defaults to `'P'`.
+#' @return A vector of plot IDs with specified layout
+#' @export
+#'
+plot_id <- function(shapefile,
+                    nrow,
+                    ncol,
+                    layout = c("tblr", "tbrl", "lrtb", "lrbt", "rltb", "rlbt"),
+                    plot_prefix = "P"){
+  allowed <- c("tblr", "tbrl", "lrtb", "lrbt", "rltb", "rlbt")
+  layout <- layout[[1]]
+  if(!layout %in% allowed){
+    stop(paste0("`layout` must be one of the following: ", paste0(allowed, collapse = ", ")))
+  }
+  if(nrow(shapefile) != nrow * ncol & layout != "tblr"){
+    warning(paste("Shapefile should have", nrow*ncol, " rows, but has", nrow(shapefile), "Only `layout = 'tlbr' can be used."))
+    type <- 'tlbr'
+  }
+  plots_tblr <- paste0(plot_prefix, leading_zeros(1:nrow(shapefile), 4))
+  # tbrl
+  plots_tbrl <- NULL
+  plots_tblr_rev <- rev(plots_tblr)
+  for (i in 1:ncol) {
+    start <- 1 + (i - 1) * nrow
+    end <- start + (nrow - 1)
+    plots_tbrl <- append(plots_tbrl, rev(plots_tblr_rev[start:end]))
+  }
 
+  plots_lrtb <- NULL
+  for (i in 1:ncol) {
+    plots_lrtb <- append(plots_lrtb, plots_tblr[seq(i, length(plots_tblr), by = ncol)])
+  }
+  # lrbt
+  # Initialize the plots_rltb vector
+  plots_lrbt <- NULL
+  # Reverse each group of four elements from the plots_lrtb sequence
+  for (i in 1:ncol) {
+    start <- 1 + (i - 1) * nrow
+    end <- start + (nrow - 1)
+    plots_lrbt <- append(plots_lrbt, rev(plots_lrtb[start:end]))
+  }
+  # rltb
+  plots_rltb <- rev(plots_lrbt)
+  # rlbt
+  plots_rlbt <- rev(plots_lrtb)
+
+  switch (layout,
+          "tblr" = plots_tblr,
+          "tbrl" = plots_tbrl,
+          "lrtb" = plots_lrtb,
+          "lrbt" = plots_lrbt,
+          "rltb" = plots_rltb,
+          "rlbt" = plots_rlbt
+  )
+}
 #' Mosaic interpolation
 #'
 #' Performs the interpolation of points from a raster object.
@@ -251,6 +320,7 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #'   containing the polygon that defines the region of interest to be analyzed.
 #' @inheritParams mosaic_analyze
 #' @inheritParams utils_shapefile
+#' @inheritParams plot_id
 #' @return A list with the built shapefile. Each element is an `sf` object with
 #'   the coordinates of the drawn polygons.
 #' @export
@@ -270,7 +340,7 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #' shapefile_plot(shps[[1]], add = TRUE)
 #' }
 #'
-#'
+
 shapefile_build <- function(mosaic,
                             basemap = NULL,
                             controlpoints = NULL,
@@ -283,6 +353,7 @@ shapefile_build <- function(mosaic,
                             grid = TRUE,
                             nrow = 1,
                             ncol = 1,
+                            layout = "lrtb",
                             build_shapefile = TRUE,
                             check_shapefile = FALSE,
                             sf_to_polygon = FALSE,
@@ -358,13 +429,19 @@ shapefile_build <- function(mosaic,
   } else{
     mosaiccr <- mosaic
   }
-
   # check the parameters
   if(length(nrow) == 1 & nrow(cpoints) != 1){
     nrow <- rep(nrow, nrow(cpoints))
   }
   if(length(nrow) != nrow(cpoints)){
     warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
+  }
+  # check the parameters
+  if(length(layout) == 1 & nrow(cpoints) != 1){
+    layout <- rep(layout, nrow(cpoints))
+  }
+  if(length(layout) != nrow(cpoints)){
+    warning(paste0("`layout` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
   }
   if(length(ncol) == 1 & nrow(cpoints) != 1){
     ncol <- rep(ncol, nrow(cpoints))
@@ -398,17 +475,29 @@ shapefile_build <- function(mosaic,
   created_shapes <- list()
   for(k in 1:nrow(cpoints)){
     if(inherits(cpoints[k, ]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(cpoints[k, ])) == 5 & grid[[k]]){
-      plot_grid <-
+      pg <-
         make_grid(cpoints[k, ],
                   nrow = nrow[k],
                   ncol = ncol[k],
                   mosaic = mosaic,
                   buffer_col = buffer_col[k],
                   buffer_row = buffer_row[k])
+      pg <-
+        pg |>
+        dplyr::mutate(block = paste0("B", leading_zeros(k, 2)),
+                      plot_id = plot_id(pg, nrow = nrow[k], ncol = ncol[k], layout = layout[k]),
+                      .before = 1)
     } else{
-      plot_grid <-  cpoints[k, ] |> sf::st_transform(sf::st_crs(mosaic)) |> dplyr::select(geometry)
+      pg <-
+        cpoints[k, ] |>
+        sf::st_transform(sf::st_crs(mosaic)) |>
+        dplyr::select(geometry) |>
+        dplyr::mutate(block = paste0("B", leading_zeros(k, 2)),
+                      plot_id = "P0001",
+                      .before = 1)
     }
-    created_shapes[[k]] <- plot_grid
+
+    created_shapes[[k]] <- pg
 
   }
   if(check_shapefile){
@@ -420,9 +509,8 @@ shapefile_build <- function(mosaic,
       do.call(rbind, lapply(seq_along(created_shapes), function(i){
         created_shapes[[i]] |>
           dplyr::mutate(`_leaflet_id` = 1:nrow(created_shapes[[i]]),
-                        feature_type = "polygon",
-                        block = i) |>
-          dplyr::relocate(geometry, .after = 3) |>
+                        feature_type = "polygon") |>
+          dplyr::relocate(geometry, .after = 4) |>
           sf::st_transform(crs = 4326)
       }))
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
@@ -434,9 +522,9 @@ shapefile_build <- function(mosaic,
     }
     edited <-
       mapedit::editFeatures(pg_edit, basemap) |>
-      dplyr::select(geometry, block) |>
+      dplyr::select(geometry, block, plot_id) |>
       sf::st_transform(sf::st_crs(mosaic))
-    sfeat <- sf::st_as_sf(edited$geometry)
+    sfeat <- sf::st_as_sf(edited)
     sf::st_geometry(sfeat) <- "geometry"
     created_shapes <- split(sfeat, edited$block)
   }
@@ -486,6 +574,7 @@ shapefile_build <- function(mosaic,
 #' @inheritParams mosaic_view
 #' @inheritParams analyze_objects
 #' @inheritParams image_binary
+#' @inheritParams plot_id
 #' @param crop_to_shape_ext Crop the mosaic to the extension of shapefile?
 #'   Defaults to `TRUE`. This allows for a faster index computation when the
 #'   region of the built shapefile is much smaller than the entire mosaic
@@ -613,6 +702,7 @@ mosaic_analyze <- function(mosaic,
                            grid = TRUE,
                            nrow = 1,
                            ncol = 1,
+                           layout = "lrtb",
                            indexes = NULL,
                            shapefile = NULL,
                            basemap = NULL,
@@ -708,6 +798,7 @@ mosaic_analyze <- function(mosaic,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
+                        layout = layout,
                         build_shapefile = build_shapefile,
                         check_shapefile = check_shapefile,
                         sf_to_polygon =  TRUE,
@@ -747,7 +838,8 @@ mosaic_analyze <- function(mosaic,
   } else{
     if(inherits(shapefile, "list")){
       created_shapes <- lapply(shapefile, function(x){
-        x[, "geometry"]
+        # x[, "geometry"]
+        x
       })
     } else{
       if(inherits(shapefile, "SpatVector")){
@@ -877,7 +969,6 @@ mosaic_analyze <- function(mosaic,
       plot_grid <- created_shapes[[j]]
       sf::st_geometry(plot_grid) <- "geometry"
       if(crop_to_shape_ext){
-
         ress <- terra::res(mosaic)
         if(sum(ress) != 2){
           plot_grid <-
@@ -995,16 +1086,27 @@ mosaic_analyze <- function(mosaic,
                   "overlap" = sf::st_overlaps(sf_df, plot_grid),
 
           )
-        plot_id <- data.frame(plot_id = paste0(intersects))
-        valid_rows <- plot_id$plot_id != "integer(0)"
+        plot_gridtmp <-
+          plot_grid |>
+          dplyr::mutate(plot_id_seq = paste0("P", leading_zeros(1:nrow(plot_grid), 4)))
+        plot_id <- data.frame(plot_id_seq = paste0(intersects))
+        valid_rows <- plot_id$plot_id_seq != "integer(0)"
         sf_df <- sf_df[valid_rows, ]
-        plot_id <- leading_zeros(as.numeric(plot_id[valid_rows, ]), n = 4)
-        addmeasures <-
+        plot_id <- paste0("P", leading_zeros(as.numeric(plot_id[valid_rows, ]), n = 4))
+
+        gridindiv <-
           do.call(rbind,
                   lapply(1:nrow(sf_df), function(i){
                     compute_measures_mosaic(as.matrix(sf_df$geometry[[i]]))
-                  }))
-        gridindiv <- cbind(sf_df, plot_id, addmeasures)[c(2, 1, 3:10)]
+                  })) |>
+          dplyr::mutate(plot_id_seq = plot_id,
+                        individual = paste0(1:nrow(sf_df)),
+                        geometry = sf_df$geometry) |>
+          dplyr::left_join(plot_gridtmp |> sf::st_drop_geometry(), by = dplyr::join_by(plot_id_seq)) |>
+          dplyr::select(-plot_id_seq) |>
+          dplyr::relocate(block, plot_id, individual, .before = 1) |>
+          sf::st_sf()
+
         # control noise removing
         if(!is.null(lower_size[j]) & !is.null(topn_lower[j]) | !is.null(upper_size[j]) & !is.null(topn_upper[j])){
           stop("Only one of 'lower_*' or 'topn_*' can be used.")
@@ -1025,7 +1127,7 @@ mosaic_analyze <- function(mosaic,
 
         valindiv <-
           exactextractr::exact_extract(x = mind_temp,
-                                       y = gridindiv,
+                                       y = sf::st_sf(gridindiv),
                                        fun = summarize_fun,
                                        quantiles = summarize_quantiles,
                                        progress = FALSE,
@@ -1046,8 +1148,7 @@ mosaic_analyze <- function(mosaic,
             valindiv <-
               do.call(rbind, lapply(1:length(valindiv), function(i){
                 tmp <- transform(valindiv[[i]],
-                                 individual = paste0(i),
-                                 block = paste0("B", leading_zeros(j, n = 2)))
+                                 individual = paste0(i))
                 tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
 
               }
@@ -1066,10 +1167,13 @@ mosaic_analyze <- function(mosaic,
           }
         }
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), gridindiv, valindiv, check.names = FALSE)
+          valindiv <-
+            dplyr::bind_cols(gridindiv, valindiv) |>
+            dplyr::mutate(individual = paste0(1:nrow(gridindiv)), .before = area) |>
+            sf::st_sf()
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         } else{
-          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual)), check.names = FALSE)
+          valindiv <- dplyr::bind_cols(dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual))) |> sf::st_sf()
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         }
       } else{
@@ -1174,7 +1278,7 @@ mosaic_analyze <- function(mosaic,
         if(!isFALSE(filter[j]) & filter[j] > 1){
           dmask <- EBImage::medianFilter(dmask, filter[j])
         }
-        if(watershed){
+        if(watershed[j]){
           dmask <- EBImage::watershed(EBImage::distmap(dmask), tolerance = tolerance, ext = extension)
         } else{
           dmask <- EBImage::bwlabel(dmask)
@@ -1234,7 +1338,7 @@ mosaic_analyze <- function(mosaic,
           exactextractr::exact_extract(x = mind_temp,
                                        y = gridindiv,
                                        fun = summarize_fun,
-                                       quantiles = summarize_quantiles,
+                                       # quantiles = summarize_quantiles,
                                        progress = FALSE,
                                        force_df = TRUE,
                                        summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
@@ -1274,10 +1378,10 @@ mosaic_analyze <- function(mosaic,
         }
 
         if(!is.null(summarize_fun)){
-          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), plot_id = leading_zeros(1, n = 4), gridindiv, valindiv, check.names = FALSE)
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), plot_id = "P0001", gridindiv, valindiv, check.names = FALSE)
           result_indiv[[j]] <- valindiv
         } else{
-          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual)), check.names = FALSE)
+          valindiv <- cbind(block = paste0("B", leading_zeros(j, n = 2)), plot_id = "P0001", dplyr::left_join(gridindiv, valindiv, by = dplyr::join_by(individual)), check.names = FALSE)
           result_indiv[[j]] <- valindiv[order(valindiv$plot_id), ]
         }
       } else{
@@ -1298,65 +1402,43 @@ mosaic_analyze <- function(mosaic,
                                      force_df = TRUE,
                                      summarize_df = ifelse(is.function(summarize_fun), TRUE, FALSE))
     }
-
     # bind the results
     if(inherits(vals, "list")){
-      vals <-
-        do.call(rbind, lapply(1:length(vals), function(i){
-          tmp <- transform(vals[[i]],
-                           plot_id = paste0(leading_zeros(i, n = 4)),
-                           block = paste0("B", leading_zeros(j, 2)))
-          tmp[, c(ncol(tmp), ncol(tmp) - 1, 1:(ncol(tmp) - 2))]
-        }
-        ))
+      names(vals) <- paste0(plot_grid$block, "_", plot_grid$plot_id)
+      vals <- dplyr::bind_rows(vals, .id = "plot") |> pliman::separate_col(plot, c("block", "plot_id"))
       if("coverage_fraction" %in% colnames(vals)){
         vals$coverage_fraction <- NULL
       }
+      print(plot_index)
       if(length(plot_index) == 1){
-        if(ncol(vals) == 1){
-          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
-        } else{
-          # colnames(vals) <- c("block", "plot_id", plot_index)
-          colnames(vals) <- paste0(colnames(vals), ".", plot_index)
+        if(ncol(vals) == 3){
+          colnames(vals)[3] <- plot_index
         }
       }
       vals <-
         vals |>
         dplyr::nest_by(block, plot_id) |>
-        dplyr::ungroup()
-      vals <- cbind(plot_grid, vals)
+        dplyr::ungroup() |>
+        dplyr::left_join(plot_grid, by = dplyr::join_by(block, plot_id))
     } else{
       if(length(plot_index) == 1){
         if(ncol(vals) == 1){
           colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         } else{
-          # colnames(vals) <- c("block", "plot_id", plot_index)
           colnames(vals) <- paste0(colnames(vals), ".", plot_index)
         }
       }
-      vals <- transform(vals,
-                        plot_id = paste0(leading_zeros(1:nrow(vals), n = 4)),
-                        block = paste0("B", leading_zeros(j, 2)))
-      vals <- vals[, c(ncol(vals), ncol(vals) - 1, 1:(ncol(vals) - 2))]
+      vals <- dplyr::bind_cols(plot_grid, vals)
     }
-    if(!is.null(summarize_fun)){
-      results[[j]] <- cbind(plot_grid, vals, check.names = FALSE)
-    } else{
-      results[[j]] <- vals
-    }
-    # end
+    results[[j]] <- vals
   }
 
 
   # bind the results  ## at a level plot
-  results <-
-    do.call(rbind, lapply(results, function(x){x})) |>
-    dplyr::relocate(block, plot_id, .before = 1)
-
-
+  results <- dplyr::bind_rows(results)
+  # return(list(results = results, result_indiv = result_indiv))
   if(any(segment_individuals)){
-
-    result_indiv <- do.call(rbind, lapply(result_indiv, function(x){x}))
+    result_indiv <- do.call(rbind, result_indiv)
     blockid <- unique(result_indiv$block)
     summres <-
       lapply(1:length(blockid), function(i){
@@ -1388,7 +1470,7 @@ mosaic_analyze <- function(mosaic,
       sf::st_as_sf()
 
     centroid <-
-      suppressWarnings(sf::st_centroid(result_indiv) |>
+      suppressWarnings(sf::st_centroid(sf::st_sf(result_indiv)) |>
                          sf::st_coordinates() |>
                          as.data.frame() |>
                          setNames(c("x", "y")))
