@@ -57,7 +57,7 @@ if (getRversion() >= "2.15.1") {
       "X2", "%dofut%", "i", "img", "plotn", "x", "leaf", "Band", "block", "mosaic",
       "geometry", "n", "area_sum", "individual", "compute_downsample", "plot_id",
       "re", "nir", "coverage_fraction", "sigma", "summarize_quantiles", "prop", "plot_id_seq",
-      "B1", "B2", "B3", "cluster"))
+      "B1", "B2", "B3", "cluster", "h", "s"))
 }
 
 

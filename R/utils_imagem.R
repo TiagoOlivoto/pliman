@@ -139,7 +139,7 @@ image_import <- function(img,
                          plot = FALSE,
                          nrow = NULL,
                          ncol = NULL){
-  # check_ebi()
+  check_ebi()
   valid_extens <- c("png", "jpeg", "jpg", "tiff", "PNG", "JPEG", "JPG", "TIFF", "TIF", "tif", "gri", "grd")
   if(!is.null(pattern)){
     if(pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
@@ -330,6 +330,44 @@ image_pliman <- function(img, plot = FALSE){
   }
 }
 
+#' Import Images Interactively (Windows Only)
+#'
+#' This function allows users to interactively select and import images from
+#' their filesystem. It calls [choose.files()] and [image_import()] and is
+#' specifically designed for Windows operating systems.
+#'
+#' @return The function returns the imported images.
+#'
+#' @details This function prompts the user to select one or multiple images from
+#'   their filesystem. It only works on Windows operating systems due to
+#'   platform-specific file selection mechanisms.
+#' @seealso [image_import()]
+#'
+#' @examples
+#'   if (interactive() && .Platform$OS.type == "windows"){
+#'   library(pliman)
+#'   imgs <- image_import_inter()
+#'   }
+#'
+#'
+#' @export
+#'
+#' @importFrom utils choose.files Filters
+#'
+#' @keywords file import windows interactive
+image_import_inter <- function(){
+  if(interactive()){
+    if(.Platform$OS.type == "windows"){
+      files <- choose.files(caption = "Select image(s) to import",
+                            filters = Filters[c("png", "jpeg", "jpeg"),])
+      return(image_import(files))
+    } else{
+      warning("'image_import_inter() only works on a Windows OS.")
+    }
+  } else{
+    warning("An interactive session is needed to run 'image_import_inter()' ")
+  }
+}
 
 
 
@@ -2944,9 +2982,8 @@ image_to_mat <- function(img,
 #' \donttest{
 #' library(pliman)
 #'img <- image_pliman("sev_leaf.jpg")
-#'pal <- image_palette(img, npal = 4)
+#'pal <- image_palette(img, npal = 5)
 #'
-#'image_combine(pal$palette_list)
 #'
 #'}
 #'

@@ -86,9 +86,8 @@ to the RGB values.
 \donttest{
 library(pliman)
 img <- image_pliman("sev_leaf.jpg")
-pal <- image_palette(img, npal = 4)
+pal <- image_palette(img, npal = 5)
 
-image_combine(pal$palette_list)
 
 }
 
