@@ -3480,3 +3480,49 @@ mosaic_draw <- function(mosaic,
 }
 
 
+#' Convert Sentinel data to GeoTIFF format
+#'
+#' This function converts Sentinel satellite data files to GeoTIFF format.
+#'
+#' @param layers (character) Vector of file paths to Sentinel data files. If
+#'   NULL, the function searches for files in the specified path with names
+#'   containing "B".
+#' @param path (character) Directory path where Sentinel data files are located.
+#'   Default is the current directory.
+#' @param destination (character) File path for the output GeoTIFF file.
+#' @param spat_res (numeric) Spatial resolution of the output GeoTIFF file.
+#'   Default is 10 meters.
+#'
+#' @details The function converts Sentinel satellite data files to GeoTIFF
+#'   format using GDAL utilities. It builds a virtual raster file (VRT) from the
+#'   input files and then translates it to GeoTIFF format. Compression is
+#'   applied to the output GeoTIFF file using DEFLATE method.
+#'
+#'
+#'
+#' @export
+sentinel_to_tif <- function(layers = NULL,
+                            path = ".",
+                            destination,
+                            spat_res = 10){
+
+  if(is.null(layers)){
+    files <- list.files(path = path, pattern = "B")
+  } else{
+    files <- layers
+  }
+  tf <- tempfile(fileext = ".vrt")
+  sf::gdal_utils(
+    util = "buildvrt",
+    source  = files,
+    destination = tf,
+    options = strsplit(paste("-separate -tr", spat_res, spat_res), split = "\\s")[[1]]
+  )
+
+  sf::gdal_utils(
+    util = "translate",
+    source  = tf,
+    destination = paste0(path, "/", destination),
+    options = strsplit(paste("-co COMPRESS=DEFLATE", "-of GTiff"), split = "\\s")[[1]]
+  )
+}
