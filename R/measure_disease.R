@@ -454,13 +454,15 @@ measure_disease <- function(img,
                                           data = fundo_resto))
           pred1 <- round(predict(modelo1, newdata = original, type="response"), 0)
           ifelse(fill_hull == TRUE,
-                 plant_background <- EBImage::fillHull(matrix(pred1, ncol = ncol_img)),
-                 plant_background <- matrix(pred1, ncol = ncol_img))
+                 plant_background <- EBImage::Image(EBImage::fillHull(matrix(pred1, ncol = ncol_img))),
+                 plant_background <- EBImage::Image(matrix(pred1, ncol = ncol_img)))
+          # return(plant_background)
+          # print(plant_background)
           if(is.numeric(opening[[1]]) & opening[[1]] > 0){
-            plant_background <- image_opening(plant_background, opening[[1]])
+            plant_background <- image_opening(plant_background, size = opening[[1]])
           }
           if(is.numeric(closing[[1]]) & closing[[1]] > 0){
-            plant_background <- image_closing(plant_background, closing[[1]])
+            plant_background <- image_closing(plant_background, size = closing[[1]])
           }
           if(is.numeric(filter[[1]]) & filter[[1]] > 1){
             plant_background <- EBImage::medianFilter(plant_background, size = filter[[1]])
@@ -495,13 +497,13 @@ measure_disease <- function(img,
             leaf_sympts <- EBImage::fillHull(leaf_sympts)
           }
           if(is.numeric(opening[[2]]) & opening[[2]] > 0){
-            leaf_sympts <- image_opening(leaf_sympts, opening[[1]])
+            leaf_sympts <- image_opening(leaf_sympts, size = opening[[2]])
           }
           if(is.numeric(closing[[2]]) & closing[[2]] > 0){
-            leaf_sympts <- image_closing(leaf_sympts, closing[[1]])
+            leaf_sympts <- image_closing(leaf_sympts, size = closing[[2]])
           }
           if(is.numeric(filter[[2]]) & filter[[2]] > 1){
-            leaf_sympts <- EBImage::medianFilter(leaf_sympts, size = filter[[1]])
+            leaf_sympts <- EBImage::medianFilter(leaf_sympts, size = filter[[2]])
           }
           ifelse(watershed == FALSE,
                  nmask <- EBImage::bwlabel(leaf_sympts),
@@ -938,6 +940,9 @@ measure_disease_iter <- function(img,
                                  has_background = TRUE,
                                  r = 2,
                                  viewer = get_pliman_viewer(),
+                                 opening = c(10, 0),
+                                 closing = c(0, 0),
+                                 filter = c(0, 0),
                                  show = "rgb",
                                  index = "NGRDI",
                                  ...){
