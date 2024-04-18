@@ -1435,7 +1435,7 @@ mosaic_analyze <- function(mosaic,
 
 
   # bind the results  ## at a level plot
-  results <- dplyr::bind_rows(results)
+  results <- dplyr::bind_rows(results) |> sf::st_sf()
   # return(list(results = results, result_indiv = result_indiv))
   if(any(segment_individuals)){
     result_indiv <- do.call(rbind, result_indiv)
@@ -1533,7 +1533,17 @@ mosaic_analyze <- function(mosaic,
         attribute <- NULL
       }
     }
+    if(is.null(summarize_fun)){
+      dfplot <-
+        dfplot |>
+        sf::st_drop_geometry() |>
+        tidyr::unnest(cols = data) |>
+        dplyr::group_by(block, plot_id) |>
+        dplyr::summarise(dplyr::across(dplyr::where(is.numeric), \(x){mean(x, na.rm = TRUE)}), .groups = "drop") |>
+        dplyr::left_join(dfplot |> dplyr::select(block, plot_id, geometry), by = dplyr::join_by(block, plot_id)) |>
+        sf::st_sf()
 
+    }
     map <-
       basemap +
       suppressWarnings(
