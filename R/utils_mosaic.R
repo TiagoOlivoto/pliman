@@ -1,9 +1,18 @@
 validate_and_replicate <- function(argument, created_shapes) {
+  if (length(argument) != length(created_shapes)) {
+    warning(paste0("`", deparse(substitute(argument)), "` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  }
   if (length(argument) == 1 & length(created_shapes) != 1) {
     argument <- rep(argument, length(created_shapes))
   }
-  if (length(argument) != length(created_shapes)) {
-    warning(paste0("`", deparse(substitute(argument)), "` must have length 1 or ", length(created_shapes), " (the number of drawn polygons)."))
+  return(argument)
+}
+validate_and_replicate2 <- function(argument, created_shapes) {
+  if (length(argument) != nrow(created_shapes)) {
+    warning(paste0("`", deparse(substitute(argument)), "` must have length 1 or ", nrow(created_shapes), " (the number of drawn polygons)."), call. = FALSE)
+  }
+  if (length(argument) == 1 & nrow(created_shapes) != 1) {
+    argument <- rep(argument, nrow(created_shapes))
   }
   return(argument)
 }
@@ -44,6 +53,7 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
 add_width_height <- function(grid,
                              width,
                              height,
+                             mosaic,
                              points_align){
   # adapted from https://github.com/filipematias23/FIELDimageR-QGIS/blob/main/rscripts/FIELDimageR_fieldShape.rsx
   rap <- function(x, xsize, ysize) {
@@ -61,7 +71,6 @@ add_width_height <- function(grid,
   }
   sf::st_crs(genpoint) <- sf::st_crs(cen)
   createdgrid <- sf::st_as_sf(genpoint)
-  sf::st_crs(createdgrid) <- sf::st_crs(mosaic)
   rot_pol <- function(x) matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
   x1 <- points_align[1]
   y1 <- points_align[3]
@@ -478,43 +487,14 @@ shapefile_build <- function(mosaic,
     mosaiccr <- mosaic
   }
   # check the parameters
-  if(length(nrow) == 1 & nrow(cpoints) != 1){
-    nrow <- rep(nrow, nrow(cpoints))
-  }
-  if(length(nrow) != nrow(cpoints)){
-    warning(paste0("`nrow` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
-  # check the parameters
-  if(length(layout) == 1 & nrow(cpoints) != 1){
-    layout <- rep(layout, nrow(cpoints))
-  }
-  if(length(layout) != nrow(cpoints)){
-    warning(paste0("`layout` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
-  if(length(ncol) == 1 & nrow(cpoints) != 1){
-    ncol <- rep(ncol, nrow(cpoints))
-  }
-  if(length(ncol) != nrow(cpoints)){
-    warning(paste0("`ncol` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
-  if(length(buffer_col) == 1 & nrow(cpoints) != 1){
-    buffer_col <- rep(buffer_col, nrow(cpoints))
-  }
-  if(length(buffer_col) != nrow(cpoints)){
-    warning(paste0("`buffer_col` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
-  if(length(buffer_row) == 1 & nrow(cpoints) != 1){
-    buffer_row <- rep(buffer_row, nrow(cpoints))
-  }
-  if(length(buffer_row) != nrow(cpoints)){
-    warning(paste0("`buffer_row` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
-  if(length(grid) == 1 & nrow(cpoints) != 1){
-    grid <- rep(grid, nrow(cpoints))
-  }
-  if(length(grid) != nrow(cpoints)){
-    warning(paste0("`grid` must have length 1 or ", nrow(cpoints), " (the number of drawn polygons)."))
-  }
+  nrow <- validate_and_replicate2(nrow, cpoints)
+  ncol <- validate_and_replicate2(ncol, cpoints)
+  layout <- validate_and_replicate2(layout, cpoints)
+  buffer_col <- validate_and_replicate2(buffer_col, cpoints)
+  buffer_row <- validate_and_replicate2(buffer_row, cpoints)
+  plot_width <- validate_and_replicate2(plot_width, cpoints)
+  plot_height <- validate_and_replicate2(plot_height, cpoints)
+  grid <- validate_and_replicate2(grid, cpoints)
 
   # check the created shapes?
   if(verbose){
