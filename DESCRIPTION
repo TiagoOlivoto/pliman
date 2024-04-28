@@ -27,7 +27,8 @@ Imports:
     methods,
     Rcpp,
     sf,
-    terra
+    terra,
+    tidyr
 Suggests: 
     BiocManager,
     EBImage,

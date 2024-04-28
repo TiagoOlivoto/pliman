@@ -61,6 +61,9 @@ measure_disease_iter(
   has_background = TRUE,
   r = 2,
   viewer = get_pliman_viewer(),
+  opening = c(10, 0),
+  closing = c(0, 0),
+  filter = c(0, 0),
   show = "rgb",
   index = "NGRDI",
   ...

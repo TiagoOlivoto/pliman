@@ -4,13 +4,7 @@
 \alias{sentinel_to_tif}
 \title{Convert Sentinel data to GeoTIFF format}
 \usage{
-sentinel_to_tif(
-  layers = NULL,
-  path = ".",
-  destination,
-  layer_names = NULL,
-  spat_res = 10
-)
+sentinel_to_tif(layers = NULL, path = ".", destination, spat_res = 10)
 }
 \arguments{
 \item{layers}{(character) Vector of file paths to Sentinel data files. If

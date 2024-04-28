@@ -246,6 +246,9 @@ automatically chosen so that the number of plotted pixels approximates the
 
 \item{verbose}{Logical, indicating whether to display verbose output
 (default: TRUE).}
+
+\item{plot_width, plot_height}{The width and height of the plot shape (in the
+mosaic unit). It is mutually exclusiv with \code{buffer_col} and \code{buffer_row}.}
 }
 \value{
 A list containing the following objects:

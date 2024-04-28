@@ -40,12 +40,49 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
   resized_coords[, 2] <- (resized_coords[, 2] - y_min) * y_scale_factor + new_y_min
   return(resized_coords)
 }
+
+add_width_height <- function(grid,
+                             width,
+                             height,
+                             points_align){
+  # adapted from https://github.com/filipematias23/FIELDimageR-QGIS/blob/main/rscripts/FIELDimageR_fieldShape.rsx
+  rap <- function(x, xsize, ysize) {
+    bbox <- sf::st_bbox(x)
+    bbox <- bbox + c(xsize / 2, ysize / 2, -xsize / 2, -ysize / 2)
+    return(sf::st_as_sfc(sf::st_bbox(bbox)))
+  }
+  cen <- sf::st_centroid(grid)
+  bbox_list <- lapply(sf::st_geometry(cen), sf::st_bbox)
+  points_list <- lapply(bbox_list, sf::st_as_sfc)
+  rectangles <- lapply(points_list, function(x){rap(x, width, height)})
+  genpoint <- rectangles[[1]]
+  for (i in 2:length(rectangles)) {
+    genpoint <- c(genpoint, rectangles[[i]])
+  }
+  sf::st_crs(genpoint) <- sf::st_crs(cen)
+  createdgrid <- sf::st_as_sf(genpoint)
+  sf::st_crs(createdgrid) <- sf::st_crs(mosaic)
+  rot_pol <- function(x) matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
+  x1 <- points_align[1]
+  y1 <- points_align[3]
+  x2 <- points_align[2]
+  y2 <- points_align[4]
+  rot <- atan((x2 - x1) / (y2 - y1))
+  ga <- sf::st_geometry(createdgrid)
+  cga <- sf::st_centroid(ga)
+  grid_shapefile <- (ga-cga) * rot_pol(rot) + cga
+  return(grid_shapefile)
+}
+
 make_grid <- function(points,
                       nrow,
                       ncol,
                       mosaic,
                       buffer_col = 0,
-                      buffer_row = 0){
+                      buffer_row = 0,
+                      plot_width = NULL,
+                      plot_height = NULL){
+  points_align <- sf::st_coordinates(points)[2:3, 1:2]
 
   grids <-
     sf::st_make_grid(points, n = c(nrow, ncol)) |>
@@ -76,6 +113,15 @@ make_grid <- function(points,
                                           buffer_col = buffer_col,
                                           buffer_row = buffer_row)
     }
+  }
+  if(!is.null(plot_width) & !is.null(plot_height)){
+   geometry <-
+     add_width_height(
+       grid = geometry,
+       width = plot_width,
+       height = plot_height,
+       points_align = points_align
+     )
   }
   gshp <-
     geometry |>
@@ -353,6 +399,8 @@ shapefile_build <- function(mosaic,
                             grid = TRUE,
                             nrow = 1,
                             ncol = 1,
+                            plot_width = NULL,
+                            plot_height = NULL,
                             layout = "lrtb",
                             build_shapefile = TRUE,
                             check_shapefile = FALSE,
@@ -481,10 +529,13 @@ shapefile_build <- function(mosaic,
                   ncol = ncol[k],
                   mosaic = mosaic,
                   buffer_col = buffer_col[k],
-                  buffer_row = buffer_row[k])
+                  buffer_row = buffer_row[k],
+                  plot_width = plot_width[k],
+                  plot_height = plot_height[k])
       pg <-
         pg |>
-        dplyr::mutate(block = paste0("B", leading_zeros(k, 2)),
+        dplyr::mutate(unique_id = dplyr::row_number(),
+                      block = paste0("B", leading_zeros(k, 2)),
                       plot_id = plot_id(pg, nrow = nrow[k], ncol = ncol[k], layout = layout[k]),
                       .before = 1)
     } else{
@@ -492,7 +543,8 @@ shapefile_build <- function(mosaic,
         cpoints[k, ] |>
         sf::st_transform(sf::st_crs(mosaic)) |>
         dplyr::select(geometry) |>
-        dplyr::mutate(block = paste0("B", leading_zeros(k, 2)),
+        dplyr::mutate(unique_id = dplyr::row_number(),
+                      block = paste0("B", leading_zeros(k, 2)),
                       plot_id = "P0001",
                       .before = 1)
     }
@@ -523,6 +575,7 @@ shapefile_build <- function(mosaic,
     edited <-
       mapedit::editFeatures(pg_edit, basemap) |>
       dplyr::select(geometry, block, plot_id) |>
+      dplyr::mutate(unique_id = dplyr::row_number(), .before = 1) |>
       sf::st_transform(sf::st_crs(mosaic))
     sfeat <- sf::st_as_sf(edited)
     sf::st_geometry(sfeat) <- "geometry"
@@ -537,6 +590,7 @@ shapefile_build <- function(mosaic,
     return(created_shapes)
   }
 }
+
 
 
 #' Analyze a mosaic of remote sensing data
@@ -583,6 +637,8 @@ shapefile_build <- function(mosaic,
 #'   (default: TRUE).
 #' @param nrow Number of rows for the grid (default: 1).
 #' @param ncol Number of columns for the grid (default: 1).
+#' @param plot_width,plot_height The width and height of the plot shape (in the
+#'   mosaic unit). It is mutually exclusiv with `buffer_col` and `buffer_row`.
 #' @param indexes An optional `SpatRaster` object with the image indexes,
 #'   computed with [mosaic_index()].
 #' @param shapefile An optional shapefile containing regions of interest (ROIs)
@@ -702,6 +758,8 @@ mosaic_analyze <- function(mosaic,
                            grid = TRUE,
                            nrow = 1,
                            ncol = 1,
+                           plot_width = NULL,
+                           plot_height = NULL,
                            layout = "lrtb",
                            indexes = NULL,
                            shapefile = NULL,
@@ -798,6 +856,8 @@ mosaic_analyze <- function(mosaic,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
+                        plot_width = plot_width,
+                        plot_height = plot_height,
                         layout = layout,
                         build_shapefile = build_shapefile,
                         check_shapefile = check_shapefile,
@@ -2107,29 +2167,31 @@ mosaic_input <- function(mosaic,
   cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
   a <- na.omit(unlist(terra::extract(mosaic, cels)))
   a <- a[!is.infinite(a)]
-  if(length(a[a - floor(a) != 0]) == 0){
-    minv <- min(a)
-    maxv <- max(a)
-    if(all(minv >= 0) & all(maxv <= 255)){
-      datatype <- "INT1U"
+  if(inherits(a, "numeric")){
+    if(length(a[a - floor(a) != 0]) == 0){
+      minv <- min(a)
+      maxv <- max(a)
+      if(all(minv >= 0) & all(maxv <= 255)){
+        datatype <- "INT1U"
+      } else{
+        datatype <- "INT2U"
+      }
     } else{
-      datatype <- "INT2U"
+      datatype <- "FLT4S"
     }
-  } else{
-    datatype <- "FLT4S"
-  }
-  dtterra <- terra::datatype(mosaic)[[1]]
-  if(datatype != dtterra){
-    warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
-                  ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
+    dtterra <- terra::datatype(mosaic)[[1]]
+    if(datatype != dtterra){
+      warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
+                    ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
+    }
+    if(check_16bits){
+      if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
+        mosaic[mosaic == 65535] <- NA
+      }
+    }
   }
   if(info){
     print(mosaic)
-  }
-  if(check_16bits){
-    if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
-      mosaic[mosaic == 65535] <- NA
-    }
   }
   return(mosaic)
 }
