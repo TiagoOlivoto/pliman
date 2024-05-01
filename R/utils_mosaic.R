@@ -8,7 +8,7 @@ validate_and_replicate <- function(argument, created_shapes) {
   return(argument)
 }
 validate_and_replicate2 <- function(argument, created_shapes) {
-  if (length(argument) != nrow(created_shapes)) {
+  if (!is.null(argument) & (length(argument) != nrow(created_shapes))) {
     warning(paste0("`", deparse(substitute(argument)), "` must have length 1 or ", nrow(created_shapes), " (the number of drawn polygons)."), call. = FALSE)
   }
   if (length(argument) == 1 & nrow(created_shapes) != 1) {
