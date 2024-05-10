@@ -10,8 +10,10 @@ mosaic_segment(
   r = 3,
   g = 2,
   b = 1,
-  re = 4,
-  nir = 5,
+  re = NA,
+  nir = NA,
+  swir = NA,
+  tir = NA,
   threshold = "Otsu",
   invert = FALSE,
   return = c("mosaic", "mask")
@@ -24,18 +26,15 @@ mosaic_segment(
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to a binary image. Use \code{\link[=pliman_indexes_rgb]{pliman_indexes_rgb()}}
 and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available RGB and multispectral
-indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, and NIR} bands (eg., \code{index = "R+B/G"}) or using the names of the
-mosaic's layers (ex., "(band_1 + band_2) / 2").}
+indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, NIR, SWIR, and TIR} bands (eg., \code{index = "R+B/G"}) or using the
+names of the mosaic's layers (ex., "(band_1 + band_2) / 2").}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
+\item{r, g, b, re, nir, swir, tir}{The red, green, blue, red-edge,  near-infrared,
+shortwave Infrared, and thermal infrared bands of the image, respectively.
+By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
+multispectral image is provided up to seven bands can be used to compute
+built-in indexes. There are no limitation of band numbers if the index is
+computed using the band name.}
 
 \item{threshold}{By default (threshold = "Otsu"), a threshold value based on
 Otsu's method is used to reduce the grayscale image to a binary image. If a

@@ -8,8 +8,9 @@ plot_id(
   shapefile,
   nrow,
   ncol,
-  layout = c("tblr", "tbrl", "lrtb", "lrbt", "rltb", "rlbt"),
-  plot_prefix = "P"
+  layout = c("tblr", "tbrl", "btlr", "btrl", "lrtb", "lrbt", "rltb", "rlbt"),
+  plot_prefix = "P",
+  serpentine = FALSE
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ plot_id(
 \itemize{
 \item \code{'tblr'} for top/bottom left/right orientation
 \item \code{'tbrl'} for top/bottom right/left orientation
+\item \code{'btlr'} for bottom/top left/right orientation
+\item \code{'btrl'} for bottom/top right/left orientation
 \item \code{'lrtb'} for left/right top/bottom orientation
 \item \code{'lrbt'} for left/right bottom/top orientation
 \item \code{'rltb'} for right/left top/bottom orientation
@@ -30,6 +33,8 @@ plot_id(
 }}
 
 \item{plot_prefix}{The plot_id prefix. Defaults to \code{'P'}.}
+
+\item{serpentine}{Create a serpentine-based layout? Defaults to \code{FALSE}.}
 }
 \value{
 A vector of plot IDs with specified layout

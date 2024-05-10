@@ -124,13 +124,13 @@ make_grid <- function(points,
     }
   }
   if(!is.null(plot_width) & !is.null(plot_height)){
-   geometry <-
-     add_width_height(
-       grid = geometry,
-       width = plot_width,
-       height = plot_height,
-       points_align = points_align
-     )
+    geometry <-
+      add_width_height(
+        grid = geometry,
+        width = plot_width,
+        height = plot_height,
+        points_align = points_align
+      )
   }
   gshp <-
     geometry |>
@@ -265,65 +265,177 @@ idw_interpolation <- function(mosaic, points){
 #' @param layout Character: one of
 #'  * `'tblr'` for top/bottom left/right orientation
 #'  * `'tbrl'` for top/bottom right/left orientation
+#'  * `'btlr'` for bottom/top left/right orientation
+#'  * `'btrl'` for bottom/top right/left orientation
 #'  * `'lrtb'` for left/right top/bottom orientation
 #'  * `'lrbt'` for left/right bottom/top orientation
 #'  * `'rltb'` for right/left top/bottom orientation
 #'  * `'rlbt'` for right/left bottom/top orientation
 #' @param plot_prefix The plot_id prefix. Defaults to `'P'`.
+#' @param serpentine Create a serpentine-based layout? Defaults to `FALSE`.
 #' @return A vector of plot IDs with specified layout
 #' @export
 #'
 plot_id <- function(shapefile,
                     nrow,
                     ncol,
-                    layout = c("tblr", "tbrl", "lrtb", "lrbt", "rltb", "rlbt"),
-                    plot_prefix = "P"){
-  allowed <- c("tblr", "tbrl", "lrtb", "lrbt", "rltb", "rlbt")
+                    layout = c("tblr", "tbrl", "btlr", "btrl", "lrtb", "lrbt", "rltb", "rlbt"),
+                    plot_prefix = "P",
+                    serpentine = FALSE) {
+  # Ensure the specified layout is valid
+  allowed <- c("tblr", "tbrl", "btlr", "btrl", "lrtb", "lrbt", "rltb", "rlbt")
   layout <- layout[[1]]
-  if(!layout %in% allowed){
+  if (!layout %in% allowed) {
     stop(paste0("`layout` must be one of the following: ", paste0(allowed, collapse = ", ")))
   }
-  if(nrow(shapefile) != nrow * ncol & layout != "tblr"){
-    warning(paste("Shapefile should have", nrow*ncol, " rows, but has", nrow(shapefile), "Only `layout = 'tlbr' can be used."))
-    type <- 'tlbr'
+
+  # Ensure that the number of rows in the shapefile matches expected dimensions
+  expected_rows <- nrow * ncol
+  if (nrow(shapefile) != expected_rows) {
+    stop(paste("Expected", expected_rows, "rows, but shapefile has", nrow(shapefile), "rows."))
   }
+
+  # Helper function for generating plot names
+  leading_zeros <- function(x, n) {
+    sprintf(paste0("%0", n, "d"), x)
+  }
+
   plots_tblr <- paste0(plot_prefix, leading_zeros(1:nrow(shapefile), 4))
-  # tbrl
-  plots_tbrl <- NULL
-  plots_tblr_rev <- rev(plots_tblr)
-  for (i in 1:ncol) {
-    start <- 1 + (i - 1) * nrow
-    end <- start + (nrow - 1)
-    plots_tbrl <- append(plots_tbrl, rev(plots_tblr_rev[start:end]))
+
+  # Define layout functions
+  make_tblr <- function() {
+    plots_tblr
   }
 
-  plots_lrtb <- NULL
-  for (i in 1:ncol) {
-    plots_lrtb <- append(plots_lrtb, plots_tblr[seq(i, length(plots_tblr), by = ncol)])
+  make_tbrl <- function() {
+    plots_tblr_rev <- rev(plots_tblr)
+    plots_tbrl <- NULL
+    for (i in 1:ncol) {
+      start <- (i - 1) * nrow + 1
+      end <- start + nrow - 1
+      plots_tbrl <- c(plots_tbrl, rev(plots_tblr_rev[start:end]))
+    }
+    plots_tbrl
   }
-  # lrbt
-  # Initialize the plots_rltb vector
-  plots_lrbt <- NULL
-  # Reverse each group of four elements from the plots_lrtb sequence
-  for (i in 1:ncol) {
-    start <- 1 + (i - 1) * nrow
-    end <- start + (nrow - 1)
-    plots_lrbt <- append(plots_lrbt, rev(plots_lrtb[start:end]))
-  }
-  # rltb
-  plots_rltb <- rev(plots_lrbt)
-  # rlbt
-  plots_rlbt <- rev(plots_lrtb)
 
-  switch (layout,
-          "tblr" = plots_tblr,
-          "tbrl" = plots_tbrl,
-          "lrtb" = plots_lrtb,
-          "lrbt" = plots_lrbt,
-          "rltb" = plots_rltb,
-          "rlbt" = plots_rlbt
-  )
+  make_btrl<- function() {
+    plots_rev <- rev(plots_tblr)
+    plots_btlr <- NULL
+    for (i in 1:ncol) {
+      start <- (i - 1) * nrow + 1
+      end <- start + nrow - 1
+      plots_btlr <- c(plots_btlr, plots_rev[start:end])
+    }
+    plots_btlr
+  }
+
+  make_btlr <- function() {
+    plots_btlr_rev <- rev(make_btrl())
+    plots_btrl <- NULL
+    for (i in seq_len(ncol)) {
+      start <- (i - 1) * nrow + 1
+      end <- start + nrow - 1
+      plots_btrl <- c(plots_btrl, rev(plots_btlr_rev[start:end]))
+    }
+    plots_btrl
+  }
+
+  make_lrtb <- function() {
+    plots_lrtb <- NULL
+    for (i in 1:ncol) {
+      plots_lrtb <- c(plots_lrtb, plots_tblr[seq(i, length(plots_tblr), by = ncol)])
+    }
+    plots_lrtb
+  }
+
+  make_lrbt <- function() {
+    plots_lrbt <- NULL
+    plots_lrtb <- make_lrtb()
+    for (i in 1:ncol) {
+      start <- (i - 1) * nrow + 1
+      end <- start + nrow - 1
+      plots_lrbt <- c(plots_lrbt, rev(plots_lrtb[start:end]))
+    }
+    plots_lrbt
+  }
+
+  make_rltb <- function() {
+    plots_rltb <- NULL
+    for (i in 1:ncol) {
+      # Columns from right to left
+      plots_rltb <- c(plots_rltb, plots_tblr[seq(ncol - i + 1, length(plots_tblr), by = ncol)])
+    }
+    plots_rltb
+  }
+
+  make_rlbt <- function() {
+    plots_rltb <- make_rltb()
+    plots_rlbt <- NULL
+    for (i in seq_len(ncol)) {
+      start <- (i - 1) * nrow + 1
+      end <- start + nrow - 1
+      plots_rlbt <- c(plots_rlbt, rev(plots_rltb[start:end]))
+    }
+    plots_rlbt
+  }
+
+  # Return the appropriate layout
+  plots <-  switch(layout,
+                   "tblr" = make_tblr(),
+                   "tbrl" = make_tbrl(),
+                   "btlr" = make_btlr(),
+                   "btrl" = make_btrl(),
+                   "lrtb" = make_lrtb(),
+                   "lrbt" = make_lrbt(),
+                   "rltb" = make_rltb(),
+                   "rlbt" = make_rlbt())
+  mat <- matrix(plots, ncol = ncol, nrow = nrow)
+  if(serpentine){
+    # column serpentine
+    if(layout %in% c("tblr", "btlr")){
+      mat2 <- mat
+      for (j in 1:ncol(mat)) {
+        if(j %% 2 == 0){
+          mat2[, j] <- rev(mat[, j])
+        } else{
+          mat2[, j]
+        }
+      }
+    }
+    if(layout %in% c( "tbrl", "btrl")){
+      mat2 <- mat
+      cols <- ncol(mat):1
+      for (j in cols[seq(2, ncol, by = 2)]) {
+        mat2[, j] <- rev(mat[, j])
+      }
+    }
+    # row serpentine
+    if(layout %in% c("lrtb", "rltb")){
+      mat2 <- mat
+      for (j in 1:nrow(mat)) {
+        if(j %% 2 == 0){
+          mat2[j, ] <- rev(mat[j, ])
+        } else{
+          mat2[j, ]
+        }
+      }
+    }
+    if(layout %in% c("lrbt", "rlbt")){
+      mat2 <- mat
+      rows <- nrow(mat):1
+      for (j in rows[seq(2, nrow, by = 2)]) {
+        mat2[j, ] <- rev(mat[j, ])
+      }
+    }
+  } else{
+    mat2 <- mat
+  }
+  return(as.vector(mat2))
 }
+
+
+
+
 #' Mosaic interpolation
 #'
 #' Performs the interpolation of points from a raster object.
@@ -402,8 +514,6 @@ shapefile_build <- function(mosaic,
                             r = 3,
                             g = 2,
                             b = 1,
-                            re = 4,
-                            nir = 5,
                             crop_to_shape_ext = TRUE,
                             grid = TRUE,
                             nrow = 1,
@@ -411,6 +521,7 @@ shapefile_build <- function(mosaic,
                             plot_width = NULL,
                             plot_height = NULL,
                             layout = "lrtb",
+                            serpentine = TRUE,
                             build_shapefile = TRUE,
                             check_shapefile = FALSE,
                             sf_to_polygon = FALSE,
@@ -437,8 +548,6 @@ shapefile_build <- function(mosaic,
                              r = r,
                              g = g,
                              b = b,
-                             re = re,
-                             nir = nir,
                              max_pixels = max_pixels,
                              downsample = downsample,
                              quantiles = quantiles)
@@ -494,6 +603,7 @@ shapefile_build <- function(mosaic,
   buffer_row <- validate_and_replicate2(buffer_row, cpoints)
   plot_width <- validate_and_replicate2(plot_width, cpoints)
   plot_height <- validate_and_replicate2(plot_height, cpoints)
+  serpentine <- validate_and_replicate2(serpentine, cpoints)
   grid <- validate_and_replicate2(grid, cpoints)
 
   # check the created shapes?
@@ -516,7 +626,7 @@ shapefile_build <- function(mosaic,
         pg |>
         dplyr::mutate(unique_id = dplyr::row_number(),
                       block = paste0("B", leading_zeros(k, 2)),
-                      plot_id = plot_id(pg, nrow = nrow[k], ncol = ncol[k], layout = layout[k]),
+                      plot_id = plot_id(pg, nrow = nrow[k], ncol = ncol[k], layout = layout[k], serpentine = serpentine[k]),
                       .before = 1)
     } else{
       pg <-
@@ -609,6 +719,18 @@ shapefile_build <- function(mosaic,
 #' @inheritParams analyze_objects
 #' @inheritParams image_binary
 #' @inheritParams plot_id
+#' @param index A character value (or a vector of characters) specifying the
+#'   target mode for conversion to a binary image. Use [pliman_indexes_rgb()]
+#'   and [pliman_indexes_me()] to see the available RGB and multispectral
+#'   indexes, respectively. Users can also calculate their own index using  `R,
+#'   G, B, RE, NIR, SWIR, and TIR` bands (eg., `index = "R+B/G"`) or using the
+#'   names of the mosaic's layers (ex., "(band_1 + band_2) / 2").
+#' @param r,g,b,re,nir,swir,tir The red, green, blue, red-edge,  near-infrared,
+#'   shortwave Infrared, and thermal infrared bands of the image, respectively.
+#'   By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
+#'   multispectral image is provided up to seven bands can be used to compute
+#'   built-in indexes. There are no limitation of band numbers if the index is
+#'   computed using the band name.
 #' @param crop_to_shape_ext Crop the mosaic to the extension of shapefile?
 #'   Defaults to `TRUE`. This allows for a faster index computation when the
 #'   region of the built shapefile is much smaller than the entire mosaic
@@ -732,8 +854,10 @@ mosaic_analyze <- function(mosaic,
                            r = 3,
                            g = 2,
                            b = 1,
-                           re = 4,
-                           nir = 5,
+                           re = NA,
+                           nir = NA,
+                           swir = NA,
+                           tir = NA,
                            crop_to_shape_ext = TRUE,
                            grid = TRUE,
                            nrow = 1,
@@ -816,6 +940,8 @@ mosaic_analyze <- function(mosaic,
                     b = b,
                     re = re,
                     nir = nir,
+                    swir = swir,
+                    tir = tir,
                     max_pixels = max_pixels,
                     verbose = verbose,
                     downsample = downsample,
@@ -831,8 +957,6 @@ mosaic_analyze <- function(mosaic,
                         r = r,
                         g = g,
                         b = b,
-                        re = re,
-                        nir = nir,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
@@ -959,6 +1083,8 @@ mosaic_analyze <- function(mosaic,
                            b = b,
                            re = re,
                            nir = nir,
+                           swir = swir,
+                           tir = tir,
                            plot = FALSE)
             })
         )
@@ -988,8 +1114,6 @@ mosaic_analyze <- function(mosaic,
                           r = r,
                           g = g,
                           b = b,
-                          re = re,
-                          nir = nir,
                           max_pixels = max_pixels,
                           return = "mask")
     )
@@ -1040,12 +1164,12 @@ mosaic_analyze <- function(mosaic,
           }
           thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
           if(invert[j]){
-            mask <- mind_temp[[segment_index[j]]] < thresh
-          } else{
             mask <- mind_temp[[segment_index[j]]] > thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] < thresh
           }
         }
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
         # compute plot coverage
 
         tmp <- exactextractr::exact_extract(mind_temp,
@@ -1224,7 +1348,7 @@ mosaic_analyze <- function(mosaic,
       # extract the values for the individual plots
       # check if a mask is used and no segmentation
       if(!is.null(mask) & (!segment_individuals[[1]] & !segment_plot[[1]])){
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = TRUE)
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
       }
       vals <-
         exactextractr::exact_extract(x = mind_temp,
@@ -1265,13 +1389,13 @@ mosaic_analyze <- function(mosaic,
           }
           thresh <- ifelse(threshold[j] == "Otsu", otsu(na.omit(terra::values(mind_temp)[, segment_index[j]])), threshold[j])
           if(invert[j]){
-            mask <- mind_temp[[segment_index[j]]] < thresh
-          } else{
             mask <- mind_temp[[segment_index[j]]] > thresh
+          } else{
+            mask <- mind_temp[[segment_index[j]]] < thresh
           }
         }
         # compute plot coverage
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = !invert[j])
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
         tmp <- exactextractr::exact_extract(mind_temp,
                                             plot_grid,
                                             coverage_area = TRUE,
@@ -1431,7 +1555,7 @@ mosaic_analyze <- function(mosaic,
       # extract the values for the individual plots
       # check if a mask is used and no segmentation
       if(!is.null(mask) & (!segment_individuals[[1]] & !segment_plot[[1]])){
-        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE, inverse = TRUE)
+        mind_temp <- terra::mask(mind_temp, mask, maskvalues = TRUE)
       }
       vals <-
         exactextractr::exact_extract(x = mind_temp,
@@ -1668,8 +1792,10 @@ mosaic_analyze_iter <- function(mosaic,
                                 r = 3,
                                 g = 2,
                                 b = 1,
-                                re = 4,
-                                nir = 5,
+                                re = NA,
+                                nir = NA,
+                                swir = NA,
+                                tir = NA,
                                 plot = TRUE,
                                 verbose = TRUE,
                                 max_pixels = 3e6,
@@ -1695,7 +1821,7 @@ mosaic_analyze_iter <- function(mosaic,
     bind[[paste0("P", leading_zeros(i, 4))]] <-
       mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
                      basemap = basemap,
-                     r = r, g = g, b = b, re = re, nir = nir,
+                     r = r, g = g, b = b, re = re, nir = nir, swir = swir, tir = tir,
                      shapefile = shapefile[i, ],
                      segment_individuals = segment_individuals,
                      segment_index = segment_index,
@@ -1903,8 +2029,6 @@ mosaic_view <- function(mosaic,
                         r = 3,
                         g = 2,
                         b = 1,
-                        re = 4,
-                        nir = 5,
                         edit = FALSE,
                         title = "",
                         shapefile = NULL,
@@ -2646,8 +2770,14 @@ mosaic_crop <- function(mosaic,
 #'   target mode for conversion to a binary image. Use [pliman_indexes_rgb()]
 #'   and [pliman_indexes_me()] to see the available RGB and multispectral
 #'   indexes, respectively. Users can also calculate their own index using  `R,
-#'   G, B, RE, and NIR` bands (eg., `index = "R+B/G"`) or using the names of the
-#'   mosaic's layers (ex., "(band_1 + band_2) / 2").
+#'   G, B, RE, NIR, SWIR, and TIR` bands (eg., `index = "R+B/G"`) or using the
+#'   names of the mosaic's layers (ex., "(band_1 + band_2) / 2").
+#' @param r,g,b,re,nir,swir,tir The red, green, blue, red-edge,  near-infrared,
+#'   shortwave Infrared, and thermal infrared bands of the image, respectively.
+#'   By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
+#'   multispectral image is provided up to seven bands can be used to compute
+#'   built-in indexes. There are no limitation of band numbers if the index is
+#'   computed using the band name.
 #' @param plot Plot the computed index? Defaults to `TRUE`.
 #' @param in_memory Logical, indicating whether the indexes should be computed
 #'   in memory. Defaults to `TRUE`. In most cases, this is 2-3 times faster, but
@@ -2683,11 +2813,15 @@ mosaic_index <- function(mosaic,
                          r = 3,
                          g = 2,
                          b = 1,
-                         re = 4,
-                         nir = 5,
+                         re = NA,
+                         nir = NA,
+                         swir = NA,
+                         tir = NA,
                          plot = TRUE,
                          in_memory = TRUE,
                          workers = 1){
+  indices <- c(r = r, g = g, b = b, re = re, nir = nir, swir = swir, tir = tir)
+  valid_indices <- indices[!is.na(indices)]
   if(length(index) == 1){
     if(inherits(mosaic, "Image")){
       ras <- t(terra::rast(mosaic@.Data))
@@ -2705,7 +2839,7 @@ mosaic_index <- function(mosaic,
     layersused <- unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE)))
     onlychar <- suppressWarnings(is.na(as.numeric(layersused)))
     layers_used <- layersused[onlychar]
-    if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR"))){
+    if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR", "SWIR", "TIR"))){
       # Extract individual layers based on the expression
       layers_used <- layers_used[is.na(suppressWarnings(as.numeric(layers_used)))]
       layers <-
@@ -2718,16 +2852,18 @@ mosaic_index <- function(mosaic,
       if(in_memory){
         if(index %in% ind$Index){
           formula <- as.character(ind$Equation[as.character(ind$Index)==index])
-          mosaic_gray <- terra::lapp(mosaic[[c(r, g, b, re, nir)]], parse_formula(formula))
+          mosaic_gray <- terra::lapp(mosaic[[valid_indices]], parse_formula(formula, valid_indices))
         } else{
-          mosaic_gray <- terra::lapp(mosaic[[c(r, g, b, re, nir)]], parse_formula(index))
+          mosaic_gray <- terra::lapp(mosaic[[valid_indices]], parse_formula(index, valid_indices))
         }
       } else{
-        R <- try(ras[[r]], TRUE)
-        G <- try(ras[[g]], TRUE)
-        B <- try(ras[[b]], TRUE)
-        NIR <- try(ras[[nir]], TRUE)
-        RE <- try(ras[[re]], TRUE)
+        R <- try(ras[[indices[["r"]]]], TRUE)
+        G <- try(ras[[indices[["g"]]]], TRUE)
+        B <- try(ras[[indices[["b"]]]], TRUE)
+        RE <- try(ras[[indices[["re"]]]], TRUE)
+        NIR <- try(ras[[indices[["nir"]]]], TRUE)
+        SWIR <- try(ras[[indices[["swir"]]]], TRUE)
+        TIR <- try(ras[[indices[["tir"]]]], TRUE)
         if(index %in% ind$Index){
           mosaic_gray <- eval(parse(text = as.character(ind$Equation[as.character(ind$Index)==index])))
         } else{
@@ -2769,6 +2905,8 @@ mosaic_index <- function(mosaic,
                                         b = b,
                                         re = re,
                                         nir = nir,
+                                        swir = swir,
+                                        tir = tir,
                                         in_memory = in_memory,
                                         plot = FALSE) |>
                              terra::writeRaster(tfil, overwrite = TRUE)
@@ -2787,6 +2925,8 @@ mosaic_index <- function(mosaic,
                            b = b,
                            re = re,
                            nir = nir,
+                           swir = swir,
+                           tir = tir,
                            in_memory = in_memory,
                            plot = FALSE)
             })
@@ -2906,8 +3046,10 @@ mosaic_segment <- function(mosaic,
                            r = 3,
                            g = 2,
                            b = 1,
-                           re = 4,
-                           nir = 5,
+                           re = NA,
+                           nir = NA,
+                           swir = NA,
+                           tir = NA,
                            threshold = "Otsu",
                            invert = FALSE,
                            return = c("mosaic", "mask")){
@@ -2921,15 +3063,17 @@ mosaic_segment <- function(mosaic,
                       b = b,
                       re = re,
                       nir = nir,
+                      swir = swir,
+                      tir = tir,
                       plot = FALSE)
   thresh <- ifelse(threshold == "Otsu", otsu(na.omit(terra::values(ind)[, index])), threshold)
   if(invert){
-    mask <- ind[[index]] < thresh
-  } else{
     mask <- ind[[index]] > thresh
+  } else{
+    mask <- ind[[index]] < thresh
   }
   if(return[[1]] == 'mosaic'){
-    terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+    terra::mask(mosaic, mask, maskvalue = TRUE)
   } else{
     mask
   }
@@ -2961,8 +3105,6 @@ mosaic_segment_pick <- function(mosaic,
                                 g = 2,
                                 r = 3,
                                 b = 1,
-                                re = 4,
-                                nir = 5,
                                 max_pixels = 2e6,
                                 downsample = NULL,
                                 quantiles = c(0, 1),
@@ -2980,8 +3122,6 @@ mosaic_segment_pick <- function(mosaic,
                   r = r,
                   g = g,
                   b = b,
-                  re = re,
-                  nir = nir,
                   max_pixels = max_pixels,
                   downsample = downsample,
                   quantiles = quantiles)
@@ -3020,7 +3160,7 @@ mosaic_segment_pick <- function(mosaic,
   mask[mask < 0.5] <- 0
   mask[mask > 0.5] <- 1
   if(return[[1]] == 'mosaic'){
-    terra::mask(mosaic, mask, maskvalue = TRUE, inverse = TRUE)
+    terra::mask(mosaic, mask, maskvalue = TRUE)
   } else{
     mask
   }
@@ -3437,8 +3577,12 @@ mosaic_draw <- function(mosaic,
     map <- NULL
   } else{
     if(segment){
-      mask <- mind[[1]] < otsu(na.omit(terra::values(mind)[, index[1]]))
-      mind <- terra::mask(mind, mask, inverse = invert, maskvalues = TRUE)
+      if(invert){
+        mask <- mind[[1]] < otsu(na.omit(terra::values(mind)[, index[1]]))
+      } else{
+        mask <- mind[[1]] < otsu(na.omit(terra::values(mind)[, index[1]]))
+      }
+      mind <- terra::mask(mind, mask, maskvalues = TRUE)
     }
     mind <- terra::mask(mind, polygons_ext)
     vals <-

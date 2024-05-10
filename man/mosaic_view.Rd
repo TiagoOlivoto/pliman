@@ -9,8 +9,6 @@ mosaic_view(
   r = 3,
   g = 2,
   b = 1,
-  re = 4,
-  nir = 5,
   edit = FALSE,
   title = "",
   shapefile = NULL,
@@ -37,10 +35,6 @@ mosaic_view(
 \item{g}{The layer for the Green band (default: 2).}
 
 \item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
 
 \item{edit}{If \code{TRUE} enable editing options using \code{\link[mapedit:editMap]{mapedit::editMap()}}.}
 
@@ -89,6 +83,10 @@ is \code{\link[=custom_palette]{custom_palette()}}.}
 \item{axes}{logical. Draw axes? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[terra:plot]{terra::plot()}} when \code{viewer = "base"}.}
+
+\item{re}{The layer for the Red-edge band (default: 4).}
+
+\item{nir}{The layer for the Near-infrared band(default: 5).}
 }
 \value{
 An sf object, the same object returned by \code{\link[mapedit:editMap]{mapedit::editMap()}}.

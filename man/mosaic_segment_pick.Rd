@@ -10,8 +10,6 @@ mosaic_segment_pick(
   g = 2,
   r = 3,
   b = 1,
-  re = 4,
-  nir = 5,
   max_pixels = 2e+06,
   downsample = NULL,
   quantiles = c(0, 1),
@@ -23,16 +21,6 @@ mosaic_segment_pick(
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
 \item{basemap}{An optional \code{mapview} object.}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
 
 \item{max_pixels}{Maximum number of pixels to render in the map or plot
 (default: 500000).}

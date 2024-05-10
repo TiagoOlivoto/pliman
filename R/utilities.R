@@ -826,10 +826,9 @@ run_app <- function(){
   plimanshiny::run_app()
 }
 
-parse_formula <- function(formula) {
-  eval(parse(text = sprintf("function(%s) %s", paste0(c("R", "G", "B", "RE", "NIR"), collapse = ", "), formula)))
+parse_formula <- function(formula, valid_indices) {
+  eval(parse(text = sprintf("function(%s) %s", paste0(toupper(names(valid_indices)), collapse = ", "), formula)))
 }
-
 compute_outsize <- function(pct) {
   if (length(pct) == 1) {
     pct <- rep(pct, 2)

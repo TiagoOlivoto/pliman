@@ -11,8 +11,6 @@ shapefile_build(
   r = 3,
   g = 2,
   b = 1,
-  re = 4,
-  nir = 5,
   crop_to_shape_ext = TRUE,
   grid = TRUE,
   nrow = 1,
@@ -20,6 +18,7 @@ shapefile_build(
   plot_width = NULL,
   plot_height = NULL,
   layout = "lrtb",
+  serpentine = TRUE,
   build_shapefile = TRUE,
   check_shapefile = FALSE,
   sf_to_polygon = FALSE,
@@ -42,16 +41,6 @@ shapefile_build(
 \item{controlpoints}{An \code{sf} object created with \code{\link[mapedit:editMap]{mapedit::editMap()}},
 containing the polygon that defines the region of interest to be analyzed.}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
-
 \item{crop_to_shape_ext}{Crop the mosaic to the extension of shapefile?
 Defaults to \code{TRUE}. This allows for a faster index computation when the
 region of the built shapefile is much smaller than the entire mosaic
@@ -71,11 +60,15 @@ mosaic unit). It is mutually exclusiv with \code{buffer_col} and \code{buffer_ro
 \itemize{
 \item \code{'tblr'} for top/bottom left/right orientation
 \item \code{'tbrl'} for top/bottom right/left orientation
+\item \code{'btlr'} for bottom/top left/right orientation
+\item \code{'btrl'} for bottom/top right/left orientation
 \item \code{'lrtb'} for left/right top/bottom orientation
 \item \code{'lrbt'} for left/right bottom/top orientation
 \item \code{'rltb'} for right/left top/bottom orientation
 \item \code{'rlbt'} for right/left bottom/top orientation
 }}
+
+\item{serpentine}{Create a serpentine-based layout? Defaults to \code{FALSE}.}
 
 \item{build_shapefile}{Logical, indicating whether to interactively draw ROIs
 if the shapefile is \code{NULL} (default: TRUE).}

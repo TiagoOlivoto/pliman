@@ -9,12 +9,16 @@ mosaic_analyze(
   r = 3,
   g = 2,
   b = 1,
-  re = 4,
-  nir = 5,
+  re = NA,
+  nir = NA,
+  swir = NA,
+  tir = NA,
   crop_to_shape_ext = TRUE,
   grid = TRUE,
   nrow = 1,
   ncol = 1,
+  plot_width = NULL,
+  plot_height = NULL,
   layout = "lrtb",
   indexes = NULL,
   shapefile = NULL,
@@ -63,15 +67,12 @@ mosaic_analyze(
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
+\item{r, g, b, re, nir, swir, tir}{The red, green, blue, red-edge,  near-infrared,
+shortwave Infrared, and thermal infrared bands of the image, respectively.
+By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
+multispectral image is provided up to seven bands can be used to compute
+built-in indexes. There are no limitation of band numbers if the index is
+computed using the band name.}
 
 \item{crop_to_shape_ext}{Crop the mosaic to the extension of shapefile?
 Defaults to \code{TRUE}. This allows for a faster index computation when the
@@ -85,10 +86,15 @@ extension.}
 
 \item{ncol}{Number of columns for the grid (default: 1).}
 
+\item{plot_width, plot_height}{The width and height of the plot shape (in the
+mosaic unit). It is mutually exclusiv with \code{buffer_col} and \code{buffer_row}.}
+
 \item{layout}{Character: one of
 \itemize{
 \item \code{'tblr'} for top/bottom left/right orientation
 \item \code{'tbrl'} for top/bottom right/left orientation
+\item \code{'btlr'} for bottom/top left/right orientation
+\item \code{'btrl'} for bottom/top right/left orientation
 \item \code{'lrtb'} for left/right top/bottom orientation
 \item \code{'lrbt'} for left/right bottom/top orientation
 \item \code{'rltb'} for right/left top/bottom orientation
@@ -247,8 +253,11 @@ automatically chosen so that the number of plotted pixels approximates the
 \item{verbose}{Logical, indicating whether to display verbose output
 (default: TRUE).}
 
-\item{plot_width, plot_height}{The width and height of the plot shape (in the
-mosaic unit). It is mutually exclusiv with \code{buffer_col} and \code{buffer_row}.}
+\item{index}{A character value (or a vector of characters) specifying the
+target mode for conversion to a binary image. Use \code{\link[=pliman_indexes_rgb]{pliman_indexes_rgb()}}
+and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available RGB and multispectral
+indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, NIR, SWIR, and TIR} bands (eg., \code{index = "R+B/G"}) or using the
+names of the mosaic's layers (ex., "(band_1 + band_2) / 2").}
 }
 \value{
 A list containing the following objects:

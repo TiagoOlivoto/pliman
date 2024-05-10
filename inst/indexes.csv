@@ -83,3 +83,4 @@ BWDRVI;(0.1*NIR-B)/(0.1*NIR+B);MULTI
 WDRVI;(0.2 * NIR - R) / (0.2 * NIR + R);MULTI
 ARI;(1 / G) - (1 / RE);MULTI
 MCARI1;((1.2*(2.5*(NIR-R)-1.3*(NIR-G))/sqrt((2*NIR+1)^2-(6*NIR-5*sqrt(R))-0.5)));MULTI
+NDMI;(NIR - SWIR) / (NIR + SWIR);MULTI

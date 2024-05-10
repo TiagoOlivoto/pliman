@@ -11,8 +11,10 @@ mosaic_analyze_iter(
   r = 3,
   g = 2,
   b = 1,
-  re = 4,
-  nir = 5,
+  re = NA,
+  nir = NA,
+  swir = NA,
+  tir = NA,
   plot = TRUE,
   verbose = TRUE,
   max_pixels = 3e+06,
@@ -37,15 +39,12 @@ for analysis.}
 
 \item{basemap}{An optional basemap generated with \code{\link[=mosaic_view]{mosaic_view()}}.}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
+\item{r, g, b, re, nir, swir, tir}{The red, green, blue, red-edge,  near-infrared,
+shortwave Infrared, and thermal infrared bands of the image, respectively.
+By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
+multispectral image is provided up to seven bands can be used to compute
+built-in indexes. There are no limitation of band numbers if the index is
+computed using the band name.}
 
 \item{plot}{Logical, indicating whether to generate plots (default: TRUE).}
 

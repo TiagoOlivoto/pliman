@@ -24,18 +24,8 @@ mosaic_index2(
 \item{index}{A character value (or a vector of characters) specifying the
 target mode for conversion to a binary image. Use \code{\link[=pliman_indexes_rgb]{pliman_indexes_rgb()}}
 and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available RGB and multispectral
-indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, and NIR} bands (eg., \code{index = "R+B/G"}) or using the names of the
-mosaic's layers (ex., "(band_1 + band_2) / 2").}
-
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
+indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, NIR, SWIR, and TIR} bands (eg., \code{index = "R+B/G"}) or using the
+names of the mosaic's layers (ex., "(band_1 + band_2) / 2").}
 
 \item{plot}{Plot the computed index? Defaults to \code{TRUE}.}
 
