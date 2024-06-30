@@ -41,6 +41,9 @@ shapefile_build(
 \item{controlpoints}{An \code{sf} object created with \code{\link[mapedit:editMap]{mapedit::editMap()}},
 containing the polygon that defines the region of interest to be analyzed.}
 
+\item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
+Defaults to \code{1}, \code{2}, and \code{3}.}
+
 \item{crop_to_shape_ext}{Crop the mosaic to the extension of shapefile?
 Defaults to \code{TRUE}. This allows for a faster index computation when the
 region of the built shapefile is much smaller than the entire mosaic

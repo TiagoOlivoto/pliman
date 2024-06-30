@@ -10,11 +10,7 @@ mosaic_to_rgb(mosaic, r = 3, g = 2, b = 1, coef = 0, plot = TRUE)
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
+\item{r, g, b}{The red, green, blue bands.}
 
 \item{coef}{An addition coefficient applied to the resulting object. This is
 useful to adjust the brightness of the final image. Defaults to 0.}

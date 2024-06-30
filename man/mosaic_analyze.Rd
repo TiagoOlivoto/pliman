@@ -252,12 +252,6 @@ automatically chosen so that the number of plotted pixels approximates the
 
 \item{verbose}{Logical, indicating whether to display verbose output
 (default: TRUE).}
-
-\item{index}{A character value (or a vector of characters) specifying the
-target mode for conversion to a binary image. Use \code{\link[=pliman_indexes_rgb]{pliman_indexes_rgb()}}
-and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available RGB and multispectral
-indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, NIR, SWIR, and TIR} bands (eg., \code{index = "R+B/G"}) or using the
-names of the mosaic's layers (ex., "(band_1 + band_2) / 2").}
 }
 \value{
 A list containing the following objects:

@@ -27,6 +27,9 @@ array or a list of \code{SpatRaster} objects.
 \item{check_16bits}{Checks if mosaic has maximum value in the 16-bits format
 (65535), and replaces it by NA. Defaults to \code{FALSE}.}
 
+\item{check_datatype}{Logical. If \code{TRUE}, checks and suggests the
+appropriate data type based on the raster values.}
+
 \item{...}{Additional arguments passed to \code{\link[terra:rast]{terra::rast()}} (\code{mosaic_input()})
 or  \code{\link[terra:writeRaster]{terra::writeRaster()}} (\code{mosaic_output()})}
 

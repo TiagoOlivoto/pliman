@@ -27,6 +27,12 @@ and \code{\link[=pliman_indexes_me]{pliman_indexes_me()}} to see the available R
 indexes, respectively. Users can also calculate their own index using  \verb{R, G, B, RE, NIR, SWIR, and TIR} bands (eg., \code{index = "R+B/G"}) or using the
 names of the mosaic's layers (ex., "(band_1 + band_2) / 2").}
 
+\item{r, g, b, re, nir}{The red, green, blue, red-edge, and  near-infrared bands
+of the image, respectively. By default, the function assumes a BGR as input
+(b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+bands can be used to compute built-in indexes. There are no limitation of
+band numbers if the index is computed using the band name.}
+
 \item{plot}{Plot the computed index? Defaults to \code{TRUE}.}
 
 \item{python}{The PATH for python.exe}

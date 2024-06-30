@@ -441,6 +441,8 @@ mosaic_interpolate <- function(mosaic, points, method = c("bilinear", "loess", "
 #' @param controlpoints An `sf` object created with [mapedit::editMap()],
 #'   containing the polygon that defines the region of interest to be analyzed.
 #' @inheritParams mosaic_analyze
+#' @inheritParams mosaic_index
+#' @inheritParams mosaic_view
 #' @inheritParams utils_shapefile
 #' @inheritParams plot_id
 #' @return A list with the built shapefile. Each element is an `sf` object with
@@ -679,12 +681,6 @@ shapefile_build <- function(mosaic,
 #' @inheritParams analyze_objects
 #' @inheritParams image_binary
 #' @inheritParams plot_id
-#' @param index A character value (or a vector of characters) specifying the
-#'   target mode for conversion to a binary image. Use [pliman_indexes_rgb()]
-#'   and [pliman_indexes_me()] to see the available RGB and multispectral
-#'   indexes, respectively. Users can also calculate their own index using  `R,
-#'   G, B, RE, NIR, SWIR, and TIR` bands (eg., `index = "R+B/G"`) or using the
-#'   names of the mosaic's layers (ex., "(band_1 + band_2) / 2").
 #' @param r,g,b,re,nir,swir,tir The red, green, blue, red-edge,  near-infrared,
 #'   shortwave Infrared, and thermal infrared bands of the image, respectively.
 #'   By default, the function assumes a BGR as input (b = 1, g = 2, r = 3). If a
@@ -1938,11 +1934,7 @@ mosaic_analyze_iter <- function(mosaic,
 #'   [mosaic_input()].
 #' @inheritParams image_view
 #' @inheritParams image_align
-#' @param r The layer for the Red band (default: 3).
-#' @param g The layer for the Green band (default: 2).
-#' @param b The layer for the Blue band (default: 1).
-#' @param re The layer for the Red-edge band (default: 4).
-#' @param nir The layer for the Near-infrared band(default: 5).
+#' @inheritParams mosaic_index
 #' @param edit If `TRUE` enable editing options using [mapedit::editMap()].
 #' @param title A title for the generated map or plot (default: "").
 #' @param shapefile An optional shapefile of class `sf` to be plotted over the
@@ -2195,6 +2187,8 @@ mosaic_view <- function(mosaic,
 #' @param info Print the mosaic informations (eg., CRS, extend). Defaults to `TRUE`
 #' @param check_16bits Checks if mosaic has maximum value in the 16-bits format
 #'   (65535), and replaces it by NA. Defaults to `FALSE`.
+#' @param check_datatype Logical. If \code{TRUE}, checks and suggests the
+#'   appropriate data type based on the raster values.
 #' @param filename character. The Output filename.
 #' @param datatype The datatype. By default, the function will try to guess the
 #'   data type that saves more memory usage and file size. See
@@ -2662,6 +2656,12 @@ shapefile_edit <- function(shapefile,
 #'   `shapefile`.
 #' @importFrom terra crs
 #' @inheritParams mosaic_view
+#' @inheritParams mosaic_index
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and  near-infrared bands
+#'   of the image, respectively. By default, the function assumes a BGR as input
+#'   (b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+#'   bands can be used to compute built-in indexes. There are no limitation of
+#'   band numbers if the index is computed using the band name.
 #' @param shapefile An optional `SpatVector`, that can be created with
 #'   [shapefile_input()].
 #' @param ... Additional arguments passed to [mosaic_view()].
@@ -2913,6 +2913,11 @@ mosaic_index <- function(mosaic,
 #' gdal_calc.py (https://gdal.org/programs/gdal_calc.html). This requires a
 #' Python and GDAL installation.
 #' @inheritParams mosaic_index
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and  near-infrared bands
+#'   of the image, respectively. By default, the function assumes a BGR as input
+#'   (b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+#'   bands can be used to compute built-in indexes. There are no limitation of
+#'   band numbers if the index is computed using the band name.
 #' @param python The PATH for python.exe
 #' @param gdal The PATH for gdal_calc.py
 #' @return An index layer extracted/computed from the mosaic raster.
@@ -3052,7 +3057,8 @@ mosaic_segment <- function(mosaic,
 #' The function segments a mosaic using an interative process where the user
 #' picks samples from background (eg., soil) and foreground (eg., plants).
 #'
-#' @inheritParams mosaic_analyze
+#' @inheritParams mosaic_index
+#' @inheritParams mosaic_view
 #' @param basemap An optional `mapview` object.
 #' @param return The output of the function. Either 'mosaic' (the segmented
 #'   mosaic), or 'mask' (the binary mask).
@@ -3138,6 +3144,12 @@ mosaic_segment_pick <- function(mosaic,
 #'
 #' Convert an `SpatRaster` object to a `Image` object with optional scaling.
 #' @inheritParams mosaic_view
+#' @inheritParams mosaic_index
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and  near-infrared bands
+#'   of the image, respectively. By default, the function assumes a BGR as input
+#'   (b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+#'   bands can be used to compute built-in indexes. There are no limitation of
+#'   band numbers if the index is computed using the band name.
 #' @param rescale Rescale the final values? If `TRUE` the final values are
 #'   rescaled so that the maximum value is 1.
 #' @param coef An addition coefficient applied to the resulting object. This is
@@ -3192,7 +3204,7 @@ mosaic_to_pliman <- function(mosaic,
 #' @inheritParams mosaic_to_pliman
 #' @param plot Logical, whether to display the resulting RGB image (default:
 #'   TRUE).
-#'
+#' @param r,g,b The red, green, blue bands.
 #' @return A three-band RGB image represented as a pliman (EBImage) object.
 #'
 #' @details This function converts `SpatRaster` that contains the RGB bands into
@@ -3236,7 +3248,13 @@ mosaic_to_rgb <- function(mosaic,
 #' The resulting object is an object of class `Image` that can be further
 #' analyzed.
 #' @inheritParams mosaic_view
+#' @inheritParams mosaic_index
 #' @inheritParams mosaic_to_pliman
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and  near-infrared bands
+#'   of the image, respectively. By default, the function assumes a BGR as input
+#'   (b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+#'   bands can be used to compute built-in indexes. There are no limitation of
+#'   band numbers if the index is computed using the band name.
 #' @param crop_mosaic Logical, whether to crop the mosaic interactively before
 #'   aligning it (default: FALSE).
 #' @param align Logical, whether to align the mosaic interactively (default:
@@ -3343,7 +3361,13 @@ mosaic_prepare <- function(mosaic,
 #'  statistic for each object.
 #'
 #' @inheritParams mosaic_view
+#' @inheritParams mosaic_index
 #' @inheritParams analyze_objects
+#' @param r,g,b,re,nir The red, green, blue, red-edge, and  near-infrared bands
+#'   of the image, respectively. By default, the function assumes a BGR as input
+#'   (b = 1, g = 2, r = 3). If a multispectral image is provided up to seven
+#'   bands can be used to compute built-in indexes. There are no limitation of
+#'   band numbers if the index is computed using the band name.
 #' @param color_regions The color palette for displaying index values. Defaults
 #'   to `rev(grDevices::terrain.colors(50))`.
 #' @param threshold By default (threshold = "Otsu"), a threshold value based on

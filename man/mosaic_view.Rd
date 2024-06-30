@@ -30,11 +30,8 @@ mosaic_view(
 \item{mosaic}{A mosaic of class \code{SpatRaster}, generally imported with
 \code{\link[=mosaic_input]{mosaic_input()}}.}
 
-\item{r}{The layer for the Red band (default: 3).}
-
-\item{g}{The layer for the Green band (default: 2).}
-
-\item{b}{The layer for the Blue band (default: 1).}
+\item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
+Defaults to \code{1}, \code{2}, and \code{3}.}
 
 \item{edit}{If \code{TRUE} enable editing options using \code{\link[mapedit:editMap]{mapedit::editMap()}}.}
 
@@ -83,10 +80,6 @@ is \code{\link[=custom_palette]{custom_palette()}}.}
 \item{axes}{logical. Draw axes? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[terra:plot]{terra::plot()}} when \code{viewer = "base"}.}
-
-\item{re}{The layer for the Red-edge band (default: 4).}
-
-\item{nir}{The layer for the Near-infrared band(default: 5).}
 }
 \value{
 An sf object, the same object returned by \code{\link[mapedit:editMap]{mapedit::editMap()}}.

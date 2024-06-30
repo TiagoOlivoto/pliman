@@ -22,6 +22,9 @@ mosaic_segment_pick(
 
 \item{basemap}{An optional \code{mapview} object.}
 
+\item{r, g, b}{The layer for the Red, Green and Blue band, respectively.
+Defaults to \code{1}, \code{2}, and \code{3}.}
+
 \item{max_pixels}{Maximum number of pixels to render in the map or plot
 (default: 500000).}
 
