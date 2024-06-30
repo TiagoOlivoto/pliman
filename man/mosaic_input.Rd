@@ -5,7 +5,13 @@
 \alias{mosaic_export}
 \title{Create and Export mosaics}
 \usage{
-mosaic_input(mosaic, info = TRUE, check_16bits = FALSE, ...)
+mosaic_input(
+  mosaic,
+  info = TRUE,
+  check_16bits = FALSE,
+  check_datatype = FALSE,
+  ...
+)
 
 mosaic_export(mosaic, filename, datatype = NULL, overwrite = FALSE, ...)
 }

@@ -50,49 +50,18 @@ create_buffer <- function(coords, buffer_col, buffer_row) {
   return(resized_coords)
 }
 
-add_width_height <- function(grid,
-                             width,
-                             height,
-                             mosaic,
-                             points_align){
-  # adapted from https://github.com/filipematias23/FIELDimageR-QGIS/blob/main/rscripts/FIELDimageR_fieldShape.rsx
-  rap <- function(x, xsize, ysize) {
-    bbox <- sf::st_bbox(x)
-    bbox <- bbox + c(xsize / 2, ysize / 2, -xsize / 2, -ysize / 2)
-    return(sf::st_as_sfc(sf::st_bbox(bbox)))
-  }
-  cen <- sf::st_centroid(grid)
-  bbox_list <- lapply(sf::st_geometry(cen), sf::st_bbox)
-  points_list <- lapply(bbox_list, sf::st_as_sfc)
-  rectangles <- lapply(points_list, function(x){rap(x, width, height)})
-  genpoint <- rectangles[[1]]
-  for (i in 2:length(rectangles)) {
-    genpoint <- c(genpoint, rectangles[[i]])
-  }
-  sf::st_crs(genpoint) <- sf::st_crs(cen)
-  createdgrid <- sf::st_as_sf(genpoint)
-  rot_pol <- function(x) matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
-  x1 <- points_align[1]
-  y1 <- points_align[3]
-  x2 <- points_align[2]
-  y2 <- points_align[4]
-  rot <- atan((x2 - x1) / (y2 - y1))
-  ga <- sf::st_geometry(createdgrid)
-  cga <- sf::st_centroid(ga)
-  grid_shapefile <- (ga-cga) * rot_pol(rot) + cga
-  return(grid_shapefile)
+
+add_width_height <- function(grid, width, height, mosaic, points_align) {
+  gridl <-lapply(sf::st_geometry(grid), sf::st_coordinates)
+  gridadj <- add_width_height_cpp(gridl, height, width, points_align)
+  grd <- lapply(gridadj, function(x){sf::st_polygon(list(x))}) |> sf::st_sfc()
+  grd <-  sf::st_sf(geometry = grd)
+  sf::st_crs(grd) <- sf::st_crs(grid)
+  return(grd)
 }
 
-make_grid <- function(points,
-                      nrow,
-                      ncol,
-                      mosaic,
-                      buffer_col = 0,
-                      buffer_row = 0,
-                      plot_width = NULL,
-                      plot_height = NULL){
+make_grid <- function(points, nrow, ncol, mosaic, buffer_col = 0, buffer_row = 0, plot_width = NULL, plot_height = NULL) {
   points_align <- sf::st_coordinates(points)[2:3, 1:2]
-
   grids <-
     sf::st_make_grid(points, n = c(nrow, ncol)) |>
     sf::st_transform(sf::st_crs(mosaic))
@@ -104,41 +73,29 @@ make_grid <- function(points,
     rev() |>
     sf::st_transform(sf::st_crs(mosaic)) |>
     sf::st_coordinates()
-
   txy <-
     points |>
     sf::st_transform(sf::st_crs(mosaic)) |>
     sf::st_coordinates()
   txy <- txy[1:4, 1:2]
-  cvm <- lm(formula = txy ~ sxy[1:4, ])
+
+  cvm <- lm(txy ~ sxy[1:4, ])
   parms <- cvm$coefficients[2:3, ]
   intercept <- cvm$coefficients[1, ]
   geometry <- grids * parms + intercept
 
-  if(buffer_row != 0 | buffer_col != 0){
-    for(k in 1:length(geometry)){
-      coords <- geometry[[k]][[1]]
-      geometry[[k]][[1]] <- create_buffer(coords,
-                                          buffer_col = buffer_col,
-                                          buffer_row = buffer_row)
-    }
+  if (buffer_row != 0 | buffer_col != 0) {
+    geometry <- lapply(geometry, function(g) {
+      g[[1]] <- create_buffer(g[[1]], buffer_col, buffer_row)
+      g
+    })
   }
-  if(!is.null(plot_width) & !is.null(plot_height)){
-    geometry <-
-      add_width_height(
-        grid = geometry,
-        width = plot_width,
-        height = plot_height,
-        points_align = points_align
-      )
+  if (!is.null(plot_width) & !is.null(plot_height)) {
+    geometry <- add_width_height(grid = geometry, width = plot_width, height = plot_height, points_align = points_align)
   }
-  gshp <-
-    geometry |>
-    sf::st_sf(crs = sf::st_crs(mosaic))
+  gshp <- geometry |> sf::st_sf(crs = sf::st_crs(mosaic))
   return(gshp)
 }
-
-
 find_aggrfact <- function(mosaic, max_pixels = 1000000){
   compute_downsample <- function(nr, nc, n) {
     if (n == 0) {
@@ -434,8 +391,6 @@ plot_id <- function(shapefile,
 }
 
 
-
-
 #' Mosaic interpolation
 #'
 #' Performs the interpolation of points from a raster object.
@@ -621,7 +576,10 @@ shapefile_build <- function(mosaic,
                   buffer_col = buffer_col[k],
                   buffer_row = buffer_row[k],
                   plot_width = plot_width[k],
-                  plot_height = plot_height[k])
+                  plot_height = plot_height[k]) |>
+        dplyr::mutate(row = rep(1:nrow[k], ncol[k]),
+                      column = rep(1:ncol[k], each = nrow[k]),
+                      .before = geometry)
       pg <-
         pg |>
         dplyr::mutate(unique_id = dplyr::row_number(),
@@ -636,6 +594,8 @@ shapefile_build <- function(mosaic,
         dplyr::mutate(unique_id = dplyr::row_number(),
                       block = paste0("B", leading_zeros(k, 2)),
                       plot_id = "P0001",
+                      row = 1,
+                      column = 1,
                       .before = 1)
     }
 
@@ -1404,11 +1364,11 @@ mosaic_analyze <- function(mosaic,
         covered_area <-
           dplyr::bind_rows(
             lapply(seq_along(tmp), function(i){
-              data.frame(covered_area = sum(na.omit(tmp[[i]])[, 2]),
-                         plot_area = sum(tmp[[i]][, 2])) |>
-                dplyr::mutate(coverage = covered_area / plot_area)
+              data.frame(covered_area = sum(na.omit(tmp[[i]])[, 2]))
             })
-          )
+          )|>
+          dplyr::mutate(plot_area = as.numeric(sf::st_area(plot_grid)),
+                        coverage = covered_area / plot_area)
         plot_grid <- dplyr::bind_cols(plot_grid, covered_area)
         if(simplify){
           plot_grid <- plot_grid |> sf::st_simplify(preserveTopology = TRUE)
@@ -1573,7 +1533,6 @@ mosaic_analyze <- function(mosaic,
       if("coverage_fraction" %in% colnames(vals)){
         vals$coverage_fraction <- NULL
       }
-      print(plot_index)
       if(length(plot_index) == 1){
         if(ncol(vals) == 3){
           colnames(vals)[3] <- plot_index
@@ -1624,13 +1583,14 @@ mosaic_analyze <- function(mosaic,
       results |>
       dplyr::mutate(plot_area = sf::st_area(geometry)) |>
       as.data.frame(check.names = FALSE) |>
-      dplyr::select(block, plot_id, plot_area)
+      dplyr::select(block, plot_id, row, column, plot_area)
     # compute coverage area
     result_plot_summ <-
       do.call(rbind, lapply(summres, function(x){x})) |>
-      dplyr::left_join(plot_area, by = dplyr::join_by(block, plot_id)) |>
+      dplyr::left_join(plot_area, by = dplyr::join_by(block, plot_id, row, column)) |>
       dplyr::mutate(coverage = as.numeric(area_sum / plot_area), .after = area) |>
-      dplyr::left_join(results |>   dplyr::select(block, plot_id, geometry), by = dplyr::join_by(block, plot_id)) |>
+      dplyr::left_join(results |>   dplyr::select(block, plot_id, row, column, geometry),
+                       by = dplyr::join_by(block, plot_id, row, column)) |>
       sf::st_as_sf()
 
     centroid <-
@@ -1646,8 +1606,8 @@ mosaic_analyze <- function(mosaic,
       dists <-
         result_indiv |>
         sf::st_drop_geometry() |>
-        dplyr::select(block, plot_id, x, y) |>
-        dplyr::group_by(block, plot_id)
+        dplyr::select(block, plot_id, row, column, x, y) |>
+        dplyr::group_by(block, plot_id, row, column)
 
       splits <- dplyr::group_split(dists)
       names(splits) <- dplyr::group_keys(dists) |> dplyr::mutate(key = paste0(block, "_", plot_id)) |> dplyr::pull()
@@ -1702,9 +1662,10 @@ mosaic_analyze <- function(mosaic,
         dfplot |>
         sf::st_drop_geometry() |>
         tidyr::unnest(cols = data) |>
-        dplyr::group_by(block, plot_id) |>
+        dplyr::group_by(block, plot_id, row, column) |>
         dplyr::summarise(dplyr::across(dplyr::where(is.numeric), \(x){mean(x, na.rm = TRUE)}), .groups = "drop") |>
-        dplyr::left_join(dfplot |> dplyr::select(block, plot_id, geometry), by = dplyr::join_by(block, plot_id)) |>
+        dplyr::left_join(dfplot |> dplyr::select(block, plot_id, row, column, geometry),
+                         by = dplyr::join_by(block, plot_id, row, column)) |>
         sf::st_sf()
 
     }
@@ -2262,35 +2223,40 @@ mosaic_view <- function(mosaic,
 mosaic_input <- function(mosaic,
                          info = TRUE,
                          check_16bits = FALSE,
+                         check_datatype = FALSE,
                          ...){
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
   }
-  cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
-  a <- na.omit(unlist(terra::extract(mosaic, cels)))
-  a <- a[!is.infinite(a)]
-  if(inherits(a, "numeric")){
-    if(length(a[a - floor(a) != 0]) == 0){
-      minv <- min(a)
-      maxv <- max(a)
-      if(all(minv >= 0) & all(maxv <= 255)){
-        datatype <- "INT1U"
-      } else{
-        datatype <- "INT2U"
+  if(check_16bits | check_datatype){
+    cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
+    a <- na.omit(unlist(terra::extract(mosaic, cels)))
+    a <- a[!is.infinite(a)]
+    if(inherits(a, "numeric")){
+      if(check_datatype){
+        if(length(a[a - floor(a) != 0]) == 0){
+          minv <- min(a)
+          maxv <- max(a)
+          if(all(minv >= 0) & all(maxv <= 255)){
+            datatype <- "INT1U"
+          } else{
+            datatype <- "INT2U"
+          }
+        } else{
+          datatype <- "FLT4S"
+        }
+        dtterra <- terra::datatype(mosaic)[[1]]
+        if(datatype != dtterra){
+          warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
+                        ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
+        }
       }
-    } else{
-      datatype <- "FLT4S"
-    }
-    dtterra <- terra::datatype(mosaic)[[1]]
-    if(datatype != dtterra){
-      warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
-                    ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
-    }
-    if(check_16bits){
-      if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
-        mosaic[mosaic == 65535] <- NA
+      if(check_16bits){
+        if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
+          mosaic[mosaic == 65535] <- NA
+        }
       }
     }
   }
@@ -2836,7 +2802,8 @@ mosaic_index <- function(mosaic,
     }
     dimmo <- prod(dim(mosaic)[1:2])
     pattern <- "\\b\\w+\\b"
-    layersused <- unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE)))
+    reserved <- c("exp", "abs", "min", "max", "median", "sum", "sqrt", "cos", "sin", "tan", "log", "log10")
+    layersused <- setdiff(unlist(regmatches(index, gregexpr(pattern, index, perl = TRUE))), reserved)
     onlychar <- suppressWarnings(is.na(as.numeric(layersused)))
     layers_used <- layersused[onlychar]
     if(!any(index  %in% ind$Index) & !all(layers_used  %in% c("R", "G", "B", "RE", "NIR", "SWIR", "TIR"))){

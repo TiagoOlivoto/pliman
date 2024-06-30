@@ -1392,4 +1392,97 @@ references:
   type: paper-conference
   URL: "https://ieeexplore.ieee.org/document/1225492"
   volume: 2
+- id: haboudane2004
+  accessed: "12:49:13"
+  author:
+  - family: Haboudane
+    given: Driss
+  - family: Miller
+    given: John R
+  - family: Pattey
+    given: Elizabeth
+  - family: Zarco-Tejada
+    given: Pablo J
+  - family: Strachan
+    given: Ian B
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/j.rse.2003.12.013
+  ISSN: 0034-4257
+  issue: 3
+  issued: 2004-04-15
+  key: L6PKPI2J
+  libraryID: 1
+  page: 337-352
+  providerKey: Zotero
+  source: ScienceDirect
+  title: "Hyperspectral vegetation indices and novel algorithms for
+    predicting green LAI of crop canopies: Modeling and validation in
+    the context of precision agriculture"
+  title-short: Hyperspectral vegetation indices and novel algorithms for
+    predicting green LAI of crop canopies
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425704000264"
+  volume: 90
+- id: liang2017
+  accessed: "12:58:14"
+  author:
+  - family: Liang
+    given: Ying
+  - family: Urano
+    given: Daisuke
+  - family: Liao
+    given: Kang-Ling
+  - family: Hedrick
+    given: Tyson L.
+  - family: Gao
+    given: Yajun
+  - family: Jones
+    given: Alan M.
+  container-title: Plant Methods
+  container-title-short: Plant Methods
+  DOI: 10.1186/s13007-017-0174-6
+  ISSN: 1746-4811
+  issue: 1
+  issued: 2017-12
+  key: DD4MWFLD
+  language: en
+  libraryID: 1
+  page: 26
+  providerKey: Zotero
+  source: DOI.org (Crossref)
+  title: A nondestructive method to estimate the chlorophyll content of
+    Arabidopsis seedlings
+  type: article-journal
+  URL: "http://plantmethods.biomedcentral.com/articles/10.1186/s13007-017-0174-6"
+  volume: 13
+- id: haboudane2002
+  accessed: "13:15:25"
+  author:
+  - family: Haboudane
+    given: Driss
+  - family: Miller
+    given: John R.
+  - family: Tremblay
+    given: Nicolas
+  - family: Zarco-Tejada
+    given: Pablo J.
+  - family: Dextraze
+    given: Louise
+  container-title: Remote Sensing of Environment
+  container-title-short: Remote Sensing of Environment
+  DOI: 10.1016/S0034-4257(02)00018-4
+  ISSN: 0034-4257
+  issue: 2
+  issued: 2002-08-01
+  key: HLAWFWSV
+  libraryID: 1
+  page: 416-426
+  providerKey: Zotero
+  source: ScienceDirect
+  title: Integrated narrow-band vegetation indices for prediction of
+    crop chlorophyll content for application to precision agriculture
+  type: article-journal
+  URL: "https://www.sciencedirect.com/science/article/pii/S0034425702000184"
+  volume: 81
 ...
