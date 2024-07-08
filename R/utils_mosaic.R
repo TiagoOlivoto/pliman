@@ -490,7 +490,6 @@ shapefile_build <- function(mosaic,
                             max_pixels = 1000000,
                             downsample = NULL,
                             quantiles =  c(0, 1)){
-
   if(terra::crs(mosaic) == ""){
     terra::crs(mosaic) <- terra::crs("EPSG:4326")
   }
@@ -626,7 +625,7 @@ shapefile_build <- function(mosaic,
     }
     edited <-
       mapedit::editFeatures(pg_edit, basemap) |>
-      dplyr::select(geometry, block, plot_id) |>
+      dplyr::select(geometry, block, plot_id, row, column) |>
       dplyr::mutate(unique_id = dplyr::row_number(), .before = 1) |>
       sf::st_transform(sf::st_crs(mosaic))
     sfeat <- sf::st_as_sf(edited)
@@ -910,9 +909,6 @@ mosaic_analyze <- function(mosaic,
       suppressWarnings(
         shapefile_build(mosaic,
                         basemap = basemap,
-                        r = r,
-                        g = g,
-                        b = b,
                         grid = grid,
                         nrow = nrow,
                         ncol = ncol,
@@ -1536,9 +1532,9 @@ mosaic_analyze <- function(mosaic,
       }
       vals <-
         vals |>
-        dplyr::nest_by(block, plot_id) |>
+        dplyr::nest_by(block, plot_id, row, column) |>
         dplyr::ungroup() |>
-        dplyr::left_join(plot_grid, by = dplyr::join_by(block, plot_id))
+        dplyr::left_join(plot_grid, by = dplyr::join_by(block, plot_id, row, column))
     } else{
       if(length(plot_index) == 1){
         if(ncol(vals) == 1){
@@ -3712,4 +3708,186 @@ sentinel_to_tif <- function(layers = NULL,
     destination = paste0(path, "/", destination),
     options = strsplit(paste("-co COMPRESS=DEFLATE", "-of GTiff"), split = "\\s")[[1]]
   )
+}
+
+#' Calculate Canopy Height Model and Volume
+#'
+#' This function calculates the canopy height model (CHM) and the volume for a
+#' given digital surface model (DSM) raster layer. Optionally, a digital terrain
+#' model (DTM) can be provided or interpolated using a set of points or a moving
+#' window.
+#'
+#' @param dsm A `SpatRaster` object representing the digital surface model. Must
+#'   be a single-layer raster.
+#' @param dtm (optional) A `SpatRaster` object representing the digital terrain
+#'   model. Must be a single-layer raster. If not provided, it can be
+#'   interpolated from points or created using a moving window.
+#' @param points (optional) An `sf` object representing sample points for DTM
+#'   interpolation. If provided, `dtm` will be interpolated using these points.
+#' @param interpolation (optional) A character string specifying the
+#'   interpolation method to use when `points` are provided. Options are
+#'   "Kriging" (default) or "Tps" (Thin Plate Spline).
+#' @param window_size An integer specifying the window size (meters) for creating a
+#'   DTM using a moving window. Default is 3.
+#' @param mask (optional) A `SpatRaster` object used to mask the CHM and volume
+#'   results. Default is NULL.
+#' @param mask_soil Is `mask` representing a soil mask (eg., removing plants)? Default is TRUE.
+#'
+#' @return A `SpatRaster` object with three layers: `dtm` (digital terrain
+#'   model), `height` (canopy height model), and `volume`.
+#'
+#' @details
+#' The function first checks if the input `dsm` is a valid single-layer
+#' `SpatRaster` object. If `dtm` is not provided, The function generates a
+#' Digital Terrain Model (DTM) from a Digital Surface Model (DSM) by
+#' downsampling and smoothing the input raster data. It iterates over the DSM
+#' matrix in windows of specified size, finds the minimum value within each
+#' window, and assigns these values to a downsampled matrix. After downsampling,
+#' the function applies a mean filter to smooth the matrix, enhancing the visual
+#' and analytical quality of the DTM. Afterwards, DTM is resampled with the
+#' original DSM.
+#'
+#' If both `dsm` and `dtm` are provided, the function ensures they have the same
+#' extent and number of cells, resampling `dtm` if necessary. The CHM is then
+#' calculated as the difference between `dsm` and `dtm`, and the volume is
+#' calculated by multiplying the CHM by the pixel size. The results are
+#' optionally masked using the provided `mask`.
+#'
+#' @importFrom fields Krig Tps
+#' @export
+
+mosaic_chm <- function(dsm,
+                       dtm = NULL,
+                       points = NULL,
+                       interpolation = c("Tps", "Kriging"),
+                       window_size = 10,
+                       mask = NULL,
+                       mask_soil = TRUE,
+                       verbose = TRUE){
+  sampp <- NULL
+  ch1 <- !inherits(dsm,"SpatRaster") || !terra::nlyr(dsm) == 1 || terra::is.bool(dsm) || is.list(dsm)
+  if(ch1){
+    stop("dsm must be single-layer SpatRaster objects")
+  }
+  # interpolate dtm using sample of points
+  if(is.null(dtm) & !is.null(points)){
+    # sampling points
+    points <- points |> sf::st_transform(sf::st_crs(dsm))
+    if(verbose){
+      cat("\014","\nExtracting values...\n")
+    }
+    vals <- terra::extract(dsm, terra::vect(points), xy = TRUE)
+    xy <- cbind(vals$x,vals$y)
+    z <- vals[, 2]
+    if(verbose){
+      cat("\014","\nInterpolating the raster...\n")
+    }
+    if(interpolation[[1]] == "Kriging"){
+      fit <- fields::Krig(xy, z, aRange=20)
+    }
+    if(interpolation[[1]] == "Tps"){
+      fit <- fields::Tps(xy, z)
+    }
+    sampp <- NULL
+    # low resolution to interpolate
+    aggr <- find_aggrfact(dsm, 4e5)
+    if(aggr > 0){
+      mosaicintp <- mosaic_aggregate(dsm, round(100 / aggr))
+    } else{
+      mosaicintp <- dsm
+    }
+    dtm <- terra::interpolate(terra::rast(mosaicintp), fit)
+    gc()
+    terra::crs(dtm) <- terra::crs(dsm)
+    if(verbose){
+      cat("\014","\nResampling and masking the interpolated raster...\n")
+    }
+    dtm <- terra::resample(dtm, dsm)
+    gc()
+    dtm <- terra::mask(dtm, dsm)
+  }
+  # create a dtm using a moving window that extract the minimum values
+  # from dsm
+  if(is.null(dtm) & is.null(points)){
+    resolu <- terra::res(dsm)
+    extens <- terra::ext(dsm)
+    wide <- extens[2] - extens[1]
+    nshapes <-ceiling( wide / window_size)
+    if(verbose){
+      cat("\014","\nExtracting minimum value for each moving window...\n")
+    }
+    shp <- shapefile_build(dsm,
+                           nrow = nshapes,
+                           ncol = nshapes,
+                           build_shapefile = FALSE,
+                           verbose = FALSE)
+    vals <- exactextractr::exact_extract(dsm,
+                                         shp[[1]],
+                                         fun = "min",
+                                         progress = FALSE)
+    gc()
+    cent <- suppressWarnings(sf::st_centroid(shp[[1]]))
+    sampp <-
+      cent |>
+      dplyr::mutate(dtm = vals) |>
+      dplyr::filter(!is.na(dtm))
+
+    xy <- sf::st_coordinates(sampp)
+    z <- sampp$dtm
+
+    if(verbose){
+      cat("\014","\nInterpolating the raster...\n")
+    }
+    if(interpolation[[1]] == "Kriging"){
+      fit <- suppressMessages(suppressWarnings(fields::Krig(xy, z, aRange=20)))
+    }
+    if(interpolation[[1]] == "Tps"){
+      fit <- fields::Tps(xy, z)
+    }
+
+    # low resolution to interpolate
+    aggr <- find_aggrfact(dsm, 4e5)
+    if(aggr > 0){
+      mosaicintp <- mosaic_aggregate(dsm, round(100 / aggr))
+    } else{
+      mosaicintp <- dsm
+    }
+    dtm <- terra::interpolate(terra::rast(mosaicintp), fit)
+    terra::crs(dtm) <- terra::crs(dsm)
+    if(verbose){
+      cat("\014","\nResampling and masking the interpolated raster...\n")
+    }
+    dtm <- terra::resample(dtm, dsm)
+    gc()
+    dtm <- terra::mask(dtm, dsm)
+    gc()
+  }
+  # now, create a chm
+  if(!is.null(dtm)){
+    ch2 <- !inherits(dtm,"SpatRaster") || !terra::nlyr(dtm) == 1 || terra::is.bool(dtm) || is.list(dtm)
+    if(ch2){
+      stop("dtm must be single-layer SpatRaster objects")
+    }
+    if((terra::ext(dsm) != terra::ext(dtm)) || (terra::ncell(dtm) != terra::ncell(dsm))){
+      dtm <- terra::resample(dtm, dsm)
+    }
+    if(verbose){
+      cat("\014","\nBuilding the digital terrain model...\n")
+    }
+    chm <- dsm - dtm
+    gc()
+    psize <- prod(terra::res(chm))
+    volume <- chm * psize
+    chm <- c(chm, volume)
+    gc()
+    if(!is.null(mask)){
+      if((terra::ext(mask) != terra::ext(dsm)) || (terra::ncell(mask) != terra::ncell(dsm))){
+        mask <- terra::resample(mask, dsm)
+      }
+      chm <- terra::mask(chm,  mask, maskvalues = mask_soil)
+    }
+    chm <- c(dtm, chm)
+    names(chm) <- c("dtm", "height", "volume")
+  }
+  return(list(chm = chm, sampling_points = sampp))
 }
