@@ -9,7 +9,7 @@ mosaic_chm(
   dtm = NULL,
   points = NULL,
   interpolation = c("Tps", "Kriging"),
-  window_size = 10,
+  window_size = c(10, 10),
   mask = NULL,
   mask_soil = TRUE,
   verbose = TRUE
@@ -30,8 +30,9 @@ interpolation. If provided, \code{dtm} will be interpolated using these points.}
 interpolation method to use when \code{points} are provided. Options are
 "Kriging" (default) or "Tps" (Thin Plate Spline).}
 
-\item{window_size}{An integer specifying the window size (meters) for creating a
-DTM using a moving window. Default is 3.}
+\item{window_size}{An integer  (meters) specifying the window size (rows and
+columns, respectively) for creating a DTM using a moving window. Default is
+c(10, 10).}
 
 \item{mask}{(optional) A \code{SpatRaster} object used to mask the CHM and volume
 results. Default is NULL.}

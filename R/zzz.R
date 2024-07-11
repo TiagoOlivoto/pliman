@@ -22,6 +22,15 @@
 #' * `soybean_touch.jpg` Soybean grains with a cyan background touching one each
 #' other.
 #' * `field_mosaic.jpg` An UVA image from a soybean field.
+#' @format `*.tif` format
+#'
+#' The following `.tif` files are provided as sample data, representing a slice
+#' from a large orthomosaic with soybean plots in the vegetative stage. These
+#' files were kindly provided by Arthur Bernardeli.
+#' - **`ortho.tif`**: An orthomosaic with soybean plots (5 rows and 3 columns).
+#' - **`dsm.tif`**: A digital surface model (DSM) for the soybean plots.
+#' - **`dtm.tif`**: A digital terrain model (DTM) for the area.
+#' - **`mask.tif`**: A mask that represents the soybean plants.
 #' @md
 #' @source Personal data, Gupta et al. (2020).
 #' @references Gupta, S., Rosenthal, D. M., Stinchcombe, J. R., & Baucom, R. S.

@@ -497,7 +497,7 @@ shapefile_build <- function(mosaic,
   nlyrs <- terra::nlyr(mosaic)
   if(build_shapefile){
     if(verbose){
-      cat("\014","\nBuilding the mosaic...\n")
+      message("\014","\nBuilding the mosaic...\n")
     }
     if(is.null(basemap)){
       basemap <- mosaic_view(mosaic,
@@ -564,7 +564,7 @@ shapefile_build <- function(mosaic,
 
   # check the created shapes?
   if(verbose){
-    cat("\014","\nCreating the shapes...\n")
+    message("\014","\nCreating the shapes...\n")
   }
   created_shapes <- list()
   for(k in 1:nrow(cpoints)){
@@ -605,7 +605,7 @@ shapefile_build <- function(mosaic,
   }
   if(check_shapefile){
     if(verbose){
-      cat("\014","\nChecking the built shapefile...\n")
+      message("\014","\nChecking the built shapefile...\n")
     }
     lengths <- sapply(created_shapes, nrow)
     pg_edit <-
@@ -633,7 +633,7 @@ shapefile_build <- function(mosaic,
     created_shapes <- split(sfeat, edited$block)
   }
   if(verbose){
-    cat("\014","\nShapefile finished...\n")
+    message("\014","\nShapefile finished...\n")
   }
   if(!as_sf){
     return(shapefile_input(created_shapes, info = FALSE, as_sf = FALSE))
@@ -884,7 +884,7 @@ mosaic_analyze <- function(mosaic,
   }
   nlyrs <- terra::nlyr(mosaic)
   if(verbose){
-    cat("\014","\nBuilding the mosaic...\n")
+    message("\014","\nBuilding the mosaic...\n")
   }
   if(is.null(basemap)){
     basemap <-
@@ -1022,7 +1022,7 @@ mosaic_analyze <- function(mosaic,
 
   if(is.null(indexes)){
     if(verbose){
-      cat("\014","\nComputing the indexes...\n")
+      message("\014","\nComputing the indexes...\n")
     }
     if(nlyrs > 1 | !all(plot_index %in% names(mosaiccr))){
       mind <- terra::rast(
@@ -1079,7 +1079,7 @@ mosaic_analyze <- function(mosaic,
       stop("Only `segment_plot` OR `segment_individuals` can be used", call. = FALSE)
     }
     if(verbose){
-      cat("\014","\nExtracting data from block", j, "\n")
+      message("\014","\nExtracting data from block", j, "\n")
     }
     if(inherits(created_shapes[[j]]$geometry, "sfc_POLYGON") & nrow(sf::st_coordinates(created_shapes[[j]]$geometry[[1]])) == 5 & grid[[j]]){
       plot_grid <- created_shapes[[j]]
@@ -1632,7 +1632,7 @@ mosaic_analyze <- function(mosaic,
 
   if(isTRUE(plot)){
     if(verbose){
-      cat("\014","\nPreparing to plot...\n")
+      message("\014","\nPreparing to plot...\n")
     }
     downsample <- find_aggrfact(mosaiccr, max_pixels = max_pixels)
     if(downsample > 0){
@@ -1700,7 +1700,7 @@ mosaic_analyze <- function(mosaic,
     mapindivid <- NULL
   }
   if(verbose){
-    cat("\014","Done!\n")
+    message("\014","Done!\n")
   }
   return(list(result_plot = results,
               result_plot_summ = result_plot_summ,
@@ -1769,7 +1769,7 @@ mosaic_analyze_iter <- function(mosaic,
   bind <- list()
   for (i in 1:nrow(shapefile)) {
     if(verbose){
-      cat("\014","\nAnalyzing plot", i, "\n")
+      message("\014","\nAnalyzing plot", i, "\n")
     }
     bind[[paste0("P", leading_zeros(i, 4))]] <-
       mosaic_analyze(terra::crop(mosaic, terra::vect(shapefile$geometry[[i]]) |> terra::ext()),
@@ -1831,7 +1831,7 @@ mosaic_analyze_iter <- function(mosaic,
 
   if(isTRUE(plot)){
     if(verbose){
-      cat("\014","\nPreparing to plot...\n")
+      message("\014","\nPreparing to plot...\n")
     }
     if(is.null(basemap)){
       if(terra::nlyr(mosaic) < 3){
@@ -1905,7 +1905,7 @@ mosaic_analyze_iter <- function(mosaic,
     mapindivid <- NULL
   }
   if(verbose){
-    cat("\014","\nDone", i, "\n")
+    message("\014","\nDone", i, "\n")
   }
   return(list(result_plot = result_plot,
               result_plot_summ = result_plot_summ,
@@ -3727,8 +3727,9 @@ sentinel_to_tif <- function(layers = NULL,
 #' @param interpolation (optional) A character string specifying the
 #'   interpolation method to use when `points` are provided. Options are
 #'   "Kriging" (default) or "Tps" (Thin Plate Spline).
-#' @param window_size An integer specifying the window size (meters) for creating a
-#'   DTM using a moving window. Default is 3.
+#' @param window_size An integer  (meters) specifying the window size (rows and
+#'   columns, respectively) for creating a DTM using a moving window. Default is
+#'   c(10, 10).
 #' @param mask (optional) A `SpatRaster` object used to mask the CHM and volume
 #'   results. Default is NULL.
 #' @param mask_soil Is `mask` representing a soil mask (eg., removing plants)? Default is TRUE.
@@ -3760,7 +3761,7 @@ mosaic_chm <- function(dsm,
                        dtm = NULL,
                        points = NULL,
                        interpolation = c("Tps", "Kriging"),
-                       window_size = 10,
+                       window_size = c(10, 10),
                        mask = NULL,
                        mask_soil = TRUE,
                        verbose = TRUE){
@@ -3774,19 +3775,19 @@ mosaic_chm <- function(dsm,
     # sampling points
     points <- points |> sf::st_transform(sf::st_crs(dsm))
     if(verbose){
-      cat("\014","\nExtracting values...\n")
+      message("\014","\nExtracting values...\n")
     }
     vals <- terra::extract(dsm, terra::vect(points), xy = TRUE)
     xy <- cbind(vals$x,vals$y)
     z <- vals[, 2]
     if(verbose){
-      cat("\014","\nInterpolating the raster...\n")
+      message("\014","\nInterpolating the raster...\n")
     }
     if(interpolation[[1]] == "Kriging"){
-      fit <- fields::Krig(xy, z, aRange=20)
+      fit <- suppressMessages(suppressWarnings(fields::Krig(xy, z, aRange=20)))
     }
     if(interpolation[[1]] == "Tps"){
-      fit <- fields::Tps(xy, z)
+      fit <- suppressMessages(suppressWarnings(fields::Tps(xy, z)))
     }
     sampp <- NULL
     # low resolution to interpolate
@@ -3800,7 +3801,7 @@ mosaic_chm <- function(dsm,
     gc()
     terra::crs(dtm) <- terra::crs(dsm)
     if(verbose){
-      cat("\014","\nResampling and masking the interpolated raster...\n")
+      message("\014","\nResampling and masking the interpolated raster...\n")
     }
     dtm <- terra::resample(dtm, dsm)
     gc()
@@ -3812,13 +3813,15 @@ mosaic_chm <- function(dsm,
     resolu <- terra::res(dsm)
     extens <- terra::ext(dsm)
     wide <- extens[2] - extens[1]
-    nshapes <-ceiling( wide / window_size)
+    heig <- extens[4] - extens[3]
+    nr <- ceiling( heig / window_size[[1]])
+    nc <- ceiling( wide / window_size[[2]])
     if(verbose){
-      cat("\014","\nExtracting minimum value for each moving window...\n")
+      message("\014","\nExtracting minimum value for each moving window...\n")
     }
     shp <- shapefile_build(dsm,
-                           nrow = nshapes,
-                           ncol = nshapes,
+                           nrow = nr,
+                           ncol = nc,
                            build_shapefile = FALSE,
                            verbose = FALSE)
     vals <- exactextractr::exact_extract(dsm,
@@ -3836,13 +3839,13 @@ mosaic_chm <- function(dsm,
     z <- sampp$dtm
 
     if(verbose){
-      cat("\014","\nInterpolating the raster...\n")
+      message("\014","\nInterpolating the raster...\n")
     }
     if(interpolation[[1]] == "Kriging"){
       fit <- suppressMessages(suppressWarnings(fields::Krig(xy, z, aRange=20)))
     }
     if(interpolation[[1]] == "Tps"){
-      fit <- fields::Tps(xy, z)
+      fit <- suppressMessages(suppressWarnings(fields::Tps(xy, z)))
     }
 
     # low resolution to interpolate
@@ -3855,7 +3858,7 @@ mosaic_chm <- function(dsm,
     dtm <- terra::interpolate(terra::rast(mosaicintp), fit)
     terra::crs(dtm) <- terra::crs(dsm)
     if(verbose){
-      cat("\014","\nResampling and masking the interpolated raster...\n")
+      message("\014","\nResampling and masking the interpolated raster...\n")
     }
     dtm <- terra::resample(dtm, dsm)
     gc()
@@ -3872,7 +3875,7 @@ mosaic_chm <- function(dsm,
       dtm <- terra::resample(dtm, dsm)
     }
     if(verbose){
-      cat("\014","\nBuilding the digital terrain model...\n")
+      message("\014","\nBuilding the digital terrain model...\n")
     }
     chm <- dsm - dtm
     gc()
@@ -3889,5 +3892,93 @@ mosaic_chm <- function(dsm,
     chm <- c(dtm, chm)
     names(chm) <- c("dtm", "height", "volume")
   }
-  return(list(chm = chm, sampling_points = sampp))
+  if(verbose){
+    message("\014","\nDone!\n")
+  }
+  return(list(chm = chm, sampling_points = sampp, mask = ifelse(is.null(mask), FALSE, TRUE)))
+}
+
+#' Extract Canopy Height and Volume
+#'
+#' This function extracts canopy height and volume metrics for given plots
+#' within a specified shapefile.
+#' @param chm A list object containing the Canopy Height Model (CHM) generated
+#'   by the [mosaic_chm()] function.
+#' @param shapefile An `sf` object representing the plot boundaries for which
+#'   the metrics will be extracted.
+#'
+#' @return A `sf` object with extracted metrics including minimum, 10th
+#'   percentile, median (50th percentile), 90th percentile, interquartile range
+#'   (IQR), mean, maximum canopy height, coefficient of variation (CV) of canopy
+#'   height, canopy height entropy, total volume, covered area, plot area, and
+#'   coverage percentage. Centroid coordinates (x, y) of each plot are also
+#'   included.
+#' @details
+#' The function uses the `exactextractr` package to extract canopy height and
+#' volume metrics from the CHM. For each plot in the shapefile, the function
+#' computes various statistics on the canopy height values (e.g., min, max,
+#' percentiles, mean, CV, entropy) and sums the volume values. If a mask was
+#' applied in the CHM calculation, the covered area and plot area are also
+#' computed.
+#' @export
+mosaic_chm_extract <- function(chm, shapefile){
+  custom_summary <- function(values, coverage_fractions, ...) {
+    valids <- na.omit(values)
+    entropy <- function(values) {
+      freq <- table(round(values, 2))
+      prob <- freq / sum(freq)
+      entropy <- -sum(prob * log(prob))
+      return(entropy)
+    }
+    quantiles <- quantile(valids, c(0.1, 0.5, 0.9))
+    data.frame(
+      min = min(valids),
+      q10 = quantiles[[1]],
+      q50 = quantiles[[2]],
+      q90 = quantiles[[3]],
+      iqr = IQR(valids),
+      mean = sum(valids) / length(valids),
+      max = max(valids),
+      cv = sd(valids) / mean(valids),
+      entropy = entropy(valids)
+    )
+  }
+  height <- exactextractr::exact_extract(chm$chm[[2]],
+                                         shapefile,
+                                         fun = custom_summary,
+                                         force_df = TRUE,
+                                         progress = FALSE)
+  vol <- exactextractr::exact_extract(chm$chm[[3]],
+                                      shapefile,
+                                      fun = "sum",
+                                      force_df = TRUE,
+                                      progress = FALSE)
+  names(vol) <- c("volume")
+
+  # include check here if mask is not present
+  if(chm$mask){
+    area <- exactextractr::exact_extract(chm$chm[[3]],
+                                         shapefile,
+                                         coverage_area = TRUE,
+                                         force_df = TRUE,
+                                         progress = FALSE)
+    covered_area <-
+      purrr::map_dfr(area, function(x){
+        data.frame(covered_area = sum(na.omit(x)[, 2]),
+                   plot_area = sum(x[, 2]))
+      }) |>
+      dplyr::mutate(coverage = covered_area / plot_area)
+  } else{
+    area <- as.numeric(sf::st_area(shapefile))
+    covered_area <- data.frame(covered_area = area,
+                               plot_area = area,
+                               coverage = 1)
+  }
+  centroids <- suppressWarnings(sf::st_centroid(shapefile)) |> sf::st_coordinates()
+  colnames(centroids) <- c("x", "y")
+  dftmp <-
+    dplyr::bind_cols(height, vol, covered_area, centroids, shapefile) |>
+    sf::st_as_sf() |>
+    dplyr::relocate(unique_id, block, plot_id, row, column, x, y, .before = 1)
+  return(dftmp)
 }

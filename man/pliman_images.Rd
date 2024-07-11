@@ -29,6 +29,18 @@ al. (2020).
 other.
 \item \code{field_mosaic.jpg} An UVA image from a soybean field.
 }
+
+\verb{*.tif} format
+
+The following \code{.tif} files are provided as sample data, representing a slice
+from a large orthomosaic with soybean plots in the vegetative stage. These
+files were kindly provided by Arthur Bernardeli.
+\itemize{
+\item \strong{\code{ortho.tif}}: An orthomosaic with soybean plots (5 rows and 3 columns).
+\item \strong{\code{dsm.tif}}: A digital surface model (DSM) for the soybean plots.
+\item \strong{\code{dtm.tif}}: A digital terrain model (DTM) for the area.
+\item \strong{\code{mask.tif}}: A mask that represents the soybean plants.
+}
 }
 \source{
 Personal data, Gupta et al. (2020).
