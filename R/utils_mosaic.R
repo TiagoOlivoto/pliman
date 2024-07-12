@@ -2215,7 +2215,12 @@ mosaic_input <- function(mosaic,
                          check_16bits = FALSE,
                          check_datatype = FALSE,
                          ...){
+
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
+  if(terra::is.lonlat(mosaic)){
+    eps <- mosaic_epsg(mosaic)
+    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the mosaic_analyze() function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
+  }
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
@@ -3981,4 +3986,116 @@ mosaic_chm_extract <- function(chm, shapefile){
     sf::st_as_sf() |>
     dplyr::relocate(unique_id, block, plot_id, row, column, x, y, .before = 1)
   return(dftmp)
+}
+#' Determine EPSG Code for a Mosaic
+#'
+#' This function calculates the EPSG code for a given mosaic based on its
+#' geographic extent.
+#'
+#' @param mosaic A raster object representing the mosaic for which the EPSG code
+#'   is to be determined.
+#'
+#' @return A character string representing the EPSG code corresponding to the
+#'   UTM zone and hemisphere of the mosaic's centroid. If the mosaic is not in
+#'   the lon/lat coordinate system, a warning is issued.
+#'
+#' @details The function calculates the centroid of the mosaic's extent,
+#'   determines the UTM zone based on the centroid's longitude, and identifies
+#'   the hemisphere based on the centroid's latitude. The EPSG code is then
+#'   constructed accordingly.
+#'
+#' @examples
+#' \dontrun{
+#' library(pliman)
+#' library(terra)
+#'
+#' # Create a sample mosaic
+#' mosaic <- rast(nrow=10, ncol=10, xmin=-120, xmax=-60, ymin=30, ymax=60)
+#'
+#' # Get the EPSG code for the mosaic
+#' mosaic_epsg(mosaic)
+#' }
+#'
+#' @export
+mosaic_epsg <- function(mosaic) {
+  if(terra::is.lonlat(mosaic)){
+    extens <- terra::ext(mosaic)
+    latitude <- mean(c(extens[3], extens[4]))
+    longitude <- mean(c(extens[1], extens[2]))
+    utm_zone <- floor((longitude + 180) / 6) + 1
+    hemisphere <- ifelse(latitude >= 0, "N", "S")
+    epsg_code <- if (hemisphere == "N") {
+      32600 + utm_zone
+    } else {
+      32700 + utm_zone
+    }
+    return(paste0("EPSG:", epsg_code))
+  } else{
+    warning("`mosaic` is not in the lon/lat coordinate system.")
+  }
+}
+
+#' Project a Mosaic to a New Coordinate Reference System (CRS)
+#'
+#' This function projects a given mosaic to a specified CRS.
+#'
+#' @param mosaic A raster object representing the mosaic to be projected.
+#' @param y The target CRS to which the mosaic should be projected. This can be
+#'   specified in various formats accepted by the [terra::project()] function.
+#' @param ... Additional arguments passed to the [terra::project()] function.
+#'
+#' @return A raster object representing the projected mosaic.
+#'
+#' @examples
+#' \dontrun{
+#' library(terra)
+#' library(pliman)
+#'
+#' # Create a sample mosaic
+#' mosaic <- rast(nrow=10, ncol=10, xmin=-120, xmax=-60, ymin=30, ymax=60)
+#' mosaic
+#' # Define target CRS (EPSG code for WGS 84 / UTM zone 33N)
+#' target_crs <- "EPSG:32633"
+#'
+#' # Project the mosaic
+#' projected_mosaic <- mosaic_project(mosaic, "EPSG:32633")
+#' projected_mosaic
+#' }
+#'
+#' @export
+mosaic_project <- function(mosaic, y, ...){
+  return(terra::project(mosaic, y, ...))
+}
+
+#' Project a Mosaic from Lon/Lat to EPSG-based CRS
+#'
+#' This function projects a given mosaic from the lon/lat coordinate system to
+#' an EPSG-based CRS determined by the mosaic's extent.
+#'
+#' @param mosaic A raster object representing the mosaic to be projected. The
+#'   mosaic must be in the lon/lat coordinate system.
+#'
+#' @return A raster object representing the projected mosaic. If the mosaic is
+#'   not in the lon/lat coordinate system, a warning is issued.
+#'
+#' @examples
+#' \dontrun{
+#' library(terra)
+#' library(pliman)
+#'
+#' # Create a sample mosaic
+#' mosaic <- rast(nrow=10, ncol=10, xmin=-120, xmax=-60, ymin=30, ymax=60)
+#'
+#' # Project the mosaic to the appropriate UTM zone
+#' mosaic_lonlat2epsg(mosaic)
+#' }
+#'
+#' @export
+mosaic_lonlat2epsg <- function(mosaic){
+  if(terra::is.lonlat(mosaic)){
+    epsg <- mosaic_epsg(mosaic)
+    return(terra::project(mosaic, epsg))
+  } else{
+    warning("`mosaic` is not in the lon/lat coordinate system.")
+  }
 }
