@@ -2219,7 +2219,7 @@ mosaic_input <- function(mosaic,
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
   if(terra::is.lonlat(mosaic)){
     eps <- mosaic_epsg(mosaic)
-    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the mosaic_analyze() function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
+    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the `mosaic_analyze()` function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
   }
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
@@ -3476,9 +3476,9 @@ mosaic_draw <- function(mosaic,
 
   if(inherits(polygons, "sfc_LINESTRING")){
     vals <-
-      terra::extract(x = mind,
-                     y = polygons_ext,
-                     fun = summarize_fun)
+      terra::extractAlong(x = mind,
+                          y = polygons_ext,
+                          ID = FALSE)
     coords <- as.matrix(polygons_spv[[1]])
     n <- nrow(coords)
     distances <- NULL
