@@ -2217,13 +2217,13 @@ mosaic_input <- function(mosaic,
                          ...){
 
   mosaic <- suppressWarnings(terra::rast(mosaic, ...))
-  if(terra::is.lonlat(mosaic)){
-    eps <- mosaic_epsg(mosaic)
-    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the `mosaic_analyze()` function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
-  }
   if(terra::crs(mosaic) == ""){
     message("Missing Coordinate Reference System. Setting to EPSG:3857")
     terra::crs(mosaic) <- terra::crs("EPSG:3857")
+  }
+  if(terra::is.lonlat(mosaic)){
+    eps <- mosaic_epsg(mosaic)
+    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the `mosaic_analyze()` function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
   }
   if(check_16bits | check_datatype){
     cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
