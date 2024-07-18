@@ -4,10 +4,21 @@
 \alias{mosaic_plot}
 \title{A wrapper around terra::plot()}
 \usage{
-mosaic_plot(mosaic, ...)
+mosaic_plot(
+  mosaic,
+  col = custom_palette(c("red", "yellow", "forestgreen"), n = 200),
+  smooth = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mosaic}{SpatRaster}
+
+\item{col}{character vector to specify the colors to use. Defaults to
+\code{custom_palette(c("red", "yellow", "forestgreen"))}.}
+
+\item{smooth}{logical. If TRUE (default) the cell values are smoothed (only
+if a continuous legend is used).}
 
 \item{...}{Further arguments passed on to \code{\link[terra:plot]{terra::plot()}}.}
 }

@@ -7,6 +7,7 @@
 \usage{
 mosaic_input(
   mosaic,
+  mosaic_pattern = NULL,
   info = TRUE,
   check_16bits = FALSE,
   check_datatype = FALSE,

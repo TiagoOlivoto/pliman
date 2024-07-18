@@ -2211,54 +2211,73 @@ mosaic_view <- function(mosaic,
 #' list.files(tempdir())
 #'
 mosaic_input <- function(mosaic,
+                         mosaic_pattern = NULL,
                          info = TRUE,
                          check_16bits = FALSE,
                          check_datatype = FALSE,
                          ...){
-
-  mosaic <- suppressWarnings(terra::rast(mosaic, ...))
-  if(terra::crs(mosaic) == ""){
-    message("Missing Coordinate Reference System. Setting to EPSG:3857")
-    terra::crs(mosaic) <- terra::crs("EPSG:3857")
-  }
-  if(terra::is.lonlat(mosaic)){
-    eps <- mosaic_epsg(mosaic)
-    warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the `mosaic_analyze()` function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
-  }
-  if(check_16bits | check_datatype){
-    cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
-    a <- na.omit(unlist(terra::extract(mosaic, cels)))
-    a <- a[!is.infinite(a)]
-    if(inherits(a, "numeric")){
-      if(check_datatype){
-        if(length(a[a - floor(a) != 0]) == 0){
-          minv <- min(a)
-          maxv <- max(a)
-          if(all(minv >= 0) & all(maxv <= 255)){
-            datatype <- "INT1U"
+  if(!is.null(mosaic_pattern)){
+    if(mosaic_pattern %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")){
+      mosaic_pattern <- "^[0-9].*$"
+    }
+    path <- getwd()
+    imgs <- list.files(pattern = mosaic_pattern, path)
+    if(length(grep(mosaic_pattern, imgs)) == 0){
+      stop(paste("'", mosaic_pattern, "' mosaic_pattern not found in '",
+                 paste0(dir)),
+           call. = FALSE)
+    }
+    list_img <-
+      lapply(imgs, function(x){
+        mosaic_input(x, info = FALSE)
+      })
+    names(list_img) <- imgs
+    invisible(list_img)
+  } else{
+    mosaic <- suppressWarnings(terra::rast(mosaic, ...))
+    if(terra::crs(mosaic) == ""){
+      message("Missing Coordinate Reference System. Setting to EPSG:3857")
+      terra::crs(mosaic) <- terra::crs("EPSG:3857")
+    }
+    if(terra::is.lonlat(mosaic)){
+      eps <- mosaic_epsg(mosaic)
+      warning(paste0("The current raster is in the lat/lon coordinate system, which may result in processing errors when trying to segment individuals in the `mosaic_analyze()` function. It is highly suggested to reproject the raster using mosaic_project() with ", eps), call. = FALSE)
+    }
+    if(check_16bits | check_datatype){
+      cels <- sample(1:terra::ncell(mosaic), 2000, replace = TRUE)
+      a <- na.omit(unlist(terra::extract(mosaic, cels)))
+      a <- a[!is.infinite(a)]
+      if(inherits(a, "numeric")){
+        if(check_datatype){
+          if(length(a[a - floor(a) != 0]) == 0){
+            minv <- min(a)
+            maxv <- max(a)
+            if(all(minv >= 0) & all(maxv <= 255)){
+              datatype <- "INT1U"
+            } else{
+              datatype <- "INT2U"
+            }
           } else{
-            datatype <- "INT2U"
+            datatype <- "FLT4S"
           }
-        } else{
-          datatype <- "FLT4S"
+          dtterra <- terra::datatype(mosaic)[[1]]
+          if(datatype != dtterra){
+            warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
+                          ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
+          }
         }
-        dtterra <- terra::datatype(mosaic)[[1]]
-        if(datatype != dtterra){
-          warning(paste("Based on the mosaic values, the datatype should be", datatype, "but it is ", dtterra,
-                        ". Consider exporting it with `mosaic_export()` to assign the suggested datatype, which can save file size and memory usage during index computation. "))
-        }
-      }
-      if(check_16bits){
-        if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
-          mosaic[mosaic == 65535] <- NA
+        if(check_16bits){
+          if(max(suppressWarnings(terra::minmax(mosaic)), na.rm = TRUE) == 65535){
+            mosaic[mosaic == 65535] <- NA
+          }
         }
       }
     }
+    if(info){
+      print(mosaic)
+    }
+    return(mosaic)
   }
-  if(info){
-    print(mosaic)
-  }
-  return(mosaic)
 }
 
 #' @export
@@ -2398,7 +2417,11 @@ mosaic_aggregate <- function(mosaic,
 #' Plot the values of a SpatRaster
 #'
 #' @param mosaic SpatRaster
+#' @param col character vector to specify the colors to use. Defaults to
+#'   `custom_palette(c("red", "yellow", "forestgreen"))`.
 #' @param ... Further arguments passed on to [terra::plot()].
+#' @param smooth logical. If TRUE (default) the cell values are smoothed (only
+#'   if a continuous legend is used).
 #'
 #' @return A `NULL` object
 #' @export
@@ -2407,11 +2430,17 @@ mosaic_aggregate <- function(mosaic,
 #' library(pliman)
 #' r <- mosaic_input(system.file("ex/elev.tif", package="terra"))
 #' mosaic_plot(r)
-mosaic_plot <- function(mosaic, ...){
+mosaic_plot <- function(mosaic,
+                        col = custom_palette(c("red", "yellow", "forestgreen"), n = 200),
+                        smooth = TRUE,
+                        ...){
   if(!inherits(mosaic, "SpatRaster")){
     stop("'mosaic' must be an object of class 'SpatRaster'")
   }
-  terra::plot(mosaic, ...)
+  terra::plot(mosaic,
+              col = col,
+              smooth = smooth,
+              ...)
 }
 
 #' A wrapper around terra::hist()
@@ -2903,7 +2932,7 @@ mosaic_index <- function(mosaic,
     }
   }
   if(plot){
-    terra::plot(mosaic_gray)
+    mosaic_plot(mosaic_gray)
   }
   invisible(mosaic_gray)
 }
@@ -4098,4 +4127,33 @@ mosaic_lonlat2epsg <- function(mosaic){
   } else{
     warning("`mosaic` is not in the lon/lat coordinate system.")
   }
+}
+
+#' Extract Values from a Raster Mosaic Using a Shapefile
+#'
+#' This function extracts values from a raster mosaic based on the regions
+#' defined in a shapefile using [exactextractr::exact_extract()].
+#'
+#' @param mosaic A `SpatRaster` object representing the raster mosaic from which
+#'   values will be extracted.
+#' @param shapefile A shapefile, which can be a `SpatVector` or an `sf` object,
+#'   defining the regions of interest for extraction.
+#' @param fun A character string specifying the summary function to be used for
+#'   extraction. Default is `"median"`.
+#' @param ... Additional arguments to be passed to `exact_extract` function from the `exactextractr` package.
+#' @return A data frame containing the extracted values for each region defined in the shapefile.
+#' @export
+#'
+mosaic_extract <- function(mosaic,
+                          shapefile,
+                          fun = "median",
+                          ...){
+  if(inherits(shapefile, "SpatVector")){
+    shapefile <- sf::st_as_sf(shapefile)
+  }
+  exactextractr::exact_extract(ndvis[[1]],
+                               shapefile,
+                               fun = fun,
+                               force_df = TRUE,
+                               ...)
 }
