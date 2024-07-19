@@ -16,7 +16,7 @@ defining the regions of interest for extraction.}
 \item{fun}{A character string specifying the summary function to be used for
 extraction. Default is \code{"median"}.}
 
-\item{...}{Additional arguments to be passed to \code{exact_extract} function from the \code{exactextractr} package.}
+\item{...}{Additional arguments to be passed to \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract()}}.}
 }
 \value{
 A data frame containing the extracted values for each region defined in the shapefile.

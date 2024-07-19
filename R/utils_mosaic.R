@@ -4140,18 +4140,18 @@ mosaic_lonlat2epsg <- function(mosaic){
 #'   defining the regions of interest for extraction.
 #' @param fun A character string specifying the summary function to be used for
 #'   extraction. Default is `"median"`.
-#' @param ... Additional arguments to be passed to `exact_extract` function from the `exactextractr` package.
+#' @param ... Additional arguments to be passed to [exactextractr::exact_extract()].
 #' @return A data frame containing the extracted values for each region defined in the shapefile.
 #' @export
 #'
 mosaic_extract <- function(mosaic,
-                          shapefile,
-                          fun = "median",
-                          ...){
+                           shapefile,
+                           fun = "median",
+                           ...){
   if(inherits(shapefile, "SpatVector")){
     shapefile <- sf::st_as_sf(shapefile)
   }
-  exactextractr::exact_extract(ndvis[[1]],
+  exactextractr::exact_extract(mosaic,
                                shapefile,
                                fun = fun,
                                force_df = TRUE,
