@@ -12,7 +12,7 @@ Description: Tools for single or batch image manipulation and analysis as
     Claude (2008) <doi:10.1007/978-0-387-77789-4>. Additionally, the
     package includes tools for analyzing RGB, multispectral, or hyperspectral 
     orthomosaics, which enables high throughput field phenotyping using UVAs- 
-    or satelite-based imagery.
+    or satelite-based imagery
 License: GPL (>= 3)
 URL: https://tiagoolivoto.github.io/pliman/, https://github.com/TiagoOlivoto/pliman
 BugReports: https://github.com/TiagoOlivoto/pliman/issues
